@@ -6,7 +6,7 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 
 > **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm.
 
-![Disk Cleanup, Smart Scan](docs/smart.png)
+![Disk Cleanup, Smart Scan](docs/smart.jpg)
 
 ## Features
 
@@ -26,9 +26,9 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 
 | Space Lens (Golden Gate theme) | Settings (Burgundy theme) |
 |---|---|
-| ![Space Lens](docs/lens.png) | ![Settings](docs/settings.png) |
+| ![Space Lens](docs/lens.jpg) | ![Settings](docs/settings.jpg) |
 | **Contact (Pride theme)** | **App icon follows the theme** |
-| ![Contact](docs/contact.png) | ![Icons](docs/icons.png) |
+| ![Contact](docs/contact.jpg) | ![Icons](docs/icons.png) |
 
 Menu bar indicator at different free-space levels:
 
