@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
-var tmC=null;try{tmC=localStorage.getItem('tm-consent')}catch(e){}
+var tmC=null;try{tmC=localStorage.getItem('tm-consent');var nt=new URLSearchParams(location.search).get('notrack');if(nt==='1')localStorage.setItem('tm-notrack','1');if(nt==='0')localStorage.removeItem('tm-notrack');if(localStorage.getItem('tm-notrack')==='1')window['ga-disable-G-19HEJDJPN3']=true}catch(e){}
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:tmC==='yes'?'granted':'denied',wait_for_update:500});
 gtag('js',new Date());gtag('config','G-19HEJDJPN3');
 </script>
