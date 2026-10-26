@@ -1,8 +1,8 @@
-# Disk Cleanup
+# Tidymint
 
-A free, open-source disk cleaner for macOS, built for people who work with AI tools.
+**Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac.
 
-AI work leaves a lot behind: model files, drafts, exported images, duplicate assets, caches from browsers and editors. Disk Cleanup finds that clutter, shows exactly what it is, and moves only what you select to the Trash.
+AI work leaves a lot behind: model files, drafts, exported images, duplicate assets, caches from browsers and editors. Tidymint finds that clutter, shows exactly what it is, and moves only what you select to the Trash.
 
 > **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm.
 
@@ -56,7 +56,7 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance |
 | **Contact** | Send feedback or bug reports from inside the app |
 
-Also: English and Vietnamese, four colour themes (Night Sky, Burgundy, Golden Gate, Pride) with a matching app icon, an Ignore list, and alerts when disk space or memory runs low.
+Also: English and Vietnamese, five colour themes (Mint, Night Sky, Burgundy, Golden Gate, Pride) with a matching app icon, an Ignore list, and alerts when disk space or memory runs low.
 
 ## Install
 
@@ -65,14 +65,14 @@ Also: English and Vietnamese, four colour themes (Night Sky, Burgundy, Golden Ga
 Requirements: macOS 14 or later, Xcode Command Line Tools (`xcode-select --install`).
 
 ```bash
-git clone https://github.com/HaiTrung-Workspace/disk-cleanup.git
-cd disk-cleanup
+git clone https://github.com/HaiTrung-Workspace/tidymint.git
+cd tidymint
 ./build.sh --install
 ```
 
 ### First launch
 
-1. Open **Disk Cleanup** from Applications.
+1. Open **Tidymint** from Applications.
 2. Grant **Full Disk Access** in System Settings > Privacy & Security > Full Disk Access, so the app can measure every folder. Without it, some folders show as empty.
 3. Optional: in **Settings**, add your **project folders** (code, AI workspaces). Drafts are found there, duplicates there are never pre-selected, and links are checked there before deleting.
 
@@ -87,7 +87,7 @@ defaults write com.haitrung.diskcleanup protectedKeywords -array "my-profile-fol
 ## Where data is stored
 
 - Settings: `~/Library/Preferences/com.haitrung.diskcleanup.plist`
-- Activity log: `~/Library/Application Support/Disk Cleanup/activity.log`
+- Activity log: `~/Library/Application Support/Tidymint/activity.log`
 
 The app works offline. It sends nothing anywhere unless you choose to send feedback or join the newsletter. See [PRIVACY.md](PRIVACY.md).
 
@@ -105,4 +105,4 @@ MIT. See [LICENSE](LICENSE). The software is provided "as is", without warranty 
 
 ## Tiếng Việt
 
-**Disk Cleanup** là app dọn ổ đĩa miễn phí, mã nguồn mở cho macOS, dành cho người làm việc với AI. App chỉ chuyển file vào Thùng rác, không xoá vĩnh viễn. Cài đặt: chạy `./build.sh --install`, cấp quyền **Truy cập toàn bộ ổ đĩa**, rồi thêm **thư mục dự án** trong phần Cài đặt. Giao diện có tiếng Việt, tự chọn theo ngôn ngữ của máy.
+**Tidymint** là app dọn ổ đĩa miễn phí, thay thế CleanMyMac mà không cần crack, mã nguồn mở cho macOS, dành cho người làm việc với AI. App chỉ chuyển file vào Thùng rác, không xoá vĩnh viễn. Cài đặt: chạy `./build.sh --install`, cấp quyền **Truy cập toàn bộ ổ đĩa**, rồi thêm **thư mục dự án** trong phần Cài đặt. Giao diện có tiếng Việt, tự chọn theo ngôn ngữ của máy.
