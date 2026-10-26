@@ -174,7 +174,9 @@ def sitemap(guides):
             '<xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/>'
             '<xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>' % today]
     rows += ['  <url><loc>https://tidymint.app/guides/</loc><lastmod>%s</lastmod></url>' % today,
-             '  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>%s</lastmod></url>' % today]
+             '  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>%s</lastmod></url>' % today,
+             '  <url><loc>https://tidymint.app/changelog/</loc><lastmod>%s</lastmod></url>' % today,
+             '  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>%s</lastmod></url>' % today]
     for g in guides:
         pre = "vi/" if g["lang"] == "vi" else ""
         rows.append('  <url><loc>https://tidymint.app/%s%s/</loc><lastmod>%s</lastmod></url>' % (pre, g["slug"], g["date"]))
@@ -202,7 +204,31 @@ def hubpage(k):
              body='<div class="rel">%s</div>' % cards, alt=("guides" if k == "vi" else "huong-dan"))
     return h
 
+CL = {
+ "vi": dict(slug="lich-su-cap-nhat", title="Lịch sử cập nhật Tidymint", crumb="Lịch sử cập nhật",
+            h1="Lịch sử cập nhật", desc="Những gì thay đổi qua từng bản Tidymint, bản mới nhất ở trên cùng.",
+            next="Đang làm cho bản", dl="Tải bản mới nhất", alt="changelog"),
+ "en": dict(slug="changelog", title="Tidymint Changelog", crumb="Changelog",
+            h1="Changelog", desc="What changed in each Tidymint release, newest first.",
+            next="In progress for", dl="Download the latest", alt="lich-su-cap-nhat"),
+}
+def changelogpage(k):
+    import changelog as CLG
+    h = dict(CL[k]); parts = []
+    for r in CLG.RELEASES:
+        head = "%s %s" % (h["next"], r["ver"]) if r["status"] == "next" else "%s <span class=\"small\">(%s)</span>" % (r["ver"], r["date"])
+        parts.append("<h2>%s</h2><ul>%s</ul>" % (head, "".join("<li>%s</li>" % x for x in r[k])))
+    body = "".join(parts) + '<p><a class="btn" href="%s">%s</a></p>' % (S.DL, h["dl"])
+    dates = [r["date"] for r in CLG.RELEASES if r["date"]]
+    h.update(lang=k, date=max(dates), hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body, lead="")
+    return h
+
 if __name__ == "__main__":
+    for k in ("vi", "en"):
+        h = changelogpage(k)
+        out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        open(out, "w").write(guide(h)); print("wrote", os.path.relpath(out, ROOT))
     for k in ("vi", "en"):
         h = hubpage(k)
         out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
