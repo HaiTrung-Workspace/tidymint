@@ -20,7 +20,7 @@ html{scroll-behavior:smooth}
 body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:radial-gradient(1200px 600px at 80% -10%,#145c4766,transparent),linear-gradient(180deg,var(--bg),var(--bg2) 60%,var(--bg))}
 a{color:var(--leaf);text-decoration:none}a:hover{text-decoration:underline}
 .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;position:sticky;top:0;z-index:10;background:#06150fcc;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 100vmax #06150fcc;clip-path:inset(0 -100vmax)}.navr{display:flex;align-items:center;gap:22px}.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
 .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--text)}
 .brand img{width:36px;height:36px}
 nav .links{display:flex;gap:22px;font-size:15px}nav .links a{color:var(--sub)}
@@ -63,7 +63,7 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-siz
 <div class="wrap">
 <nav>
   <a class="brand" href="./"><img src="../icon.png" alt="">Tidymint</a>
-  <div class="links"><a href="#tinh-nang">Tính năng</a><a href="#an-toan">An toàn</a><a href="#cai-dat">Cài đặt</a><a href="../">English</a></div>
+  <div class="navr"><div class="links"><a href="#tinh-nang">Tính năng</a><a href="#an-toan">An toàn</a><a href="#cai-dat">Cài đặt</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><div class="lang" role="group" aria-label="Ngôn ngữ"><a class="on" href="./" data-l="vi">VI</a><a href="../" data-l="en">EN</a></div></div>
 </nav>
 
 <header class="hero">
@@ -162,6 +162,9 @@ document.getElementById('f').addEventListener('submit', async (e) => {
     msg.textContent = 'Cảm ơn bạn! Đã đăng ký.'; e.target.reset();
   } catch (err) { msg.textContent = 'Chưa gửi được, bạn thử lại sau nhé.'; }
 });
+</script>
+<script>
+document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
 </script>
 </body>
 </html>
