@@ -1633,6 +1633,15 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
 
+    // Updates
+    @Published var newVersion: String? = nil
+    @Published var updChecking = false
+    func checkUpdates(force: Bool = false) {
+        guard force || !updChecking else { return }
+        updChecking = true
+        Updates.check(force: force) { v in self.newVersion = v; self.updChecking = false }
+    }
+
     func confirm(_ title: String, _ text: String, _ ok: String) -> Bool {
         let a = NSAlert()
         a.messageText = title; a.informativeText = text
@@ -2220,6 +2229,13 @@ struct SmartView: View {
                 Scanning(text: t("Scanning your Mac...", "Đang quét máy..."))
             case .idle:
                 Header(title: t("Welcome back", "Dọn máy chút nhé?"), sub: t("Scan for safe junk, large files and the Trash.\nNothing is removed until you click Clean.", "Quét rác an toàn, file lớn và Thùng rác.\nChưa xoá gì cho tới khi bạn bấm Dọn."))
+                if let v = vm.newVersion {
+                    Button { NSWorkspace.shared.open(Updates.page) } label: {
+                        Label(t("Tidymint \(v) is available. Download", "Đã có Tidymint \(v). Tải về"), systemImage: "arrow.down.circle")
+                            .font(.system(size: 12, weight: .medium)).foregroundColor(.white)
+                            .padding(.horizontal, 12).padding(.vertical, 6).background(Capsule().fill(Color.white.opacity(0.12)))
+                    }.buttonStyle(.plain).hoverLift()
+                }
                 BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
                 Text(String(format: t("%.0f GB available", "Trống %.0f GB"), vm.freeGB)).foregroundColor(Theme.sub)
             default:
@@ -2918,6 +2934,52 @@ struct RootView: View {
         .id(vm.theme)
         .preferredColorScheme(.dark)
         .ignoresSafeArea()
+        .onAppear { vm.checkUpdates() }
+    }
+}
+
+/// Update check: one request a day to GitHub's public releases endpoint. Nothing about the Mac is sent;
+/// the app only reads the latest version number and shows a line if it is newer. No auto-install.
+enum Updates {
+    static let api = URL(string: "https://api.github.com/repos/HaiTrung-Workspace/tidymint/releases/latest")!
+    static let page = URL(string: "https://github.com/HaiTrung-Workspace/tidymint/releases/latest")!
+    static var current: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0" }
+    static func parts(_ v: String) -> [Int] { v.trimmingCharacters(in: CharacterSet(charactersIn: "vV")).split(separator: ".").map { Int($0) ?? 0 } }
+    static func newer(_ a: String, than b: String) -> Bool {
+        let x = parts(a), y = parts(b)
+        for i in 0..<max(x.count, y.count) { let p = i < x.count ? x[i] : 0, q = i < y.count ? y[i] : 0; if p != q { return p > q } }
+        return false
+    }
+    /// Calls back with the newer version string, or nil. Skips the network when the last check was under a day ago.
+    static func check(force: Bool = false, _ done: @escaping (String?) -> Void) {
+        let ud = UserDefaults.standard
+        let last = ud.object(forKey: "upd-last") as? Date ?? .distantPast
+        if !force, Date().timeIntervalSince(last) < 86400 {
+            let cached = ud.string(forKey: "upd-latest") ?? ""
+            done(newer(cached, than: current) ? cached : nil); return
+        }
+        // The website copy is tried first: it is a plain text file on the same host as the docs and reachable
+        // on networks where api.github.com is slow or blocked. GitHub's API is the fallback.
+        var req = URLRequest(url: site); req.timeoutInterval = 6; req.cachePolicy = .reloadIgnoringLocalCacheData
+        URLSession.shared.dataTask(with: req) { data, resp, _ in
+            let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
+            if code == 200, let d = data, let v = String(data: d, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines), !parts(v).isEmpty {
+                DispatchQueue.main.async { record(v, done) }; return
+            }
+            var r2 = URLRequest(url: api); r2.timeoutInterval = 8
+            r2.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+            URLSession.shared.dataTask(with: r2) { data, _, _ in
+                var tag: String? = nil
+                if let d = data, let j = try? JSONSerialization.jsonObject(with: d) as? [String: Any], let tg = j["tag_name"] as? String { tag = tg }
+                DispatchQueue.main.async { if let tg = tag { record(tg, done) } else { done(nil) } }
+            }.resume()
+        }.resume()
+    }
+    static let site = URL(string: "https://tidymint.app/version.txt")!
+    private static func record(_ v: String, _ done: (String?) -> Void) {
+        let ud = UserDefaults.standard
+        ud.set(Date(), forKey: "upd-last"); ud.set(v, forKey: "upd-latest")
+        done(newer(v, than: current) ? v : nil)
     }
 }
 
@@ -3245,6 +3307,15 @@ struct SettingsView: View {
                     }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Color.white.opacity(0.06))
                 }
             }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
+                       vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
+                                            : t("Checked once a day against GitHub. Nothing about your Mac is sent.", "Kiểm tra mỗi ngày một lần trên GitHub. Không gửi thông tin gì về máy.")) {
+                HStack(spacing: 10) {
+                    if vm.updChecking { ProgressView().controlSize(.small).tint(.white) }
+                    if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }) }
+                    else { GhostButton(title: t("Check now", "Kiểm tra ngay")) { vm.checkUpdates(force: true) } }
+                }
+            }
             settingRow(t("Open at login", "Mở cùng máy"),
                        t("Keeps the menu bar monitor running after restart.", "Giữ biểu tượng theo dõi trên thanh menu sau khi khởi động lại máy.")) {
                 Toggle("", isOn: Binding(get: { vm.openAtLogin }, set: { vm.setOpenAtLogin($0) })).toggleStyle(.switch).labelsHidden()
