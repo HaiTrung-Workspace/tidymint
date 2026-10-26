@@ -8,7 +8,7 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 
 > **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm.
 
-![Smart Scan results](docs/smart.jpg)
+![Clean Now results](docs/smart.jpg)
 
 ## See it in action
 
@@ -18,7 +18,7 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 Clean Now finds the safe part (caches, logs, old installers), shows it by group with sizes, and cleans only when you click **Clean**. Everything goes to the Trash first, and **Undo** on the Trash page puts the last run back.
 
 ### 2. Full control over every item
-Open **Review Details** to see each category, expand it, and tick or untick single items. Apps that are still running are flagged and left unticked.
+Open **Review every item** to see each category, expand it, and tick or untick single items. Apps that are still running are flagged and left unticked.
 
 ![Cleanup details](docs/cleanup.jpg)
 
@@ -51,14 +51,16 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 
 | Area | What it does |
 |---|---|
-| **Smart Scan** | One click to find safe junk, large files and the Trash size |
+| **Clean Now** | One scan finds safe junk, shows it by group with sizes, cleans only when you press Clean |
+| **Clean by App** | Zalo, Chrome, Edge, Cốc Cốc, CapCut: caches pre-selected, photos and files by month, messages and logins locked |
+| **Undo** | Every clean is journaled; the Trash page puts the last run back |
 | **Cleanup** | User caches, app caches (Chrome, Slack, Notion, VS Code...), logs, npm cache, downloaded aerial wallpapers, old Downloads, `_tmp` / `_to_delete` drafts in your project folders |
-| **Uninstaller** | Removes an app together with its leftovers; finds leftovers of apps already removed and old installers |
-| **Large & Old Files** | Files over 100 MB in your personal folders, never pre-selected |
+| **Uninstaller** | Removes an app together with its leftovers (only bundle-id matches pre-selected, anything holding a database left to you); finds leftovers of apps already removed and old installers |
+| **Large Files** | Files over 100 MB in your personal folders, never pre-selected |
 | **Duplicates** | Finds identical files (SHA-256), keeps one copy, and before deleting can check whether a script or skill in your project folders still uses them |
 | **Space Lens** | Bubble map of what takes up space, with plain-language notes for common folders (AI model folders included) |
 | **Cloud Cleanup** | Shows how much of iCloud Drive, Google Drive, Dropbox... is stored locally |
-| **Startup Items** | Lists background helpers that start with your Mac; flags ones left by removed apps |
+| **Startup Items** | Lists background helpers with who signed them, flags unusual locations or names and ones left by removed apps. Facts, not antivirus |
 | **Statistics** | Space freed over time and a full activity log |
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance |
 | **Contact** | Send feedback or bug reports from inside the app |

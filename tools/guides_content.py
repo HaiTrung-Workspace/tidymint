@@ -54,7 +54,7 @@ dict(
 <h3>1. Công cụ có sẵn trong macOS</h3>
 <p>Vào <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>. macOS sẽ gợi ý tối ưu: tự đổ Thùng rác sau 30 ngày, đưa file lên iCloud, xem danh sách app và tài liệu lớn. Ưu điểm: an toàn tuyệt đối. Nhược điểm: không đụng tới bộ nhớ đệm, không giải thích được "Dữ liệu hệ thống" gồm gì.</p>
 <h3>2. Tidymint: dọn dẹp toàn diện, có tiếng Việt</h3>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac <b>miễn phí, mã nguồn mở</b> (giấy phép MIT), giao diện tiếng Việt. Một lần quét tìm bộ nhớ đệm, nhật ký, Downloads cũ, file lớn, file trùng; có bản đồ bong bóng cho thấy thư mục nào chiếm ổ; gỡ app kèm phần sót lại. Điểm khác biệt: <b>mọi thứ chỉ chuyển vào Thùng rác</b>, bạn kiểm tra xong mới tự đổ, nên lỡ chọn nhầm vẫn lấy lại được.</p>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac <b>miễn phí, mã nguồn mở</b> (giấy phép MIT), giao diện tiếng Việt. Một lần quét tìm bộ nhớ đệm, nhật ký, Downloads cũ, file lớn, file trùng, cho xem từng nhóm rồi bạn mới bấm Dọn; mục <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, Cốc Cốc, CapCut đang giữ gì (bộ nhớ đệm chọn sẵn, ảnh và file xếp theo tháng để bạn tự chọn, tin nhắn bị khoá); có bản đồ bong bóng cho thấy thư mục nào chiếm ổ; gỡ app kèm phần sót lại. Điểm khác biệt: <b>mọi thứ chỉ chuyển vào Thùng rác</b> và có nút <b>Hoàn tác</b>, nên lỡ chọn nhầm vẫn lấy lại được.</p>
 <h3>3. AppCleaner hoặc Pearcleaner: chuyên gỡ app</h3>
 <p>Nếu bạn chỉ cần gỡ app cho sạch, <b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở) làm rất tốt việc này: kéo app vào, chúng liệt kê các file cài đặt, bộ nhớ đệm đi kèm để xoá cùng.</p>
 <h3>4. OnyX: cho người rành máy</h3>
@@ -149,7 +149,7 @@ dict(
 <h2 id="cach-3-app">Cách 3: Gỡ sạch bằng app miễn phí</h2>
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Các app gỡ cài đặt sẽ tự tìm phần sót lại giúp bạn:</p>
 <ul>
-<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Có thêm tab tìm <b>phần sót lại của app đã xóa từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, kiểm tra xong bạn mới tự đổ.</li>
+<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xóa nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xóa từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, có nút Hoàn tác.</li>
 <li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xóa.</li>
 </ul>
 {CTA}
@@ -238,7 +238,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 <p>Also be careful with "one click" cleaners that delete permanently. If something goes wrong, there is no undo.</p>
 
 <h2 id="faster">The faster way: let an app find it</h2>
-<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you: Smart Scan finds user and app caches, logs, npm cache, old downloads and project drafts; Space Lens draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>. Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
+<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you: Clean Now finds user and app caches, logs, npm cache, old downloads and project drafts and shows them by group before you press Clean; Clean by App lists what Chrome, Edge, Zalo and CapCut keep; Space Lens draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>. Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
 {CTA}
 """,
   faq=[
@@ -291,7 +291,7 @@ dict(
 <div class="warn"><p>Clearing caches frees space for a while, but apps rebuild them as you use them. It is maintenance, not a permanent fix. Large files, duplicates and unused apps give longer-lasting results.</p></div>
 
 <h2 id="faster">Do it in one scan</h2>
-<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that covers most of this list: Smart Scan for caches, logs and old downloads; Large &amp; Old Files (never pre-selected); Duplicates that keeps the best copy; an Uninstaller that finds leftovers, even from apps you removed long ago; and Space Lens to see where the space went. Everything goes to the Trash first.</p>
+<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that covers most of this list: Clean Now for caches, logs and old downloads (shown by group before you press Clean); Clean by App for Chrome, Edge, Zalo and CapCut; Large Files (never pre-selected); Duplicates that keeps the best copy; an Uninstaller that finds leftovers, even from apps you removed long ago; and Space Lens to see where the space went. Everything goes to the Trash first.</p>
 {CTA}
 """,
   faq=[
@@ -342,7 +342,7 @@ dict(
 
 <h2 id="options">5 free alternatives</h2>
 <h3>1. Tidymint: free, open-source all-in-one cleaner</h3>
-<p><a href="{HOME}">Tidymint</a> covers cleanup, duplicates, large files, an uninstaller, a bubble map of your disk and a menu bar indicator. Its defining rule: <b>everything goes to the Trash</b>, nothing is deleted permanently until you empty it. It is MIT-licensed, works offline and is available in English and Vietnamese. Built with AI and developer workflows in mind, it also knows folders like <code>.ollama</code> and project drafts.</p>
+<p><a href="{HOME}">Tidymint</a> covers cleanup, clean-by-app pages for browsers and messengers, duplicates, large files, an uninstaller with undo, a bubble map of your disk and a menu bar indicator. Its defining rule: <b>everything goes to the Trash</b>, nothing is deleted permanently until you empty it. It is MIT-licensed, works offline and is available in English and Vietnamese. Built with AI and developer workflows in mind, it also knows folders like <code>.ollama</code> and project drafts.</p>
 <h3>2. AppCleaner: the classic uninstaller</h3>
 <p>Free. Drag an app onto its window and it lists the related files to remove. Does one thing well.</p>
 <h3>3. Pearcleaner: open-source uninstaller</h3>
