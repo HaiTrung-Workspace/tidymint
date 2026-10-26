@@ -183,7 +183,7 @@ def sitemap(guides):
 
 HUB = {
  "vi": dict(slug="huong-dan", title="Hướng dẫn dọn dẹp và tăng dung lượng Mac | Tidymint", crumb="Hướng dẫn",
-            h1="Hướng dẫn giữ máy Mac gọn gàng", desc="Các bài hướng dẫn dọn rác, gỡ ứng dụng và lấy lại dung lượng trên Mac, viết dễ hiểu, có nguồn chính thức.",
+            h1="Hướng dẫn giữ máy Mac gọn gàng", desc="Các bài hướng dẫn dọn dẹp MacBook, gỡ ứng dụng và lấy lại dung lượng trên Mac, viết dễ hiểu, có nguồn chính thức.",
             lead='<p class="lead" style="margin-top:6px">Bài viết dễ hiểu, có nguồn chính thức, chỉ cách làm tay trước rồi mới gợi ý công cụ.</p>'),
  "en": dict(slug="guides", title="Mac Cleanup and Storage Guides | Tidymint", crumb="Guides",
             h1="Guides to a tidy Mac", desc="Plain-language guides to clearing System Data, freeing up space and uninstalling apps on macOS, with official sources.",

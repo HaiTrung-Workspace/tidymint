@@ -80,13 +80,13 @@ summary{user-select:none}
 T = {
 "en": dict(
   lang="en", path="", other="vi/", title="Free Mac Cleaner, CleanMyMac Alternative | Tidymint",
-  desc="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, find duplicate files, uninstall apps completely and see what fills your disk. Everything goes to the Trash first.",
+  desc="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicates, uninstall apps fully. Everything goes to the Trash first.",
   nav=[("#features","Features"),("#how","How it works"),("guides/","Guides"),("#faq","FAQ"),(GH,"GitHub")], navcta="Download",
   h1='Keep your Mac in <span>mint condition</span>.',
   sub="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.",
   cta1="Download free", cta2="How to install",
   badges=["✓ Free and open source (MIT)","✓ Everything goes to the Trash first","✓ Works offline, no tracking",'★ Listed in <a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a>'],
-  shot_alt="Tidymint Smart Scan results",
+  shot_alt="Tidymint Smart Scan results", lens_alt="Space Lens bubble map showing which folders fill a Mac disk", dupes_alt="Tidymint duplicate file finder with the copy to keep marked", cleanup_alt="Tidymint cleanup details listing caches and logs by size", vs_more='Full comparison: <a href="cleanmymac-alternative/">free CleanMyMac alternatives</a> · Guide: <a href="clear-system-data-mac/">how to clear System Data on Mac</a>',
   vs_tag="Why Tidymint", vs_h="A cleaner you can actually trust",
   vs_bad_h="Typical paid cleaners", vs_bad=["Paid licence or subscription, major upgrades often cost extra","Closed source: you cannot see what it deletes","Cracked copies are a common way to get malware"],
   vs_good_h="Tidymint", vs_good=["Free, with no account and no subscription","Open source (MIT): anyone can read every line","Only moves items to the Trash, you empty it yourself"],
@@ -127,14 +127,14 @@ T = {
   src="website", img="", aria_lang="Language", top="Back to top",
   ck_text="This website uses Google Analytics cookies to count visits. The Tidymint app itself tracks nothing.", ck_yes="Accept", ck_no="Decline", ck_link="Cookie settings", ck_more="Privacy"),
 "vi": dict(
-  lang="vi", path="vi/", other="../", title="App dọn rác Mac miễn phí, thay CleanMyMac | Tidymint",
-  desc="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Mọi thứ vào Thùng rác trước.",
+  lang="vi", path="vi/", other="../", title="Dọn dẹp MacBook miễn phí, thay CleanMyMac | Tidymint",
+  desc="Dọn dẹp MacBook miễn phí: xoá bộ nhớ đệm, gọn Dữ liệu hệ thống, gỡ ứng dụng sạch, tìm file trùng. Mã nguồn mở, tiếng Việt, mọi thứ vào Thùng rác trước.",
   nav=[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("huong-dan/","Hướng dẫn"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")], navcta="Tải về",
-  h1='Giữ máy Mac <span>luôn gọn gàng</span>.',
-  sub="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, giao diện tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ và xem chính xác cái gì đang chiếm ổ.",
+  h1='Giữ MacBook <span>luôn như mới</span>.',
+  sub="Tidymint giúp bạn dọn dẹp MacBook an toàn và miễn phí: xoá bộ nhớ đệm, gọn Dữ liệu hệ thống, gỡ ứng dụng sạch sẽ, tìm file trùng và biết chính xác cái gì đang chiếm ổ.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài",
   badges=["✓ Miễn phí, mã nguồn mở (MIT)","✓ Chỉ chuyển vào Thùng rác","✓ Chạy không cần mạng, không theo dõi",'★ Có trong danh sách <a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a>'],
-  shot_alt="Kết quả Quét thông minh của Tidymint",
+  shot_alt="Kết quả Quét thông minh của Tidymint", lens_alt="Bản đồ bong bóng cho thấy thư mục nào chiếm ổ MacBook", dupes_alt="Tìm file trùng trên MacBook, đánh dấu bản giữ lại", cleanup_alt="Chi tiết dọn dẹp: bộ nhớ đệm và nhật ký xếp theo dung lượng", vs_more='So sánh chi tiết: <a href="cleanmymac-mien-phi/">CleanMyMac miễn phí? Lựa chọn hợp pháp</a> · Hướng dẫn: <a href="xoa-ung-dung-macbook/">cách xóa ứng dụng trên MacBook sạch hoàn toàn</a>',
   vs_tag="Vì sao chọn Tidymint", vs_h="App dọn dẹp bạn tin được",
   vs_bad_h="App dọn dẹp trả phí thường gặp", vs_bad=["Trả tiền bản quyền hoặc thuê bao, lên đời bản lớn thường tốn thêm","Mã nguồn đóng: không biết app xoá những gì","Bản crack là đường lây mã độc rất phổ biến"],
   vs_good_h="Tidymint", vs_good=["Miễn phí, không cần tài khoản, không thuê bao","Mã nguồn mở (MIT): ai cũng đọc được từng dòng","Chỉ chuyển vào Thùng rác, bạn tự đổ"],
@@ -166,7 +166,7 @@ T = {
   sign_h="Nhận tin khi có bản mới", sign_p="Mẹo giữ máy gọn và thông báo phiên bản mới, mỗi tháng tối đa một thư.", sign_ph="ten@example.com", sign_btn="Đăng ký",
   consent="Nhận thông tin cập nhật mới nhất. Huỷ bất kỳ lúc nào.",
   end_h="Dọn máy thôi?", end_p="Miễn phí, mã nguồn mở, mọi thứ vào Thùng rác trước.",
-  f_blurb="App dọn rác Mac miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành.",
+  f_blurb="Ứng dụng dọn dẹp MacBook miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành.",
   f_cols=[("Sản phẩm",[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("#cai-dat","Cài đặt"),(GH+"/releases","Các phiên bản")]),
           ("Hướng dẫn",[("cleanmymac-mien-phi/","CleanMyMac miễn phí?"),("xoa-ung-dung-macbook/","Xóa ứng dụng trên MacBook"),(GH,"Mã nguồn"),(GH+"/issues","Báo lỗi")]),
           ("Pháp lý",[(GH+"/blob/main/PRIVACY.md","Quyền riêng tư"),(GH+"/blob/main/LICENSE","Giấy phép MIT"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
@@ -246,12 +246,13 @@ gtag('js',new Date());gtag('config','{GA_ID}');
     <div class="col bad"><h3>{t["vs_bad_h"]}</h3><ul>{"".join("<li>%s</li>" % x for x in t["vs_bad"])}</ul></div>
     <div class="col good"><h3>{t["vs_good_h"]}</h3><ul>{"".join("<li>%s</li>" % x for x in t["vs_good"])}</ul></div>
   </div>
+  <p class="small" style="margin-top:14px">{t["vs_more"]}</p>
 </section>
 
 <section>
   <div class="def">
     <div><span class="tag">{t["def_tag"]}</span><h2>{t["def_h"]}</h2><p>{t["def_p"]}</p><ul>{"".join("<li>%s</li>" % x for x in t["def_li"])}</ul><p>{t["def_p2"]}</p></div>
-    <img src="{img}lens.jpg" alt="Space Lens" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
+    <img src="{img}lens.jpg" alt="{t["lens_alt"]}" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
   </div>
 </section>
 
@@ -263,7 +264,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <section id="{i["f"]}">
   <span class="tag">{t["feat_tag"]}</span><h2>{t["feat_h"]}</h2>
   <div class="grid" style="margin-top:24px">{feats}</div>
-  <div class="feature" style="margin-top:48px"><img src="{img}dupes.jpg" alt="" loading="lazy"><img src="{img}cleanup.jpg" alt="" loading="lazy"></div>
+  <div class="feature" style="margin-top:48px"><img src="{img}dupes.jpg" alt="{t["dupes_alt"]}" loading="lazy"><img src="{img}cleanup.jpg" alt="{t["cleanup_alt"]}" loading="lazy"></div>
 </section>
 
 <section>
