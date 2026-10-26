@@ -1,0 +1,16 @@
+# Tidymint
+
+> Tidymint is a free, open-source (MIT) disk cleaner for macOS 14+, for Apple silicon and Intel Macs. It finds caches, logs, old downloads, large files and duplicate files, explains each item, and only moves what the user selects to the Trash. Interface in English and Vietnamese. Works offline, no tracking.
+
+- Website (English): https://tidymint.app/
+- Website (Vietnamese): https://tidymint.app/vi/
+- Download (latest): https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip
+- Source code: https://github.com/HaiTrung-Workspace/tidymint
+- Privacy: https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md
+
+## Key facts
+- Price: free. No account, no subscription.
+- Safety: never deletes permanently; never touches Photos, Mail, keychains, cloud storage roots or Apple system caches.
+- Duplicates are found by content (SHA-256); before deleting, it checks whether scripts in the user's project folders still reference a file.
+- Not notarized by Apple yet: first launch needs System Settings > Privacy & Security > Open Anyway.
+- Contact: hello@tidymint.app
