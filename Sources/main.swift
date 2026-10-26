@@ -1645,6 +1645,7 @@ struct CleanupView: View {
                     PrimaryButton(title: t("Go to Trash", "Mở mục Thùng rác"), action: { vm.page = .trash })
                 }
                 if Invite.shouldShow() { InviteCard(source: "after-clean").frame(maxWidth: 520).padding(.top, 8) }
+                if ConCao.shouldShow() { ConCaoHint().frame(maxWidth: 520) }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
@@ -2444,6 +2445,11 @@ struct SettingsView: View {
                        t("Notify when more than 90% of RAM is in use (at most once an hour).", "Báo khi RAM dùng trên 90% (tối đa 1 giờ báo một lần).")) {
                 Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden()
             }
+            if appLang == "vi" {
+                settingRow("Cùng tác giả: Cồn Cào", "Kiến thức đồ uống tiếng Việt: whisky, sake, cocktail.") {
+                    Link("concao.org", destination: ConCao.url("settings")).font(.system(size: 12)).foregroundColor(Theme.link).tint(Theme.link)
+                }
+            }
         }.padding(.horizontal, 24).padding(.bottom, 24).frame(maxWidth: .infinity, alignment: .leading) }
     }
     func settingRow<C: View>(_ title: String, _ sub: String, @ViewBuilder _ control: () -> C) -> some View {
@@ -2593,7 +2599,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
             sharedVM.page = pg
-            if pg == .cleanup && a.contains("--demo") { sharedVM.phase = .review }
+            if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
+            if a.contains("--done") { sharedVM.lastResult = t("Moved 128 items (6.2 GB) to the Trash.", "Đã chuyển 128 mục (6,2 GB) vào Thùng rác.") }
         }
         if let i = a.firstIndex(of: "--window"), i + 1 < a.count {
             let wh = a[i + 1].split(separator: "x").compactMap { Double($0) }
@@ -2909,6 +2916,49 @@ final class FormState: ObservableObject {
     @Published var result = ""
     @Published var ok = false
     @Published var hidden = false
+}
+
+/// A gentle pointer to the author's Vietnamese drinks site, shown only in Vietnamese,
+/// at most once a day on the "done" screen, and never again after "Don't show again".
+/// Nothing is sent anywhere: the link only opens when the user clicks it.
+enum ConCao {
+    static let lastKey = "concaoHintLast", offKey = "concaoHintOff"
+    static func url(_ place: String) -> URL {
+        URL(string: "https://concao.org/?utm_source=tidymint&utm_medium=app&utm_campaign=\(place)")!
+    }
+    static func shouldShow() -> Bool {
+        guard appLang == "vi", !UserDefaults.standard.bool(forKey: offKey) else { return false }
+        if let d = UserDefaults.standard.object(forKey: lastKey) as? Date, Calendar.current.isDateInToday(d) {
+            return shownThisSession
+        }
+        return true
+    }
+    static var shownThisSession = false
+    static func markShown() {
+        if !shownThisSession { shownThisSession = true; UserDefaults.standard.set(Date(), forKey: lastKey) }
+    }
+}
+
+final class HintState: ObservableObject { @Published var hidden = false }
+
+struct ConCaoHint: View {
+    @StateObject private var h = HintState()
+    var body: some View {
+        if !h.hidden {
+            HStack(spacing: 10) {
+                Image(systemName: "wineglass").foregroundColor(Theme.link)
+                Text("Dọn xong rồi, thưởng mình một ly?").foregroundColor(Theme.sub)
+                Link("Gợi ý ở Cồn Cào →", destination: ConCao.url("done")).foregroundColor(Theme.link).tint(Theme.link)
+                Spacer()
+                Button("Đừng hiện nữa") { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true }
+                    .buttonStyle(.plain).foregroundColor(Theme.sub)
+            }
+            .font(.system(size: 12))
+            .padding(.horizontal, 14).padding(.vertical, 10)
+            .background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            .onAppear { ConCao.markShown() }
+        }
+    }
 }
 
 struct FieldBox<C: View>: View {
