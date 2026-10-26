@@ -435,13 +435,13 @@ struct Sphere: View {
         Color(NSColor(c).usingColorSpace(.sRGB)?.blended(withFraction: f, of: other) ?? NSColor(c))
     }
     var body: some View {
-        let edge = Sphere.mix(color, .white, 0.35)
+        let edge = Sphere.mix(color, .white, 0.2)
         ZStack {
             Circle().fill(color.opacity(hot ? 0.34 : 0.22))
             Circle().fill(RadialGradient(colors: [color.opacity(0), color.opacity(hot ? 0.75 : 0.55)], center: .center,
                                          startRadius: r * 0.45, endRadius: r))
-            Circle().fill(LinearGradient(colors: [Color.white.opacity(0.10), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
-            Circle().strokeBorder(edge.opacity(hot ? 0.95 : 0.7), lineWidth: 1.2)
+            Circle().fill(LinearGradient(colors: [Color.white.opacity(0.06), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
+            Circle().strokeBorder(edge.opacity(hot ? 0.55 : 0.32), lineWidth: 0.75)
         }
         .shadow(color: color.opacity(hot ? 0.5 : 0.3), radius: max(3, r * 0.12))
     }
@@ -2011,7 +2011,7 @@ struct LangSwitch: View {
 final class ScrollEdges: ObservableObject {
     @Published var view: CGRect = .zero      // visible scroll area (global coordinates)
     @Published var content: CGRect = .zero   // menu content (global coordinates)
-    var moreBelow: Bool { view.height > 0 && content.maxY > view.maxY + 4 }
+    var moreBelow: Bool { view.height > 0 && content.maxY - 6 > view.maxY + 4 }   // 6 = bottom padding under the last item
     var moreAbove: Bool { view.height > 0 && content.minY < view.minY - 4 }
 }
 
@@ -2028,6 +2028,7 @@ struct Sidebar: View {
             // The menu scrolls when the window is short, so nothing overlaps.
             // A fade and a "More" chevron show that items are hidden below (and a fade at the top when scrolled).
             ScrollViewReader { proxy in
+            VStack(spacing: 0) {
             ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .leading, spacing: 2) {
             NavItem(p: .smart, vm: vm)
@@ -2047,7 +2048,7 @@ struct Sidebar: View {
             NavItem(p: .ignore, vm: vm)
             NavItem(p: .settings, vm: vm)
             NavItem(p: .contact, vm: vm)
-            }.padding(.bottom, 34)   // room so the "More" chip never covers the last item
+            }.padding(.bottom, 6)
             .background(GeometryReader { g in
                 Color.clear
                     .onAppear { edges.content = g.frame(in: .global) }
@@ -2069,20 +2070,22 @@ struct Sidebar: View {
             }
             .overlay(alignment: .bottom) {
                 if edges.moreBelow {
-                    ZStack(alignment: .bottom) {
-                        LinearGradient(colors: [.clear, Color.black.opacity(0.45)], startPoint: .top, endPoint: .bottom)
-                            .frame(height: 40).allowsHitTesting(false)
-                        Button { withAnimation(.easeInOut(duration: 0.3)) { proxy.scrollTo(Page.contact, anchor: .bottom) } } label: {
-                            HStack(spacing: 4) {
-                                Text(t("More", "Xem thêm")).font(.system(size: 10, weight: .semibold))
-                                Image(systemName: "chevron.down").font(.system(size: 9, weight: .bold))
-                            }
-                            .foregroundColor(.white.opacity(0.85))
-                            .padding(.horizontal, 10).padding(.vertical, 3)
-                            .background(Capsule().fill(Color.white.opacity(0.14)))
-                        }.buttonStyle(.plain).hoverLift().padding(.bottom, 4)
-                    }
+                    LinearGradient(colors: [.clear, Color.black.opacity(0.45)], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 28).allowsHitTesting(false)
                 }
+            }
+            // The "More" chip sits in its own row under the list, so it can never cover a menu item.
+            if edges.moreBelow {
+                Button { withAnimation(.easeInOut(duration: 0.3)) { proxy.scrollTo(Page.contact, anchor: .bottom) } } label: {
+                    HStack(spacing: 4) {
+                        Text(t("More", "Xem thêm")).font(.system(size: 10, weight: .semibold))
+                        Image(systemName: "chevron.down").font(.system(size: 9, weight: .bold))
+                    }
+                    .foregroundColor(.white.opacity(0.85))
+                    .padding(.horizontal, 10).padding(.vertical, 3)
+                    .background(Capsule().fill(Color.white.opacity(0.14)))
+                }.buttonStyle(.plain).hoverLift().padding(.vertical, 4).frame(maxWidth: .infinity)
+            }
             }
             }
             Divider().overlay(Color.white.opacity(0.08)).padding(.bottom, 10)
