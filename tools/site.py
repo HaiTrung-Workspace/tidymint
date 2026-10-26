@@ -8,7 +8,7 @@ GH = "https://github.com/HaiTrung-Workspace/tidymint"
 DL = GH + "/releases/latest/download/Tidymint.zip"
 GA_ID = "G-19HEJDJPN3"
 # Line icons (Lucide style, MIT): 24px grid, 1.75 stroke, currentColor. Used in feature and audience cards.
-ICONS = {'scan': '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4M22 5h-4"/>', 'dupes': '<rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>', 'lens': '<circle cx="8.5" cy="14.5" r="5.5"/><circle cx="17" cy="7.5" r="4"/><circle cx="18.5" cy="18" r="2.5"/>', 'apps': '<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12M3.3 7 12 12l8.7-5"/>', 'large': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M12 11v7M9 15l3 3 3-3"/>', 'menu': '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>', 'ai': '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>', 'dev': '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>', 'video': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 12h18M3 7.5h4M3 16.5h4M17 7.5h4M17 16.5h4"/>', 'drive': '<path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M6 16h.01M10 16h.01"/>'}
+ICONS = {'byapp': '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>', 'undo': '<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>', 'shield': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>', 'scan': '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4M22 5h-4"/>', 'dupes': '<rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>', 'lens': '<circle cx="8.5" cy="14.5" r="5.5"/><circle cx="17" cy="7.5" r="4"/><circle cx="18.5" cy="18" r="2.5"/>', 'apps': '<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12M3.3 7 12 12l8.7-5"/>', 'large': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M12 11v7M9 15l3 3 3-3"/>', 'menu': '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>', 'ai': '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>', 'dev': '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>', 'video': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 12h18M3 7.5h4M3 16.5h4M17 7.5h4M17 16.5h4"/>', 'drive': '<path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M6 16h.01M10 16h.01"/>'}
 def icon(k):
     return '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">%s</svg>' % ICONS[k]
 ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec"
@@ -86,7 +86,7 @@ T = {
   sub="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.",
   cta1="Download free", cta2="How to install",
   badges=["✓ Free and open source (MIT)","✓ Everything goes to the Trash first","✓ Works offline, no tracking",'★ Listed in <a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a>'],
-  shot_alt="Tidymint Smart Scan results", lens_alt="Space Lens bubble map showing which folders fill a Mac disk", dupes_alt="Tidymint duplicate file finder with the copy to keep marked", cleanup_alt="Tidymint cleanup details listing caches and logs by size", vs_more='Full comparison: <a href="cleanmymac-alternative/">free CleanMyMac alternatives</a> · Guide: <a href="clear-system-data-mac/">how to clear System Data on Mac</a>',
+  shot_alt="Tidymint home page after a scan: what is safe to clean, grouped and sized", byapp_alt="Clean by App showing Zalo caches pre-selected and chat photos by month", lens_alt="Space Lens bubble map showing which folders fill a Mac disk", dupes_alt="Tidymint duplicate file finder with the copy to keep marked", cleanup_alt="Tidymint cleanup details listing caches and logs by size", vs_more='Full comparison: <a href="cleanmymac-alternative/">free CleanMyMac alternatives</a> · Guide: <a href="clear-system-data-mac/">how to clear System Data on Mac</a>',
   vs_tag="Why Tidymint", vs_h="A cleaner you can actually trust",
   vs_bad_h="Typical paid cleaners", vs_bad=["Paid licence or subscription, major upgrades often cost extra","Closed source: you cannot see what it deletes","Cracked copies are a common way to get malware"],
   vs_good_h="Tidymint", vs_good=["Free, with no account and no subscription","Open source (MIT): anyone can read every line","Only moves items to the Trash, you empty it yourself"],
@@ -97,7 +97,7 @@ T = {
   how_tag="How it works", how_h="Three steps, you stay in control",
   how=[("Scan","One click looks through caches, logs, old downloads, large files and duplicates. Nothing is touched yet."),("Review","Every item is grouped, sized and explained. Risky items are never pre-selected, files still used by your scripts are flagged."),("Clean","Selected items move to the Trash. Check the Trash, then empty it when you are ready.")],
   feat_tag="Features", feat_h="Everything in one small app",
-  feats=[("scan","Smart Scan","Caches, logs, npm cache, old downloads and drafts in your project folders."),("dupes","Duplicates","Identical files found by content. Keeps the best copy, checks your scripts before deleting."),("lens","Space Lens","A bubble map of what fills your disk, with notes for common folders."),("apps","Uninstaller","Removes apps with their caches, preferences and leftovers."),("large","Large & old files","Files over 100 MB, sorted by size or last opened. Never pre-selected."),("menu","Menu bar","Free space, RAM and Trash at a glance, with low-space alerts.")],
+  feats=[("scan","Clean Now","Scans caches, logs, npm cache and old installers, shows what it found, and cleans only when you press Clean."),("byapp","Clean by App","Zalo, Chrome, Edge, Cốc Cốc and CapCut: caches pre-selected, photos and files by month for you to pick, messages and logins locked."),("undo","Undo","Every clean is recorded. One button puts the last run back where it was while it is still in the Trash."),("dupes","Duplicates","Identical files found by content. Keeps the best copy, checks your scripts before deleting."),("lens","Space Lens","A bubble map of what fills your disk, with notes for common folders."),("apps","Uninstaller","Removes apps with their caches and leftovers. Only bundle-id matches are pre-selected; anything holding a database is left to you."),("large","Large files","Files over 100 MB, sorted by size or last opened. Never pre-selected."),("shield","Startup Items","Who signed each background item, and a flag on unusual locations or names. Facts, not verdicts.")],
   use_tag="Made for", use_h="Who fills their Mac the fastest",
   uses=[("ai","AI work","Model weights, Hugging Face and Ollama caches, generated images."),("dev","Developers","node_modules, npm and Homebrew caches, old builds."),("video","Video and photo","Exports, render drafts and duplicate assets."),("drive","256 GB Macs","Every gigabyte counts on a small SSD.")],
   faq_h="Questions",
@@ -125,7 +125,7 @@ T = {
           ("Legal",[(GH+"/blob/main/PRIVACY.md","Privacy"),(GH+"/blob/main/LICENSE","MIT License"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer="",
   msg=dict(bad="Please enter a valid email.",sending="Sending...",ok="Thanks! You are on the list.",err="Could not send right now. Please try again later."),
-  src="website", img="", aria_lang="Language", top="Back to top",
+  src="website", img="", shot="", aria_lang="Language", top="Back to top",
   ck_text="This website uses Google Analytics cookies to count visits. The Tidymint app itself tracks nothing.", ck_yes="Accept", ck_no="Decline", ck_link="Cookie settings", ck_more="Privacy"),
 "vi": dict(
   lang="vi", path="vi/", other="../", title="Dọn dẹp MacBook miễn phí, thay CleanMyMac | Tidymint",
@@ -135,7 +135,7 @@ T = {
   sub="Tidymint giúp bạn dọn dẹp MacBook an toàn và miễn phí: xoá bộ nhớ đệm, gọn Dữ liệu hệ thống, gỡ ứng dụng sạch sẽ, tìm file trùng và biết chính xác cái gì đang chiếm ổ.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài",
   badges=["✓ Miễn phí, mã nguồn mở (MIT)","✓ Chỉ chuyển vào Thùng rác","✓ Chạy không cần mạng, không theo dõi",'★ Có trong danh sách <a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a>'],
-  shot_alt="Kết quả Quét thông minh của Tidymint", lens_alt="Bản đồ bong bóng cho thấy thư mục nào chiếm ổ MacBook", dupes_alt="Tìm file trùng trên MacBook, đánh dấu bản giữ lại", cleanup_alt="Chi tiết dọn dẹp: bộ nhớ đệm và nhật ký xếp theo dung lượng", vs_more='So sánh chi tiết: <a href="cleanmymac-mien-phi/">CleanMyMac miễn phí? Lựa chọn hợp pháp</a> · Hướng dẫn: <a href="xoa-ung-dung-macbook/">cách xóa ứng dụng trên MacBook sạch hoàn toàn</a>',
+  shot_alt="Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm và ghi dung lượng", byapp_alt="Dọn theo ứng dụng: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng", lens_alt="Bản đồ bong bóng cho thấy thư mục nào chiếm ổ MacBook", dupes_alt="Tìm file trùng trên MacBook, đánh dấu bản giữ lại", cleanup_alt="Chi tiết dọn dẹp: bộ nhớ đệm và nhật ký xếp theo dung lượng", vs_more='So sánh chi tiết: <a href="cleanmymac-mien-phi/">CleanMyMac miễn phí? Lựa chọn hợp pháp</a> · Hướng dẫn: <a href="xoa-ung-dung-macbook/">cách xóa ứng dụng trên MacBook sạch hoàn toàn</a>',
   vs_tag="Vì sao chọn Tidymint", vs_h="App dọn dẹp bạn tin được",
   vs_bad_h="App dọn dẹp trả phí thường gặp", vs_bad=["Trả tiền bản quyền hoặc thuê bao, lên đời bản lớn thường tốn thêm","Mã nguồn đóng: không biết app xoá những gì","Bản crack là đường lây mã độc rất phổ biến"],
   vs_good_h="Tidymint", vs_good=["Miễn phí, không cần tài khoản, không thuê bao","Mã nguồn mở (MIT): ai cũng đọc được từng dòng","Chỉ chuyển vào Thùng rác, bạn tự đổ"],
@@ -146,7 +146,7 @@ T = {
   how_tag="Cách dùng", how_h="Ba bước, bạn luôn là người quyết",
   how=[("Quét","Một cú bấm xem qua bộ nhớ đệm, nhật ký, Downloads cũ, file lớn và file trùng. Chưa động vào gì."),("Xem lại","Từng mục được chia nhóm, ghi dung lượng và giải thích. Mục rủi ro không bao giờ chọn sẵn, file còn được script dùng sẽ được đánh dấu."),("Dọn","Mục đã chọn chuyển vào Thùng rác. Xem lại Thùng rác rồi tự đổ khi sẵn sàng.")],
   feat_tag="Tính năng", feat_h="Đủ cả trong một app nhỏ",
-  feats=[("scan","Quét thông minh","Bộ nhớ đệm, nhật ký, npm cache, Downloads cũ và file nháp trong thư mục dự án."),("dupes","File trùng","Tìm theo nội dung. Giữ bản tốt nhất, kiểm tra script trước khi xoá."),("lens","Bản đồ ổ đĩa","Bong bóng cho thấy cái gì chiếm ổ, kèm giải thích thư mục hay gặp."),("apps","Gỡ app","Gỡ app cùng bộ nhớ đệm, cài đặt và phần sót lại."),("large","File lớn và cũ","File trên 100 MB, xếp theo dung lượng hoặc lần mở cuối. Không chọn sẵn."),("menu","Thanh menu","Xem nhanh dung lượng trống, RAM, Thùng rác; báo khi ổ sắp đầy.")],
+  feats=[("scan","Dọn ngay","Quét bộ nhớ đệm, nhật ký, npm cache, file cài đặt cũ, cho xem tìm được gì, và chỉ dọn khi bạn bấm Dọn."),("byapp","Dọn theo ứng dụng","Zalo, Chrome, Edge, Cốc Cốc, CapCut: bộ nhớ đệm chọn sẵn, ảnh và file xếp theo tháng để bạn tự chọn, tin nhắn và đăng nhập bị khoá."),("undo","Hoàn tác","Mỗi lần dọn đều được ghi lại. Một nút trả mọi thứ về chỗ cũ khi còn trong Thùng rác."),("dupes","File trùng","Tìm theo nội dung. Giữ bản tốt nhất, kiểm tra script trước khi xoá."),("lens","Bản đồ ổ đĩa","Bong bóng cho thấy cái gì chiếm ổ, kèm giải thích thư mục hay gặp."),("apps","Gỡ app","Gỡ app cùng bộ nhớ đệm và phần sót lại. Chỉ chọn sẵn phần khớp bundle id; có database bên trong thì để bạn quyết."),("large","File lớn","File trên 100 MB, xếp theo dung lượng hoặc lần mở cuối. Không chọn sẵn."),("shield","Khởi động cùng máy","Ai đã ký từng mục chạy ngầm, đánh dấu vị trí hoặc tên bất thường. Nêu sự thật, không phán xét.")],
   use_tag="Dành cho", use_h="Ai hay đầy ổ nhất",
   uses=[("ai","Người làm AI","File model, bộ nhớ đệm Hugging Face, Ollama, ảnh tạo bằng AI."),("dev","Lập trình viên","node_modules, npm, Homebrew, bản build cũ."),("video","Làm video, ảnh","File xuất, bản nháp render, ảnh trùng."),("drive","Mac 256 GB","Ổ nhỏ thì từng GB đều quý.")],
   faq_h="Hỏi đáp",
@@ -174,14 +174,14 @@ T = {
           ("Pháp lý",[(GH+"/blob/main/PRIVACY.md","Quyền riêng tư"),(GH+"/blob/main/LICENSE","Giấy phép MIT"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer=' · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a>',
   msg=dict(bad="Email chưa đúng.",sending="Đang gửi...",ok="Cảm ơn bạn! Đã đăng ký.",err="Chưa gửi được, bạn thử lại sau nhé."),
-  src="website-vi", img="../", aria_lang="Ngôn ngữ", top="Lên đầu trang",
+  src="website-vi", img="../", shot="", aria_lang="Ngôn ngữ", top="Lên đầu trang",
   ck_text="Website dùng cookie Google Analytics để đếm lượt truy cập. Bản thân app Tidymint không theo dõi gì.", ck_yes="Đồng ý", ck_no="Từ chối", ck_link="Cài đặt cookie", ck_more="Quyền riêng tư"),
 }
 IDS = {"en": dict(f="features", h="how", q="faq", i="install", s="signup"),
        "vi": dict(f="tinh-nang", h="cach-dung", q="hoi-dap", i="cai-dat", s="dang-ky")}
 
 def page(k):
-    t = T[k]; i = IDS[k]; img = t["img"]
+    t = T[k]; i = IDS[k]; img = t["img"]; shot = t["shot"]
     url = "https://tidymint.app/" + t["path"]
     ld = [
       {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Tidymint","operatingSystem":"macOS 14 or later",
@@ -214,7 +214,7 @@ def page(k):
 <link rel="icon" href="{img}favicon.png">
 <meta property="og:title" content="{t["title"]}">
 <meta property="og:description" content="{t["desc"]}">
-<meta property="og:image" content="https://tidymint.app/smart.jpg">
+<meta property="og:image" content="https://tidymint.app/{"vi/" if k == "vi" else ""}smart.jpg">
 <meta property="og:url" content="{url}">
 <meta name="twitter:card" content="summary_large_image">
 <script>
@@ -239,7 +239,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
   <p>{t["sub"]}</p>
   <div class="cta"><a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">→</span></a><a class="btn ghost" href="#{i["i"]}">{t["cta2"]}</a></div>
   <div class="badges">{"".join("<span>%s</span>" % b for b in t["badges"])}</div>
-  <div class="shot"><img src="{img}smart.jpg" alt="{t["shot_alt"]}" width="1600" height="1084"></div>
+  <div class="shot"><img src="{shot}smart.jpg" alt="{t["shot_alt"]}" width="1600" height="1013"></div>
 </header>
 
 <section>
@@ -254,7 +254,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <section>
   <div class="def">
     <div><span class="tag">{t["def_tag"]}</span><h2>{t["def_h"]}</h2><p>{t["def_p"]}</p><ul>{"".join("<li>%s</li>" % x for x in t["def_li"])}</ul><p>{t["def_p2"]}</p></div>
-    <img src="{img}lens.jpg" alt="{t["lens_alt"]}" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
+    <img src="{shot}lens.jpg" alt="{t["lens_alt"]}" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
   </div>
 </section>
 
@@ -266,7 +266,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <section id="{i["f"]}">
   <span class="tag">{t["feat_tag"]}</span><h2>{t["feat_h"]}</h2>
   <div class="grid" style="margin-top:24px">{feats}</div>
-  <div class="feature" style="margin-top:48px"><img src="{img}dupes.jpg" alt="{t["dupes_alt"]}" loading="lazy"><img src="{img}cleanup.jpg" alt="{t["cleanup_alt"]}" loading="lazy"></div>
+  <div class="feature" style="margin-top:48px"><img src="{shot}byapp.jpg" alt="{t["byapp_alt"]}" loading="lazy" width="1600" height="1013"><img src="{shot}dupes.jpg" alt="{t["dupes_alt"]}" loading="lazy" width="1600" height="1013"></div>
 </section>
 
 <section>
