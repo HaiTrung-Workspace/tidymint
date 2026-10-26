@@ -1,4 +1,5 @@
-// Disk Cleanup: a free, open-source disk cleaner for macOS, built for people who work with AI tools.
+// Tidymint: a free, open-source disk cleaner for macOS, built for people who work with AI tools.
+// "Keep your Mac in mint condition."
 // Author: Hai Trung. License: MIT (see LICENSE). Provided "as is", without warranty.
 // Safety rules: items are only moved to the Trash (the "Empty Trash" button asks first);
 // cloud libraries, Photos, Mail, keychains, browser profiles and Apple system caches are never touched.
@@ -19,9 +20,14 @@ struct Palette {
     let link: UInt32          // small text buttons
     let bubbles: [UInt32]     // Space Lens
     let icon: [UInt32]        // app icon background, top to bottom
+    var leaf: UInt32 = 0x5ff0c0   // mint leaf on the app icon
 }
 
 let palettes: [Palette] = [
+    Palette(id: "mint", nameEN: "Mint", nameVI: "Mint (xanh bạc hà)",
+            bg: [0x04130f, 0x0b2620, 0x124a3b], accent: [0x2fd39f, 0x0f8f68], link: 0x7ef2c8,
+            bubbles: [0x14a57a, 0x7ef2c8, 0x3ec7a0, 0xb8fbe3, 0x5fb4ff, 0xa3e48a, 0x2e8f74, 0xd6f5c9],
+            icon: [0x0d2b24, 0x145c47, 0x1d7a5d], leaf: 0x5ff0c0),
     Palette(id: "nightsky", nameEN: "Night Sky", nameVI: "Night Sky (xanh đêm)",
             bg: [0x05070f, 0x0f1a33, 0x1d2f5a], accent: [0x9fd3ff, 0x4f7cff], link: 0x9fd3ff,
             bubbles: [0x4f7cff, 0x9fd3ff, 0x6c5ce7, 0x5fd3c6, 0xa29bfe, 0x74b9ff, 0x81ecec, 0xdfe6e9],
@@ -40,7 +46,7 @@ let palettes: [Palette] = [
             icon: [0xe8414a, 0xf5902e, 0xf7d33a, 0x3fb36b, 0x3c7bf0, 0x8e4fd6]),
 ]
 
-var appTheme: String = UserDefaults.standard.string(forKey: "theme").flatMap { id in palettes.contains { $0.id == id } ? id : nil } ?? "nightsky"
+var appTheme: String = UserDefaults.standard.string(forKey: "theme").flatMap { id in palettes.contains { $0.id == id } ? id : nil } ?? "mint"
 
 enum Theme {
     static var p: Palette { palettes.first { $0.id == appTheme } ?? palettes[0] }
@@ -1031,7 +1037,7 @@ enum Phase { case idle, scanning, summary, review, done }
         if freeGB > 0 && freeGB < lowSpaceGB && Date().timeIntervalSince(lastDiskAlert) > 6 * 3600 {
             lastDiskAlert = Date()
             notify(t("Low disk space", "Ổ sắp đầy"),
-                   String(format: t("Only %.0f GB left. Open Disk Cleanup to free up space.", "Chỉ còn %.0f GB. Mở Disk Cleanup để dọn."), freeGB))
+                   String(format: t("Only %.0f GB left. Open Tidymint to free up space.", "Chỉ còn %.0f GB. Mở Tidymint để dọn."), freeGB))
         }
         if ramAlert && ramTotal > 0 && ramUsed / ramTotal > 0.9 && Date().timeIntervalSince(lastRamAlert) > 3600 {
             lastRamAlert = Date()
@@ -1152,7 +1158,7 @@ enum Phase { case idle, scanning, summary, review, done }
                     let why: String
                     if !FileManager.default.fileExists(atPath: u.path) { why = t("file no longer exists (already moved?)", "file không còn ở đó (có thể đã xoá trước)") }
                     else if ns.code == NSFileWriteNoPermissionError || ns.code == 513 || ns.code == 257 {
-                        why = t("no permission. Open System Settings > Privacy & Security > Full Disk Access, turn Disk Cleanup off and on again", "không có quyền. Vào Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Truy cập toàn bộ ổ đĩa, tắt rồi bật lại Disk Cleanup")
+                        why = t("no permission. Open System Settings > Privacy & Security > Full Disk Access, turn Tidymint off and on again", "không có quyền. Vào Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Truy cập toàn bộ ổ đĩa, tắt rồi bật lại Tidymint")
                     } else { why = ns.localizedDescription }
                     lastErr = why
                 }
@@ -1408,9 +1414,12 @@ struct LogEntry: Identifiable {
 }
 
 enum Stats {
-    static let dir = NSHomeDirectory() + "/Library/Application Support/Disk Cleanup"
+    static let dir = NSHomeDirectory() + "/Library/Application Support/Tidymint"
+    static let oldDir = NSHomeDirectory() + "/Library/Application Support/Disk Cleanup"   // name before the rename
     static var path: String {
-        try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: dir) && fm.fileExists(atPath: oldDir) { try? fm.moveItem(atPath: oldDir, toPath: dir) }
+        try? fm.createDirectory(atPath: dir, withIntermediateDirectories: true)
         return dir + "/activity.log"
     }
     static func load() -> [LogEntry] {
@@ -1987,7 +1996,7 @@ struct Sidebar: View {
             // Fixed header, kept clear of the window's traffic-light buttons.
             HStack(spacing: 8) {
                 Image(nsImage: cachedIcon(Theme.p)).resizable().frame(width: 28, height: 28)
-                Text("Disk Cleanup").font(.system(size: 15, weight: .bold)).foregroundColor(.white)
+                Text("Tidymint").font(.system(size: 15, weight: .bold)).foregroundColor(.white)
             }.padding(.top, 44).padding(.bottom, 12)
             // The menu scrolls when the window is short, so nothing overlaps.
             // A fade and a "More" chevron show that items are hidden below (and a fade at the top when scrolled).
@@ -2490,7 +2499,7 @@ struct MenuView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 22, height: 22)
-                Text("Disk Cleanup").font(.system(size: 13, weight: .bold))
+                Text("Tidymint").font(.system(size: 13, weight: .bold))
                 Spacer()
             }
             VStack(alignment: .leading, spacing: 4) {
@@ -2508,7 +2517,7 @@ struct MenuView: View {
             HStack { Text(t("Trash", "Thùng rác")).foregroundColor(.secondary); Spacer(); Text(fmt(vm.trashSize)).fontWeight(.semibold) }.font(.system(size: 12))
             Divider()
             VStack(spacing: 1) {
-                MenuRow(title: t("Open Disk Cleanup", "Mở Disk Cleanup")) { openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true) }
+                MenuRow(title: t("Open Tidymint", "Mở Tidymint")) { openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true) }
                 MenuRow(title: t("Smart Scan", "Quét thông minh")) { vm.page = .smart; openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true); vm.smartScan() }
                 MenuRow(title: t("Empty Trash...", "Đổ Thùng rác..."), disabled: vm.trashCount == 0) { NSApp.activate(ignoringOtherApps: true); vm.emptyTrash() }
             }.padding(.horizontal, -8)
@@ -2559,7 +2568,7 @@ func menuBarImage(free: Double, total: Double, low: Bool) -> NSImage {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationDidFinishLaunching(_ n: Notification) {
-        // Developer helper: `DiskCleanup --export-icon <theme> <out.png>` writes the 1024px icon and quits.
+        // Developer helper: `Tidymint --export-icon <theme> <out.png>` writes the 1024px icon and quits.
         let a = CommandLine.arguments
         if let i = a.firstIndex(of: "--export-icon"), i + 2 < a.count,
            let pal = palettes.first(where: { $0.id == a[i + 1] }),
@@ -2567,7 +2576,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            let png = rep.representation(using: .png, properties: [:]) {
             try? png.write(to: URL(fileURLWithPath: a[i + 2])); exit(0)
         }
-        // Developer helper: `DiskCleanup --export-menubar <freeGB> <out.png>` writes the menu bar icon at 8x and quits.
+        // Developer helper: `Tidymint --export-menubar <freeGB> <out.png>` writes the menu bar icon at 8x and quits.
         if let i = a.firstIndex(of: "--export-menubar"), i + 2 < a.count, let f = Double(a[i + 1]) {
             let im = menuBarImage(free: f, total: 245, low: false)
             let px = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(im.size.width * 8), pixelsHigh: Int(im.size.height * 8),
@@ -2590,7 +2599,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let wh = a[i + 1].split(separator: "x").compactMap { Double($0) }
             if wh.count == 2 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    for w in NSApp.windows where w.title == "Disk Cleanup" || w.identifier?.rawValue.contains("main") == true {
+                    for w in NSApp.windows where w.title == "Tidymint" || w.identifier?.rawValue.contains("main") == true {
                         w.setContentSize(NSSize(width: wh[0], height: wh[1])); w.center()
                     }
                 }
@@ -2620,7 +2629,7 @@ func makeAppIcon(_ p: Palette) -> NSImage {
         NSGraphicsContext.restoreGraphicsState()
         let cols = p.icon.map { NSColor(hex: $0) }
         let locs = (0..<cols.count).map { CGFloat($0) / CGFloat(max(cols.count - 1, 1)) }
-        NSGradient(colors: cols, atLocations: locs, colorSpace: .sRGB)?.draw(in: body, angle: 90)
+        NSGradient(colors: cols, atLocations: locs, colorSpace: .sRGB)?.draw(in: body, angle: p.id == "pride" ? 90 : -45)
         NSGradient(colors: [NSColor.white.withAlphaComponent(0.14), NSColor.white.withAlphaComponent(0)],
                    atLocations: [0, 0.45], colorSpace: .sRGB)?.draw(in: body, angle: 90)
         // recessed foot
@@ -2652,18 +2661,20 @@ func makeAppIcon(_ p: Palette) -> NSImage {
         NSBezierPath(ovalIn: NSRect(x: 707, y: 560, width: 30, height: 30)).fill()
         NSColor.black.setFill()
         NSBezierPath(ovalIn: NSRect(x: 715, y: 568, width: 14, height: 14)).fill()
-        // sparkles
-        func sparkle(_ cx: CGFloat, _ cy: CGFloat, _ r: CGFloat, _ k: CGFloat, _ alpha: CGFloat) {
-            let path = NSBezierPath()
-            path.move(to: NSPoint(x: cx, y: cy - r))
-            path.curve(to: NSPoint(x: cx + r, y: cy), controlPoint1: NSPoint(x: cx + r * k * 0.12, y: cy - r * 0.3), controlPoint2: NSPoint(x: cx + r * 0.3, y: cy - r * k * 0.12))
-            path.curve(to: NSPoint(x: cx, y: cy + r), controlPoint1: NSPoint(x: cx + r * 0.3, y: cy + r * k * 0.12), controlPoint2: NSPoint(x: cx + r * k * 0.12, y: cy + r * 0.3))
-            path.curve(to: NSPoint(x: cx - r, y: cy), controlPoint1: NSPoint(x: cx - r * k * 0.12, y: cy + r * 0.3), controlPoint2: NSPoint(x: cx - r * 0.3, y: cy + r * k * 0.12))
-            path.curve(to: NSPoint(x: cx, y: cy - r), controlPoint1: NSPoint(x: cx - r * 0.3, y: cy - r * k * 0.12), controlPoint2: NSPoint(x: cx - r * k * 0.12, y: cy - r * 0.3))
-            NSColor.white.withAlphaComponent(alpha).setFill(); path.fill()
-        }
-        sparkle(640, 330, 100, 1, 1)
-        sparkle(410, 290, 40, 1, 0.85)
+        // mint leaf above the Mac mini (stem leans right, like a fresh sprig)
+        let leaf = NSBezierPath()
+        leaf.move(to: NSPoint(x: 640, y: 450))
+        leaf.curve(to: NSPoint(x: 600, y: 196), controlPoint1: NSPoint(x: 555, y: 365), controlPoint2: NSPoint(x: 540, y: 255))
+        leaf.curve(to: NSPoint(x: 640, y: 450), controlPoint1: NSPoint(x: 745, y: 226), controlPoint2: NSPoint(x: 795, y: 360))
+        NSGraphicsContext.saveGraphicsState()
+        let lg = NSShadow(); lg.shadowOffset = NSSize(width: 0, height: -6); lg.shadowBlurRadius = 18
+        lg.shadowColor = NSColor.black.withAlphaComponent(0.3); lg.set()
+        NSColor(hex: p.leaf).setFill(); leaf.fill()
+        NSGraphicsContext.restoreGraphicsState()
+        NSGradient(colors: [NSColor.white.withAlphaComponent(0.35), NSColor.white.withAlphaComponent(0)], atLocations: [0, 1], colorSpace: .sRGB)?
+            .draw(in: leaf, angle: -60)
+        let vein = NSBezierPath(); vein.move(to: NSPoint(x: 606, y: 232)); vein.curve(to: NSPoint(x: 638, y: 440), controlPoint1: NSPoint(x: 618, y: 300), controlPoint2: NSPoint(x: 632, y: 380))
+        vein.lineWidth = 10; vein.lineCapStyle = .round; dark.withAlphaComponent(0.75).setStroke(); vein.stroke()
         return true
     }
     return img
@@ -2682,7 +2693,7 @@ struct DiskCleanupApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @ObservedObject var vm = sharedVM
     var body: some Scene {
-        Window("Disk Cleanup", id: "main") { RootView(vm: vm) }
+        Window("Tidymint", id: "main") { RootView(vm: vm) }
             .windowStyle(.hiddenTitleBar)
             .defaultSize(width: 1080, height: 700)
         MenuBarExtra {
@@ -2845,7 +2856,7 @@ struct StatsView: View {
 enum Backend {
     static let endpoint = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec"
     /// Public privacy policy (PRIVACY.md on GitHub). The link is hidden while empty.
-    static let privacyURL = "https://github.com/HaiTrung-Workspace/disk-cleanup/blob/main/PRIVACY.md"
+    static let privacyURL = "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md"
     static let consentVersion = "2026-10"
     static var newsletterText: String {
         t("Get the latest updates. Unsubscribe any time.",

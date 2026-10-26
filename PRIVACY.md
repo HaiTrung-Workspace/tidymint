@@ -1,6 +1,6 @@
 # Privacy
 
-Disk Cleanup runs entirely on your Mac. It does not track you, show ads, or send your files anywhere.
+Tidymint runs entirely on your Mac. It does not track you, show ads, or send your files anywhere.
 
 ## What leaves your Mac
 
@@ -22,7 +22,7 @@ You only join the newsletter by clicking **Send & get the newsletter** or **Subs
 ## Data stored on your Mac
 
 - Settings: `~/Library/Preferences/com.haitrung.diskcleanup.plist`
-- Activity log: `~/Library/Application Support/Disk Cleanup/activity.log`
+- Activity log: `~/Library/Application Support/Tidymint/activity.log`
 
 ## Contact
 

@@ -1,5 +1,5 @@
 /**
- * Disk Cleanup feedback & newsletter collector (Google Apps Script).
+ * Tidymint feedback & newsletter collector (Google Apps Script).
  * Appends one row per submission to the "Submissions" sheet of the spreadsheet this script is bound to.
  *
  * Deploy: Extensions > Apps Script > paste this file > Deploy > New deployment > Web app
@@ -31,7 +31,7 @@ function doPost(e) {
   }
 }
 
-function doGet() { return out('Disk Cleanup collector is running'); }
+function doGet() { return out('Tidymint collector is running'); }
 
 function sheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
