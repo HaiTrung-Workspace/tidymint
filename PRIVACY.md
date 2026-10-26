@@ -15,6 +15,10 @@ Only what you choose to send from **Contact** or the newsletter invitation:
 
 Submissions are stored in a private Google Sheet owned by the developer.
 
+## Update check
+
+Once a day, when the app is open, it downloads a small text file from tidymint.app (and, if that fails, asks GitHub's public releases page) to learn the latest version number. The request carries no data about you or your Mac beyond what any web request includes (your IP address, which GitHub Pages and GitHub log under their own policies). Nothing is installed automatically; the app only shows a line with a download link.
+
 ## Newsletter
 
 You only join the newsletter by clicking **Send & get the newsletter** or **Subscribe**. Nothing is pre-ticked. The newsletter covers Mac tips, AI tools and drinks (concao.org). Every issue has an unsubscribe link, and you can ask for your data to be deleted at any time through **Contact**.
