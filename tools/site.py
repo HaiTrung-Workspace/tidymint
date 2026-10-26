@@ -50,7 +50,8 @@ footer{border-top:0;padding:0 0 28px}
  .btn.ghost:hover{border-color:#2fd39faa;background-color:#ffffff0d}
  .topbar a:hover{border-color:#2fd39faa;background-color:#ffffff0d;box-shadow:0 0 0 3px #2fd39f26}
  details:hover{border-color:#2fd39f66}
- nav .links a:hover,.fcols a:hover{color:var(--text);text-decoration:none}
+ nav .links a:hover{color:var(--text);text-decoration:none}.fcols a:hover{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+footer span a{color:var(--leaf);text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px}footer span a:hover{text-decoration-color:var(--leaf)}
  .lang a:hover{background-color:#ffffff14}
  .up:hover{border-color:#2fd39f;box-shadow:0 14px 36px #0f8f6866}
 }
