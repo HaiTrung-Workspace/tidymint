@@ -70,6 +70,14 @@ extension Color {
     }
 }
 
+func ago(_ d: Date) -> String {
+    let m = Int(Date().timeIntervalSince(d) / 60)
+    if m < 1 { return t("just now", "vừa xong") }
+    if m < 60 { return t("\(m) min ago", "\(m) phút trước") }
+    if m < 60 * 48 { return t("\(m / 60) h ago", "\(m / 60) giờ trước") }
+    return t("\(m / 1440) days ago", "\(m / 1440) ngày trước")
+}
+
 func fmt(_ b: Int64) -> String {
     let f = ByteCountFormatter(); f.countStyle = .file; f.allowedUnits = [.useKB, .useMB, .useGB]
     return f.string(fromByteCount: b)
@@ -178,13 +186,34 @@ struct CleanItem: Identifiable, Hashable {
     var shortPath: String { url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~") }
 }
 
+/// How safe it is to move a group of items to the Trash.
+enum Safety: Int, Comparable {
+    case safe = 0     // the app rebuilds it on its own: pre-selected
+    case review       // user data or app state: the user ticks it
+    case locked       // never offered (databases, messages, settings)
+    static func < (a: Safety, b: Safety) -> Bool { a.rawValue < b.rawValue }
+    var label: String {
+        switch self {
+        case .safe: return t("Safe", "An toàn")
+        case .review: return t("You choose", "Bạn tự chọn")
+        case .locked: return t("Locked", "Khoá")
+        }
+    }
+    var color: Color { self == .safe ? Theme.green : (self == .review ? Theme.warn : Theme.danger) }
+    var icon: String { self == .safe ? "checkmark.shield" : (self == .review ? "hand.raised" : "lock") }
+}
+
 struct Category: Identifiable {
     let id: String
     let titleEN: String, titleVI: String
     let icon: String
     let descEN: String, descVI: String
+    var safety: Safety = .safe
+    /// What happens after cleaning (shown on hover of the safety badge).
+    var whyEN = "", whyVI = ""
     var title: String { t(titleEN, titleVI) }
     var desc: String { t(descEN, descVI) }
+    var why: String { t(whyEN, whyVI) }
     var items: [CleanItem]
     var expanded = false
     var total: Int64 { items.reduce(0) { $0 + $1.size } }
@@ -277,6 +306,31 @@ enum Scanner {
     static func blocked(_ p: String) -> Bool { never.contains { p.contains($0) } }
     static func skip(_ p: String) -> Bool { blocked(p) || IgnoreList.contains(p) }
 
+    /// Chat and app databases with their journals. A folder holding one is never offered as a whole.
+    static let dbExts: Set<String> = ["db", "sqlite", "sqlite3", "db-wal", "db-shm", "sqlite-wal", "sqlite-shm", "wal", "shm", "realm"]
+    static func isDatabase(_ u: URL) -> Bool { dbExts.contains(u.pathExtension.lowercased()) }
+    /// True when the item is a database file or a folder with a database among its direct children.
+    static func holdsDatabase(_ u: URL) -> Bool {
+        if isDatabase(u) { return true }
+        return children(u, hidden: true).contains { isDatabase($0) }
+    }
+
+    /// Running state by bundle id (exact), the reliable way to tell "Zalo" from "Zalo Helper".
+    static func running(_ bundleIDs: [String]) -> NSRunningApplication? {
+        for b in bundleIDs { if let a = NSRunningApplication.runningApplications(withBundleIdentifier: b).first { return a } }
+        return nil
+    }
+    static func quit(_ bundleIDs: [String]) { bundleIDs.forEach { NSRunningApplication.runningApplications(withBundleIdentifier: $0).forEach { $0.terminate() } } }
+
+    /// Refuse paths that resolve outside the user's home (symlink escape), or that are too shallow to be junk.
+    static func safeToTrash(_ u: URL) -> Bool {
+        let real = u.resolvingSymlinksInPath().path
+        let homeReal = home.resolvingSymlinksInPath().path
+        guard real.hasPrefix(homeReal + "/") || real.hasPrefix("/Volumes/") else { return false }
+        let depth = real.split(separator: "/").count
+        return depth >= 3   // /Users/name/x is the shallowest thing allowed
+    }
+
     static func make(_ urls: [URL], running: [String], defaultOn: Bool = true, minSize: Int64 = 512 * 1024) -> [CleanItem] {
         var out: [CleanItem] = []
         for u in urls where !skip(u.path) {
@@ -310,17 +364,20 @@ enum Scanner {
 
         cats.append(Category(id: "usercache", titleEN: "User Cache Files", titleVI: "Bộ nhớ đệm người dùng", icon: "internaldrive",
                              descEN: "Temporary files apps rebuild on their own", descVI: "File tạm, app tự tạo lại khi cần",
+                             whyEN: "Apps rebuild these. The first launch after cleaning may be a little slower.", whyVI: "App tự tạo lại. Lần mở đầu sau khi dọn có thể chậm hơn một chút.",
                              items: make(children(lib.appendingPathComponent("Caches")), running: run)))
 
         let appCacheNames: Set<String> = ["Cache", "Code Cache", "GPUCache", "DawnCache", "DawnGraphiteCache", "GraphiteDawnCache",
                                           "ShaderCache", "CacheStorage", "CachedData", "CachedExtensionVSIXs", "Crashpad"]
         cats.append(Category(id: "appcache", titleEN: "App Caches", titleVI: "Bộ nhớ đệm trong app", icon: "square.stack.3d.up",
                              descEN: "Web and graphics caches from Chrome, Slack, Notion, VS Code...", descVI: "Bộ nhớ đệm web, đồ hoạ của Chrome, Slack, Notion, VS Code...",
+                             whyEN: "Pages and images load from the network again. Logins and settings are not touched.", whyVI: "Trang web, ảnh sẽ tải lại từ mạng. Đăng nhập và cài đặt không bị đụng.",
                              items: make(findDirs(appRoots, names: appCacheNames, depth: 6), running: run)))
 
         let logs = [lib.appendingPathComponent("Logs")] + findDirs(appRoots, names: ["logs", "Logs"], depth: 6)
         cats.append(Category(id: "logs", titleEN: "Log Files", titleVI: "Nhật ký (log)", icon: "doc.text",
                              descEN: "Error and activity logs, safe to remove", descVI: "Nhật ký lỗi và hoạt động, xoá an toàn",
+                             whyEN: "Only useful when debugging a problem.", whyVI: "Chỉ cần khi đang tìm lỗi.",
                              items: make(logs, running: run)))
 
         var dev: [URL] = []
@@ -334,6 +391,7 @@ enum Scanner {
         cats.append(Category(id: "drafts", titleEN: "Project Drafts", titleVI: "Nháp trong thư mục dự án", icon: "tray.full",
                              descEN: "_to_delete and _tmp folders in your project folders (set them in Settings)",
                              descVI: "Thư mục _to_delete, _tmp trong thư mục dự án (chọn ở Cài đặt)",
+                             safety: .review, whyEN: "Your own drafts. Check the folder before cleaning.", whyVI: "Nháp của chính bạn. Xem lại thư mục trước khi dọn.",
                              items: make(findDirs(projects, names: ["_to_delete", "_to-delete", "_tmp"], depth: 5), running: run, minSize: 1)))
 
         let cutoff = Date().addingTimeInterval(-14 * 86400)
@@ -342,6 +400,7 @@ enum Scanner {
         }
         cats.append(Category(id: "downloads", titleEN: "Old Downloads (14+ days)", titleVI: "Downloads cũ hơn 14 ngày", icon: "arrow.down.circle",
                              descEN: "Not selected by default. Review before removing", descVI: "Mặc định không tick, xem rồi chọn",
+                             safety: .review, whyEN: "Files you downloaded. Once the Trash is emptied they are gone.", whyVI: "File bạn đã tải. Đổ Thùng rác rồi là mất.",
                              items: make(dls, running: run, defaultOn: false, minSize: 1)))
 
         return cats.filter { !$0.items.isEmpty }
@@ -383,6 +442,71 @@ enum Scanner {
     }
 
     static var trashURL: URL { home.appendingPathComponent(".Trash") }
+}
+
+// MARK: - Clean by app (rules)
+
+/// One group of paths inside an app's data, with its own safety level and a plain explanation.
+struct AppSection {
+    let id: String
+    let titleEN: String, titleVI: String
+    /// Home-relative templates. A single "*" component matches every child folder (accounts, profiles).
+    let paths: [String]
+    let safety: Safety
+    let whyEN: String, whyVI: String
+    /// Offer the files by month so old media can be cleaned first.
+    var byAge = false
+    /// Skip a matched folder entirely if a database file sits directly inside it.
+    var dbGuard = true
+    var title: String { t(titleEN, titleVI) }
+    var why: String { t(whyEN, whyVI) }
+}
+
+struct AppRule: Identifiable {
+    let id: String
+    let nameEN: String, nameVI: String
+    let bundleIDs: [String]
+    /// Folder whose presence means the app has data on this Mac.
+    let marker: String
+    let sections: [AppSection]
+    var name: String { t(nameEN, nameVI) }
+}
+
+enum AppRules {
+    /// Expand a home-relative template, resolving one "*" level, to the folders that exist.
+    static func expand(_ template: String) -> [URL] {
+        let parts = template.split(separator: "/").map(String.init)
+        var urls = [Scanner.home]
+        for p in parts {
+            var next: [URL] = []
+            for u in urls {
+                if p == "*" { next += Scanner.children(u, hidden: true).filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true } }
+                else { let c = u.appendingPathComponent(p); if Scanner.fm.fileExists(atPath: c.path) { next.append(c) } }
+            }
+            urls = next
+            if urls.isEmpty { return [] }
+        }
+        return urls
+    }
+
+    /// Items for one section: every matched folder, minus anything a database guard or the ignore list rejects.
+    static func items(_ s: AppSection) -> [CleanItem] {
+        var out: [CleanItem] = []
+        for tpl in s.paths {
+            for u in expand(tpl) where !Scanner.skip(u.path) {
+                if s.dbGuard && Scanner.holdsDatabase(u) { continue }
+                let size = Scanner.size(u)
+                guard size > 0 else { continue }
+                out.append(CleanItem(url: u, size: size, selected: s.safety == .safe))
+            }
+        }
+        return out.sorted { $0.size > $1.size }
+    }
+
+    static func installed() -> [AppRule] { all.filter { Scanner.fm.fileExists(atPath: Scanner.home.appendingPathComponent($0.marker).path) } }
+
+    /// Rules are added per app, each one measured on a real Mac first (see docs/11 in the project notes).
+    static let all: [AppRule] = []
 }
 
 // MARK: - Circle packing (greedy)
@@ -1169,15 +1293,30 @@ enum Phase { case idle, scanning, summary, review, done }
 
     var lastOK = Set<URL>()
     var lastErr = ""
-    func trash(_ urls: [URL]) -> (Int, Int) {
+    @Published var undoable: Journal.Session? = Journal.load()
+    /// Move items to the Trash and remember where each one went, so the whole run can be undone.
+    /// `strict` refuses paths outside the home folder or too close to its root (off only for a folder the user picked by hand).
+    func trash(_ urls: [URL], label: String = "", strict: Bool = true) -> (Int, Int) {
         var ok = 0, fail = 0
         lastOK = []; lastErr = ""
+        var moved: [Journal.Entry] = []
         for u in urls {
-            do { try FileManager.default.trashItem(at: u, resultingItemURL: nil); ok += 1; lastOK.insert(u) }
-            catch where FileManager.default.fileExists(atPath: u.path) && ((try? moveToUserTrash(u)) != nil) {
-                ok += 1; lastOK.insert(u)   // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly
+            if strict && !Scanner.safeToTrash(u) {
+                fail += 1
+                if lastErr.isEmpty { lastErr = t("refused, path is outside the safe area", "từ chối, đường dẫn nằm ngoài vùng an toàn") }
+                continue
             }
+            let size = Scanner.size(u)
+            var dest: NSURL?
+            do { try FileManager.default.trashItem(at: u, resultingItemURL: &dest); ok += 1; lastOK.insert(u)
+                 if let d = dest as URL? { moved.append(Journal.Entry(from: u.path, to: d.path, size: size)) } }
             catch {
+                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly
+                if FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
+                    ok += 1; lastOK.insert(u)
+                    moved.append(Journal.Entry(from: u.path, to: d.path, size: size))
+                    continue
+                }
                 fail += 1
                 if lastErr.isEmpty {
                     let ns = error as NSError
@@ -1191,7 +1330,21 @@ enum Phase { case idle, scanning, summary, review, done }
             }
         }
         if !lastErr.isEmpty { log("ERROR trash: \(lastErr)") }
+        if !moved.isEmpty { undoable = Journal.save(Journal.Session(date: Date(), label: label, entries: moved)) }
         return (ok, fail)
+    }
+
+    /// Put everything from the last run back where it was (only items still sitting in the Trash).
+    func undoLast() {
+        guard let s = undoable else { return }
+        guard confirm(t("Undo the last clean?", "Hoàn tác lần dọn vừa rồi?"),
+                      t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ."),
+                      t("Put Back", "Trả về chỗ cũ")) else { return }
+        let r = Journal.restore(s)
+        lastResult = t("Put back \(r.ok) items.", "Đã trả về \(r.ok) mục.") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+        log("Undo: put back \(r.ok) items, skipped \(r.skipped)")
+        undoable = nil; Journal.clear()
+        refreshTrash(); refreshDisk()
     }
     func okSize(_ items: [CleanItem]) -> Int64 { items.filter { lastOK.contains($0.url) }.reduce(0) { $0 + $1.size } }
     var failNote: String { lastErr.isEmpty ? "" : t(" Reason: ", " Lý do: ") + lastErr }
@@ -1199,7 +1352,7 @@ enum Phase { case idle, scanning, summary, review, done }
     func cleanJunk() {
         let sel = cats.flatMap { $0.items.filter(\.selected) }
         let size = sel.reduce(0) { $0 + $1.size }
-        let (ok, fail) = trash(sel.map(\.url)); _ = size
+        let (ok, fail) = trash(sel.map(\.url), label: "cleanup"); _ = size
         lastResult = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + failNote : "")
         log(lastResult)
         phase = .done
@@ -1209,7 +1362,7 @@ enum Phase { case idle, scanning, summary, review, done }
     func cleanLarge() {
         let sel = large.filter(\.selected)
         let size = sel.reduce(0) { $0 + $1.size }
-        let (ok, fail) = trash(sel.map(\.url)); _ = size
+        let (ok, fail) = trash(sel.map(\.url), label: "large"); _ = size
         lastResult = t("Moved \(ok) large files (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) file lớn (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") + failNote : "")
         log(lastResult)
         large.removeAll { lastOK.contains($0.url) }
@@ -1307,7 +1460,7 @@ enum Phase { case idle, scanning, summary, review, done }
     func rescanLens() { if let u = lensPath.last { sizeCache = sizeCache.filter { !$0.key.hasPrefix(u.path) } }; loadLens() }
     func trashNode(_ n: Node) {
         guard confirm(t("Move to Trash?", "Chuyển vào Thùng rác?"), "\(n.name), \(fmt(n.size))", t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
-        let (ok, _) = trash([n.url])
+        let (ok, _) = trash([n.url], label: "lens", strict: false)
         if ok > 0 { lensNodes.removeAll { $0.id == n.id }; log("Space Lens: moved \(n.url.path) (\(fmt(n.size))) to Trash") }
         refreshTrash(); refreshDisk()
     }
@@ -1482,7 +1635,51 @@ enum Stats {
     }
 }
 
+/// Undo journal: where the last clean moved each item. One session only, stored as JSON next to the activity log.
+enum Journal {
+    struct Entry: Codable { let from: String; let to: String; let size: Int64 }
+    struct Session: Codable {
+        let date: Date; let label: String; let entries: [Entry]
+        var size: Int64 { entries.reduce(0) { $0 + $1.size } }
+    }
+    static var path: String { Stats.dir + "/last-clean.json" }
+    static func load() -> Session? {
+        guard let d = FileManager.default.contents(atPath: path), let s = try? JSONDecoder().decode(Session.self, from: d) else { return nil }
+        // Only worth offering while something from that run is still in the Trash.
+        return s.entries.contains { FileManager.default.fileExists(atPath: $0.to) } ? s : nil
+    }
+    @discardableResult static func save(_ s: Session) -> Session {
+        _ = Stats.path
+        if let d = try? JSONEncoder().encode(s) { try? d.write(to: URL(fileURLWithPath: path)) }
+        return s
+    }
+    static func clear() { try? FileManager.default.removeItem(atPath: path) }
+    static func restore(_ s: Session) -> (ok: Int, skipped: Int) {
+        var ok = 0, skipped = 0
+        let fm = FileManager.default
+        for e in s.entries {
+            guard fm.fileExists(atPath: e.to), !fm.fileExists(atPath: e.from) else { skipped += 1; continue }
+            try? fm.createDirectory(atPath: (e.from as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
+            do { try fm.moveItem(atPath: e.to, toPath: e.from); ok += 1 } catch { skipped += 1 }
+        }
+        return (ok, skipped)
+    }
+}
+
 // MARK: - Components
+
+struct SafetyBadge: View {
+    let level: Safety; var why = ""
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: level.icon).font(.system(size: 9, weight: .bold))
+            Text(level.label).font(.system(size: 10, weight: .semibold))
+        }
+        .foregroundColor(level.color).padding(.horizontal, 7).padding(.vertical, 2)
+        .background(Capsule().fill(level.color.opacity(0.15)))
+        .help(why)
+    }
+}
 
 struct CheckBox: View {
     let state: Int
@@ -1672,6 +1869,7 @@ struct CleanupView: View {
                 Text(vm.lastResult).foregroundColor(Theme.sub).multilineTextAlignment(.center)
                 Text(t("Last step: review the Trash, then empty it.", "Bước cuối: xem lại Thùng rác rồi đổ.")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
+                    if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoLast() } }
                     GhostButton(title: t("Scan Again", "Quét lại")) { vm.scanJunk() }
                     PrimaryButton(title: t("Go to Trash", "Mở mục Thùng rác"), action: { vm.page = .trash })
                 }
@@ -1710,6 +1908,7 @@ struct ReviewView: View {
                                     Text(cat.desc).foregroundColor(Theme.sub).font(.system(size: 11))
                                 }
                                 Spacer()
+                                SafetyBadge(level: cat.safety, why: cat.why)
                                 Text("\(cat.items.count) items").foregroundColor(Theme.sub).font(.system(size: 12))
                                 Text(fmt(cat.selectedSize) + " / " + fmt(cat.total)).foregroundColor(.white)
                                     .font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 150, alignment: .trailing)
@@ -1919,6 +2118,13 @@ struct TrashView: View {
                 PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
             }
             Text("Emptying cannot be undone. Take a quick look first.").font(.system(size: 12)).foregroundColor(Theme.sub)
+            if let s = vm.undoable {
+                VStack(spacing: 8) {
+                    Text(t("Last clean: \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi: \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
+                        .font(.system(size: 12)).foregroundColor(Theme.sub)
+                    GhostButton(title: t("Undo last clean", "Hoàn tác lần dọn vừa rồi")) { vm.undoLast() }
+                }.padding(.top, 10)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { vm.refreshTrash() }
