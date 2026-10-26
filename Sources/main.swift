@@ -1,6 +1,6 @@
 // Tidymint: a free, open-source disk cleaner for macOS, built for people who work with AI tools.
 // "Keep your Mac in mint condition."
-// Author: Hai Trung. License: MIT (see LICENSE). Provided "as is", without warranty.
+// Author: Tidymint contributors. License: MIT (see LICENSE). Provided "as is", without warranty.
 // Safety rules: items are only moved to the Trash (the "Empty Trash" button asks first);
 // cloud libraries, Photos, Mail, keychains, browser profiles and Apple system caches are never touched.
 // Note: no @State anywhere (the @State macro needs an Xcode-only plugin); use Flag/ObservableObject instead.
@@ -2933,8 +2933,8 @@ struct ContactView: View {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(t("Contact the developer", "Liên hệ nhà phát triển")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
-                    Text(t("Feedback, bug reports and questions go straight to Hai Trung. An email address is needed so you can get a reply.",
-                           "Góp ý, báo lỗi, câu hỏi đều tới thẳng Hải Trung. Cần email để có thể trả lời bạn."))
+                    Text(t("Feedback, bug reports and questions go straight to the developer. An email address is needed so you can get a reply.",
+                           "Góp ý, báo lỗi, câu hỏi đều tới thẳng nhà phát triển. Cần email để có thể trả lời bạn."))
                         .foregroundColor(Theme.sub).font(.system(size: 12))
                 }.padding(.top, 34)
                 HStack(spacing: 8) {
