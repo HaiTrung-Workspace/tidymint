@@ -3,16 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tidymint: app dọn rác Mac miễn phí, mã nguồn mở</title>
-<meta name="description" content="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, giao diện tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Thay CleanMyMac mà không cần crack.">
-<link rel="icon" href="../favicon.png">
+<title>App dọn rác Mac miễn phí, thay CleanMyMac | Tidymint</title>
+<meta name="description" content="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Mọi thứ vào Thùng rác trước.">
+<link rel="canonical" href="https://tidymint.app/vi/">
 <link rel="alternate" hreflang="en" href="https://tidymint.app/">
 <link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/">
-<meta property="og:title" content="Tidymint: giữ máy Mac luôn gọn gàng">
-<meta property="og:description" content="App dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt.">
+<link rel="alternate" hreflang="x-default" href="https://tidymint.app/">
+<link rel="icon" href="../favicon.png">
+<meta property="og:title" content="App dọn rác Mac miễn phí, thay CleanMyMac | Tidymint">
+<meta property="og:description" content="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Mọi thứ vào Thùng rác trước.">
 <meta property="og:image" content="https://tidymint.app/smart.jpg">
 <meta property="og:url" content="https://tidymint.app/vi/">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Tidymint", "operatingSystem": "macOS 14 or later", "applicationCategory": "UtilitiesApplication", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "downloadUrl": "https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip", "url": "https://tidymint.app/vi/", "license": "https://opensource.org/licenses/MIT", "inLanguage": ["en", "vi"], "image": "https://tidymint.app/icon.png"}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Tidymint có miễn phí thật không?", "acceptedAnswer": {"@type": "Answer", "text": "Có. App mã nguồn mở theo giấy phép MIT, không tài khoản, không thuê bao, không có bản trả phí."}}, {"@type": "Question", "name": "Có an toàn không?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint chỉ chuyển vào Thùng rác nên lấy lại được hết. App không bao giờ động tới Ảnh, Mail, mật khẩu, thư mục đám mây hay bộ nhớ đệm hệ thống của Apple, và mục rủi ro không bao giờ chọn sẵn."}}, {"@type": "Question", "name": "Sao lần đầu macOS lại chặn?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint chưa được Apple công chứng (cần tài khoản nhà phát triển trả phí). Mở một lần qua Cài đặt hệ thống › Quyền riêng tư & Bảo mật › Vẫn mở, đúng như hướng dẫn của Apple. Mã nguồn công khai trên GitHub."}}, {"@type": "Question", "name": "App có gửi dữ liệu của tôi đi không?", "acceptedAnswer": {"@type": "Answer", "text": "Không. App chạy không cần mạng. Dữ liệu chỉ rời máy khi bạn tự gửi góp ý hoặc đăng ký bản tin."}}, {"@type": "Question", "name": "Khác gì CleanMyMac?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint miễn phí, mã nguồn mở, tập trung vào dọn dẹp và dung lượng ổ. App không có quét mã độc hay tinh chỉnh hiệu năng."}}, {"@type": "Question", "name": "Chạy trên máy nào?", "acceptedAnswer": {"@type": "Answer", "text": "macOS 14 trở lên, cả máy chip Apple lẫn máy Intel."}}, {"@type": "Question", "name": "Có bản Windows hay iPhone không?", "acceptedAnswer": {"@type": "Answer", "text": "Không. iOS không cho app dọn dữ liệu của app khác, còn Windows hiện chưa có kế hoạch."}}]}]</script>
 <style>
 :root{--bg:#06150f;--bg2:#0b2620;--card:#10302780;--line:#ffffff1a;--text:#eafff7;--sub:#a9c9bd;--mint:#2fd39f;--mint2:#0f8f68;--leaf:#5ff0c0}
 *{box-sizing:border-box}
@@ -54,100 +57,117 @@ pre{background:#00000059;border:1px solid var(--line);border-radius:12px;padding
 .signup form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 .signup input{min-width:280px;padding:13px 16px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
 .small{font-size:13px;color:var(--sub)}
+.steps{padding-left:22px;color:var(--sub)}.steps li{margin-bottom:10px}.steps b{color:var(--text)}
 #msg{min-height:22px;margin-top:10px;font-size:15px}
 footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 @media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
-.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}.note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}</style>
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;position:sticky;top:0;z-index:10;background:#06150fcc;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 100vmax #06150fcc;clip-path:inset(0 -100vmax)}
+.navr{display:flex;align-items:center;gap:22px}
+.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}
+.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
+.navcta{padding:7px 14px;font-size:14px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.vs .col.good{border-color:#2fd39f66;background:linear-gradient(160deg,#145c4766,#10302780)}
+.vs h3{margin:0 0 12px;font-size:20px}.vs ul{list-style:none;padding:0;margin:0}.vs li{padding:8px 0 8px 30px;position:relative;color:var(--sub);border-top:1px solid var(--line)}
+.vs li:before{position:absolute;left:4px;top:8px;font-weight:700}.vs .bad li:before{content:"✕";color:#ff7a7a}.vs .good li:before{content:"✓";color:var(--leaf)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf);margin-bottom:8px}
+.def{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center}
+.def p{color:var(--sub)}.def ul{color:var(--sub);padding-left:20px}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:h}
+.how .card{counter-increment:h;position:relative;padding-top:56px}.how .card:before{content:counter(h);position:absolute;left:20px;top:18px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ico{font-size:22px;display:block;margin-bottom:8px}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
+summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
+details p{color:var(--sub);margin:0 0 16px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}
+.fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
+.fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
+footer{border-top:0;padding:0 0 28px}
+@media (max-width:820px){.vs,.def,.how,.fcols{grid-template-columns:1fr}.navcta{display:none}}
+</style>
 </head>
 <body>
 <div class="wrap">
 <nav>
   <a class="brand" href="./"><img src="../icon.png" alt="">Tidymint</a>
-  <div class="navr"><div class="links"><a href="#tinh-nang">Tính năng</a><a href="#an-toan">An toàn</a><a href="#cai-dat">Cài đặt</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><div class="lang" role="group" aria-label="Ngôn ngữ"><a class="on" href="./" data-l="vi">VI</a><a href="../" data-l="en">EN</a></div></div>
+  <div class="navr"><div class="links"><a href="#tinh-nang">Tính năng</a><a href="#cach-dung">Cách dùng</a><a href="#hoi-dap">Hỏi đáp</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><a class="btn primary navcta" href="#cai-dat">Tải về</a><div class="lang" role="group" aria-label="Ngôn ngữ"><a class="on" href="./" data-l="vi">VI</a><a href="../" data-l="en">EN</a></div></div>
 </nav>
 
 <header class="hero">
   <h1>Giữ máy Mac <span>luôn gọn gàng</span>.</h1>
   <p>Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, giao diện tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ và xem chính xác cái gì đang chiếm ổ.</p>
-  <div class="cta">
-    <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint miễn phí</a>
-    <a class="btn ghost" href="#cai-dat">Hướng dẫn cài</a>
-  </div>
+  <div class="cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải miễn phí</a><a class="btn ghost" href="#cai-dat">Hướng dẫn cài</a></div>
   <div class="badges"><span>✓ Miễn phí, mã nguồn mở (MIT)</span><span>✓ Chỉ chuyển vào Thùng rác</span><span>✓ Chạy không cần mạng, không theo dõi</span></div>
   <div class="shot"><img src="../smart.jpg" alt="Kết quả Quét thông minh của Tidymint" width="1600" height="1084"></div>
 </header>
 
-<section id="tinh-nang">
-  <h2>Mạnh, nhưng bạn luôn là người quyết</h2>
-  <p class="lead">Quét một lần là thấy rác. Xoá gì là do bạn chọn. Ảnh minh hoạ dùng dữ liệu mẫu.</p>
-  <div class="feature">
-    <div class="text"><h3>Xem từng mục trước khi dọn</h3>
-      <p>Bộ nhớ đệm, nhật ký, npm cache, Downloads cũ và file nháp trong thư mục dự án, chia nhóm và ghi rõ dung lượng. Mở nhóm nào cũng tick hoặc bỏ tick từng mục được.</p>
-      <ul><li>App đang mở được đánh dấu và không tick sẵn</li><li>Downloads cũ không bao giờ được chọn sẵn</li></ul></div>
-    <img src="../cleanup.jpg" alt="Chi tiết dọn rác có ô tick" loading="lazy">
-  </div>
-  <div class="feature">
-    <div class="text"><h3>Xoá file trùng mà không sợ</h3>
-      <p>File giống hệt nhau được tìm theo nội dung, bất kể tên. Bản tốt nhất được đánh dấu <b>Giữ</b>, một cú bấm chọn hết các bản thừa.</p>
-      <ul><li>Trước khi xoá, Tidymint kiểm tra thư mục dự án của bạn</li><li>File vẫn được script dùng sẽ hiện đỏ và tự bỏ tick</li></ul></div>
-    <img src="../dupes.jpg" alt="Nhóm file trùng có nhãn Giữ" loading="lazy">
-  </div>
-  <div class="feature">
-    <div class="text"><h3>Thấy ngay ổ đầy vì đâu</h3>
-      <p>Bản đồ ổ đĩa vẽ mỗi thư mục thành một bong bóng theo dung lượng thật, kèm giải thích dễ hiểu cho các thư mục hay gặp, kể cả thư mục model AI.</p></div>
-    <img src="../lens.jpg" alt="Bản đồ ổ đĩa dạng bong bóng" loading="lazy">
-  </div>
-  <div class="feature">
-    <div class="text"><h3>Gỡ app sạch sẽ</h3>
-      <p>Gỡ app là gỡ luôn bộ nhớ đệm, cài đặt, nhật ký đi kèm. Rác của app đã xoá từ trước và file cài đặt cũ có mục riêng.</p></div>
-    <img src="../apps.jpg" alt="Gỡ app kèm file sót lại" loading="lazy">
-  </div>
-  <div class="grid">
-    <div class="card"><b>Dữ liệu đám mây</b><span>Xem iCloud Drive, Google Drive, Dropbox đang lưu bao nhiêu trên máy.</span></div>
-    <div class="card"><b>Tự chạy khi bật máy</b><span>Các app chạy ngầm khi khởi động, kể cả phần sót của app đã gỡ.</span></div>
-    <div class="card"><b>Thanh menu</b><span>Xem nhanh dung lượng trống, RAM, Thùng rác; báo khi ổ sắp đầy.</span></div>
+<section>
+  <span class="tag">Vì sao chọn Tidymint</span><h2>App dọn dẹp bạn tin được</h2>
+  <div class="vs" style="margin-top:24px">
+    <div class="col bad"><h3>App dọn dẹp trả phí thường gặp</h3><ul><li>Trả tiền bản quyền hoặc thuê bao, lên đời bản lớn thường tốn thêm</li><li>Mã nguồn đóng: không biết app xoá những gì</li><li>Bản crack là đường lây mã độc rất phổ biến</li></ul></div>
+    <div class="col good"><h3>Tidymint</h3><ul><li>Miễn phí, không cần tài khoản, không thuê bao</li><li>Mã nguồn mở (MIT): ai cũng đọc được từng dòng</li><li>Chỉ chuyển vào Thùng rác, bạn tự đổ</li></ul></div>
   </div>
 </section>
 
-<section id="an-toan">
-  <h2>An toàn là trên hết</h2>
-  <div class="grid">
-    <div class="card"><b>Luôn vào Thùng rác trước</b><span>Không xoá vĩnh viễn. Bạn tự đổ Thùng rác, có hỏi lại trước.</span></div>
-    <div class="card"><b>Không đụng thứ quan trọng</b><span>Ảnh, Mail, mật khẩu, thư mục đám mây và bộ nhớ đệm hệ thống của Apple không bao giờ bị động tới.</span></div>
-    <div class="card"><b>Riêng tư</b><span>Chạy không cần mạng. Không gửi dữ liệu gì đi trừ khi bạn tự gửi góp ý. <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a></span></div>
+<section>
+  <div class="def">
+    <div><span class="tag">Nên biết</span><h2>“Dữ liệu hệ thống” trên Mac là gì?</h2><p>Trong <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>, macOS gom mọi thứ không xếp được vào mục <b>Dữ liệu hệ thống</b> (System Data). Mục này hay phình lên hàng chục GB và khó xem bằng Finder.</p><ul><li>Bộ nhớ đệm, nhật ký, file tạm của app và trình duyệt</li><li>Phần sót lại của app đã xoá</li><li>Bản chụp Time Machine trên máy và file cài đặt cũ</li><li>Với người làm AI: file model và bộ nhớ đệm thư viện</li></ul><p>Tidymint chỉ ra thư mục nào đang lớn trên máy bạn, giải thích từng thư mục bằng lời dễ hiểu, và cho bạn chuyển các mục an toàn vào Thùng rác.</p></div>
+    <img src="../lens.jpg" alt="Space Lens" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
   </div>
+</section>
+
+<section id="cach-dung">
+  <span class="tag">Cách dùng</span><h2>Ba bước, bạn luôn là người quyết</h2>
+  <div class="how" style="margin-top:24px"><div class="card"><b>Quét</b><span>Một cú bấm xem qua bộ nhớ đệm, nhật ký, Downloads cũ, file lớn và file trùng. Chưa động vào gì.</span></div><div class="card"><b>Xem lại</b><span>Từng mục được chia nhóm, ghi dung lượng và giải thích. Mục rủi ro không bao giờ chọn sẵn, file còn được script dùng sẽ được đánh dấu.</span></div><div class="card"><b>Dọn</b><span>Mục đã chọn chuyển vào Thùng rác. Xem lại Thùng rác rồi tự đổ khi sẵn sàng.</span></div></div>
+</section>
+
+<section id="tinh-nang">
+  <span class="tag">Tính năng</span><h2>Đủ cả trong một app nhỏ</h2>
+  <div class="grid" style="margin-top:24px"><div class="card"><span class="ico">🧹</span><b>Quét thông minh</b><span>Bộ nhớ đệm, nhật ký, npm cache, Downloads cũ và file nháp trong thư mục dự án.</span></div><div class="card"><span class="ico">🗂️</span><b>File trùng</b><span>Tìm theo nội dung. Giữ bản tốt nhất, kiểm tra script trước khi xoá.</span></div><div class="card"><span class="ico">🫧</span><b>Bản đồ ổ đĩa</b><span>Bong bóng cho thấy cái gì chiếm ổ, kèm giải thích thư mục hay gặp.</span></div><div class="card"><span class="ico">🧩</span><b>Gỡ app</b><span>Gỡ app cùng bộ nhớ đệm, cài đặt và phần sót lại.</span></div><div class="card"><span class="ico">📦</span><b>File lớn và cũ</b><span>File trên 100 MB, xếp theo dung lượng hoặc lần mở cuối. Không chọn sẵn.</span></div><div class="card"><span class="ico">📊</span><b>Thanh menu</b><span>Xem nhanh dung lượng trống, RAM, Thùng rác; báo khi ổ sắp đầy.</span></div></div>
+  <div class="feature" style="margin-top:48px"><img src="../dupes.jpg" alt="" loading="lazy"><img src="../cleanup.jpg" alt="" loading="lazy"></div>
+</section>
+
+<section>
+  <span class="tag">Dành cho</span><h2>Ai hay đầy ổ nhất</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:24px"><div class="card"><span class="ico">🤖</span><b>Người làm AI</b><span>File model, bộ nhớ đệm Hugging Face, Ollama, ảnh tạo bằng AI.</span></div><div class="card"><span class="ico">👩‍💻</span><b>Lập trình viên</b><span>node_modules, npm, Homebrew, bản build cũ.</span></div><div class="card"><span class="ico">🎬</span><b>Làm video, ảnh</b><span>File xuất, bản nháp render, ảnh trùng.</span></div><div class="card"><span class="ico">💻</span><b>Mac 256 GB</b><span>Ổ nhỏ thì từng GB đều quý.</span></div></div>
+</section>
+
+<section id="hoi-dap">
+  <h2>Hỏi đáp</h2>
+  <div style="margin-top:20px"><details><summary>Tidymint có miễn phí thật không?</summary><p>Có. App mã nguồn mở theo giấy phép MIT, không tài khoản, không thuê bao, không có bản trả phí.</p></details><details><summary>Có an toàn không?</summary><p>Tidymint chỉ chuyển vào Thùng rác nên lấy lại được hết. App không bao giờ động tới Ảnh, Mail, mật khẩu, thư mục đám mây hay bộ nhớ đệm hệ thống của Apple, và mục rủi ro không bao giờ chọn sẵn.</p></details><details><summary>Sao lần đầu macOS lại chặn?</summary><p>Tidymint chưa được Apple công chứng (cần tài khoản nhà phát triển trả phí). Mở một lần qua Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật › Vẫn mở, đúng như hướng dẫn của Apple. Mã nguồn công khai trên GitHub.</p></details><details><summary>App có gửi dữ liệu của tôi đi không?</summary><p>Không. App chạy không cần mạng. Dữ liệu chỉ rời máy khi bạn tự gửi góp ý hoặc đăng ký bản tin.</p></details><details><summary>Khác gì CleanMyMac?</summary><p>Tidymint miễn phí, mã nguồn mở, tập trung vào dọn dẹp và dung lượng ổ. App không có quét mã độc hay tinh chỉnh hiệu năng.</p></details><details><summary>Chạy trên máy nào?</summary><p>macOS 14 trở lên, cả máy chip Apple lẫn máy Intel.</p></details><details><summary>Có bản Windows hay iPhone không?</summary><p>Không. iOS không cho app dọn dữ liệu của app khác, còn Windows hiện chưa có kế hoạch.</p></details></div>
 </section>
 
 <section id="cai-dat">
   <h2>Cài đặt</h2>
   <p class="lead">Cần macOS 14 trở lên, chạy được cả máy chip Apple và máy Intel.</p>
-  <div class="note">Tidymint chưa được Apple ký số (tài khoản nhà phát triển Apple tốn 99 USD/năm, app miễn phí nên chưa mua). Vì vậy lần đầu mở, macOS sẽ chặn và báo không xác minh được nhà phát triển. Đây là cảnh báo chung cho mọi app chưa ký. Mã nguồn công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a> để ai cũng kiểm tra được.</div>
-  <ol class="steps">
-    <li><b>Tải về:</b> bấm <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint</a>, mở file <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).</li>
-    <li><b>Mở lần đầu:</b> nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.</li>
-    <li><b>Cho phép mở:</b> vào <b>Cài đặt hệ thống</b> → <b>Quyền riêng tư &amp; Bảo mật</b>, kéo xuống cuối, bấm <b>Vẫn mở</b> (Open Anyway), nhập mật khẩu máy nếu được hỏi, rồi bấm <b>Mở</b>. Từ lần sau mở bình thường.</li>
-    <li><b>Cấp quyền đọc ổ đĩa:</b> vẫn trong <b>Quyền riêng tư &amp; Bảo mật</b>, chọn <b>Truy cập toàn bộ ổ đĩa</b> (Full Disk Access), bật <b>Tidymint</b>. Thiếu quyền này app vẫn chạy nhưng một số thư mục sẽ hiện trống.</li>
-  </ol>
-  <p class="small">Các bước mở app chưa ký theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Bạn rành Terminal có thể tự build từ mã nguồn: <code>git clone https://github.com/HaiTrung-Workspace/tidymint.git &amp;&amp; cd tidymint &amp;&amp; ./build.sh --install</code></p>
-
-  <div class="signup" id="dang-ky">
+  <div class="note">Tidymint chưa được Apple công chứng (tài khoản nhà phát triển Apple tốn 99 USD/năm, app miễn phí nên chưa mua). Vì vậy lần đầu mở, macOS sẽ chặn. Đây là cảnh báo chung cho mọi app chưa công chứng. Mã nguồn công khai trên GitHub để ai cũng kiểm tra được.</div>
+  <ol class="steps"><li><b>Tải về:</b> bấm <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint</a>, mở file <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).</li><li><b>Mở lần đầu:</b> nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.</li><li><b>Cho phép mở:</b> vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo xuống cuối, bấm <b>Vẫn mở</b> (Open Anyway), nhập mật khẩu máy nếu được hỏi, rồi bấm <b>Mở</b>. Từ lần sau mở bình thường.</li><li><b>Cấp quyền đọc ổ đĩa:</b> vẫn trong <b>Quyền riêng tư &amp; Bảo mật</b>, chọn <b>Truy cập toàn bộ ổ đĩa</b> (Full Disk Access), bật <b>Tidymint</b>. Thiếu quyền này app vẫn chạy nhưng một số thư mục sẽ hiện trống.</li></ol>
+  <p class="small">Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Bạn rành Terminal có thể tự build: <code>git clone https://github.com/HaiTrung-Workspace/tidymint.git &amp;&amp; cd tidymint &amp;&amp; ./build.sh --install</code></p>
+  <div class="signup" id="dang-ky" style="margin-top:36px">
     <h2 style="margin-bottom:6px">Nhận tin khi có bản mới</h2>
     <p class="small" style="margin:0">Mẹo giữ máy gọn và thông báo phiên bản mới, mỗi tháng tối đa một thư.</p>
-    <form id="f">
-      <input type="email" id="email" required placeholder="ten@example.com" autocomplete="email">
-      <button class="btn primary" type="submit">Đăng ký</button>
-    </form>
+    <form id="f"><input type="email" id="email" required placeholder="ten@example.com" autocomplete="email"><button class="btn primary" type="submit">Đăng ký</button></form>
     <div id="msg"></div>
     <p class="small">Nhận thông tin cập nhật mới nhất. Huỷ bất kỳ lúc nào.</p>
   </div>
 </section>
 
-<footer>
-  <span>© 2026 Tidymint · Giấy phép MIT · Cung cấp nguyên trạng, không bảo hành</span>
-  <span><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a> · <a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Báo lỗi</a> · <a href="mailto:hello@tidymint.app">hello@tidymint.app</a> · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a></span>
-</footer>
+<section style="text-align:center;padding-top:20px">
+  <h2>Dọn máy thôi?</h2><p class="lead" style="margin:0 auto 24px">Miễn phí, mã nguồn mở, mọi thứ vào Thùng rác trước.</p>
+  <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải miễn phí</a>
+</section>
+
+<div class="fcols">
+  <div><a class="brand" href="./"><img src="../icon.png" alt="">Tidymint</a><p>App dọn rác Mac miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành.</p></div>
+  <div><h4>Sản phẩm</h4><a href="#tinh-nang">Tính năng</a><a href="#cach-dung">Cách dùng</a><a href="#cai-dat">Cài đặt</a><a href="https://github.com/HaiTrung-Workspace/tidymint/releases">Các phiên bản</a></div><div><h4>Tài nguyên</h4><a href="https://github.com/HaiTrung-Workspace/tidymint">Mã nguồn</a><a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Báo lỗi</a><a href="#hoi-dap">Hỏi đáp</a></div><div><h4>Pháp lý</h4><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/LICENSE">Giấy phép MIT</a><a href="mailto:hello@tidymint.app">hello@tidymint.app</a></div>
+</div>
+<footer><span>© 2026 Tidymint · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a></span></footer>
 </div>
 <script>
+document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec";
 document.getElementById('f').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -162,9 +182,6 @@ document.getElementById('f').addEventListener('submit', async (e) => {
     msg.textContent = 'Cảm ơn bạn! Đã đăng ký.'; e.target.reset();
   } catch (err) { msg.textContent = 'Chưa gửi được, bạn thử lại sau nhé.'; }
 });
-</script>
-<script>
-document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
 </script>
 </body>
 </html>
