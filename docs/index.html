@@ -3,16 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tidymint: free Mac cleaner for people who work with AI</title>
-<meta name="description" content="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, find duplicate files, uninstall apps completely and see what fills your disk. A free alternative to CleanMyMac.">
-<link rel="icon" href="favicon.png">
+<title>Free Mac Cleaner, CleanMyMac Alternative | Tidymint</title>
+<meta name="description" content="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, find duplicate files, uninstall apps completely and see what fills your disk. Everything goes to the Trash first.">
+<link rel="canonical" href="https://tidymint.app/">
 <link rel="alternate" hreflang="en" href="https://tidymint.app/">
 <link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/">
-<meta property="og:title" content="Tidymint: keep your Mac in mint condition">
-<meta property="og:description" content="Free, open-source Mac cleaner built for people who work with AI tools.">
+<link rel="alternate" hreflang="x-default" href="https://tidymint.app/">
+<link rel="icon" href="favicon.png">
+<meta property="og:title" content="Free Mac Cleaner, CleanMyMac Alternative | Tidymint">
+<meta property="og:description" content="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, find duplicate files, uninstall apps completely and see what fills your disk. Everything goes to the Trash first.">
 <meta property="og:image" content="https://tidymint.app/smart.jpg">
 <meta property="og:url" content="https://tidymint.app/">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Tidymint", "operatingSystem": "macOS 14 or later", "applicationCategory": "UtilitiesApplication", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "downloadUrl": "https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip", "url": "https://tidymint.app/", "license": "https://opensource.org/licenses/MIT", "inLanguage": ["en", "vi"], "image": "https://tidymint.app/icon.png"}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is Tidymint really free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is open source under the MIT licence, with no account, no subscription and no paid tier."}}, {"@type": "Question", "name": "Is it safe?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint only moves items to the Trash, so you can put anything back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and risky items are never pre-selected."}}, {"@type": "Question", "name": "Why does macOS block it the first time?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint is not notarized by Apple yet (that needs a paid developer account). Open it once from System Settings › Privacy & Security › Open Anyway, as Apple describes in its own guide. The source code is public on GitHub."}}, {"@type": "Question", "name": "Does it send my data anywhere?", "acceptedAnswer": {"@type": "Answer", "text": "No. It works offline. Data only leaves your Mac if you send feedback or join the newsletter yourself."}}, {"@type": "Question", "name": "How is it different from CleanMyMac?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint is free and open source and focuses on cleaning and disk space. It has no malware scanner or performance tweaks."}}, {"@type": "Question", "name": "Which Macs are supported?", "acceptedAnswer": {"@type": "Answer", "text": "macOS 14 or later, on both Apple silicon and Intel."}}, {"@type": "Question", "name": "Is there a Windows or iPhone version?", "acceptedAnswer": {"@type": "Answer", "text": "No. iOS does not allow apps to clean other apps' data, and Windows is not planned for now."}}]}]</script>
 <style>
 :root{--bg:#06150f;--bg2:#0b2620;--card:#10302780;--line:#ffffff1a;--text:#eafff7;--sub:#a9c9bd;--mint:#2fd39f;--mint2:#0f8f68;--leaf:#5ff0c0}
 *{box-sizing:border-box}
@@ -58,110 +61,114 @@ pre{background:#00000059;border:1px solid var(--line);border-radius:12px;padding
 #msg{min-height:22px;margin-top:10px;font-size:15px}
 footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 @media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;position:sticky;top:0;z-index:10;background:#06150fcc;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 100vmax #06150fcc;clip-path:inset(0 -100vmax)}
+.navr{display:flex;align-items:center;gap:22px}
+.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}
+.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
+.navcta{padding:7px 14px;font-size:14px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.vs .col.good{border-color:#2fd39f66;background:linear-gradient(160deg,#145c4766,#10302780)}
+.vs h3{margin:0 0 12px;font-size:20px}.vs ul{list-style:none;padding:0;margin:0}.vs li{padding:8px 0 8px 30px;position:relative;color:var(--sub);border-top:1px solid var(--line)}
+.vs li:before{position:absolute;left:4px;top:8px;font-weight:700}.vs .bad li:before{content:"✕";color:#ff7a7a}.vs .good li:before{content:"✓";color:var(--leaf)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf);margin-bottom:8px}
+.def{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center}
+.def p{color:var(--sub)}.def ul{color:var(--sub);padding-left:20px}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:h}
+.how .card{counter-increment:h;position:relative;padding-top:56px}.how .card:before{content:counter(h);position:absolute;left:20px;top:18px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ico{font-size:22px;display:block;margin-bottom:8px}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
+summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
+details p{color:var(--sub);margin:0 0 16px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}
+.fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
+.fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
+footer{border-top:0;padding:0 0 28px}
+@media (max-width:820px){.vs,.def,.how,.fcols{grid-template-columns:1fr}.navcta{display:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <nav>
-  <a class="brand" href="#"><img src="icon.png" alt="">Tidymint</a>
-  <div class="navr"><div class="links"><a href="#features">Features</a><a href="#safety">Safety</a><a href="#install">Install</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><div class="lang" role="group" aria-label="Language"><a href="vi/" data-l="vi">VI</a><a class="on" href="./" data-l="en">EN</a></div></div>
+  <a class="brand" href="./"><img src="icon.png" alt="">Tidymint</a>
+  <div class="navr"><div class="links"><a href="#features">Features</a><a href="#how">How it works</a><a href="#faq">FAQ</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><a class="btn primary navcta" href="#install">Download</a><div class="lang" role="group" aria-label="Language"><a href="vi/" data-l="vi">VI</a><a class="on" href="./" data-l="en">EN</a></div></div>
 </nav>
 
 <header class="hero">
   <h1>Keep your Mac in <span>mint condition</span>.</h1>
-  <p>Tidymint is a free, open-source Mac cleaner built for people who work with AI tools. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.</p>
-  <div class="cta">
-    <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download Tidymint, free</a>
-    <a class="btn ghost" href="https://github.com/HaiTrung-Workspace/tidymint">View on GitHub</a>
-  </div>
+  <p>Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.</p>
+  <div class="cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download free</a><a class="btn ghost" href="#install">How to install</a></div>
   <div class="badges"><span>✓ Free and open source (MIT)</span><span>✓ Everything goes to the Trash first</span><span>✓ Works offline, no tracking</span></div>
-  <div class="shot"><img src="smart.jpg" alt="Tidymint Smart Scan results: 21 GB of safe junk found" width="1600" height="1084"></div>
+  <div class="shot"><img src="smart.jpg" alt="Tidymint Smart Scan results" width="1600" height="1084"></div>
 </header>
 
-<section id="features">
-  <h2>Powerful, and always under your control</h2>
-  <p class="lead">One scan finds the clutter. You decide what goes. Screenshots use sample data.</p>
-
-  <div class="feature">
-    <div class="text"><h3>Review every item before cleaning</h3>
-      <p>Caches, logs, npm cache, old downloads and drafts in your project folders, grouped and sized. Expand any group and tick or untick single items.</p>
-      <ul><li>Apps that are still open are flagged and left unticked</li><li>Old downloads are never pre-selected</li></ul></div>
-    <img src="cleanup.jpg" alt="Cleanup details with checkboxes" loading="lazy">
-  </div>
-
-  <div class="feature">
-    <div class="text"><h3>Duplicates without the risk</h3>
-      <p>Identical files are found by content (SHA-256), whatever their name. The best copy is marked <b>Keep</b>, one click selects every extra copy.</p>
-      <ul><li>Before deleting, Tidymint checks your project folders</li><li>Files still used by a script or skill are flagged red and unticked for you</li></ul></div>
-    <img src="dupes.jpg" alt="Duplicate files grouped, with Keep labels" loading="lazy">
-  </div>
-
-  <div class="feature">
-    <div class="text"><h3>See where the space went</h3>
-      <p>Space Lens draws every folder as a bubble sized by real disk usage, with plain-language notes for common folders, including AI model folders like <code>.ollama</code> and Hugging Face caches.</p></div>
-    <img src="lens.jpg" alt="Space Lens bubble map" loading="lazy">
-  </div>
-
-  <div class="feature">
-    <div class="text"><h3>Uninstall apps completely</h3>
-      <p>Removing an app also removes its caches, preferences, logs and saved state. Leftovers from apps you already deleted and old installers get their own tabs.</p></div>
-    <img src="apps.jpg" alt="Uninstaller showing an app and its leftovers" loading="lazy">
-  </div>
-
-  <div class="feature">
-    <div class="text"><h3>Large and old files, never pre-selected</h3>
-      <p>Files over 100 MB, sorted by size or by when you last opened them. Screen recordings, model weights, ISO images: you pick what goes.</p></div>
-    <img src="large.jpg" alt="Large files list" loading="lazy">
-  </div>
-
-  <div class="grid">
-    <div class="card"><b>Cloud Cleanup</b><span>See how much of iCloud Drive, Google Drive or Dropbox is stored on this Mac.</span></div>
-    <div class="card"><b>Startup Items</b><span>Background helpers that start with your Mac, including leftovers from removed apps.</span></div>
-    <div class="card"><b>Menu bar monitor</b><span>Free space, RAM and Trash at a glance, with low-space alerts.</span></div>
-    <div class="card"><b>Statistics</b><span>Space freed over time and a full activity log.</span></div>
-    <div class="card"><b>English and Vietnamese</b><span>Follows your Mac's language. Five colour themes.</span></div>
-    <div class="card"><b>Ignore list</b><span>Anything you never want touched stays off every scan.</span></div>
+<section>
+  <span class="tag">Why Tidymint</span><h2>A cleaner you can actually trust</h2>
+  <div class="vs" style="margin-top:24px">
+    <div class="col bad"><h3>Typical paid cleaners</h3><ul><li>Paid licence or subscription, major upgrades often cost extra</li><li>Closed source: you cannot see what it deletes</li><li>Cracked copies are a common way to get malware</li></ul></div>
+    <div class="col good"><h3>Tidymint</h3><ul><li>Free, with no account and no subscription</li><li>Open source (MIT): anyone can read every line</li><li>Only moves items to the Trash, you empty it yourself</li></ul></div>
   </div>
 </section>
 
-<section id="safety">
-  <h2>Built to be safe</h2>
-  <p class="lead">A cleaner should never surprise you.</p>
-  <div class="grid">
-    <div class="card"><b>Trash first, always</b><span>Nothing is deleted permanently. You empty the Trash yourself, after a confirmation.</span></div>
-    <div class="card"><b>Hands off what matters</b><span>Photos, Mail, keychains, cloud storage roots and Apple system caches are never touched.</span></div>
-    <div class="card"><b>Private by design</b><span>Runs offline. Nothing leaves your Mac unless you send feedback. <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Privacy</a></span></div>
+<section>
+  <div class="def">
+    <div><span class="tag">Good to know</span><h2>What is “System Data” on a Mac?</h2><p>In <b>System Settings › General › Storage</b>, macOS groups everything it cannot sort into a category called <b>System Data</b>. It often grows to tens of gigabytes and is hard to inspect from Finder.</p><ul><li>App and browser caches, logs and temporary files</li><li>Leftovers from apps you already deleted</li><li>Local Time Machine snapshots and old installers</li><li>For AI work: model weights and package caches</li></ul><p>Tidymint shows which of these folders are large on your Mac, explains each one in plain words, and lets you move the safe ones to the Trash.</p></div>
+    <img src="lens.jpg" alt="Space Lens" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
   </div>
+</section>
+
+<section id="how">
+  <span class="tag">How it works</span><h2>Three steps, you stay in control</h2>
+  <div class="how" style="margin-top:24px"><div class="card"><b>Scan</b><span>One click looks through caches, logs, old downloads, large files and duplicates. Nothing is touched yet.</span></div><div class="card"><b>Review</b><span>Every item is grouped, sized and explained. Risky items are never pre-selected, files still used by your scripts are flagged.</span></div><div class="card"><b>Clean</b><span>Selected items move to the Trash. Check the Trash, then empty it when you are ready.</span></div></div>
+</section>
+
+<section id="features">
+  <span class="tag">Features</span><h2>Everything in one small app</h2>
+  <div class="grid" style="margin-top:24px"><div class="card"><span class="ico">🧹</span><b>Smart Scan</b><span>Caches, logs, npm cache, old downloads and drafts in your project folders.</span></div><div class="card"><span class="ico">🗂️</span><b>Duplicates</b><span>Identical files found by content. Keeps the best copy, checks your scripts before deleting.</span></div><div class="card"><span class="ico">🫧</span><b>Space Lens</b><span>A bubble map of what fills your disk, with notes for common folders.</span></div><div class="card"><span class="ico">🧩</span><b>Uninstaller</b><span>Removes apps with their caches, preferences and leftovers.</span></div><div class="card"><span class="ico">📦</span><b>Large & old files</b><span>Files over 100 MB, sorted by size or last opened. Never pre-selected.</span></div><div class="card"><span class="ico">📊</span><b>Menu bar</b><span>Free space, RAM and Trash at a glance, with low-space alerts.</span></div></div>
+  <div class="feature" style="margin-top:48px"><img src="dupes.jpg" alt="" loading="lazy"><img src="cleanup.jpg" alt="" loading="lazy"></div>
+</section>
+
+<section>
+  <span class="tag">Made for</span><h2>Who fills their Mac the fastest</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:24px"><div class="card"><span class="ico">🤖</span><b>AI work</b><span>Model weights, Hugging Face and Ollama caches, generated images.</span></div><div class="card"><span class="ico">👩‍💻</span><b>Developers</b><span>node_modules, npm and Homebrew caches, old builds.</span></div><div class="card"><span class="ico">🎬</span><b>Video and photo</b><span>Exports, render drafts and duplicate assets.</span></div><div class="card"><span class="ico">💻</span><b>256 GB Macs</b><span>Every gigabyte counts on a small SSD.</span></div></div>
+</section>
+
+<section id="faq">
+  <h2>Questions</h2>
+  <div style="margin-top:20px"><details><summary>Is Tidymint really free?</summary><p>Yes. It is open source under the MIT licence, with no account, no subscription and no paid tier.</p></details><details><summary>Is it safe?</summary><p>Tidymint only moves items to the Trash, so you can put anything back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and risky items are never pre-selected.</p></details><details><summary>Why does macOS block it the first time?</summary><p>Tidymint is not notarized by Apple yet (that needs a paid developer account). Open it once from System Settings › Privacy &amp; Security › Open Anyway, as Apple describes in its own guide. The source code is public on GitHub.</p></details><details><summary>Does it send my data anywhere?</summary><p>No. It works offline. Data only leaves your Mac if you send feedback or join the newsletter yourself.</p></details><details><summary>How is it different from CleanMyMac?</summary><p>Tidymint is free and open source and focuses on cleaning and disk space. It has no malware scanner or performance tweaks.</p></details><details><summary>Which Macs are supported?</summary><p>macOS 14 or later, on both Apple silicon and Intel.</p></details><details><summary>Is there a Windows or iPhone version?</summary><p>No. iOS does not allow apps to clean other apps&#x27; data, and Windows is not planned for now.</p></details></div>
 </section>
 
 <section id="install">
   <h2>Install</h2>
-  <p class="lead">Tidymint needs macOS 14 or later and runs on Apple silicon and Intel Macs.</p>
-  <ol class="steps">
-    <li><b>Download</b> <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tidymint.zip</a>, open it and drag <b>Tidymint</b> to <b>Applications</b>.</li>
-    <li><b>First launch:</b> Tidymint is not notarized yet, so macOS blocks it the first time. Click <b>Done</b>, then open <b>System Settings &gt; Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> (<a href="https://support.apple.com/102445">Apple's guide</a>).</li>
-    <li><b>Full Disk Access:</b> in the same pane, turn on Tidymint under <b>Full Disk Access</b> so it can measure every folder.</li>
-  </ol>
-  <p class="small">Prefer to build it yourself? <code>git clone https://github.com/HaiTrung-Workspace/tidymint.git &amp;&amp; cd tidymint &amp;&amp; ./build.sh --install</code></p>
-
-  <div class="signup" id="signup">
+  <p class="lead">macOS 14 or later, Apple silicon and Intel.</p>
+  <div class="note">Tidymint is not notarized by Apple yet, so macOS blocks the first launch. This happens to every app that is not notarized. The source code is public on GitHub.</div>
+  <ol class="steps"><li><b>Download</b> <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tidymint.zip</a>, open it and drag <b>Tidymint</b> to <b>Applications</b>.</li><li><b>First launch:</b> double-click Tidymint. When macOS says it cannot be opened, click <b>Done</b>.</li><li><b>Allow it:</b> open <b>System Settings › Privacy &amp; Security</b>, scroll down, click <b>Open Anyway</b>, enter your password if asked, then <b>Open</b>.</li><li><b>Full Disk Access:</b> in the same pane, turn on Tidymint under <b>Full Disk Access</b> so it can measure every folder.</li></ol>
+  <p class="small">Steps from Apple: <a href="https://support.apple.com/102445">Safely open apps on your Mac</a>. Prefer to build it yourself? <code>git clone https://github.com/HaiTrung-Workspace/tidymint.git &amp;&amp; cd tidymint &amp;&amp; ./build.sh --install</code></p>
+  <div class="signup" id="signup" style="margin-top:36px">
     <h2 style="margin-bottom:6px">Get updates</h2>
     <p class="small" style="margin:0">Mac tips and new releases, at most one email a month.</p>
-    <form id="f">
-      <input type="email" id="email" required placeholder="name@example.com" autocomplete="email">
-      <button class="btn primary" type="submit">Subscribe</button>
-    </form>
+    <form id="f"><input type="email" id="email" required placeholder="name@example.com" autocomplete="email"><button class="btn primary" type="submit">Subscribe</button></form>
     <div id="msg"></div>
     <p class="small">Get the latest updates. Unsubscribe any time.</p>
   </div>
 </section>
 
-<footer>
-  <span>© 2026 Tidymint · MIT License · Provided as is, without warranty</span>
-  <span><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a> · <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Privacy</a> · <a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Report a bug</a> · <a href="mailto:hello@tidymint.app">hello@tidymint.app</a></span>
-</footer>
+<section style="text-align:center;padding-top:20px">
+  <h2>Ready to tidy up?</h2><p class="lead" style="margin:0 auto 24px">Free, open source, and everything goes to the Trash first.</p>
+  <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download free</a>
+</section>
+
+<div class="fcols">
+  <div><a class="brand" href="./"><img src="icon.png" alt="">Tidymint</a><p>Free, open-source Mac cleaner. Provided as is, without warranty.</p></div>
+  <div><h4>Product</h4><a href="#features">Features</a><a href="#how">How it works</a><a href="#install">Install</a><a href="https://github.com/HaiTrung-Workspace/tidymint/releases">Releases</a></div><div><h4>Resources</h4><a href="https://github.com/HaiTrung-Workspace/tidymint">Source code</a><a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Report a bug</a><a href="#faq">FAQ</a></div><div><h4>Legal</h4><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Privacy</a><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/LICENSE">MIT License</a><a href="mailto:hello@tidymint.app">hello@tidymint.app</a></div>
+</div>
+<footer><span>© 2026 Tidymint</span></footer>
 </div>
 <script>
+document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
+try{if(!localStorage.getItem('tm-lang')&&/^vi\b/i.test(navigator.language||'')&&!location.hash)location.replace('vi/')}catch(e){}
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec";
 document.getElementById('f').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -176,10 +183,6 @@ document.getElementById('f').addEventListener('submit', async (e) => {
     msg.textContent = 'Thanks! You are on the list.'; e.target.reset();
   } catch (err) { msg.textContent = 'Could not send right now. Please try again later.'; }
 });
-</script>
-<script>
-document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
-try{if(!localStorage.getItem('tm-lang')&&/^vi\b/i.test(navigator.language||'')&&!location.hash)location.replace('vi/')}catch(e){}
 </script>
 </body>
 </html>
