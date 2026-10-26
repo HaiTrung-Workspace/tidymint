@@ -159,7 +159,7 @@ T = {
   end_h="Dọn máy thôi?", end_p="Miễn phí, mã nguồn mở, mọi thứ vào Thùng rác trước.",
   f_blurb="App dọn rác Mac miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành.",
   f_cols=[("Sản phẩm",[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("#cai-dat","Cài đặt"),(GH+"/releases","Các phiên bản")]),
-          ("Tài nguyên",[(GH,"Mã nguồn"),(GH+"/issues","Báo lỗi"),("#hoi-dap","Hỏi đáp")]),
+          ("Tài nguyên",[("cleanmymac-mien-phi/","CleanMyMac miễn phí?"),(GH,"Mã nguồn"),(GH+"/issues","Báo lỗi"),("#hoi-dap","Hỏi đáp")]),
           ("Pháp lý",[(GH+"/blob/main/PRIVACY.md","Quyền riêng tư"),(GH+"/blob/main/LICENSE","Giấy phép MIT"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer=' · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a>',
   msg=dict(bad="Email chưa đúng.",sending="Đang gửi...",ok="Cảm ơn bạn! Đã đăng ký.",err="Chưa gửi được, bạn thử lại sau nhé."),
@@ -330,7 +330,8 @@ document.getElementById('f').addEventListener('submit', async (e) => {{
 </html>
 '''
 
-for k, out in (("en", "docs/index.html"), ("vi", "docs/vi/index.html")):
-    with open(os.path.join(ROOT, out), "w") as f:
-        f.write(page(k))
-    print("wrote", out)
+if __name__ == "__main__":
+    for k, out in (("en", "docs/index.html"), ("vi", "docs/vi/index.html")):
+        with open(os.path.join(ROOT, out), "w") as f:
+            f.write(page(k))
+        print("wrote", out)
