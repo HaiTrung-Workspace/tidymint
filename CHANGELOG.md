@@ -2,6 +2,13 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## Unreleased (next: 0.3.2)
+
+- Star White: a light theme, with every colour checked for contrast (WCAG AA or better)
+- New mint-leaf icon with a serrated leaf; the wordmark shows "mint" in leaf green
+- Text and buttons take their colour from the theme everywhere, so light themes stay readable
+- Remaining English strings in the Vietnamese interface translated; dates follow the app language
+
 ## 0.3.1 (2026-10-27)
 
 - Clean by App: Zalo, Chrome, Edge, Cốc Cốc and CapCut, by type and by month, with messages and logins locked

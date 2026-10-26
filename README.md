@@ -65,7 +65,7 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance |
 | **Contact** | Send feedback or bug reports from inside the app |
 
-Also: English and Vietnamese, five colour themes (Mint, Night Sky, Burgundy, Golden Gate, Pride) with a matching app icon, an Ignore list, and alerts when disk space or memory runs low.
+Also: English and Vietnamese, six colour themes (Mint, Night Sky, Burgundy, Golden Gate, Star White, Pride) with a matching app icon, an Ignore list, and alerts when disk space or memory runs low.
 
 ## Install
 
