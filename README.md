@@ -15,12 +15,17 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 *Screenshots use sample data.*
 
 ### 1. One scan, then you decide
-Smart Scan finds safe junk, large files and the Trash in one pass. Nothing is removed until you click **Clean**, and everything goes to the Trash first.
+Clean Now finds the safe part (caches, logs, old installers), shows it by group with sizes, and cleans only when you click **Clean**. Everything goes to the Trash first, and **Undo** on the Trash page puts the last run back.
 
 ### 2. Full control over every item
 Open **Review Details** to see each category, expand it, and tick or untick single items. Apps that are still running are flagged and left unticked.
 
 ![Cleanup details](docs/cleanup.jpg)
+
+### 2b. Clean by app
+Zalo, Chrome, Edge, Cốc Cốc and CapCut each get their own page: caches are pre-selected, photos, videos and files are listed by month for you to pick, and messages, logins and projects are locked. Cleaning is refused while the app is open.
+
+![Clean by App](docs/byapp.jpg)
 
 ### 3. Duplicates without the risk
 Identical files are grouped (SHA-256, any file name). The best copy is marked **Keep**, and one click selects every extra copy. Before deleting, the app checks your project folders: a file still used by a script or skill is flagged in red and unticked for you.
