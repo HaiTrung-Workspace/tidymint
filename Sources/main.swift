@@ -1465,7 +1465,7 @@ enum Phase { case idle, scanning, summary, review, done }
     }
 
     func smartScan() {
-        phase = .scanning; largePhase = .scanning; quickClean = false
+        phase = .scanning; largePhase = .scanning
         refreshTrash(); refreshDisk()
         Task.detached {
             let j = Scanner.scanJunk()
@@ -1474,27 +1474,8 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
 
-    // One-click clean: scan, then move only the pre-selected (safe) items to the Trash.
-    @Published var quickClean = false
     @Published var lastFreed: Int64 = 0
     @Published var lastCount = 0
-    func quickCleanRun() {
-        phase = .scanning; quickClean = true
-        Task.detached {
-            let j = Scanner.scanJunk()
-            await MainActor.run {
-                self.cats = j
-                let sel = j.flatMap { $0.items.filter(\.selected) }
-                if sel.isEmpty { self.lastFreed = 0; self.lastCount = 0; self.phase = .done; self.quickClean = false; return }
-                let (ok, fail) = self.trash(sel.map(\.url), label: "quick")
-                self.lastFreed = self.okSize(sel); self.lastCount = ok
-                self.lastResult = t("Moved \(ok) items (\(fmt(self.lastFreed))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(self.lastFreed))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + self.failNote : "")
-                self.log(self.lastResult)
-                self.phase = .done; self.quickClean = false
-                self.refreshTrash(); self.refreshDisk()
-            }
-        }
-    }
 
     func toggleCat(_ id: String) {
         guard let i = cats.firstIndex(where: { $0.id == id }) else { return }
@@ -2254,11 +2235,11 @@ struct SmartView: View {
         VStack(spacing: 22) {
             switch vm.phase {
             case .scanning:
-                Scanning(text: vm.quickClean ? t("Cleaning what is safe...", "Đang dọn phần an toàn...") : t("Scanning your Mac...", "Đang quét máy..."))
+                Scanning(text: t("Scanning your Mac...", "Đang quét máy..."))
             case .idle:
                 Header(title: t("Tidy up a little?", "Dọn máy chút nhé?"),
-                       sub: t("One click handles the safe part: caches, logs, old installers.\nEverything goes to the Trash first, so you can change your mind.",
-                              "Một nút là xong phần an toàn: bộ nhớ đệm, nhật ký, file cài đặt cũ.\nMọi thứ vào Thùng rác trước, đổi ý thì lấy lại được."))
+                       sub: t("Scan finds the safe part: caches, logs, old installers. You see what it is, then press Clean.\nEverything goes to the Trash first, so you can change your mind.",
+                              "Quét sẽ tìm phần an toàn: bộ nhớ đệm, nhật ký, file cài đặt cũ. Bạn xem rồi mới bấm Dọn.\nMọi thứ vào Thùng rác trước, đổi ý thì lấy lại được."))
                 if let v = vm.newVersion {
                     Button { NSWorkspace.shared.open(Updates.page) } label: {
                         Label(t("Tidymint \(v) is available. Download", "Đã có Tidymint \(v). Tải về"), systemImage: "arrow.down.circle")
@@ -2266,12 +2247,8 @@ struct SmartView: View {
                             .padding(.horizontal, 12).padding(.vertical, 6).background(Capsule().fill(Color.white.opacity(0.12)))
                     }.buttonStyle(.plain).hoverLift()
                 }
-                BigScanButton(label: t("Clean now", "Dọn ngay")) { vm.quickCleanRun() }
-                Button { vm.smartScan() } label: {
-                    (Text(t("Want to see each item first? ", "Muốn xem trước từng mục? ")).foregroundColor(Theme.sub)
-                     + Text(t("Review details", "Xem chi tiết")).foregroundColor(.white).underline())
-                        .font(.system(size: 12))
-                }.buttonStyle(.plain)
+                BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
+                Text(t("Nothing is moved until you press Clean.", "Chưa dọn gì cho tới khi bạn bấm Dọn.")).font(.system(size: 12)).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     HomeCard(title: t("Zalo, Chrome, CapCut...", "Zalo, Chrome, CapCut..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
                     HomeCard(title: t("Photos, videos, old files", "Ảnh, video, file cũ"), value: t("Large Files", "File lớn"), sub: t("you choose", "bạn tự chọn")) { vm.page = .large }
@@ -2301,15 +2278,31 @@ struct SmartView: View {
                 if Invite.shouldShow() { InviteCard(source: "after-clean").frame(maxWidth: 520).padding(.top, 8) }
                 if ConCao.shouldShow() { ConCaoHint().frame(maxWidth: 520) }
             default:
-                Header(title: t("Scan Results", "Kết quả quét"), sub: String(format: t("%.0f GB available", "Trống %.0f GB"), vm.freeGB))
-                HStack(spacing: 16) {
-                    Tile(icon: "trash.slash", title: t("Safe Junk", "Rác an toàn"), value: fmt(vm.junkSelected), sub: t("selected of \(fmt(vm.junkTotal))", "đã chọn / \(fmt(vm.junkTotal))")) { vm.page = .cleanup; vm.phase = .review }
-                    Tile(icon: "doc.on.doc", title: t("Large Files", "File lớn"), value: t("\(vm.large.count) files", "\(vm.large.count) file"), sub: fmt(vm.large.reduce(0) { $0 + $1.size })) { vm.page = .large }
-                    Tile(icon: "trash", title: t("Trash", "Thùng rác"), value: fmt(vm.trashSize), sub: t("\(vm.trashCount) items", "\(vm.trashCount) mục")) { vm.page = .trash }
-                }
+                Text(vm.junkSelected > 0 ? t("\(fmt(vm.junkSelected)) safe to clean", "\(fmt(vm.junkSelected)) an toàn để dọn") : t("Already tidy", "Máy đang gọn rồi"))
+                    .font(.system(size: 40, weight: .bold)).foregroundColor(.white)
+                Text(vm.junkSelected > 0
+                     ? t("Apps rebuild all of this on their own. Everything goes to the Trash first.", "Toàn bộ phần này app tự tạo lại được. Mọi thứ vào Thùng rác trước.")
+                     : t("Nothing safe to clean right now. Try Clean by App or Large Files for things only you can decide on.", "Không có gì an toàn để dọn lúc này. Thử Dọn theo ứng dụng hoặc File lớn, là phần chỉ bạn quyết được."))
+                    .foregroundColor(Theme.sub).multilineTextAlignment(.center).frame(maxWidth: 520)
+                // What will be cleaned, one line per group, so the decision is informed without opening the full list.
+                VStack(spacing: 6) {
+                    ForEach(vm.cats.filter { $0.selectedSize > 0 }) { c in
+                        HStack(spacing: 10) {
+                            Image(systemName: c.icon).foregroundStyle(Theme.accent).frame(width: 20)
+                            Text(c.title).foregroundColor(.white).font(.system(size: 13))
+                            Text(c.desc).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1)
+                            Spacer()
+                            Text(fmt(c.selectedSize)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit())
+                        }.padding(.horizontal, 14).padding(.vertical, 8).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+                    }
+                }.frame(maxWidth: 560)
                 HStack(spacing: 14) {
-                    GhostButton(title: t("Review Details", "Xem chi tiết")) { vm.page = .cleanup; vm.phase = .review }
-                    PrimaryButton(title: t("Clean Selected (\(fmt(vm.junkSelected)))", "Dọn rác đã chọn (\(fmt(vm.junkSelected)))"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
+                    GhostButton(title: t("Review every item", "Xem từng mục")) { vm.page = .cleanup; vm.phase = .review }
+                    PrimaryButton(title: t("Clean (\(fmt(vm.junkSelected)))", "Dọn (\(fmt(vm.junkSelected)))"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
+                }
+                if vm.junkSelected > 0 {
+                    Text(t("Not pre-selected: \(fmt(vm.junkTotal - vm.junkSelected)) of drafts and old downloads. Tick them under Review every item.", "Chưa tick: \(fmt(vm.junkTotal - vm.junkSelected)) nháp và Downloads cũ. Muốn dọn thì tick ở Xem từng mục."))
+                        .font(.system(size: 11)).foregroundColor(Theme.sub)
                 }
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -3573,6 +3566,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sharedVM.page = pg
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
+            if pg == .smart && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .summary; sharedVM.lastFreed = sharedVM.junkSelected; sharedVM.lastCount = 38 }
             if a.contains("--done") { sharedVM.lastResult = t("Moved 128 items (6.2 GB) to the Trash.", "Đã chuyển 128 mục (6,2 GB) vào Thùng rác.") }
         }
         if let i = a.firstIndex(of: "--window"), i + 1 < a.count {
