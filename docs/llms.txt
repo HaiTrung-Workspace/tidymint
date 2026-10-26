@@ -14,3 +14,10 @@
 - Duplicates are found by content (SHA-256); before deleting, it checks whether scripts in the user's project folders still reference a file.
 - Not notarized by Apple yet: first launch needs System Settings > Privacy & Security > Open Anyway.
 - Contact: hello@tidymint.app
+
+## Guides
+- How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/
+- How to free up space on Mac (incl. clearing cache): https://tidymint.app/free-up-space-mac/
+- Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
+- (Vietnamese) CleanMyMac miễn phí, lựa chọn hợp pháp: https://tidymint.app/vi/cleanmymac-mien-phi/
+- (Vietnamese) Cách xóa ứng dụng trên MacBook sạch hoàn toàn: https://tidymint.app/vi/xoa-ung-dung-macbook/

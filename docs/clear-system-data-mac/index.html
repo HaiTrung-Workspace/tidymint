@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Clear System Data on Mac (Safely) | Tidymint</title>
+<meta name="description" content="System Data taking up 50 GB or more? Here is what it actually contains and 7 safe ways to shrink it on macOS, from caches and Time Machine snapshots to Xcode and Docker.">
+<link rel="canonical" href="https://tidymint.app/clear-system-data-mac/">
+<link rel="alternate" hreflang="en" href="https://tidymint.app/clear-system-data-mac/">
+<link rel="icon" href="../favicon.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to Clear System Data on Mac (Safely) | Tidymint">
+<meta property="og:description" content="System Data taking up 50 GB or more? Here is what it actually contains and 7 safe ways to shrink it on macOS, from caches and Time Machine snapshots to Xcode and Docker.">
+<meta property="og:image" content="https://tidymint.app/smart.jpg">
+<meta property="og:url" content="https://tidymint.app/clear-system-data-mac/">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+var tmC=null;try{tmC=localStorage.getItem('tm-consent');var nt=new URLSearchParams(location.search).get('notrack');if(nt==='1')localStorage.setItem('tm-notrack','1');if(nt==='0')localStorage.removeItem('tm-notrack');if(localStorage.getItem('tm-notrack')==='1')window['ga-disable-G-19HEJDJPN3']=true}catch(e){}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:tmC==='yes'?'granted':'denied',wait_for_update:500});
+gtag('js',new Date());gtag('config','G-19HEJDJPN3');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-19HEJDJPN3"></script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Article", "headline": "How to clear System Data on Mac, safely", "description": "System Data taking up 50 GB or more? Here is what it actually contains and 7 safe ways to shrink it on macOS, from caches and Time Machine snapshots to Xcode and Docker.", "inLanguage": "en", "datePublished": "2026-10-26", "dateModified": "2026-10-26", "mainEntityOfPage": "https://tidymint.app/clear-system-data-mac/", "image": "https://tidymint.app/smart.jpg", "author": {"@type": "Organization", "name": "Tidymint", "url": "https://tidymint.app/"}, "publisher": {"@type": "Organization", "name": "Tidymint", "logo": {"@type": "ImageObject", "url": "https://tidymint.app/icon.png"}}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is it safe to delete System Data on Mac?", "acceptedAnswer": {"@type": "Answer", "text": "Parts of it, yes: caches, old downloads, local Time Machine snapshots, old device backups and developer build data are safe to remove. Files macOS needs to run, such as virtual memory, are not. Never delete anything inside /System or /private/var."}}, {"@type": "Question", "name": "Why is my System Data so large?", "acceptedAnswer": {"@type": "Answer", "text": "The usual causes are local Time Machine snapshots, app and browser caches, old iPhone backups, Xcode and Docker data, and downloaded AI models. On developer and AI machines it can pass 100 GB."}}, {"@type": "Question", "name": "Will System Data shrink on its own?", "acceptedAnswer": {"@type": "Answer", "text": "Partly. macOS removes local snapshots and some caches when space runs low, and a restart clears temporary files. It will not remove developer files, models or old backups for you."}}, {"@type": "Question", "name": "Does restarting clear System Data?", "acceptedAnswer": {"@type": "Answer", "text": "It clears temporary files and swap, which can free a few gigabytes. Larger items like snapshots and caches need the other steps."}}, {"@type": "Question", "name": "Can Tidymint delete System Data?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint finds the safe parts, such as caches, logs and old downloads, explains each folder, and moves only what you select to the Trash. It never touches Apple system folders."}}]}, {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://tidymint.app/"}, {"@type": "ListItem", "position": 2, "name": "Clear System Data on Mac", "item": "https://tidymint.app/clear-system-data-mac/"}]}]</script>
+<style>
+:root{--bg:#06150f;--bg2:#0b2620;--card:#10302780;--line:#ffffff1a;--text:#eafff7;--sub:#a9c9bd;--mint:#2fd39f;--mint2:#0f8f68;--leaf:#5ff0c0}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:radial-gradient(1200px 600px at 80% -10%,#145c4766,transparent),linear-gradient(180deg,var(--bg),var(--bg2) 60%,var(--bg))}
+a{color:var(--leaf);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;position:sticky;top:0;z-index:10;background:#06150fcc;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 100vmax #06150fcc;clip-path:inset(0 -100vmax)}.navr{display:flex;align-items:center;gap:22px}.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--text)}
+.brand img{width:36px;height:36px}
+nav .links{display:flex;gap:22px;font-size:15px}nav .links a{color:var(--sub)}
+.hero{text-align:center;padding:56px 0 24px}
+.hero h1{font-size:clamp(34px,5.5vw,60px);line-height:1.08;margin:0 0 16px;letter-spacing:-.02em}
+.hero h1 span{background:linear-gradient(90deg,var(--leaf),var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:clamp(17px,2vw,20px);color:var(--sub);max-width:680px;margin:0 auto 28px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:999px;font-weight:600;font-size:16px;border:0;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--mint),var(--mint2));color:#fff;box-shadow:0 8px 24px #0f8f6855}
+.btn.ghost{border:1px solid #ffffff40;color:var(--text);background:transparent}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.badges{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:22px;color:var(--sub);font-size:14px}
+.shot{margin:40px auto 0;max-width:1040px}
+.shot img{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 30px 80px #0009}
+section{padding:72px 0}
+h2{font-size:clamp(26px,3.4vw,38px);margin:0 0 12px;letter-spacing:-.01em}
+.lead{color:var(--sub);max-width:640px;margin:0 0 36px}
+.feature{display:grid;grid-template-columns:1fr 1.35fr;gap:40px;align-items:center;margin-bottom:64px}
+.feature:nth-child(even) .text{order:2}
+.feature h3{font-size:24px;margin:0 0 10px}
+.feature p{color:var(--sub);margin:0 0 10px}
+.feature ul{color:var(--sub);padding-left:20px;margin:0}
+.feature img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card b{display:block;margin-bottom:6px}
+.card span{color:var(--sub);font-size:15px}
+pre{background:#00000059;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d6fff0}
+.signup{background:linear-gradient(135deg,#145c4755,#0b262099);border:1px solid var(--line);border-radius:20px;padding:36px;text-align:center}
+.signup form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.signup input{min-width:280px;padding:13px 16px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
+.small{font-size:13px;color:var(--sub)}
+.steps{padding-left:22px;color:var(--sub)}.steps li{margin-bottom:10px}.steps b{color:var(--text)}
+#msg{min-height:22px;margin-top:10px;font-size:15px}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+@media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
+
+.topnav{position:sticky;top:0;z-index:10;background:#06150fe6;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #ffffff12}
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.navr{display:flex;align-items:center;gap:22px}
+.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}
+.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
+.navcta{padding:7px 14px;font-size:14px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.vs .col.good{border-color:#2fd39f66;background:linear-gradient(160deg,#145c4766,#10302780)}
+.vs h3{margin:0 0 12px;font-size:20px}.vs ul{list-style:none;padding:0;margin:0}.vs li{padding:8px 0 8px 30px;position:relative;color:var(--sub);border-top:1px solid var(--line)}
+.vs li:before{position:absolute;left:4px;top:8px;font-weight:700}.vs .bad li:before{content:"✕";color:#ff7a7a}.vs .good li:before{content:"✓";color:var(--leaf)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf);margin-bottom:8px}
+.def{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center}
+.def p{color:var(--sub)}.def ul{color:var(--sub);padding-left:20px}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:h}
+.how .card{counter-increment:h;position:relative;padding-top:56px}.how .card:before{content:counter(h);position:absolute;left:20px;top:18px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ico{font-size:22px;display:block;margin-bottom:8px}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
+summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
+details p{color:var(--sub);margin:0 0 16px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}
+.fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
+.fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
+footer{border-top:0;padding:0 0 28px}
+@media (max-width:820px){.vs,.def,.how,.fcols{grid-template-columns:1fr}.navcta{display:none}}
+
+/* Hover only on things that can be clicked. Nothing moves its box on hover (moving boxes made the
+   pointer slip off the edge and flicker); feedback is a glow ring, border and background change. */
+.btn,.topbar a,.lang a,details,nav .links a,.fcols a{transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease}
+.btn:hover{filter:none}
+@media (hover:hover){
+ .btn.primary:hover{box-shadow:0 0 0 3px #2fd39f40,0 10px 26px #0f8f6866}
+ .btn.ghost:hover{border-color:#2fd39faa;background-color:#ffffff0d}
+ .topbar a:hover{border-color:#2fd39faa;background-color:#ffffff0d;box-shadow:0 0 0 3px #2fd39f26}
+ details:hover{border-color:#2fd39f66}
+ nav .links a:hover,.fcols a:hover{color:var(--text);text-decoration:none}
+ .lang a:hover{background-color:#ffffff14}
+ .up:hover{border-color:#2fd39f;box-shadow:0 14px 36px #0f8f6866}
+}
+.btn:active,.topbar a:active{filter:brightness(.92)}
+.arr{display:inline-block;transition:transform .18s ease}a:hover .arr{transform:translateX(4px)}
+.topbar{text-align:center;padding:8px 0 28px}
+.topbar a{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid #ffffff33;color:var(--text);font-size:14px;font-weight:600}
+.topbar a:hover{text-decoration:none}
+.up{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);opacity:0;pointer-events:none;z-index:20;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1px solid #2fd39f66;background:#0b2620f2;color:var(--text);font-family:inherit;font-size:14px;font-weight:600;box-shadow:0 12px 30px #0008;cursor:pointer;transition:transform .25s ease,opacity .25s ease,box-shadow .18s ease,border-color .18s ease}
+.up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.up.show:active{transform:translate(-50%,0) scale(.98)}
+summary{user-select:none}
+.ck{position:fixed;left:16px;bottom:16px;z-index:30;max-width:380px;background:#0b2620f7;border:1px solid #2fd39f55;border-radius:14px;padding:14px 16px;box-shadow:0 12px 30px #0009;font-size:14px;color:var(--sub);display:none}
+.ck.show{display:block}.ck p{margin:0 0 10px}.ck .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ck button{font:600 14px/1 inherit;font-family:inherit;padding:9px 16px;border-radius:999px;cursor:pointer;border:1px solid #ffffff33;background:transparent;color:var(--text)}
+.ck button.yes{background:linear-gradient(90deg,var(--mint),var(--mint2));border:0;color:#fff}
+.linkbtn{background:none;border:0;padding:0;color:var(--sub);font:inherit;cursor:pointer;text-decoration:underline}
+@media (max-width:820px){.ck{left:12px;right:12px;max-width:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.crumb{font-size:14px;color:var(--sub);margin:28px 0 0}.crumb a{color:var(--sub)}
+.art{max-width:760px;margin:0 auto;padding:12px 0 40px}
+.art h1{font-size:clamp(30px,4.4vw,46px);line-height:1.15;letter-spacing:-.02em;margin:14px 0 14px}
+.art .meta{color:var(--sub);font-size:14px;margin:0 0 26px}
+.art h2{font-size:clamp(23px,2.8vw,30px);margin:46px 0 12px;scroll-margin-top:80px}
+.art h3{font-size:19px;margin:28px 0 8px}
+.art p,.art li{color:#cfe6dc;font-size:17px;line-height:1.7}.art li{margin-bottom:6px}
+.art strong,.art b{color:var(--text)}
+.tldr{background:linear-gradient(135deg,#145c4755,#0b262099);border:1px solid #2fd39f55;border-radius:14px;padding:18px 22px;margin:0 0 26px}
+.tldr p{margin:0}.tldr .k{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf);margin-bottom:6px}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;margin:0 0 10px}
+.toc b{display:block;margin-bottom:6px}.toc ol{margin:0;padding-left:20px}.toc li{font-size:15px;margin:3px 0}.toc a{color:var(--sub)}
+.tbl{overflow-x:auto;margin:18px 0}
+.art table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+.art th,.art td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;color:#cfe6dc}
+.art th{background:#ffffff0d;color:var(--text)}
+.art td.y{color:var(--leaf)}.art td.n{color:#ff9a9a}
+.box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}
+.box h3{margin:0 0 6px}.box p{margin:0 0 14px}
+.warn{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 18px;margin:18px 0}.warn p{margin:0}
+.art code{overflow-wrap:anywhere}.art pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
+.src{font-size:14px}.src li{font-size:14px;color:var(--sub)}
+.rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
+@media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+</style>
+</head>
+<body id="top">
+<div class="topnav"><div class="wrap"><nav>
+  <a class="brand" href="../"><img src="../icon.png" alt="">Tidymint</a>
+  <div class="navr"><div class="links"><a href="../#features">Features</a><a href="../#how">How it works</a><a href="../#faq">FAQ</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><a class="btn primary navcta" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download</a><div class="lang" role="group" aria-label="Language"><a href="../vi/" data-l="vi">VI</a><a class="on" href="./" data-l="en">EN</a></div></div>
+</nav></div></div>
+<div class="wrap">
+<article class="art">
+  <p class="crumb"><a href="../">Home</a> › Clear System Data on Mac</p>
+  <h1>How to clear System Data on Mac, safely</h1>
+  <p class="meta">Updated: October 26, 2026 · 8 min read</p>
+  <div class="tldr"><span class="k">Quick answer</span><p>System Data is macOS's catch-all bucket for files that don't fit another category: caches, logs, local Time Machine snapshots, old iPhone backups, developer tools and more. You can shrink it safely by <b>restarting</b>, <b>emptying the Trash</b>, <b>deleting local snapshots</b>, <b>clearing user caches</b>, <b>removing old device backups</b> and cleaning <b>Xcode, Docker or AI model caches</b>. Never delete anything inside <code>/System</code> or <code>/private/var</code>.</p></div>
+  <div class="toc" role="navigation" aria-label="On this page"><b>On this page</b><ol><li><a href="#what">What is System Data?</a></li><li><a href="#check">Check how big it is</a></li><li><a href="#steps">7 safe ways to shrink System Data</a></li><li><a href="#dont">What you should never delete</a></li><li><a href="#faster">The faster way: let an app find it</a></li><li><a href="#faq">FAQ</a></li></ol></div>
+  
+<h2 id="what">What is System Data?</h2>
+<p>Apple describes System Data (called "Other" on older macOS) as a general category that measures storage used by Apple and third-party files that don't fit a more specific category. In practice, it usually includes:</p>
+<ul>
+<li>App and browser <b>caches</b>, logs and temporary files</li>
+<li><b>Local Time Machine snapshots</b> stored on your internal drive</li>
+<li>Old <b>iPhone and iPad backups</b></li>
+<li><b>Developer files</b>: Xcode build data, simulators, Docker disk images</li>
+<li>For AI work: downloaded <b>model files</b> and package caches</li>
+<li>Files macOS needs to run, like virtual memory and the sleep image (leave these alone)</li>
+</ul>
+<p>On a Mac that has been in use for a year or two, System Data can grow to 50 GB or more, and macOS gives you no button to clear it.</p>
+
+<h2 id="check">Check how big it is</h2>
+<p>Open <b>Apple menu › System Settings › General › Storage</b> (macOS 13 Ventura or later). Wait for the bar to finish calculating, then hover over the gray segment to see the System Data size. Note the number so you can see what each step frees.</p>
+
+<h2 id="steps">7 safe ways to shrink System Data</h2>
+<h3>1. Restart your Mac</h3>
+<p>A restart clears temporary files and swap. It is free, safe, and sometimes frees several gigabytes on its own.</p>
+<h3>2. Empty the Trash and your Downloads folder</h3>
+<p>Files in the Trash still take space until you empty it. Old installers (<code>.dmg</code>, <code>.pkg</code>, <code>.zip</code>) in Downloads are a common hidden cost.</p>
+<h3>3. Delete local Time Machine snapshots</h3>
+<p>If you use Time Machine, macOS keeps snapshots on your internal drive. macOS removes them when it needs space, but the Storage screen often counts them as System Data. To list and remove them, open Terminal:</p>
+<pre>tmutil listlocalsnapshots /
+sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
+<p>Replace the date with one from the list. Your backups on the external Time Machine drive are not affected.</p>
+<h3>4. Clear user caches</h3>
+<p>Quit your apps, then in Finder press <b>Shift+Cmd+G</b> and go to <code>~/Library/Caches</code>. Move the folders of apps you recognize to the Trash. Apps rebuild what they need, so the first launch afterward may be a little slower.</p>
+<div class="warn"><p>Use <code>~/Library/Caches</code> (with the tilde, your own folder), not <code>/Library/Caches</code> or <code>/System/Library/Caches</code>.</p></div>
+<h3>5. Remove old iPhone and iPad backups</h3>
+<p>Open <b>System Settings › General › Storage</b> and click the info button next to <b>iOS Files</b>. Delete backups of devices you no longer own or no longer need.</p>
+<h3>6. Clean developer leftovers</h3>
+<ul>
+<li><b>Xcode build data</b>: move <code>~/Library/Developer/Xcode/DerivedData</code> to the Trash. Xcode recreates it.</li>
+<li><b>Old simulators</b>: run <code>xcrun simctl delete unavailable</code>.</li>
+<li><b>Docker</b>: run <code>docker system prune</code> to remove unused images and containers.</li>
+<li><b>node_modules</b> in old projects you no longer work on.</li>
+</ul>
+<h3>7. Clean AI model caches</h3>
+<ul>
+<li><b>Ollama</b>: run <code>ollama list</code>, then <code>ollama rm model-name</code> for models you don't use.</li>
+<li><b>Hugging Face</b>: downloaded models live in <code>~/.cache/huggingface</code>.</li>
+</ul>
+<p>A single local model can be several gigabytes, so this is often the biggest win on an AI workstation.</p>
+
+<h2 id="dont">What you should never delete</h2>
+<ul>
+<li>Anything inside <code>/System</code>, <code>/private/var/vm</code> (virtual memory) or <code>/private/var/db</code></li>
+<li>The whole <code>~/Library</code> folder, or your Photos and Mail libraries</li>
+<li>Files you don't recognize. If you are not sure, leave it.</li>
+</ul>
+<p>Also be careful with "one click" cleaners that delete permanently. If something goes wrong, there is no undo.</p>
+
+<h2 id="faster">The faster way: let an app find it</h2>
+<p>Steps 2 to 7 mean digging through hidden folders. <a href="../">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you: Smart Scan finds user and app caches, logs, npm cache, old downloads and project drafts; Space Lens draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>. Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
+<div class="box"><h3>Clean your Mac for free</h3><p>Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.</p><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download Tidymint <span class="arr">→</span></a> <a class="btn ghost" href="../#install">How to install</a></div>
+
+  <h2 id="faq">FAQ</h2>
+  <details><summary>Is it safe to delete System Data on Mac?</summary><p>Parts of it, yes: caches, old downloads, local Time Machine snapshots, old device backups and developer build data are safe to remove. Files macOS needs to run, such as virtual memory, are not. Never delete anything inside /System or /private/var.</p></details><details><summary>Why is my System Data so large?</summary><p>The usual causes are local Time Machine snapshots, app and browser caches, old iPhone backups, Xcode and Docker data, and downloaded AI models. On developer and AI machines it can pass 100 GB.</p></details><details><summary>Will System Data shrink on its own?</summary><p>Partly. macOS removes local snapshots and some caches when space runs low, and a restart clears temporary files. It will not remove developer files, models or old backups for you.</p></details><details><summary>Does restarting clear System Data?</summary><p>It clears temporary files and swap, which can free a few gigabytes. Larger items like snapshots and caches need the other steps.</p></details><details><summary>Can Tidymint delete System Data?</summary><p>Tidymint finds the safe parts, such as caches, logs and old downloads, explains each folder, and moves only what you select to the Trash. It never touches Apple system folders.</p></details>
+  <div class="box"><h3>Clean your Mac for free</h3><p>Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.</p><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download Tidymint <span class="arr">→</span></a> <a class="btn ghost" href="../#install">How to install</a></div>
+  <h2>Sources</h2>
+  <ul class="src"><li><a href="https://support.apple.com/ht206996" rel="nofollow">Apple: Free up storage space on Mac</a></li><li><a href="https://www.macworld.com/article/231067/how-to-delete-time-machine-snapshots-on-your-mac.html" rel="nofollow">Macworld: How to delete Time Machine snapshots</a></li></ul>
+  <h2>Read next</h2><div class="rel"><a href="../free-up-space-mac/">How to free up space on Mac <span class="arr">→</span></a><a href="../cleanmymac-alternative/">Free CleanMyMac alternative <span class="arr">→</span></a></div>
+</article>
+<div class="topbar"><a href="#top" id="toTop">↑ Back to top</a></div>
+<div class="fcols">
+  <div><a class="brand" href="../"><img src="../icon.png" alt="">Tidymint</a><p>Free, open-source Mac cleaner. Provided as is, without warranty.</p></div>
+  <div><h4>Product</h4><a href="../#features">Features</a><a href="../#how">How it works</a><a href="../#install">Install</a><a href="https://github.com/HaiTrung-Workspace/tidymint/releases">Releases</a></div><div><h4>Guides</h4><a href="../clear-system-data-mac/">Clear System Data</a><a href="../free-up-space-mac/">Free up space on Mac</a><a href="../cleanmymac-alternative/">CleanMyMac alternative</a><a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Report a bug</a></div><div><h4>Legal</h4><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Privacy</a><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/LICENSE">MIT License</a><a href="mailto:hello@tidymint.app">hello@tidymint.app</a></div>
+</div>
+<footer><span>© 2026 Tidymint · <button class="linkbtn" id="ckOpen" type="button">Cookie settings</button></span></footer>
+</div>
+<button class="up" id="up" type="button" aria-label="Back to top">↑ Back to top</button>
+<div class="ck" id="ck" role="dialog" aria-live="polite"><p>This website uses Google Analytics cookies to count visits. The Tidymint app itself tracks nothing. <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Privacy</a></p><div class="row"><button class="yes" id="ckY" type="button">Accept</button><button id="ckN" type="button">Decline</button></div></div>
+<script>
+document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
+(function(){var up=document.getElementById('up'),bar=document.getElementById('toTop'),barIn=false,tick=false;
+function top(e){if(e)e.preventDefault();scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+up.addEventListener('click',top);bar.addEventListener('click',top);
+function upd(){tick=false;up.classList.toggle('show',scrollY>600&&!barIn)}
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){barIn=es[0].isIntersecting;upd()}).observe(bar);
+addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});upd();})();
+(function(){var ck=document.getElementById('ck');
+function show(v){ck.classList.toggle('show',v)}
+function set(v){try{localStorage.setItem('tm-consent',v)}catch(e){};gtag('consent','update',{analytics_storage:v==='yes'?'granted':'denied'});show(false)}
+document.getElementById('ckY').onclick=function(){set('yes')};document.getElementById('ckN').onclick=function(){set('no')};
+document.getElementById('ckOpen').onclick=function(){show(true)};
+if(!tmC)show(true);
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','download_click',{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide'})})});})();
+</script>
+</body>
+</html>

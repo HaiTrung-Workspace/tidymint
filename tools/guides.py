@@ -30,6 +30,7 @@ ART_CSS = """
 .box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}
 .box h3{margin:0 0 6px}.box p{margin:0 0 14px}
 .warn{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 18px;margin:18px 0}.warn p{margin:0}
+.art code{overflow-wrap:anywhere}.art pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
 .src{font-size:14px}.src li{font-size:14px;color:var(--sub)}
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
@@ -42,11 +43,11 @@ L = {
             cta_h="Dọn Mac miễn phí, hợp pháp", cta_p="Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.",
             cta_btn="Tải Tidymint", cta_more="Xem cách cài", inst="#cai-dat",
             nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
- "en": dict(home="../../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
+ "en": dict(home="../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
             toc="On this page", faq="FAQ", src="Sources", rel="Read next",
             cta_h="Clean your Mac for free", cta_p="Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.",
             cta_btn="Download Tidymint", cta_more="How to install", inst="#install",
-            nav=[("../../#features","Features"),("../../#how","How it works"),("../../#faq","FAQ"),(S.GH,"GitHub")]),
+            nav=[("../#features","Features"),("../#how","How it works"),("../#faq","FAQ"),(S.GH,"GitHub")]),
 }
 
 def guide(g):
