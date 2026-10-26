@@ -505,8 +505,161 @@ enum AppRules {
 
     static func installed() -> [AppRule] { all.filter { Scanner.fm.fileExists(atPath: Scanner.home.appendingPathComponent($0.marker).path) } }
 
-    /// Rules are added per app, each one measured on a real Mac first (see docs/11 in the project notes).
-    static let all: [AppRule] = []
+    // Rules below were measured on a real Mac (macOS 26, Oct 2026) unless marked "unverified".
+    // Chromium browsers keep the HTTP cache under ~/Library/Caches/<vendor>/<profile> and the rest inside the profile.
+    static func chromium(id: String, nameEN: String, nameVI: String, bundle: String, support: String, caches: String, aiModel: Bool = false) -> AppRule {
+        var secs: [AppSection] = [
+            AppSection(id: "cache", titleEN: "Browser cache", titleVI: "Bộ nhớ đệm trình duyệt",
+                       paths: ["Library/Caches/\(caches)/*/Cache", "Library/Caches/\(caches)/*/Code Cache",
+                               "Library/Application Support/\(support)/*/Cache", "Library/Application Support/\(support)/*/Code Cache",
+                               "Library/Application Support/\(support)/*/GPUCache", "Library/Application Support/\(support)/*/DawnGraphiteCache",
+                               "Library/Application Support/\(support)/*/DawnWebGPUCache", "Library/Application Support/\(support)/*/Service Worker/CacheStorage",
+                               "Library/Application Support/\(support)/GrShaderCache", "Library/Application Support/\(support)/GraphiteDawnCache",
+                               "Library/Application Support/\(support)/ShaderCache", "Library/Application Support/\(support)/component_crx_cache",
+                               "Library/Application Support/\(support)/extensions_crx_cache", "Library/Application Support/\(support)/Crashpad/completed"],
+                       safety: .safe,
+                       whyEN: "Pages, scripts and images load from the network again. Logins, history and passwords are not touched.",
+                       whyVI: "Trang web, script và ảnh sẽ tải lại từ mạng. Đăng nhập, lịch sử, mật khẩu không bị đụng.")]
+        if aiModel {
+            secs.append(AppSection(id: "ai", titleEN: "On-device AI models", titleVI: "Mô hình AI chạy tại máy",
+                       paths: ["Library/Application Support/\(support)/OptGuideOnDeviceModel", "Library/Application Support/\(support)/OptGuideOnDeviceClassifierModel",
+                               "Library/Application Support/\(support)/optimization_guide_model_store"],
+                       safety: .review,
+                       whyEN: "Models the browser downloaded for AI features (a few GB). It downloads them again when a feature needs them.",
+                       whyVI: "Mô hình trình duyệt tải về cho tính năng AI (vài GB). Khi cần, trình duyệt sẽ tải lại."))
+        }
+        secs.append(AppSection(id: "profile", titleEN: "Logins, history, passwords", titleVI: "Đăng nhập, lịch sử, mật khẩu",
+                       paths: ["Library/Application Support/\(support)/*/Cookies", "Library/Application Support/\(support)/*/History",
+                               "Library/Application Support/\(support)/*/Login Data", "Library/Application Support/\(support)/*/Local Storage",
+                               "Library/Application Support/\(support)/*/IndexedDB", "Library/Application Support/\(support)/*/Bookmarks"],
+                       safety: .locked, whyEN: "Tidymint never touches these.", whyVI: "Tidymint không bao giờ đụng vào đây.", dbGuard: false))
+        return AppRule(id: id, nameEN: nameEN, nameVI: nameVI, bundleIDs: [bundle], marker: "Library/Application Support/\(support)", sections: secs)
+    }
+
+    static let all: [AppRule] = [
+        AppRule(id: "zalo", nameEN: "Zalo", nameVI: "Zalo", bundleIDs: ["com.vng.zalo"], marker: "Library/Application Support/ZaloData", sections: [
+            AppSection(id: "cache", titleEN: "Cache, thumbnails, old installers", titleVI: "Bộ nhớ đệm, ảnh thu nhỏ, bản cài cũ",
+                       paths: ["Library/Application Support/ZaloData/Cache", "Library/Application Support/ZaloData/Code Cache",
+                               "Library/Application Support/ZaloData/GPUCache", "Library/Application Support/ZaloData/DawnCache",
+                               "Library/Application Support/ZaloData/resp_cache", "Library/Application Support/ZaloData/media/temp",
+                               "Library/Application Support/ZaloData/media/update",
+                               "Library/Application Support/ZaloData/media/*/ZaloDownloads/Cache", "Library/Application Support/ZaloData/media/*/ZaloDownloads/fileThumb",
+                               "Library/Application Support/ZaloData/media/*/ZaloDownloads/richThumb", "Library/Application Support/ZaloData/media/*/ZaloDownloads/sticker"],
+                       safety: .safe,
+                       whyEN: "Zalo rebuilds these on its own. The installer is re-downloaded at the next update.",
+                       whyVI: "Zalo tự tạo lại. Bản cài sẽ tải lại khi có bản cập nhật mới."),
+            AppSection(id: "picture", titleEN: "Photos in chats", titleVI: "Ảnh trong tin nhắn",
+                       paths: ["Library/Application Support/ZaloData/media/*/ZaloDownloads/picture", "Library/Application Support/ZaloData/media/*/ZaloDownloads/resource"],
+                       safety: .review,
+                       whyEN: "Cleaning removes them from this Mac. Recent photos usually download again when you open the chat; old ones may be gone for good. Text messages are not affected.",
+                       whyVI: "Dọn là mất trên máy này. Ảnh gần đây thường tải lại được khi mở lại cuộc trò chuyện, ảnh cũ có thể mất hẳn. Tin nhắn chữ không ảnh hưởng.",
+                       byAge: true),
+            AppSection(id: "video", titleEN: "Videos in chats", titleVI: "Video trong tin nhắn",
+                       paths: ["Library/Application Support/ZaloData/media/*/ZaloDownloads/video"],
+                       safety: .review,
+                       whyEN: "May be gone for good on this Mac. Save the ones you want to keep first.",
+                       whyVI: "Có thể mất hẳn trên máy này. Muốn giữ thì tải về trước.", byAge: true),
+            AppSection(id: "file", titleEN: "Files and voice messages", titleVI: "File và tin nhắn thoại",
+                       paths: ["Library/Application Support/ZaloData/media/*/ZaloDownloads/file", "Library/Application Support/ZaloData/media/*/ZaloDownloads/voice"],
+                       safety: .review,
+                       whyEN: "May be gone for good on this Mac. Save the ones you want to keep first.",
+                       whyVI: "Có thể mất hẳn trên máy này. Muốn giữ thì tải về trước.", byAge: true),
+            AppSection(id: "db", titleEN: "Messages", titleVI: "Tin nhắn",
+                       paths: ["Library/Application Support/ZaloData/Database"],
+                       safety: .locked, whyEN: "Your chat history. Tidymint never touches it.", whyVI: "Lịch sử trò chuyện. Tidymint không bao giờ đụng vào.", dbGuard: false),
+        ]),
+        chromium(id: "chrome", nameEN: "Google Chrome", nameVI: "Google Chrome", bundle: "com.google.Chrome", support: "Google/Chrome", caches: "Google/Chrome", aiModel: true),
+        chromium(id: "edge", nameEN: "Microsoft Edge", nameVI: "Microsoft Edge", bundle: "com.microsoft.edgemac", support: "Microsoft Edge", caches: "Microsoft Edge", aiModel: true),
+        // Unverified on a real Mac: folder names taken from the Chromium layout and public tooling that reads Cốc Cốc profiles.
+        chromium(id: "coccoc", nameEN: "Cốc Cốc", nameVI: "Cốc Cốc", bundle: "com.coccoc.Coccoc", support: "Coccoc", caches: "Coccoc"),
+        // Unverified on a real Mac. Only scratch folders inside Cache: rendered media in there can be the last copy of a clip.
+        AppRule(id: "capcut", nameEN: "CapCut", nameVI: "CapCut", bundleIDs: ["com.lemon.lvoverseas"], marker: "Movies/CapCut/User Data", sections: [
+            AppSection(id: "cache", titleEN: "Scratch files", titleVI: "File tạm khi dựng video",
+                       paths: ["recognize", "frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       safety: .safe,
+                       whyEN: "Thumbnails, waveforms and analysis caches. CapCut rebuilds them when you open a project.",
+                       whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích. CapCut tự tạo lại khi mở dự án."),
+            AppSection(id: "projects", titleEN: "Projects", titleVI: "Dự án",
+                       paths: ["Movies/CapCut/User Data/Projects"],
+                       safety: .locked, whyEN: "Your edits. Tidymint never touches them.", whyVI: "Dự án bạn đang dựng. Tidymint không bao giờ đụng vào.", dbGuard: false),
+        ]),
+    ]
+}
+
+/// What the clean-by-app scan produces.
+struct AppRow: Identifiable {
+    let id: String
+    let title: String, sub: String
+    let size: Int64
+    let count: Int
+    let urls: [URL]
+    let month: Date?          // for by-age rows: the first day of that month
+    var selected: Bool
+}
+struct AppGroup: Identifiable {
+    let id: String
+    let section: AppSection
+    var rows: [AppRow]
+    var expanded = false
+    var total: Int64 { rows.reduce(0) { $0 + $1.size } }
+    var selected: Int64 { rows.filter(\.selected).reduce(0) { $0 + $1.size } }
+    var state: Int { let n = rows.filter(\.selected).count; return n == 0 ? 0 : (n == rows.count ? 2 : 1) }
+}
+struct AppReport: Identifiable {
+    let rule: AppRule
+    var groups: [AppGroup]
+    var running: Bool
+    var id: String { rule.id }
+    var total: Int64 { groups.reduce(0) { $0 + $1.total } }
+    var cleanable: Int64 { groups.filter { $0.section.safety != .locked }.reduce(0) { $0 + $1.total } }
+    var selected: Int64 { groups.reduce(0) { $0 + $1.selected } }
+}
+
+extension AppRules {
+    static func monthStart(_ d: Date) -> Date {
+        let c = Calendar.current
+        return c.date(from: c.dateComponents([.year, .month], from: d)) ?? d
+    }
+    static func monthLabel(_ d: Date) -> String {
+        let f = DateFormatter(); f.locale = Locale(identifier: appLang == "vi" ? "vi_VN" : "en_US"); f.dateFormat = appLang == "vi" ? "'Tháng' M/yyyy" : "MMMM yyyy"
+        return f.string(from: d)
+    }
+
+    /// Rows for one section: one per matched folder, or one per month when the section is split by age.
+    static func rows(_ s: AppSection) -> [AppRow] {
+        let home = Scanner.home.path + "/"
+        func short(_ u: URL) -> String { u.path.hasPrefix(home) ? "~/" + u.path.dropFirst(home.count) : u.path }
+        if !s.byAge {
+            return items(s).map { AppRow(id: $0.url.path, title: $0.name, sub: short($0.url), size: $0.size, count: 1, urls: [$0.url], month: nil, selected: $0.selected) }
+        }
+        var bucket: [Date: (size: Int64, urls: [URL])] = [:]
+        let keys: Set<URLResourceKey> = [.totalFileAllocatedSizeKey, .isRegularFileKey, .contentModificationDateKey]
+        for tpl in s.paths {
+            for folder in expand(tpl) where !Scanner.skip(folder.path) {
+                if s.dbGuard && Scanner.holdsDatabase(folder) { continue }
+                guard let en = Scanner.fm.enumerator(at: folder, includingPropertiesForKeys: Array(keys), options: [], errorHandler: { _, _ in true }) else { continue }
+                for case let f as URL in en {
+                    guard let v = try? f.resourceValues(forKeys: keys), v.isRegularFile == true, !Scanner.isDatabase(f) else { continue }
+                    let m = monthStart(v.contentModificationDate ?? Date())
+                    bucket[m, default: (0, [])].size += Int64(v.totalFileAllocatedSize ?? 0)
+                    bucket[m, default: (0, [])].urls.append(f)
+                }
+            }
+        }
+        return bucket.keys.sorted(by: >).map { m in
+            let b = bucket[m]!
+            return AppRow(id: s.id + "|" + ISO8601DateFormatter().string(from: m), title: monthLabel(m),
+                          sub: t("\(b.urls.count) files", "\(b.urls.count) file"), size: b.size, count: b.urls.count, urls: b.urls, month: m, selected: false)
+        }.filter { $0.size > 0 }
+    }
+
+    static func scan() -> [AppReport] {
+        installed().compactMap { rule in
+            let groups = rule.sections.map { AppGroup(id: $0.id, section: $0, rows: rows($0)) }.filter { !$0.rows.isEmpty }
+            guard groups.contains(where: { $0.section.safety != .locked }) else { return nil }
+            return AppReport(rule: rule, groups: groups, running: Scanner.running(rule.bundleIDs) != nil)
+        }
+    }
 }
 
 // MARK: - Circle packing (greedy)
@@ -837,12 +990,13 @@ func ramInfo() -> (used: Double, total: Double) {
 // MARK: - ViewModel
 
 enum Page: String, CaseIterable, Identifiable {
-    case smart = "Smart Scan", cleanup = "Cleanup", large = "Large & Old Files", lens = "Space Lens", trash = "Trash", ignore = "Ignore List", cloud = "Cloud Cleanup", settings = "Settings", apps = "Uninstaller", dupes = "Duplicates", startup = "Startup", stats = "Stats", contact = "Contact"
+    case smart = "Smart Scan", cleanup = "Cleanup", byapp = "Clean by App", large = "Large & Old Files", lens = "Space Lens", trash = "Trash", ignore = "Ignore List", cloud = "Cloud Cleanup", settings = "Settings", apps = "Uninstaller", dupes = "Duplicates", startup = "Startup", stats = "Stats", contact = "Contact"
     var id: String { rawValue }
     var label: String {
         switch self {
         case .smart: return t("Smart Scan", "Quét thông minh")
         case .cleanup: return t("Cleanup", "Dọn rác")
+        case .byapp: return t("Clean by App", "Dọn theo ứng dụng")
         case .large: return t("Large & Old Files", "File lớn và cũ")
         case .lens: return t("Space Lens", "Bản đồ ổ đĩa")
         case .trash: return t("Trash", "Thùng rác")
@@ -860,6 +1014,7 @@ enum Page: String, CaseIterable, Identifiable {
         switch self {
         case .smart: return "sparkles"
         case .cleanup: return "trash.slash"
+        case .byapp: return "app.badge"
         case .large: return "doc.on.doc"
         case .lens: return "circle.hexagongrid"
         case .trash: return "trash"
@@ -1367,6 +1522,82 @@ enum Phase { case idle, scanning, summary, review, done }
         log(lastResult)
         large.removeAll { lastOK.contains($0.url) }
         refreshTrash(); refreshDisk()
+    }
+
+    // Clean by app
+    @Published var appReports: [AppReport] = []
+    @Published var appBusy = false
+    @Published var appScanned = false
+    @Published var appSel: String? = nil
+    @Published var appMsg = ""
+    @Published var appAge = 0      // months; 0 = no age filter applied
+    func scanByApp() {
+        appBusy = true; appMsg = ""
+        Task.detached(priority: .userInitiated) {
+            let r = AppRules.scan()
+            await MainActor.run { self.appReports = r; self.appBusy = false; self.appScanned = true; self.appAge = 0 }
+        }
+    }
+    func refreshAppRunning() { for i in appReports.indices { appReports[i].running = Scanner.running(appReports[i].rule.bundleIDs) != nil } }
+    func quitApp(_ id: String) {
+        guard let r = appReports.first(where: { $0.id == id }) else { return }
+        Scanner.quit(r.rule.bundleIDs)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { self.refreshAppRunning() }
+    }
+    func toggleAppGroup(_ app: String, _ g: String) {
+        guard let i = appReports.firstIndex(where: { $0.id == app }), let j = appReports[i].groups.firstIndex(where: { $0.id == g }) else { return }
+        guard appReports[i].groups[j].section.safety != .locked else { return }
+        let on = appReports[i].groups[j].state != 2
+        for k in appReports[i].groups[j].rows.indices { appReports[i].groups[j].rows[k].selected = on }
+    }
+    /// Tick every by-age row older than `months` (0 clears them), leaving "safe" groups as they are.
+    func selectOlder(_ app: String, months: Int) {
+        appAge = months
+        guard let i = appReports.firstIndex(where: { $0.id == app }) else { return }
+        let cutoff = Calendar.current.date(byAdding: .month, value: -months, to: AppRules.monthStart(Date())) ?? Date()
+        for j in appReports[i].groups.indices where appReports[i].groups[j].section.byAge {
+            for k in appReports[i].groups[j].rows.indices {
+                let m = appReports[i].groups[j].rows[k].month ?? Date()
+                appReports[i].groups[j].rows[k].selected = months > 0 && m < cutoff
+            }
+        }
+    }
+    func toggleAppExpand(_ app: String, _ g: String) {
+        guard let i = appReports.firstIndex(where: { $0.id == app }), let j = appReports[i].groups.firstIndex(where: { $0.id == g }) else { return }
+        withAnimation(.easeOut(duration: 0.2)) { appReports[i].groups[j].expanded.toggle() }
+    }
+    func toggleAppRow(_ app: String, _ g: String, _ row: String) {
+        guard let i = appReports.firstIndex(where: { $0.id == app }), let j = appReports[i].groups.firstIndex(where: { $0.id == g }),
+              let k = appReports[i].groups[j].rows.firstIndex(where: { $0.id == row }) else { return }
+        appReports[i].groups[j].rows[k].selected.toggle()
+    }
+    func cleanApp(_ id: String) {
+        guard let i = appReports.firstIndex(where: { $0.id == id }) else { return }
+        let r = appReports[i]
+        refreshAppRunning()
+        if appReports[i].running {
+            _ = confirm(t("Quit \(r.rule.name) first", "Tắt \(r.rule.name) trước"), t("The app is open and may be writing these files. Quit it, then clean.", "App đang mở, có thể đang ghi vào các file này. Tắt app rồi dọn."), "OK"); return
+        }
+        let rows = r.groups.filter { $0.section.safety != .locked }.flatMap { $0.rows.filter(\.selected) }
+        let urls = rows.flatMap(\.urls)
+        let size = rows.reduce(0) { $0 + $1.size }
+        let risky = r.groups.contains { $0.section.safety == .review && $0.rows.contains(where: \.selected) }
+        let body = risky
+            ? t("\(urls.count) items (\(fmt(size))) go to the Trash. Photos, videos and files you ticked are removed from this Mac; put them back from the Trash if you change your mind.",
+                "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác. Ảnh, video, file đã tick sẽ mất trên máy này; đổi ý thì trả về từ Thùng rác.")
+            : t("\(urls.count) items (\(fmt(size))) go to the Trash.", "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác.")
+        guard confirm(t("Clean \(r.rule.name)?", "Dọn \(r.rule.name)?"), body, t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
+        let (ok, fail) = trash(urls, label: "app:" + id)
+        appMsg = t("\(r.rule.name): moved \(ok) items (\(fmt(size))) to the Trash.", "\(r.rule.name): đã chuyển \(ok) mục (\(fmt(size))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail).", " Bỏ qua \(fail).") + failNote : "")
+        log(appMsg)
+        // Re-measure just this app.
+        Task.detached(priority: .userInitiated) {
+            let fresh = AppRules.scan().first { $0.id == id }
+            await MainActor.run {
+                if let f = fresh { self.appReports[i] = f } else { self.appReports.remove(at: i); self.appSel = nil }
+                self.refreshTrash(); self.refreshDisk()
+            }
+        }
     }
 
     func confirm(_ title: String, _ text: String, _ ok: String) -> Bool {
@@ -1939,6 +2170,177 @@ struct ReviewView: View {
     }
 }
 
+struct ByAppView: View {
+    @ObservedObject var vm: VM
+    var body: some View {
+        if vm.appBusy {
+            Scanning(text: t("Measuring app data...", "Đang đo dữ liệu từng app...")).frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if !vm.appScanned {
+            VStack(spacing: 28) {
+                Header(title: t("Clean by App", "Dọn theo ứng dụng"),
+                       sub: t("Zalo, Chrome, Edge, Cốc Cốc, CapCut: see what each app keeps on your Mac and clean it by type.\nMessages and logins are never touched.",
+                              "Zalo, Chrome, Edge, Cốc Cốc, CapCut: xem từng app đang giữ gì trên máy và dọn theo loại.\nTin nhắn và đăng nhập không bao giờ bị đụng."))
+                BigScanButton(label: t("Scan", "Quét")) { vm.scanByApp() }
+            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if let id = vm.appSel, let r = vm.appReports.first(where: { $0.id == id }) {
+            AppDetail(vm: vm, report: r)
+        } else {
+            AppList(vm: vm)
+        }
+    }
+}
+
+func appIcon(_ bundleIDs: [String]) -> NSImage {
+    for b in bundleIDs { if let u = NSWorkspace.shared.urlForApplication(withBundleIdentifier: b) { return NSWorkspace.shared.icon(forFile: u.path) } }
+    return NSWorkspace.shared.icon(for: .applicationBundle)
+}
+
+struct AppList: View {
+    @ObservedObject var vm: VM
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(t("Clean by App", "Dọn theo ứng dụng")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                    Text(t("\(vm.appReports.count) apps, \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })) can be cleaned.", "\(vm.appReports.count) app, có thể dọn \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable }))."))
+                        .font(.system(size: 12)).foregroundColor(Theme.sub)
+                }
+                Spacer()
+                GhostButton(title: t("Scan Again", "Quét lại")) { vm.scanByApp() }
+            }.padding(.horizontal, 24).padding(.top, 30).padding(.bottom, 14)
+            if !vm.appMsg.isEmpty { Text(vm.appMsg).font(.system(size: 12)).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8) }
+            if vm.appReports.isEmpty {
+                VStack(spacing: 10) {
+                    Image(systemName: "app.dashed").font(.system(size: 40)).foregroundColor(Theme.sub)
+                    Text(t("None of the supported apps keeps data on this Mac.", "Không thấy dữ liệu của các app được hỗ trợ trên máy này.")).foregroundColor(Theme.sub)
+                }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 10) {
+                        ForEach(vm.appReports) { r in
+                            HStack(spacing: 14) {
+                                Image(nsImage: appIcon(r.rule.bundleIDs)).resizable().frame(width: 40, height: 40)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    HStack(spacing: 8) {
+                                        Text(r.rule.name).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                                        if r.running {
+                                            Text(t("Open", "Đang mở")).font(.system(size: 10, weight: .semibold)).foregroundColor(Theme.warn)
+                                                .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(Theme.warn.opacity(0.15)))
+                                        }
+                                    }
+                                    Text(r.groups.map { "\($0.section.title) \(fmt($0.total))" }.joined(separator: " · ")).font(.system(size: 11)).foregroundColor(Theme.sub).lineLimit(1)
+                                }
+                                Spacer()
+                                VStack(alignment: .trailing, spacing: 2) {
+                                    Text(fmt(r.total)).foregroundColor(.white).font(.system(size: 15, weight: .semibold).monospacedDigit())
+                                    Text(t("\(fmt(r.cleanable)) cleanable", "dọn được \(fmt(r.cleanable))")).font(.system(size: 11)).foregroundColor(Theme.sub)
+                                }
+                                Image(systemName: "chevron.right").foregroundColor(Theme.sub)
+                            }
+                            .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card)).hoverBG(14, Color.white.opacity(0.06))
+                            .contentShape(Rectangle()).onTapGesture { vm.appSel = r.id; vm.appAge = 0 }
+                        }
+                    }.padding(.horizontal, 24).padding(.bottom, 16)
+                }
+            }
+        }
+        .onAppear { vm.refreshAppRunning() }
+    }
+}
+
+struct AppDetail: View {
+    @ObservedObject var vm: VM
+    let report: AppReport
+    var hasAge: Bool { report.groups.contains { $0.section.byAge } }
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(.white)
+                Spacer()
+                HStack(spacing: 8) {
+                    Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
+                    Text(report.rule.name).font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
+                    Text(fmt(report.total)).font(.system(size: 13)).foregroundColor(Theme.sub)
+                }
+                Spacer()
+                if hasAge {
+                    Picker("", selection: Binding(get: { vm.appAge }, set: { vm.selectOlder(report.id, months: $0) })) {
+                        Text(t("Pick by hand", "Tự tick")).tag(0)
+                        Text(t("Older than 3 months", "Cũ hơn 3 tháng")).tag(3)
+                        Text(t("Older than 6 months", "Cũ hơn 6 tháng")).tag(6)
+                        Text(t("Older than 1 year", "Cũ hơn 1 năm")).tag(12)
+                    }.pickerStyle(.menu).frame(width: 170)
+                } else { Color.clear.frame(width: 170, height: 1) }
+            }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
+
+            if report.running {
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
+                    Text(t("\(report.rule.name) is open. Quit it before cleaning so it does not write to these files.", "\(report.rule.name) đang mở. Tắt app trước khi dọn để app không ghi vào các file này."))
+                        .font(.system(size: 12)).foregroundColor(.white)
+                    Spacer()
+                    GhostButton(title: t("Quit \(report.rule.name)", "Tắt \(report.rule.name)")) { vm.quitApp(report.id) }
+                }.padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.warn.opacity(0.12))).padding(.horizontal, 24).padding(.bottom, 10)
+            }
+
+            ScrollView {
+                LazyVStack(spacing: 10) {
+                    ForEach(report.groups) { g in
+                        let locked = g.section.safety == .locked
+                        VStack(spacing: 0) {
+                            HStack(spacing: 12) {
+                                if locked { Image(systemName: "lock.fill").foregroundColor(Theme.danger).frame(width: 18) }
+                                else { Button { vm.toggleAppGroup(report.id, g.id) } label: { CheckBox(state: g.state) }.buttonStyle(.plain) }
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(g.section.title).foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                                    Text(g.section.why).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(2)
+                                }
+                                Spacer()
+                                SafetyBadge(level: g.section.safety, why: g.section.why)
+                                Text(locked ? fmt(g.total) : fmt(g.selected) + " / " + fmt(g.total)).foregroundColor(.white)
+                                    .font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 150, alignment: .trailing)
+                                Image(systemName: "chevron.down").rotationEffect(.degrees(g.expanded ? 0 : -90)).foregroundColor(Theme.sub).opacity(locked ? 0 : 1)
+                            }
+                            .padding(14).hoverBG(14, Color.white.opacity(0.06)).contentShape(Rectangle())
+                            .onTapGesture { if !locked { vm.toggleAppExpand(report.id, g.id) } }
+                            if g.expanded && !locked {
+                                Divider().background(Color.white.opacity(0.1))
+                                ForEach(g.rows) { row in
+                                    HStack(spacing: 12) {
+                                        Button { vm.toggleAppRow(report.id, g.id, row.id) } label: { CheckBox(state: row.selected ? 2 : 0) }.buttonStyle(.plain)
+                                        if let u = row.urls.first, row.month == nil {
+                                            Image(nsImage: NSWorkspace.shared.icon(forFile: u.path)).resizable().frame(width: 22, height: 22)
+                                        } else { Image(systemName: "calendar").foregroundColor(Theme.sub).frame(width: 22) }
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(row.title).foregroundColor(.white).font(.system(size: 13)).lineLimit(1)
+                                            Text(row.sub).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1).truncationMode(.middle)
+                                        }
+                                        Spacer()
+                                        Text(fmt(row.size)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
+                                    }
+                                    .padding(.vertical, 6).padding(.horizontal, 12).hoverBG(8, Color.white.opacity(0.07)).contentShape(Rectangle())
+                                    .contextMenu { Button(t("Reveal in Finder", "Mở trong Finder")) { if let u = row.urls.first { vm.reveal(u) } } }
+                                }.padding(.leading, 26)
+                            }
+                        }
+                        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+                    }
+                }.padding(.horizontal, 24).padding(.bottom, 16)
+            }
+
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(t("\(fmt(report.selected)) selected", "Đã chọn \(fmt(report.selected))")).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                    Text(t("Everything goes to the Trash first. Undo is on the Trash page.", "Mọi thứ vào Thùng rác trước. Hoàn tác ở trang Thùng rác.")).foregroundColor(Theme.sub).font(.system(size: 11))
+                }
+                Spacer()
+                PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanApp(report.id) }, disabled: report.selected == 0)
+            }.padding(.horizontal, 24).padding(.vertical, 14).background(Color.black.opacity(0.25))
+        }
+        .onAppear { vm.refreshAppRunning() }
+    }
+}
+
 struct LargeView: View {
     @ObservedObject var vm: VM
     @StateObject private var sortByDate = Flag()
@@ -2246,6 +2648,7 @@ struct Sidebar: View {
             NavItem(p: .smart, vm: vm)
             SectionTitle(text: t("CLEANUP", "DỌN DẸP"))
             NavItem(p: .cleanup, vm: vm)
+            NavItem(p: .byapp, vm: vm)
             NavItem(p: .apps, vm: vm)
             NavItem(p: .trash, vm: vm)
             SectionTitle(text: t("SPACE", "DUNG LƯỢNG"))
@@ -2328,6 +2731,7 @@ struct RootView: View {
                 switch vm.page {
                 case .smart: SmartView(vm: vm)
                 case .cleanup: CleanupView(vm: vm)
+                case .byapp: ByAppView(vm: vm)
                 case .large: LargeView(vm: vm)
                 case .lens: LensView(vm: vm)
                 case .trash: TrashView(vm: vm)
@@ -2841,6 +3245,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
             sharedVM.page = pg
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
+            if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
             if a.contains("--done") { sharedVM.lastResult = t("Moved 128 items (6.2 GB) to the Trash.", "Đã chuyển 128 mục (6,2 GB) vào Thùng rác.") }
         }
         if let i = a.firstIndex(of: "--window"), i + 1 < a.count {
@@ -3370,6 +3775,31 @@ struct InviteCard: View {
         var c = CleanItem(url: u(p), size: size, selected: sel, running: running)
         if days > 0 { c.date = Date().addingTimeInterval(-days * 86400) }
         return c
+    }
+    static func apps(_ vm: VM, detail: Bool) {
+        func month(_ back: Int) -> Date { Calendar.current.date(byAdding: .month, value: -back, to: AppRules.monthStart(Date()))! }
+        func ageRows(_ sec: String, _ sizes: [(Int, Double, Int)]) -> [AppRow] {
+            sizes.map { AppRow(id: sec + "\($0.0)", title: AppRules.monthLabel(month($0.0)), sub: t("\($0.2) files", "\($0.2) file"), size: mb($0.1), count: $0.2, urls: [], month: month($0.0), selected: false) }
+        }
+        func row(_ p: String, _ size: Double, _ sel: Bool) -> AppRow { AppRow(id: p, title: (p as NSString).lastPathComponent, sub: "~/" + p, size: mb(size), count: 1, urls: [u(p)], month: nil, selected: sel) }
+        let zalo = AppRules.all[0], chrome = AppRules.all[1]
+        let z = "Library/Application Support/ZaloData/"
+        vm.appReports = [
+            AppReport(rule: zalo, groups: [
+                AppGroup(id: "cache", section: zalo.sections[0], rows: [row(z + "media/update", 312, true), row(z + "Cache", 210, true), row(z + "media/1570043733251276210/ZaloDownloads/fileThumb", 101, true), row(z + "resp_cache", 1.4, true)], expanded: true),
+                AppGroup(id: "picture", section: zalo.sections[1], rows: ageRows("p", [(0, 180, 412), (1, 260, 590), (2, 310, 702), (4, 420, 1210), (7, 390, 980), (13, 530, 1430)]), expanded: true),
+                AppGroup(id: "video", section: zalo.sections[2], rows: ageRows("v", [(1, 96, 3), (6, 240, 7)])),
+                AppGroup(id: "file", section: zalo.sections[3], rows: ageRows("f", [(0, 12, 9), (3, 40, 22)])),
+                AppGroup(id: "db", section: zalo.sections[4], rows: [row(z + "Database", 520, false)]),
+            ], running: true),
+            AppReport(rule: chrome, groups: [
+                AppGroup(id: "cache", section: chrome.sections[0], rows: [row("Library/Caches/Google/Chrome/Default/Code Cache", 300, true), row("Library/Application Support/Google/Chrome/Default/Service Worker/CacheStorage", 1300, true), row("Library/Application Support/Google/Chrome/component_crx_cache", 240, true)]),
+                AppGroup(id: "ai", section: chrome.sections[1], rows: [row("Library/Application Support/Google/Chrome/OptGuideOnDeviceModel", 4000, false)]),
+                AppGroup(id: "profile", section: chrome.sections[2], rows: [row("Library/Application Support/Google/Chrome/Default/History", 48, false)]),
+            ], running: false),
+        ]
+        vm.appScanned = true
+        if detail { vm.appSel = "zalo"; vm.selectOlder("zalo", months: 6) }
     }
     static func load(_ vm: VM) {
         vm.cats = [
