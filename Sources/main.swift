@@ -1014,18 +1014,18 @@ enum Page: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .smart: return t("Smart Scan", "Quét thông minh")
-        case .cleanup: return t("Cleanup", "Dọn rác")
+        case .smart: return t("Clean Now", "Dọn ngay")
+        case .cleanup: return t("Cleanup Details", "Dọn rác chi tiết")
         case .byapp: return t("Clean by App", "Dọn theo ứng dụng")
-        case .large: return t("Large & Old Files", "File lớn và cũ")
+        case .large: return t("Large Files", "File lớn")
         case .lens: return t("Space Lens", "Bản đồ ổ đĩa")
         case .trash: return t("Trash", "Thùng rác")
-        case .ignore: return t("Ignore List", "Danh sách bỏ qua")
-        case .cloud: return t("Cloud Cleanup", "Dữ liệu đám mây")
+        case .ignore: return t("Ignore List", "Bỏ qua")
+        case .cloud: return t("Cloud", "Đám mây")
         case .settings: return t("Settings", "Cài đặt")
         case .apps: return t("Uninstaller", "Gỡ app")
         case .dupes: return t("Duplicates", "File trùng")
-        case .startup: return t("Startup Items", "Tự chạy khi bật máy")
+        case .startup: return t("Startup Items", "Khởi động cùng máy")
         case .stats: return t("Statistics", "Thống kê")
         case .contact: return t("Contact", "Liên hệ")
         }
@@ -1053,7 +1053,9 @@ enum Page: String, CaseIterable, Identifiable {
 enum Phase { case idle, scanning, summary, review, done }
 
 @MainActor final class VM: ObservableObject {
-    @Published var page: Page = .smart
+    @Published var page: Page = .smart {
+        didSet { if VM.advancedPages.contains(page), !advancedOpen { advancedOpen = true } }
+    }
     @Published var phase: Phase = .idle
     @Published var cats: [Category] = []
     @Published var large: [CleanItem] = []
@@ -1070,6 +1072,9 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var lensBusy = false
     @Published var hoverNode: UUID? = nil
     @Published var lang: String = appLang
+    static let advancedPages: Set<Page> = [.cleanup, .large, .dupes, .lens, .cloud, .startup, .stats, .ignore]
+    @Published var advancedOpen: Bool = UserDefaults.standard.bool(forKey: "nav-advanced")
+    func setAdvanced(_ on: Bool) { advancedOpen = on; UserDefaults.standard.set(on, forKey: "nav-advanced") }
 
     func setLang(_ l: String) { appLang = l; UserDefaults.standard.set(l, forKey: "lang"); lang = l }
     @Published var theme: String = appTheme
@@ -1460,12 +1465,34 @@ enum Phase { case idle, scanning, summary, review, done }
     }
 
     func smartScan() {
-        phase = .scanning; largePhase = .scanning
+        phase = .scanning; largePhase = .scanning; quickClean = false
         refreshTrash(); refreshDisk()
         Task.detached {
             let j = Scanner.scanJunk()
             let l = Scanner.scanLarge()
             await MainActor.run { self.cats = j; self.large = l; self.phase = .summary; self.largePhase = .review }
+        }
+    }
+
+    // One-click clean: scan, then move only the pre-selected (safe) items to the Trash.
+    @Published var quickClean = false
+    @Published var lastFreed: Int64 = 0
+    @Published var lastCount = 0
+    func quickCleanRun() {
+        phase = .scanning; quickClean = true
+        Task.detached {
+            let j = Scanner.scanJunk()
+            await MainActor.run {
+                self.cats = j
+                let sel = j.flatMap { $0.items.filter(\.selected) }
+                if sel.isEmpty { self.lastFreed = 0; self.lastCount = 0; self.phase = .done; self.quickClean = false; return }
+                let (ok, fail) = self.trash(sel.map(\.url), label: "quick")
+                self.lastFreed = self.okSize(sel); self.lastCount = ok
+                self.lastResult = t("Moved \(ok) items (\(fmt(self.lastFreed))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(self.lastFreed))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + self.failNote : "")
+                self.log(self.lastResult)
+                self.phase = .done; self.quickClean = false
+                self.refreshTrash(); self.refreshDisk()
+            }
         }
     }
 
@@ -1541,6 +1568,7 @@ enum Phase { case idle, scanning, summary, review, done }
         let sel = cats.flatMap { $0.items.filter(\.selected) }
         let size = sel.reduce(0) { $0 + $1.size }
         let (ok, fail) = trash(sel.map(\.url), label: "cleanup"); _ = size
+        lastFreed = okSize(sel); lastCount = ok
         lastResult = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + failNote : "")
         log(lastResult)
         phase = .done
@@ -2223,12 +2251,14 @@ struct Tile: View {
 struct SmartView: View {
     @ObservedObject var vm: VM
     var body: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: 22) {
             switch vm.phase {
             case .scanning:
-                Scanning(text: t("Scanning your Mac...", "Đang quét máy..."))
+                Scanning(text: vm.quickClean ? t("Cleaning what is safe...", "Đang dọn phần an toàn...") : t("Scanning your Mac...", "Đang quét máy..."))
             case .idle:
-                Header(title: t("Welcome back", "Dọn máy chút nhé?"), sub: t("Scan for safe junk, large files and the Trash.\nNothing is removed until you click Clean.", "Quét rác an toàn, file lớn và Thùng rác.\nChưa xoá gì cho tới khi bạn bấm Dọn."))
+                Header(title: t("Tidy up a little?", "Dọn máy chút nhé?"),
+                       sub: t("One click handles the safe part: caches, logs, old installers.\nEverything goes to the Trash first, so you can change your mind.",
+                              "Một nút là xong phần an toàn: bộ nhớ đệm, nhật ký, file cài đặt cũ.\nMọi thứ vào Thùng rác trước, đổi ý thì lấy lại được."))
                 if let v = vm.newVersion {
                     Button { NSWorkspace.shared.open(Updates.page) } label: {
                         Label(t("Tidymint \(v) is available. Download", "Đã có Tidymint \(v). Tải về"), systemImage: "arrow.down.circle")
@@ -2236,8 +2266,40 @@ struct SmartView: View {
                             .padding(.horizontal, 12).padding(.vertical, 6).background(Capsule().fill(Color.white.opacity(0.12)))
                     }.buttonStyle(.plain).hoverLift()
                 }
-                BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
-                Text(String(format: t("%.0f GB available", "Trống %.0f GB"), vm.freeGB)).foregroundColor(Theme.sub)
+                BigScanButton(label: t("Clean now", "Dọn ngay")) { vm.quickCleanRun() }
+                Button { vm.smartScan() } label: {
+                    (Text(t("Want to see each item first? ", "Muốn xem trước từng mục? ")).foregroundColor(Theme.sub)
+                     + Text(t("Review details", "Xem chi tiết")).foregroundColor(.white).underline())
+                        .font(.system(size: 12))
+                }.buttonStyle(.plain)
+                HStack(spacing: 14) {
+                    HomeCard(title: t("Zalo, Chrome, CapCut...", "Zalo, Chrome, CapCut..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
+                    HomeCard(title: t("Photos, videos, old files", "Ảnh, video, file cũ"), value: t("Large Files", "File lớn"), sub: t("you choose", "bạn tự chọn")) { vm.page = .large }
+                    HomeCard(title: t("Trash", "Thùng rác"), value: fmt(vm.trashSize), sub: t("empty it to free space for real", "đổ là trống thật")) { vm.page = .trash }
+                }.padding(.top, 6)
+            case .done:
+                Image(systemName: "checkmark.circle.fill").font(.system(size: 54)).foregroundColor(Theme.green)
+                Text(vm.lastFreed > 0 ? t("\(fmt(vm.lastFreed)) tidier", "Gọn thêm \(fmt(vm.lastFreed))") : t("Already tidy", "Máy đang gọn rồi"))
+                    .font(.system(size: 40, weight: .bold)).foregroundColor(.white)
+                Text(vm.lastFreed > 0
+                     ? t("\(vm.lastCount) items moved to the Trash. Nothing is lost yet: empty the Trash to free the space for real, or undo if you change your mind.",
+                         "Đã chuyển \(vm.lastCount) mục vào Thùng rác. Chưa mất gì cả: đổ Thùng rác thì ổ mới trống thật, hoặc bấm Hoàn tác nếu đổi ý.")
+                     : t("Nothing safe to clean right now. Try Clean by App or Large Files for things only you can decide on.",
+                         "Không có gì an toàn để dọn lúc này. Thử Dọn theo ứng dụng hoặc File lớn, là phần chỉ bạn quyết được."))
+                    .foregroundColor(Theme.sub).multilineTextAlignment(.center).frame(maxWidth: 520)
+                HStack(spacing: 12) {
+                    if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoLast(); vm.phase = .idle } }
+                    GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.page = .trash }
+                    PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
+                }
+                Button { vm.page = .byapp } label: {
+                    (Text(t("Want more room? ", "Muốn gọn hơn nữa? ")).foregroundColor(Theme.sub)
+                     + Text(t("Clean by App", "Dọn theo ứng dụng")).foregroundColor(.white).underline()
+                     + Text(t(" lists what Zalo, Chrome and CapCut keep.", " cho xem Zalo, Chrome, CapCut đang giữ gì.")).foregroundColor(Theme.sub))
+                        .font(.system(size: 12))
+                }.buttonStyle(.plain).padding(.top, 6)
+                if Invite.shouldShow() { InviteCard(source: "after-clean").frame(maxWidth: 520).padding(.top, 8) }
+                if ConCao.shouldShow() { ConCaoHint().frame(maxWidth: 520) }
             default:
                 Header(title: t("Scan Results", "Kết quả quét"), sub: String(format: t("%.0f GB available", "Trống %.0f GB"), vm.freeGB))
                 HStack(spacing: 16) {
@@ -2247,10 +2309,29 @@ struct SmartView: View {
                 }
                 HStack(spacing: 14) {
                     GhostButton(title: t("Review Details", "Xem chi tiết")) { vm.page = .cleanup; vm.phase = .review }
-                    PrimaryButton(title: t("Clean Selected (\(fmt(vm.junkSelected)))", "Dọn rác đã chọn (\(fmt(vm.junkSelected)))"), action: { vm.cleanJunk(); vm.page = .cleanup }, disabled: vm.junkSelected == 0)
+                    PrimaryButton(title: t("Clean Selected (\(fmt(vm.junkSelected)))", "Dọn rác đã chọn (\(fmt(vm.junkSelected)))"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
                 }
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear { vm.refreshTrash() }
+    }
+}
+
+/// Small navigation card on the home page: what it is, where it goes, who decides.
+struct HomeCard: View {
+    let title: String, value: String, sub: String
+    let action: () -> Void
+    @StateObject private var hover = Flag()
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1)
+                Text(value).foregroundColor(.white).font(.system(size: 16, weight: .semibold))
+                Text(sub).foregroundColor(Theme.sub).font(.system(size: 11))
+            }
+            .padding(14).frame(width: 190, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 14).fill(hover.v ? Theme.cardHi : Theme.card))
+        }.buttonStyle(.plain).onHover { hover.v = $0 }
     }
 }
 
@@ -2829,21 +2910,29 @@ struct Sidebar: View {
             ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .leading, spacing: 2) {
             NavItem(p: .smart, vm: vm)
-            SectionTitle(text: t("CLEANUP", "DỌN DẸP"))
-            NavItem(p: .cleanup, vm: vm)
             NavItem(p: .byapp, vm: vm)
             NavItem(p: .apps, vm: vm)
             NavItem(p: .trash, vm: vm)
-            SectionTitle(text: t("SPACE", "DUNG LƯỢNG"))
-            NavItem(p: .large, vm: vm)
-            NavItem(p: .dupes, vm: vm)
-            NavItem(p: .lens, vm: vm)
-            NavItem(p: .cloud, vm: vm)
-            SectionTitle(text: t("SYSTEM", "HỆ THỐNG"))
-            NavItem(p: .startup, vm: vm)
-            NavItem(p: .stats, vm: vm)
-            SectionTitle(text: t("SETTINGS", "CÀI ĐẶT"))
-            NavItem(p: .ignore, vm: vm)
+            // Advanced pages fold away so the first screen stays simple. The fold opens itself when one of them is active.
+            Button { withAnimation(.easeOut(duration: 0.2)) { vm.setAdvanced(!vm.advancedOpen) } } label: {
+                HStack {
+                    SectionTitle(text: t("ADVANCED", "NÂNG CAO"))
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.system(size: 9, weight: .bold)).foregroundColor(Theme.sub)
+                        .rotationEffect(.degrees(vm.advancedOpen ? 90 : 0)).padding(.trailing, 10)
+                }.contentShape(Rectangle())
+            }.buttonStyle(.plain)
+            if vm.advancedOpen {
+                NavItem(p: .cleanup, vm: vm)
+                NavItem(p: .large, vm: vm)
+                NavItem(p: .dupes, vm: vm)
+                NavItem(p: .lens, vm: vm)
+                NavItem(p: .cloud, vm: vm)
+                NavItem(p: .startup, vm: vm)
+                NavItem(p: .stats, vm: vm)
+                NavItem(p: .ignore, vm: vm)
+            }
+            SectionTitle(text: "")
             NavItem(p: .settings, vm: vm)
             NavItem(p: .contact, vm: vm)
             }.padding(.bottom, 6)
