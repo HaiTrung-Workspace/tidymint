@@ -2,7 +2,7 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
-## Unreleased (next: 0.3.2)
+## 0.3.2 (2026-10-27)
 
 - Star White: a light theme, with every colour checked for contrast (WCAG AA or better)
 - New mint-leaf icon with a serrated leaf; the wordmark shows "mint" in leaf green

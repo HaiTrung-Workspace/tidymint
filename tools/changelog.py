@@ -1,7 +1,7 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
-    dict(ver="0.3.2", date="", status="next",
+    dict(ver="0.3.2", date="2026-10-27", status="released",
          en=["Star White: a light theme, with every colour checked for contrast (WCAG AA or better)",
              "New mint-leaf icon with a serrated leaf; the wordmark shows \"mint\" in leaf green",
              "Text and buttons take their colour from the theme everywhere, so light themes stay readable",
