@@ -25,7 +25,7 @@ struct Palette {
 
 let palettes: [Palette] = [
     Palette(id: "mint", nameEN: "Mint", nameVI: "Mint (xanh bạc hà)",
-            bg: [0x04130f, 0x0b2620, 0x124a3b], accent: [0x2fd39f, 0x0f8f68], link: 0x7ef2c8,
+            bg: [0x030c09, 0x061712, 0x0a2a21], accent: [0x2fd39f, 0x0f8f68], link: 0x7ef2c8,
             bubbles: [0x14a57a, 0x7ef2c8, 0x3ec7a0, 0xb8fbe3, 0x5fb4ff, 0xa3e48a, 0x2e8f74, 0xd6f5c9],
             icon: [0x0d2b24, 0x145c47, 0x1d7a5d], leaf: 0x5ff0c0),
     Palette(id: "nightsky", nameEN: "Night Sky", nameVI: "Night Sky (xanh đêm)",
@@ -425,6 +425,26 @@ func pack(_ nodes: [Node], in size: CGSize) -> [Bubble] {
     let s = min((size.width - 20) / (maxX - minX), (size.height - 20) / (maxY - minY))
     let cx = (minX + maxX) / 2, cy = (minY + maxY) / 2
     return bs.map { Bubble(node: $0.node, x: ($0.x - cx) * s + size.width / 2, y: ($0.y - cy) * s + size.height / 2, r: $0.r * s, color: $0.color) }
+}
+
+/// Space Lens bubble in the "glass bubble" style of CleanMyMac's Space Lens: a translucent fill, a brighter rim that
+/// fades toward the centre, a thin light outline and a soft coloured glow. No specular highlight, no drop shadow.
+struct Sphere: View {
+    let color: Color; let r: CGFloat; var hot = false
+    static func mix(_ c: Color, _ other: NSColor, _ f: CGFloat) -> Color {
+        Color(NSColor(c).usingColorSpace(.sRGB)?.blended(withFraction: f, of: other) ?? NSColor(c))
+    }
+    var body: some View {
+        let edge = Sphere.mix(color, .white, 0.35)
+        ZStack {
+            Circle().fill(color.opacity(hot ? 0.34 : 0.22))
+            Circle().fill(RadialGradient(colors: [color.opacity(0), color.opacity(hot ? 0.75 : 0.55)], center: .center,
+                                         startRadius: r * 0.45, endRadius: r))
+            Circle().fill(LinearGradient(colors: [Color.white.opacity(0.10), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
+            Circle().strokeBorder(edge.opacity(hot ? 0.95 : 0.7), lineWidth: 1.2)
+        }
+        .shadow(color: color.opacity(hot ? 0.5 : 0.3), radius: max(3, r * 0.12))
+    }
 }
 
 // MARK: - Applications (Uninstaller, Leftovers, Installers)
@@ -1494,16 +1514,21 @@ struct GhostButton: View {
 
 struct BigScanButton: View {
     let label: String; let action: () -> Void
-    @StateObject private var pulse = Flag()
+    @StateObject private var pulse = Flag()   // hover
+    @StateObject private var breath = Flag()  // slow idle breathing, off when Reduce Motion is on
     var body: some View {
+        let still = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         Button(action: action) {
             ZStack {
-                Circle().fill(Theme.accent.opacity(0.25)).frame(width: 190, height: 190).scaleEffect(pulse.v ? 1.06 : 1.0)
-                Circle().fill(Theme.accent).frame(width: 150, height: 150).shadow(color: Theme.accentSolid.opacity(0.5), radius: 24)
+                Circle().fill(Theme.accent.opacity(breath.v ? 0.30 : 0.18)).frame(width: 190, height: 190)
+                    .scaleEffect(pulse.v ? 1.08 : (breath.v ? 1.05 : 0.97))
+                Circle().fill(Theme.accent).frame(width: 150, height: 150)
+                    .shadow(color: Theme.accentSolid.opacity(breath.v || pulse.v ? 0.6 : 0.35), radius: breath.v ? 30 : 20)
                 Text(label).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
             }
         }.buttonStyle(.plain)
         .onHover { h in withAnimation(.easeOut(duration: 0.25)) { pulse.v = h } }
+        .onAppear { if !still { withAnimation(.easeInOut(duration: 2.4).repeatForever(autoreverses: true)) { breath.v = true } } }
     }
 }
 
@@ -1827,20 +1852,21 @@ struct LensView: View {
                             ZStack {
                                 ForEach(bs, id: \.node.id) { b in
                                     ZStack {
-                                        Circle().fill(b.color.opacity(vm.hoverNode == b.node.id ? 0.95 : 0.7))
-                                        Circle().stroke(Color.white.opacity(0.35), lineWidth: 1)
+                                        Sphere(color: b.color, r: b.r, hot: vm.hoverNode == b.node.id)
                                         let pct = Double(b.node.size) / Double(total) * 100
                                         let pctText = pct < 1 ? "<1%" : String(format: "%.0f%%", pct)
                                         if b.r > 34 {
                                             VStack(spacing: 2) {
                                                 Text(b.node.name).font(.system(size: max(9, min(14, b.r / 5)), weight: .semibold)).lineLimit(1)
                                                 Text(fmt(b.node.size) + " · " + pctText).font(.system(size: max(8, min(12, b.r / 6))))
-                                            }.foregroundColor(.white).frame(width: b.r * 1.6)
+                                            }.foregroundColor(.white).frame(width: b.r * 1.6).shadow(color: .black.opacity(0.5), radius: 2, y: 1)
                                         } else if b.r > 14 {
                                             Text(pctText).font(.system(size: 9, weight: .semibold)).foregroundColor(.white)
                                         }
                                     }
                                     .frame(width: b.r * 2, height: b.r * 2)
+                                    .scaleEffect(vm.hoverNode == b.node.id ? 1.03 : 1)
+                                    .animation(.easeOut(duration: 0.18), value: vm.hoverNode == b.node.id)
                                     .position(x: b.x, y: b.y)
                                     .onTapGesture { if b.node.isDir && b.node.otherCount == 0 { vm.openLens(b.node.url) } }
                                     .onHover { h in vm.hoverNode = h ? b.node.id : nil }
