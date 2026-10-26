@@ -1617,7 +1617,7 @@ struct CleanupView: View {
         case .summary:
             VStack(spacing: 24) {
                 Text(fmt(vm.junkTotal)).font(.system(size: 54, weight: .bold)).foregroundColor(.white)
-                Text("of junk found. \(fmt(vm.junkSelected)) is safe and pre-selected.").foregroundColor(Theme.sub)
+                Text(t("of junk found. \(fmt(vm.junkSelected)) is safe and pre-selected.", "rác tìm thấy. \(fmt(vm.junkSelected)) an toàn, đã chọn sẵn.")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     GhostButton(title: t("Review Details", "Xem chi tiết")) { vm.phase = .review }
                     PrimaryButton(title: t("Clean", "Dọn"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
@@ -2578,10 +2578,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try? px.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: a[i + 2])); exit(0)
         }
         NSApp.applicationIconImage = makeAppIcon(Theme.p)
-        // Developer helper for README screenshots: `--page <name> --window <W>x<H>` opens a page at a fixed size.
+        // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
+        // `--page <name> --window <W>x<H>` opens a page at a fixed size.
+        if a.contains("--demo") { Demo.load(sharedVM) }
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
             sharedVM.page = pg
+            if pg == .cleanup && a.contains("--demo") { sharedVM.phase = .review }
         }
         if let i = a.firstIndex(of: "--window"), i + 1 < a.count {
             let wh = a[i + 1].split(separator: "x").compactMap { Double($0) }
@@ -3046,5 +3049,89 @@ struct InviteCard: View {
             if ok { f.ok = true; Invite.subscribed() }
             else { f.result = t("Could not sign up right now. Please try again later.", "Chưa đăng ký được lúc này. Bạn thử lại sau nhé.") }
         }
+    }
+}
+
+
+// MARK: - Sample data for screenshots (--demo). Nothing here touches real files.
+
+@MainActor enum Demo {
+    static let H = NSHomeDirectory()
+    static func u(_ p: String) -> URL { URL(fileURLWithPath: H + "/" + p) }
+    static func gb(_ x: Double) -> Int64 { Int64(x * 1_000_000_000) }
+    static func mb(_ x: Double) -> Int64 { Int64(x * 1_000_000) }
+    static func item(_ p: String, _ size: Int64, _ sel: Bool, running: Bool = false, days: Double = 0) -> CleanItem {
+        var c = CleanItem(url: u(p), size: size, selected: sel, running: running)
+        if days > 0 { c.date = Date().addingTimeInterval(-days * 86400) }
+        return c
+    }
+    static func load(_ vm: VM) {
+        vm.cats = [
+            Category(id: "usercache", titleEN: "User Cache Files", titleVI: "Bộ nhớ đệm người dùng", icon: "internaldrive",
+                     descEN: "Temporary files apps rebuild on their own", descVI: "File tạm, app tự tạo lại khi cần",
+                     items: [item("Library/Caches/com.google.Chrome", mb(2140), true),
+                             item("Library/Caches/com.spotify.client", mb(1380), true),
+                             item("Library/Caches/com.tinyspeck.slackmacgap", mb(612), false, running: true),
+                             item("Library/Caches/pip", mb(840), true),
+                             item("Library/Caches/Homebrew", mb(1210), true)], expanded: true),
+            Category(id: "appcache", titleEN: "App Caches", titleVI: "Bộ nhớ đệm trong app", icon: "square.stack.3d.up",
+                     descEN: "Web and graphics caches from Chrome, Slack, Notion, VS Code...", descVI: "Bộ nhớ đệm web, đồ hoạ của Chrome, Slack, Notion, VS Code...",
+                     items: [item("Library/Application Support/Code/CachedData", mb(930), true),
+                             item("Library/Application Support/Notion/Cache", mb(455), true),
+                             item("Library/Application Support/discord/Cache", mb(388), true),
+                             item("Library/Application Support/Google/Chrome/Default/GPUCache", mb(126), true)], expanded: true),
+            Category(id: "logs", titleEN: "Log Files", titleVI: "Nhật ký (log)", icon: "doc.text",
+                     descEN: "Error and activity logs, safe to remove", descVI: "Nhật ký lỗi và hoạt động, xoá an toàn",
+                     items: [item("Library/Logs/DiagnosticReports", mb(212), true), item("Library/Logs/JetBrains", mb(96), true)]),
+            Category(id: "dev", titleEN: "Developer & Wallpaper Junk", titleVI: "Công cụ và hình nền", icon: "hammer",
+                     descEN: "npm cache, downloaded aerial wallpapers", descVI: "Bộ nhớ đệm npm, hình nền động đã tải",
+                     items: [item(".npm/_cacache", mb(3420), true), item("Library/Application Support/com.apple.wallpaper/aerials", gb(6.8), true)]),
+            Category(id: "drafts", titleEN: "Project Drafts", titleVI: "Nháp trong thư mục dự án", icon: "tray.full",
+                     descEN: "_to_delete and _tmp folders in your project folders", descVI: "Thư mục _to_delete, _tmp trong thư mục dự án",
+                     items: [item("Projects/ai-video/_tmp", mb(2860), true), item("Projects/landing-page/_to_delete", mb(418), true)]),
+            Category(id: "downloads", titleEN: "Old Downloads (14+ days)", titleVI: "Downloads cũ hơn 14 ngày", icon: "arrow.down.circle",
+                     descEN: "Not selected by default. Review before removing", descVI: "Mặc định không tick, xem rồi chọn",
+                     items: [item("Downloads/Figma-125.4.dmg", mb(412), false, days: 41), item("Downloads/Zoom.pkg", mb(98), false, days: 63),
+                             item("Downloads/dataset-v2.zip", gb(2.4), false, days: 28)]),
+        ]
+        vm.phase = .summary
+        vm.large = [item("Movies/Screen Recording 2026-09-14.mov", gb(8.2), true, days: 42),
+                    item("Downloads/sdxl-base-1.0.safetensors", gb(6.9), true, days: 77),
+                    item("Documents/Footage/interview-raw.mp4", gb(4.1), false, days: 120),
+                    item("Downloads/ubuntu-24.04-desktop-arm64.iso", gb(3.2), true, days: 160),
+                    item("Pictures/Exports/product-shoot-4k.zip", gb(1.9), false, days: 33),
+                    item("Documents/Backups/site-backup-2026-06.tar.gz", gb(1.4), false, days: 118),
+                    item("Music/Logic/Podcast EP12.logicx", mb(860), false, days: 54)]
+        vm.largePhase = .review
+        var d1 = DupGroup(size: mb(46), items: [item("Projects/brand/hero-banner.psd", mb(46), false),
+                                                  item("Downloads/hero-banner.psd", mb(46), true),
+                                                  item("Desktop/hero-banner copy.psd", mb(46), true)])
+        d1.expanded = true
+        var d2 = DupGroup(size: mb(18), items: [item("Projects/ai-video/assets/intro.mp4", mb(18), false),
+                                                  item("Downloads/intro.mp4", mb(18), true)])
+        d2.items[0].refStrong = [H + "/Projects/ai-video/render.py"]
+        d2.expanded = true
+        var d3 = DupGroup(size: mb(12), items: [item("Pictures/IMG_2041.HEIC", mb(12), false), item("Desktop/IMG_2041.HEIC", mb(12), true)])
+        d3.items[1].refWeak = [H + "/Projects/blog/notes.md"]
+        d3.expanded = true
+        vm.dupes = [d1, d2, d3, DupGroup(size: mb(9), items: [item("Documents/contract-v3.pdf", mb(9), false), item("Downloads/contract-v3 (1).pdf", mb(9), true)])]
+        vm.lensPath = [URL(fileURLWithPath: H)]
+        vm.lensNodes = [("Library", 48.3), ("Documents", 31.2), ("Movies", 18.4), (".ollama", 12.6), ("Downloads", 9.1),
+                        ("Pictures", 7.4), ("Developer", 6.2), ("Projects", 5.8), ("Desktop", 2.3), ("Music", 1.1), (".npm", 0.9), (".cache", 0.6)]
+            .map { Node(url: u($0.0), size: gb($0.1), isDir: true) }
+        let z = AppEntry(url: URL(fileURLWithPath: "/Applications/Zoom.app"), name: "Zoom", bundleID: "us.zoom.xos", size: mb(412),
+                         lastUsed: Date().addingTimeInterval(-90 * 86400),
+                         related: [item("Library/Application Support/zoom.us", mb(186), true),
+                                   item("Library/Caches/us.zoom.xos", mb(64), true),
+                                   item("Library/Preferences/us.zoom.xos.plist", 24_000, true),
+                                   item("Library/Logs/zoom.us", mb(12), true),
+                                   item("Library/Saved Application State/us.zoom.xos.savedState", 410_000, true)])
+        vm.apps = [z,
+                   AppEntry(url: URL(fileURLWithPath: "/Applications/Figma.app"), name: "Figma", bundleID: "com.figma.Desktop", size: mb(520), lastUsed: Date()),
+                   AppEntry(url: URL(fileURLWithPath: "/Applications/Docker.app"), name: "Docker", bundleID: "com.docker.docker", size: gb(2.1), lastUsed: Date().addingTimeInterval(-200 * 86400)),
+                   AppEntry(url: URL(fileURLWithPath: "/Applications/Draw Things.app"), name: "Draw Things", bundleID: "com.liuliu.draw-things", size: mb(310), lastUsed: Date().addingTimeInterval(-3 * 86400)),
+                   AppEntry(url: URL(fileURLWithPath: "/Applications/Ollama.app"), name: "Ollama", bundleID: "com.electron.ollama", size: mb(380), lastUsed: Date().addingTimeInterval(-12 * 86400)),
+                   AppEntry(url: URL(fileURLWithPath: "/Applications/Spotify.app"), name: "Spotify", bundleID: "com.spotify.client", size: mb(290), lastUsed: Date())]
+        vm.selApp = z.id
     }
 }

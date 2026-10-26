@@ -6,7 +6,39 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 
 > **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm.
 
-![Disk Cleanup, Smart Scan](docs/smart.jpg)
+![Smart Scan results](docs/smart.jpg)
+
+## See it in action
+
+*Screenshots use sample data.*
+
+### 1. One scan, then you decide
+Smart Scan finds safe junk, large files and the Trash in one pass. Nothing is removed until you click **Clean**, and everything goes to the Trash first.
+
+### 2. Full control over every item
+Open **Review Details** to see each category, expand it, and tick or untick single items. Apps that are still running are flagged and left unticked.
+
+![Cleanup details](docs/cleanup.jpg)
+
+### 3. Duplicates without the risk
+Identical files are grouped (SHA-256, any file name). The best copy is marked **Keep**, and one click selects every extra copy. Before deleting, the app checks your project folders: a file still used by a script or skill is flagged in red and unticked for you.
+
+![Duplicates](docs/dupes.jpg)
+
+### 4. See where the space went
+Space Lens draws every folder as a bubble sized by real disk usage, with plain-language notes for common folders, including AI model folders like `.ollama`.
+
+![Space Lens](docs/lens.jpg)
+
+### 5. Uninstall apps completely
+Removing an app also finds its caches, preferences, logs and saved state. Leftovers from apps you already deleted and old installers have their own tabs.
+
+![Uninstaller](docs/apps.jpg)
+
+### 6. Large and old files, never pre-selected
+Files over 100 MB, sorted by size or by when you last opened them. You pick what goes.
+
+![Large files](docs/large.jpg)
 
 ## Features
 
@@ -23,16 +55,6 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 | **Statistics** | Space freed over time and a full activity log |
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance |
 | **Contact** | Send feedback or bug reports from inside the app |
-
-| Space Lens (Golden Gate theme) | Settings (Burgundy theme) |
-|---|---|
-| ![Space Lens](docs/lens.jpg) | ![Settings](docs/settings.jpg) |
-| **Contact (Pride theme)** | **App icon follows the theme** |
-| ![Contact](docs/contact.jpg) | ![Icons](docs/icons.png) |
-
-Menu bar indicator at different free-space levels:
-
-![Menu bar](docs/menubar.png)
 
 Also: English and Vietnamese, four colour themes (Night Sky, Burgundy, Golden Gate, Pride) with a matching app icon, an Ignore list, and alerts when disk space or memory runs low.
 
