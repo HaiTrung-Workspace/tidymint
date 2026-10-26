@@ -29,8 +29,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0
 .def{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center}
 .def p{color:var(--sub)}.def ul{color:var(--sub);padding-left:20px}
 .how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:h}
-.how .card{counter-increment:h;position:relative;padding-top:56px}.how .card:before{content:counter(h);position:absolute;left:20px;top:18px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
-.ico{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;margin-bottom:12px;color:var(--leaf);background:#2fd39f14;border:1px solid #2fd39f33}.ico svg{display:block}
+.card .hd{display:flex;align-items:center;gap:12px;margin-bottom:10px}.card .hd b{margin:0;font-size:17px}
+.how .card{counter-increment:h}.how .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}.how .n:before{content:counter(h)}
+.ico{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;color:var(--leaf);background:#2fd39f14;border:1px solid #2fd39f33}.ico svg{display:block}
 details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
 summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
 details p{color:var(--sub);margin:0 0 16px}
@@ -193,9 +194,9 @@ def page(k):
     nav = "".join('<a href="%s">%s</a>' % (h, l) for h, l in t["nav"])
     vi_on, en_on = ('class="on" ', '') if k == "vi" else ('', 'class="on" ')
     vi_href, en_href = ("./", "../") if k == "vi" else ("vi/", "./")
-    feats = "".join('<div class="card"><span class="ico">%s</span><b>%s</b><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["feats"])
-    uses = "".join('<div class="card"><span class="ico">%s</span><b>%s</b><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["uses"])
-    how = "".join('<div class="card"><b>%s</b><span>%s</span></div>' % h for h in t["how"])
+    feats = "".join('<div class="card"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["feats"])
+    uses = "".join('<div class="card"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["uses"])
+    how = "".join('<div class="card"><div class="hd"><span class="n"></span><b>%s</b></div><span>%s</span></div>' % h for h in t["how"])
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), html.escape(a)) for q, a in t["faq"])
     inst = "".join("<li>%s</li>" % s for s in t["inst"])
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % l for l in links)) for h, links in t["f_cols"])
