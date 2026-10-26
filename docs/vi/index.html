@@ -87,9 +87,29 @@ details p{color:var(--sub);margin:0 0 16px}
 .fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
 footer{border-top:0;padding:0 0 28px}
 @media (max-width:820px){.vs,.def,.how,.fcols{grid-template-columns:1fr}.navcta{display:none}}
+
+/* hover: lift, shadow, mint border; press on touch; respect reduced motion */
+.card,.vs .col,details,.steps li,.btn,.lang a,.feature img,.shot img,.def img,.up,.topbar a{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,background .22s ease,filter .22s ease}
+@media (hover:hover){
+ .card:hover,.vs .col:hover,.steps li:hover{transform:translateY(-5px);box-shadow:0 16px 40px #00000066;border-color:#2fd39f66}
+ details:hover{border-color:#2fd39f66}
+ .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px #0f8f6866;filter:brightness(1.08)}
+ .btn.ghost:hover{border-color:#2fd39faa;background:#ffffff0d}
+ .feature img:hover,.shot img:hover,.def img:hover{transform:scale(1.02);box-shadow:0 30px 80px #000a}
+ nav .links a:hover,.fcols a:hover{color:var(--text)}
+}
+.card:active,.btn:active,.steps li:active{transform:scale(.98)}.up.show:active{transform:translate(-50%,0) scale(.98)}
+.arr{display:inline-block;transition:transform .22s ease}a:hover .arr{transform:translateX(4px)}
+.topbar{text-align:center;padding:8px 0 28px}
+.topbar a{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid #ffffff33;color:var(--text);font-size:14px;font-weight:600}
+.topbar a:hover{text-decoration:none;border-color:#2fd39faa;transform:translateY(-2px);box-shadow:0 10px 24px #0f8f6844}
+.up{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);opacity:0;pointer-events:none;z-index:20;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1px solid #2fd39f66;background:#0b2620e6;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--text);font-size:14px;font-weight:600;box-shadow:0 12px 30px #0008;cursor:pointer}
+.up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.up:hover{border-color:#2fd39f;box-shadow:0 14px 36px #0f8f6866}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
-<body>
+<body id="top">
 <div class="wrap">
 <nav>
   <a class="brand" href="./"><img src="../icon.png" alt="">Tidymint</a>
@@ -99,7 +119,7 @@ footer{border-top:0;padding:0 0 28px}
 <header class="hero">
   <h1>Giữ máy Mac <span>luôn gọn gàng</span>.</h1>
   <p>Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, giao diện tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ và xem chính xác cái gì đang chiếm ổ.</p>
-  <div class="cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải miễn phí</a><a class="btn ghost" href="#cai-dat">Hướng dẫn cài</a></div>
+  <div class="cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải miễn phí <span class="arr">→</span></a><a class="btn ghost" href="#cai-dat">Hướng dẫn cài</a></div>
   <div class="badges"><span>✓ Miễn phí, mã nguồn mở (MIT)</span><span>✓ Chỉ chuyển vào Thùng rác</span><span>✓ Chạy không cần mạng, không theo dõi</span></div>
   <div class="shot"><img src="../smart.jpg" alt="Kết quả Quét thông minh của Tidymint" width="1600" height="1084"></div>
 </header>
@@ -157,17 +177,26 @@ footer{border-top:0;padding:0 0 28px}
 
 <section style="text-align:center;padding-top:20px">
   <h2>Dọn máy thôi?</h2><p class="lead" style="margin:0 auto 24px">Miễn phí, mã nguồn mở, mọi thứ vào Thùng rác trước.</p>
-  <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải miễn phí</a>
+  <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải miễn phí <span class="arr">→</span></a>
 </section>
 
+<div class="topbar"><a href="#top" id="toTop">↑ Lên đầu trang</a></div>
 <div class="fcols">
   <div><a class="brand" href="./"><img src="../icon.png" alt="">Tidymint</a><p>App dọn rác Mac miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành.</p></div>
   <div><h4>Sản phẩm</h4><a href="#tinh-nang">Tính năng</a><a href="#cach-dung">Cách dùng</a><a href="#cai-dat">Cài đặt</a><a href="https://github.com/HaiTrung-Workspace/tidymint/releases">Các phiên bản</a></div><div><h4>Tài nguyên</h4><a href="https://github.com/HaiTrung-Workspace/tidymint">Mã nguồn</a><a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Báo lỗi</a><a href="#hoi-dap">Hỏi đáp</a></div><div><h4>Pháp lý</h4><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/LICENSE">Giấy phép MIT</a><a href="mailto:hello@tidymint.app">hello@tidymint.app</a></div>
 </div>
 <footer><span>© 2026 Tidymint · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a></span></footer>
 </div>
+<button class="up" id="up" type="button" aria-label="Lên đầu trang">↑ Lên đầu trang</button>
 <script>
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
+(function(){var up=document.getElementById('up'),bar=document.getElementById('toTop'),last=scrollY,acc=0,barIn=false;
+function top(e){if(e)e.preventDefault();scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+up.addEventListener('click',top);bar.addEventListener('click',top);
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){barIn=es[0].isIntersecting;if(barIn)up.classList.remove('show')}).observe(bar);
+addEventListener('scroll',function(){var y=scrollY,d=y-last;last=y;acc=(d>0)===(acc>0)?acc+d:d;
+ if(y<700||barIn){up.classList.remove('show');return}
+ if(acc<-40)up.classList.add('show');else if(acc>12)up.classList.remove('show');},{passive:true});})();
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec";
 document.getElementById('f').addEventListener('submit', async (e) => {
   e.preventDefault();
