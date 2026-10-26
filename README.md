@@ -6,6 +6,8 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 
 > **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm.
 
+![Disk Cleanup, Smart Scan](docs/smart.png)
+
 ## Features
 
 | Area | What it does |
@@ -21,6 +23,16 @@ AI work leaves a lot behind: model files, drafts, exported images, duplicate ass
 | **Statistics** | Space freed over time and a full activity log |
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance |
 | **Contact** | Send feedback or bug reports from inside the app |
+
+| Space Lens (Golden Gate theme) | Settings (Burgundy theme) |
+|---|---|
+| ![Space Lens](docs/lens.png) | ![Settings](docs/settings.png) |
+| **Contact (Pride theme)** | **App icon follows the theme** |
+| ![Contact](docs/contact.png) | ![Icons](docs/icons.png) |
+
+Menu bar indicator at different free-space levels:
+
+![Menu bar](docs/menubar.png)
 
 Also: English and Vietnamese, four colour themes (Night Sky, Burgundy, Golden Gate, Pride) with a matching app icon, an Ignore list, and alerts when disk space or memory runs low.
 

@@ -1943,7 +1943,7 @@ struct NavItem: View {
                 : (p == .smart ? AnyShapeStyle(Theme.accentSolid.opacity(0.22)) : AnyShapeStyle(Color.clear))))
             .hoverBG(8, Color.white.opacity(0.07))
             .contentShape(Rectangle())
-        }.buttonStyle(.plain)
+        }.buttonStyle(.plain).id(p)
     }
 }
 
@@ -1994,7 +1994,7 @@ struct Sidebar: View {
             ScrollViewReader { proxy in
             ScrollView(.vertical, showsIndicators: true) {
             VStack(alignment: .leading, spacing: 2) {
-            NavItem(p: .smart, vm: vm).id("navTop")
+            NavItem(p: .smart, vm: vm)
             SectionTitle(text: t("CLEANUP", "DỌN DẸP"))
             NavItem(p: .cleanup, vm: vm)
             NavItem(p: .apps, vm: vm)
@@ -2010,8 +2010,8 @@ struct Sidebar: View {
             SectionTitle(text: t("SETTINGS", "CÀI ĐẶT"))
             NavItem(p: .ignore, vm: vm)
             NavItem(p: .settings, vm: vm)
-            NavItem(p: .contact, vm: vm).id("navBottom")
-            }.padding(.bottom, 8)
+            NavItem(p: .contact, vm: vm)
+            }.padding(.bottom, 34)   // room so the "More" chip never covers the last item
             .background(GeometryReader { g in
                 Color.clear
                     .onAppear { edges.content = g.frame(in: .global) }
@@ -2023,6 +2023,8 @@ struct Sidebar: View {
                     .onAppear { edges.view = g.frame(in: .global) }
                     .onChange(of: g.frame(in: .global)) { _, r in edges.view = r }
             })
+            .onAppear { DispatchQueue.main.async { proxy.scrollTo(vm.page, anchor: .center) } }
+            .onChange(of: vm.page) { _, pg in withAnimation(.easeInOut(duration: 0.25)) { proxy.scrollTo(pg, anchor: .center) } }
             .overlay(alignment: .top) {
                 if edges.moreAbove {
                     LinearGradient(colors: [Color.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
@@ -2034,7 +2036,7 @@ struct Sidebar: View {
                     ZStack(alignment: .bottom) {
                         LinearGradient(colors: [.clear, Color.black.opacity(0.45)], startPoint: .top, endPoint: .bottom)
                             .frame(height: 40).allowsHitTesting(false)
-                        Button { withAnimation(.easeInOut(duration: 0.3)) { proxy.scrollTo("navBottom", anchor: .bottom) } } label: {
+                        Button { withAnimation(.easeInOut(duration: 0.3)) { proxy.scrollTo(Page.contact, anchor: .bottom) } } label: {
                             HStack(spacing: 4) {
                                 Text(t("More", "Xem thêm")).font(.system(size: 10, weight: .semibold))
                                 Image(systemName: "chevron.down").font(.system(size: 9, weight: .bold))
@@ -2576,6 +2578,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try? px.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: a[i + 2])); exit(0)
         }
         NSApp.applicationIconImage = makeAppIcon(Theme.p)
+        // Developer helper for README screenshots: `--page <name> --window <W>x<H>` opens a page at a fixed size.
+        if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
+           let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
+            sharedVM.page = pg
+        }
+        if let i = a.firstIndex(of: "--window"), i + 1 < a.count {
+            let wh = a[i + 1].split(separator: "x").compactMap { Double($0) }
+            if wh.count == 2 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    for w in NSApp.windows where w.title == "Disk Cleanup" || w.identifier?.rawValue.contains("main") == true {
+                        w.setContentSize(NSSize(width: wh[0], height: wh[1])); w.center()
+                    }
+                }
+            }
+        }
     }
 }
 
