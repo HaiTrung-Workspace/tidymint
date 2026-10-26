@@ -2936,6 +2936,10 @@ struct ContactView: View {
                     Text(t("Feedback, bug reports and questions go straight to the developer. An email address is needed so you can get a reply.",
                            "Góp ý, báo lỗi, câu hỏi đều tới thẳng nhà phát triển. Cần email để có thể trả lời bạn."))
                         .foregroundColor(Theme.sub).font(.system(size: 12))
+                    HStack(spacing: 4) {
+                        Text(t("Or email", "Hoặc gửi email tới")).foregroundColor(Theme.sub)
+                        Link("hello@tidymint.app", destination: URL(string: "mailto:hello@tidymint.app")!).foregroundColor(Theme.link).tint(Theme.link)
+                    }.font(.system(size: 12))
                 }.padding(.top, 34)
                 HStack(spacing: 8) {
                     ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in

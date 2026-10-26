@@ -26,4 +26,4 @@ You only join the newsletter by clicking **Send & get the newsletter** or **Subs
 
 ## Contact
 
-Use **Contact** inside the app or open an issue on GitHub.
+Use **Contact** inside the app, email hello@tidymint.app, or open an issue on GitHub.
