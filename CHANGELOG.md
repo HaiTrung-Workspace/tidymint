@@ -4,20 +4,19 @@ All notable changes to Tidymint. Dates are release dates.
 
 ## 0.3.2 (2026-10-27)
 
-- Star White: a light theme, with every colour checked for contrast (WCAG AA or better)
-- New mint-leaf icon with a serrated leaf; the wordmark shows "mint" in leaf green
-- Text and buttons take their colour from the theme everywhere, so light themes stay readable
-- Remaining English strings in the Vietnamese interface translated; dates follow the app language
+- New: Star White, a light theme
+- New app icon and favicon
+- Better readability on every theme
+- Vietnamese: remaining text translated, dates in Vietnamese
 
 ## 0.3.1 (2026-10-27)
 
-- Clean by App: Zalo, Chrome, Edge, Cốc Cốc and CapCut, by type and by month, with messages and logins locked
-- Undo the last clean from the Trash page
-- Safety level and a plain explanation on every cleanup group
-- Uninstaller pre-selects only files matched by bundle id; name matches and anything holding a database are left for you
-- Startup Items show who signed each item and flag unusual locations or names
-- Darker mint theme with glass bubbles in Space Lens
-- Update check: a quiet note in Settings when a newer version is on GitHub
+- New: Clean by App for Zalo, Chrome, Edge, Cốc Cốc and CapCut
+- New: Undo the last clean from the Trash page
+- Safety level on every cleanup group
+- Uninstaller and Startup Items are more careful about what they pre-select and flag
+- Update check in Settings
+- Darker mint theme
 
 ## 0.3.0 (2026-10-26)
 
