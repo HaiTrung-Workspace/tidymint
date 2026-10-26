@@ -93,7 +93,7 @@ The app works offline. It sends nothing anywhere unless you choose to send feedb
 
 ## Feedback
 
-Use **Contact** inside the app (an email address is required so you can get a reply), or open an issue on GitHub.
+Use **Contact** inside the app (an email address is required so you can get a reply), email hello@tidymint.app, or open an issue on GitHub.
 
 Self-hosting the collector: `backend/Code.gs` is a Google Apps Script that appends submissions to a Google Sheet. Deploy it as a web app and put its URL in `Backend.endpoint`.
 
