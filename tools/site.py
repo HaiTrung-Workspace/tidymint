@@ -34,6 +34,26 @@ details p{color:var(--sub);margin:0 0 16px}
 .fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
 footer{border-top:0;padding:0 0 28px}
 @media (max-width:820px){.vs,.def,.how,.fcols{grid-template-columns:1fr}.navcta{display:none}}
+
+/* hover: lift, shadow, mint border; press on touch; respect reduced motion */
+.card,.vs .col,details,.steps li,.btn,.lang a,.feature img,.shot img,.def img,.up,.topbar a{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,background .22s ease,filter .22s ease}
+@media (hover:hover){
+ .card:hover,.vs .col:hover,.steps li:hover{transform:translateY(-5px);box-shadow:0 16px 40px #00000066;border-color:#2fd39f66}
+ details:hover{border-color:#2fd39f66}
+ .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px #0f8f6866;filter:brightness(1.08)}
+ .btn.ghost:hover{border-color:#2fd39faa;background:#ffffff0d}
+ .feature img:hover,.shot img:hover,.def img:hover{transform:scale(1.02);box-shadow:0 30px 80px #000a}
+ nav .links a:hover,.fcols a:hover{color:var(--text)}
+}
+.card:active,.btn:active,.steps li:active{transform:scale(.98)}.up.show:active{transform:translate(-50%,0) scale(.98)}
+.arr{display:inline-block;transition:transform .22s ease}a:hover .arr{transform:translateX(4px)}
+.topbar{text-align:center;padding:8px 0 28px}
+.topbar a{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid #ffffff33;color:var(--text);font-size:14px;font-weight:600}
+.topbar a:hover{text-decoration:none;border-color:#2fd39faa;transform:translateY(-2px);box-shadow:0 10px 24px #0f8f6844}
+.up{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);opacity:0;pointer-events:none;z-index:20;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1px solid #2fd39f66;background:#0b2620e6;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--text);font-size:14px;font-weight:600;box-shadow:0 12px 30px #0008;cursor:pointer}
+.up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.up:hover{border-color:#2fd39f;box-shadow:0 14px 36px #0f8f6866}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 """
 
 T = {
@@ -83,7 +103,7 @@ T = {
           ("Legal",[(GH+"/blob/main/PRIVACY.md","Privacy"),(GH+"/blob/main/LICENSE","MIT License"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer="",
   msg=dict(bad="Please enter a valid email.",sending="Sending...",ok="Thanks! You are on the list.",err="Could not send right now. Please try again later."),
-  src="website", img="", aria_lang="Language"),
+  src="website", img="", aria_lang="Language", top="Back to top"),
 "vi": dict(
   lang="vi", path="vi/", other="../", title="App dọn rác Mac miễn phí, thay CleanMyMac | Tidymint",
   desc="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Mọi thứ vào Thùng rác trước.",
@@ -130,7 +150,7 @@ T = {
           ("Pháp lý",[(GH+"/blob/main/PRIVACY.md","Quyền riêng tư"),(GH+"/blob/main/LICENSE","Giấy phép MIT"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer=' · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a>',
   msg=dict(bad="Email chưa đúng.",sending="Đang gửi...",ok="Cảm ơn bạn! Đã đăng ký.",err="Chưa gửi được, bạn thử lại sau nhé."),
-  src="website-vi", img="../", aria_lang="Ngôn ngữ"),
+  src="website-vi", img="../", aria_lang="Ngôn ngữ", top="Lên đầu trang"),
 }
 IDS = {"en": dict(f="features", h="how", q="faq", i="install", s="signup"),
        "vi": dict(f="tinh-nang", h="cach-dung", q="hoi-dap", i="cai-dat", s="dang-ky")}
@@ -175,7 +195,7 @@ def page(k):
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 <style>{BASE_CSS}{EXTRA_CSS}</style>
 </head>
-<body>
+<body id="top">
 <div class="wrap">
 <nav>
   <a class="brand" href="./"><img src="{img}icon.png" alt="">Tidymint</a>
@@ -185,7 +205,7 @@ def page(k):
 <header class="hero">
   <h1>{t["h1"]}</h1>
   <p>{t["sub"]}</p>
-  <div class="cta"><a class="btn primary" href="{DL}">{t["cta1"]}</a><a class="btn ghost" href="#{i["i"]}">{t["cta2"]}</a></div>
+  <div class="cta"><a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">→</span></a><a class="btn ghost" href="#{i["i"]}">{t["cta2"]}</a></div>
   <div class="badges">{"".join("<span>%s</span>" % b for b in t["badges"])}</div>
   <div class="shot"><img src="{img}smart.jpg" alt="{t["shot_alt"]}" width="1600" height="1084"></div>
 </header>
@@ -243,18 +263,27 @@ def page(k):
 
 <section style="text-align:center;padding-top:20px">
   <h2>{t["end_h"]}</h2><p class="lead" style="margin:0 auto 24px">{t["end_p"]}</p>
-  <a class="btn primary" href="{DL}">{t["cta1"]}</a>
+  <a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">→</span></a>
 </section>
 
+<div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
 <div class="fcols">
   <div><a class="brand" href="./"><img src="{img}icon.png" alt="">Tidymint</a><p>{t["f_blurb"]}</p></div>
   {fcols}
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]}</span></footer>
 </div>
+<button class="up" id="up" type="button" aria-label="{t["top"]}">↑ {t["top"]}</button>
 <script>
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{{try{{localStorage.setItem('tm-lang',a.dataset.l)}}catch(e){{}}}}));
-{redirect}const ENDPOINT = "{ENDPOINT}";
+{redirect}(function(){{var up=document.getElementById('up'),bar=document.getElementById('toTop'),last=scrollY,acc=0,barIn=false;
+function top(e){{if(e)e.preventDefault();scrollTo({{top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}})}}
+up.addEventListener('click',top);bar.addEventListener('click',top);
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){{barIn=es[0].isIntersecting;if(barIn)up.classList.remove('show')}}).observe(bar);
+addEventListener('scroll',function(){{var y=scrollY,d=y-last;last=y;acc=(d>0)===(acc>0)?acc+d:d;
+ if(y<700||barIn){{up.classList.remove('show');return}}
+ if(acc<-40)up.classList.add('show');else if(acc>12)up.classList.remove('show');}},{{passive:true}});}})();
+const ENDPOINT = "{ENDPOINT}";
 document.getElementById('f').addEventListener('submit', async (e) => {{
   e.preventDefault();
   const email = document.getElementById('email').value.trim();
