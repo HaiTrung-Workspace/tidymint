@@ -173,13 +173,17 @@ struct CleanItem: Identifiable, Hashable {
     var running = false
     var refStrong: [String] = []   // referenced by a script or skill
     var refWeak: [String] = []     // only mentioned in notes
+    var nameMatch = false          // found by app name, not bundle id: could belong to something else
+    var hasDB = false              // a database sits inside: may be the user's own data
     var note: String {
         if running { return t("App is open, quit it first", "App đang mở, tắt app rồi dọn") }
+        if hasDB { return t("Has a database inside, may be your data", "Có database bên trong, có thể là dữ liệu của bạn") }
+        if nameMatch { return t("Matched by name only, check first", "Khớp theo tên app, kiểm tra trước") }
         if !refStrong.isEmpty { return t("Used by \(refStrong.count) script/skill", "Script/skill đang dùng (\(refStrong.count))") }
         if !refWeak.isEmpty { return t("Mentioned in \(refWeak.count) notes", "Được nhắc trong \(refWeak.count) ghi chú") }
         return ""
     }
-    var noteColor: Color { !refStrong.isEmpty ? Theme.danger : Theme.warn }
+    var noteColor: Color { !refStrong.isEmpty || hasDB ? Theme.danger : Theme.warn }
     var refHelp: String { (refStrong + refWeak).map { $0.replacingOccurrences(of: NSHomeDirectory(), with: "~") }.joined(separator: "\n") }
     var date: Date? = nil
     var name: String { url.lastPathComponent }
@@ -772,25 +776,38 @@ enum Apps {
         return out.compactMap { $0 }.sorted { $0.size > $1.size }
     }
 
+    /// Folder names shared by many apps of one vendor, or too generic to prove ownership. Never offered by name.
+    static let sharedNames: Set<String> = ["google", "microsoft", "adobe", "jetbrains", "mozilla", "apple", "logs", "cache", "caches", "data", "app", "application support"]
+
+    /// Files that belong to an app. Bundle-id matches are pre-selected; name matches are listed but left for the user,
+    /// and anything holding a database is never pre-selected (the data-loss pattern behind most cleaner complaints).
     static func related(_ a: AppEntry) -> [CleanItem] {
         let id = a.bundleID, n = a.name
-        var c: [URL] = [
-            L.appendingPathComponent("Application Support/\(id)"), L.appendingPathComponent("Application Support/\(n)"),
-            L.appendingPathComponent("Caches/\(id)"), L.appendingPathComponent("Caches/\(n)"),
+        var byID: [URL] = [
+            L.appendingPathComponent("Application Support/\(id)"),
+            L.appendingPathComponent("Caches/\(id)"),
             L.appendingPathComponent("Preferences/\(id).plist"),
             L.appendingPathComponent("Containers/\(id)"),
             L.appendingPathComponent("Application Scripts/\(id)"),
             L.appendingPathComponent("Saved Application State/\(id).savedState"),
             L.appendingPathComponent("HTTPStorages/\(id)"), L.appendingPathComponent("HTTPStorages/\(id).binarycookies"),
             L.appendingPathComponent("WebKit/\(id)"),
-            L.appendingPathComponent("Logs/\(n)"),
         ]
-        c += Scanner.children(L.appendingPathComponent("Group Containers")).filter { $0.lastPathComponent.hasSuffix(id) }
-        c += Scanner.children(L.appendingPathComponent("LaunchAgents")).filter { $0.lastPathComponent.hasPrefix(id) }
+        byID += Scanner.children(L.appendingPathComponent("Group Containers")).filter { $0.lastPathComponent.hasSuffix(id) }
+        byID += Scanner.children(L.appendingPathComponent("LaunchAgents")).filter { $0.lastPathComponent.hasPrefix(id) }
+        var byName: [URL] = []
+        if n.count >= 4 && !sharedNames.contains(n.lowercased()) {
+            byName = ["Application Support", "Caches", "Logs"].map { L.appendingPathComponent("\($0)/\(n)") }
+        }
         var seen = Set<String>(), out: [CleanItem] = []
-        for u in c where FileManager.default.fileExists(atPath: u.path) && !seen.contains(u.path) && !Scanner.blocked(u.path) {
-            seen.insert(u.path)
-            out.append(CleanItem(url: u, size: Cloud.localSize(u.path), selected: true))
+        for (list, weak) in [(byID, false), (byName, true)] {
+            for u in list where FileManager.default.fileExists(atPath: u.path) && !seen.contains(u.path) && !Scanner.blocked(u.path) {
+                seen.insert(u.path)
+                let db = Scanner.holdsDatabase(u)
+                var it = CleanItem(url: u, size: Cloud.localSize(u.path), selected: !weak && !db)
+                it.nameMatch = weak; it.hasDB = db
+                out.append(it)
+            }
         }
         return out.sorted { $0.size > $1.size }
     }
@@ -812,7 +829,10 @@ enum Apps {
                 if NSWorkspace.shared.urlForApplication(withBundleIdentifier: id) != nil { continue }
                 if Scanner.skip(u.path) { continue }
                 let s = Cloud.localSize(u.path)
-                if s > 0 { out.append(CleanItem(url: u, size: s, selected: true)) }
+                guard s > 0 else { continue }
+                let db = Scanner.holdsDatabase(u)
+                var it = CleanItem(url: u, size: s, selected: !db); it.hasDB = db
+                out.append(it)
             }
         }
         return out.sorted { $0.size > $1.size }
@@ -2085,7 +2105,7 @@ struct CleanupView: View {
         case .summary:
             VStack(spacing: 24) {
                 Text(fmt(vm.junkTotal)).font(.system(size: 54, weight: .bold)).foregroundColor(.white)
-                Text(t("of junk found. \(fmt(vm.junkSelected)) is safe and pre-selected.", "rác tìm thấy. \(fmt(vm.junkSelected)) an toàn, đã chọn sẵn.")).foregroundColor(Theme.sub)
+                Text(t("can be cleaned. \(fmt(vm.junkSelected)) is rebuilt by apps on their own and is pre-selected.", "có thể dọn. \(fmt(vm.junkSelected)) là phần app tự tạo lại được, đã chọn sẵn.")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     GhostButton(title: t("Review Details", "Xem chi tiết")) { vm.phase = .review }
                     PrimaryButton(title: t("Clean", "Dọn"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
