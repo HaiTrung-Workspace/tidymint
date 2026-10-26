@@ -15,6 +15,13 @@
 <meta property="og:image" content="https://tidymint.app/smart.jpg">
 <meta property="og:url" content="https://tidymint.app/vi/">
 <meta name="twitter:card" content="summary_large_image">
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+var tmC=null;try{tmC=localStorage.getItem('tm-consent')}catch(e){}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:tmC==='yes'?'granted':'denied',wait_for_update:500});
+gtag('js',new Date());gtag('config','G-19HEJDJPN3');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-19HEJDJPN3"></script>
 <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Tidymint", "operatingSystem": "macOS 14 or later", "applicationCategory": "UtilitiesApplication", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "downloadUrl": "https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip", "url": "https://tidymint.app/vi/", "license": "https://opensource.org/licenses/MIT", "inLanguage": ["en", "vi"], "image": "https://tidymint.app/icon.png"}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Tidymint có miễn phí thật không?", "acceptedAnswer": {"@type": "Answer", "text": "Có. App mã nguồn mở theo giấy phép MIT, không tài khoản, không thuê bao, không có bản trả phí."}}, {"@type": "Question", "name": "Có an toàn không?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint chỉ chuyển vào Thùng rác nên lấy lại được hết. App không bao giờ động tới Ảnh, Mail, mật khẩu, thư mục đám mây hay bộ nhớ đệm hệ thống của Apple, và mục rủi ro không bao giờ chọn sẵn."}}, {"@type": "Question", "name": "Sao lần đầu macOS lại chặn?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint chưa được Apple công chứng (cần tài khoản nhà phát triển trả phí). Mở một lần qua Cài đặt hệ thống › Quyền riêng tư & Bảo mật › Vẫn mở, đúng như hướng dẫn của Apple. Mã nguồn công khai trên GitHub."}}, {"@type": "Question", "name": "App có gửi dữ liệu của tôi đi không?", "acceptedAnswer": {"@type": "Answer", "text": "Không. App chạy không cần mạng. Dữ liệu chỉ rời máy khi bạn tự gửi góp ý hoặc đăng ký bản tin."}}, {"@type": "Question", "name": "Khác gì CleanMyMac?", "acceptedAnswer": {"@type": "Answer", "text": "Tidymint miễn phí, mã nguồn mở, tập trung vào dọn dẹp và dung lượng ổ. App không có quét mã độc hay tinh chỉnh hiệu năng."}}, {"@type": "Question", "name": "Chạy trên máy nào?", "acceptedAnswer": {"@type": "Answer", "text": "macOS 14 trở lên, cả máy chip Apple lẫn máy Intel."}}, {"@type": "Question", "name": "Có bản Windows hay iPhone không?", "acceptedAnswer": {"@type": "Answer", "text": "Không. iOS không cho app dọn dữ liệu của app khác, còn Windows hiện chưa có kế hoạch."}}]}]</script>
 <style>
 :root{--bg:#06150f;--bg2:#0b2620;--card:#10302780;--line:#ffffff1a;--text:#eafff7;--sub:#a9c9bd;--mint:#2fd39f;--mint2:#0f8f68;--leaf:#5ff0c0}
@@ -111,6 +118,12 @@ footer{border-top:0;padding:0 0 28px}
 .up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .up.show:active{transform:translate(-50%,0) scale(.98)}
 summary{user-select:none}
+.ck{position:fixed;left:16px;bottom:16px;z-index:30;max-width:380px;background:#0b2620f7;border:1px solid #2fd39f55;border-radius:14px;padding:14px 16px;box-shadow:0 12px 30px #0009;font-size:14px;color:var(--sub);display:none}
+.ck.show{display:block}.ck p{margin:0 0 10px}.ck .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ck button{font:600 14px/1 inherit;font-family:inherit;padding:9px 16px;border-radius:999px;cursor:pointer;border:1px solid #ffffff33;background:transparent;color:var(--text)}
+.ck button.yes{background:linear-gradient(90deg,var(--mint),var(--mint2));border:0;color:#fff}
+.linkbtn{background:none;border:0;padding:0;color:var(--sub);font:inherit;cursor:pointer;text-decoration:underline}
+@media (max-width:820px){.ck{left:12px;right:12px;max-width:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -190,9 +203,10 @@ summary{user-select:none}
   <div><a class="brand" href="./"><img src="../icon.png" alt="">Tidymint</a><p>App dọn rác Mac miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành.</p></div>
   <div><h4>Sản phẩm</h4><a href="#tinh-nang">Tính năng</a><a href="#cach-dung">Cách dùng</a><a href="#cai-dat">Cài đặt</a><a href="https://github.com/HaiTrung-Workspace/tidymint/releases">Các phiên bản</a></div><div><h4>Tài nguyên</h4><a href="https://github.com/HaiTrung-Workspace/tidymint">Mã nguồn</a><a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Báo lỗi</a><a href="#hoi-dap">Hỏi đáp</a></div><div><h4>Pháp lý</h4><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/LICENSE">Giấy phép MIT</a><a href="mailto:hello@tidymint.app">hello@tidymint.app</a></div>
 </div>
-<footer><span>© 2026 Tidymint · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a></span></footer>
+<footer><span>© 2026 Tidymint · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a> · <button class="linkbtn" id="ckOpen" type="button">Cài đặt cookie</button></span></footer>
 </div>
 <button class="up" id="up" type="button" aria-label="Lên đầu trang">↑ Lên đầu trang</button>
+<div class="ck" id="ck" role="dialog" aria-live="polite"><p>Website dùng cookie Google Analytics để đếm lượt truy cập. Bản thân app Tidymint không theo dõi gì. <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a></p><div class="row"><button class="yes" id="ckY" type="button">Đồng ý</button><button id="ckN" type="button">Từ chối</button></div></div>
 <script>
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
 (function(){var up=document.getElementById('up'),bar=document.getElementById('toTop'),barIn=false,tick=false;
@@ -201,6 +215,13 @@ up.addEventListener('click',top);bar.addEventListener('click',top);
 function upd(){tick=false;up.classList.toggle('show',scrollY>600&&!barIn)}
 if('IntersectionObserver' in window)new IntersectionObserver(function(es){barIn=es[0].isIntersecting;upd()}).observe(bar);
 addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});upd();})();
+(function(){var ck=document.getElementById('ck'),up=document.getElementById('up');
+function show(v){ck.classList.toggle('show',v)}
+function set(v){try{localStorage.setItem('tm-consent',v)}catch(e){};gtag('consent','update',{analytics_storage:v==='yes'?'granted':'denied'});show(false)}
+document.getElementById('ckY').onclick=function(){set('yes')};document.getElementById('ckN').onclick=function(){set('no')};
+document.getElementById('ckOpen').onclick=function(){show(true)};
+if(!tmC)show(true);
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','download_click',{link_url:a.href,page_lang:document.documentElement.lang})})});})();
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec";
 document.getElementById('f').addEventListener('submit', async (e) => {
   e.preventDefault();

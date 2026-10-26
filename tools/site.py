@@ -6,6 +6,7 @@ import json, os, html
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GH = "https://github.com/HaiTrung-Workspace/tidymint"
 DL = GH + "/releases/latest/download/Tidymint.zip"
+GA_ID = "G-19HEJDJPN3"
 ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec"
 BASE_CSS = open(os.path.join(ROOT, "tools", "site.css")).read()
 EXTRA_CSS = """
@@ -58,6 +59,12 @@ footer{border-top:0;padding:0 0 28px}
 .up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .up.show:active{transform:translate(-50%,0) scale(.98)}
 summary{user-select:none}
+.ck{position:fixed;left:16px;bottom:16px;z-index:30;max-width:380px;background:#0b2620f7;border:1px solid #2fd39f55;border-radius:14px;padding:14px 16px;box-shadow:0 12px 30px #0009;font-size:14px;color:var(--sub);display:none}
+.ck.show{display:block}.ck p{margin:0 0 10px}.ck .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ck button{font:600 14px/1 inherit;font-family:inherit;padding:9px 16px;border-radius:999px;cursor:pointer;border:1px solid #ffffff33;background:transparent;color:var(--text)}
+.ck button.yes{background:linear-gradient(90deg,var(--mint),var(--mint2));border:0;color:#fff}
+.linkbtn{background:none;border:0;padding:0;color:var(--sub);font:inherit;cursor:pointer;text-decoration:underline}
+@media (max-width:820px){.ck{left:12px;right:12px;max-width:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 """
 
@@ -108,7 +115,8 @@ T = {
           ("Legal",[(GH+"/blob/main/PRIVACY.md","Privacy"),(GH+"/blob/main/LICENSE","MIT License"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer="",
   msg=dict(bad="Please enter a valid email.",sending="Sending...",ok="Thanks! You are on the list.",err="Could not send right now. Please try again later."),
-  src="website", img="", aria_lang="Language", top="Back to top"),
+  src="website", img="", aria_lang="Language", top="Back to top",
+  ck_text="This website uses Google Analytics cookies to count visits. The Tidymint app itself tracks nothing.", ck_yes="Accept", ck_no="Decline", ck_link="Cookie settings", ck_more="Privacy"),
 "vi": dict(
   lang="vi", path="vi/", other="../", title="App dọn rác Mac miễn phí, thay CleanMyMac | Tidymint",
   desc="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Mọi thứ vào Thùng rác trước.",
@@ -155,7 +163,8 @@ T = {
           ("Pháp lý",[(GH+"/blob/main/PRIVACY.md","Quyền riêng tư"),(GH+"/blob/main/LICENSE","Giấy phép MIT"),("mailto:hello@tidymint.app","hello@tidymint.app")])],
   copy="© 2026 Tidymint", extra_footer=' · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a>',
   msg=dict(bad="Email chưa đúng.",sending="Đang gửi...",ok="Cảm ơn bạn! Đã đăng ký.",err="Chưa gửi được, bạn thử lại sau nhé."),
-  src="website-vi", img="../", aria_lang="Ngôn ngữ", top="Lên đầu trang"),
+  src="website-vi", img="../", aria_lang="Ngôn ngữ", top="Lên đầu trang",
+  ck_text="Website dùng cookie Google Analytics để đếm lượt truy cập. Bản thân app Tidymint không theo dõi gì.", ck_yes="Đồng ý", ck_no="Từ chối", ck_link="Cài đặt cookie", ck_more="Quyền riêng tư"),
 }
 IDS = {"en": dict(f="features", h="how", q="faq", i="install", s="signup"),
        "vi": dict(f="tinh-nang", h="cach-dung", q="hoi-dap", i="cai-dat", s="dang-ky")}
@@ -197,6 +206,13 @@ def page(k):
 <meta property="og:image" content="https://tidymint.app/smart.jpg">
 <meta property="og:url" content="{url}">
 <meta name="twitter:card" content="summary_large_image">
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}
+var tmC=null;try{{tmC=localStorage.getItem('tm-consent')}}catch(e){{}}
+gtag('consent','default',{{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:tmC==='yes'?'granted':'denied',wait_for_update:500}});
+gtag('js',new Date());gtag('config','{GA_ID}');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 <style>{BASE_CSS}{EXTRA_CSS}</style>
 </head>
@@ -276,9 +292,10 @@ def page(k):
   <div><a class="brand" href="./"><img src="{img}icon.png" alt="">Tidymint</a><p>{t["f_blurb"]}</p></div>
   {fcols}
 </div>
-<footer><span>{t["copy"]}{t["extra_footer"]}</span></footer>
+<footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
 </div>
 <button class="up" id="up" type="button" aria-label="{t["top"]}">↑ {t["top"]}</button>
+<div class="ck" id="ck" role="dialog" aria-live="polite"><p>{t["ck_text"]} <a href="{GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
 <script>
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{{try{{localStorage.setItem('tm-lang',a.dataset.l)}}catch(e){{}}}}));
 {redirect}(function(){{var up=document.getElementById('up'),bar=document.getElementById('toTop'),barIn=false,tick=false;
@@ -287,6 +304,13 @@ up.addEventListener('click',top);bar.addEventListener('click',top);
 function upd(){{tick=false;up.classList.toggle('show',scrollY>600&&!barIn)}}
 if('IntersectionObserver' in window)new IntersectionObserver(function(es){{barIn=es[0].isIntersecting;upd()}}).observe(bar);
 addEventListener('scroll',function(){{if(!tick){{tick=true;requestAnimationFrame(upd)}}}},{{passive:true}});upd();}})();
+(function(){{var ck=document.getElementById('ck'),up=document.getElementById('up');
+function show(v){{ck.classList.toggle('show',v)}}
+function set(v){{try{{localStorage.setItem('tm-consent',v)}}catch(e){{}};gtag('consent','update',{{analytics_storage:v==='yes'?'granted':'denied'}});show(false)}}
+document.getElementById('ckY').onclick=function(){{set('yes')}};document.getElementById('ckN').onclick=function(){{set('no')}};
+document.getElementById('ckOpen').onclick=function(){{show(true)}};
+if(!tmC)show(true);
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang}})}})}});}})();
 const ENDPOINT = "{ENDPOINT}";
 document.getElementById('f').addEventListener('submit', async (e) => {{
   e.preventDefault();
