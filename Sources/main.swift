@@ -437,9 +437,9 @@ struct Sphere: View {
     var body: some View {
         let edge = Sphere.mix(color, .white, 0.2)
         ZStack {
-            Circle().fill(color.opacity(hot ? 0.34 : 0.22))
-            Circle().fill(RadialGradient(colors: [color.opacity(0), color.opacity(hot ? 0.75 : 0.55)], center: .center,
-                                         startRadius: r * 0.45, endRadius: r))
+            Circle().fill(color.opacity(hot ? 0.40 : 0.30))
+            Circle().fill(RadialGradient(colors: [color.opacity(0), color.opacity(hot ? 0.38 : 0.26)], center: .center,
+                                         startRadius: r * 0.80, endRadius: r))
             Circle().fill(LinearGradient(colors: [Color.white.opacity(0.06), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
             Circle().strokeBorder(edge.opacity(hot ? 0.55 : 0.32), lineWidth: 0.75)
         }
