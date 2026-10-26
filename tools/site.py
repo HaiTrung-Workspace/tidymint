@@ -65,6 +65,11 @@ summary{user-select:none}
 .ck button.yes{background:linear-gradient(90deg,var(--mint),var(--mint2));border:0;color:#fff}
 .linkbtn{background:none;border:0;padding:0;color:var(--sub);font:inherit;cursor:pointer;text-decoration:underline}
 @media (max-width:820px){.ck{left:12px;right:12px;max-width:none}}
+.topnav nav{clip-path:none;box-shadow:none;background:transparent;position:static}
+.mbtn{display:none;background:none;border:1px solid #ffffff33;border-radius:8px;color:var(--text);font:600 18px/1 inherit;font-family:inherit;width:38px;height:34px;cursor:pointer;align-items:center;justify-content:center}
+@media (max-width:820px){.mbtn{display:inline-flex}.navr{gap:10px}
+ .topnav.open nav .links{display:flex;flex-direction:column;gap:0;position:absolute;top:100%;left:0;right:0;background:#06150f;padding:6px 20px 14px;z-index:30;border-bottom:1px solid #ffffff1a;box-shadow:0 18px 30px #0008}
+ .topnav.open nav .links a{padding:13px 0;border-bottom:1px solid #ffffff12;color:var(--text);font-size:16px}.topnav.open nav .links a:last-child{border-bottom:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 """
 
@@ -72,7 +77,7 @@ T = {
 "en": dict(
   lang="en", path="", other="vi/", title="Free Mac Cleaner, CleanMyMac Alternative | Tidymint",
   desc="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, find duplicate files, uninstall apps completely and see what fills your disk. Everything goes to the Trash first.",
-  nav=[("#features","Features"),("#how","How it works"),("#faq","FAQ"),(GH,"GitHub")], navcta="Download",
+  nav=[("#features","Features"),("#how","How it works"),("guides/","Guides"),("#faq","FAQ"),(GH,"GitHub")], navcta="Download",
   h1='Keep your Mac in <span>mint condition</span>.',
   sub="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.",
   cta1="Download free", cta2="How to install",
@@ -120,7 +125,7 @@ T = {
 "vi": dict(
   lang="vi", path="vi/", other="../", title="App dọn rác Mac miễn phí, thay CleanMyMac | Tidymint",
   desc="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, có tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ, xem cái gì chiếm ổ. Mọi thứ vào Thùng rác trước.",
-  nav=[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")], navcta="Tải về",
+  nav=[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("huong-dan/","Hướng dẫn"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")], navcta="Tải về",
   h1='Giữ máy Mac <span>luôn gọn gàng</span>.',
   sub="Tidymint là app dọn rác Mac miễn phí, mã nguồn mở, giao diện tiếng Việt. Dọn bộ nhớ đệm và Dữ liệu hệ thống, tìm file trùng, gỡ app sạch sẽ và xem chính xác cái gì đang chiếm ổ.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài",
@@ -219,7 +224,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <body id="top">
 <div class="topnav"><div class="wrap"><nav>
   <a class="brand" href="./"><img src="{img}icon.png" alt="">Tidymint</a>
-  <div class="navr"><div class="links">{nav}</div><a class="btn primary navcta" href="#{i["i"]}">{t["navcta"]}</a><div class="lang" role="group" aria-label="{t["aria_lang"]}"><a {vi_on}href="{vi_href}" data-l="vi">VI</a><a {en_on}href="{en_href}" data-l="en">EN</a></div></div>
+  <div class="navr"><div class="links">{nav}</div><a class="btn primary navcta" href="#{i["i"]}">{t["navcta"]}</a><div class="lang" role="group" aria-label="{t["aria_lang"]}"><a {vi_on}href="{vi_href}" data-l="vi">VI</a><a {en_on}href="{en_href}" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
 </nav></div></div>
 <div class="wrap">
 
@@ -297,6 +302,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <button class="up" id="up" type="button" aria-label="{t["top"]}">↑ {t["top"]}</button>
 <div class="ck" id="ck" role="dialog" aria-live="polite"><p>{t["ck_text"]} <a href="{GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
 <script>
+(function(){{var b=document.getElementById('mbtn'),n=document.querySelector('.topnav');b.addEventListener('click',function(){{var o=n.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'✕':'☰'}});n.querySelectorAll('.links a').forEach(function(a){{a.addEventListener('click',function(){{n.classList.remove('open');b.setAttribute('aria-expanded',false);b.textContent='☰'}})}})}})();
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{{try{{localStorage.setItem('tm-lang',a.dataset.l)}}catch(e){{}}}}));
 {redirect}(function(){{var up=document.getElementById('up'),bar=document.getElementById('toTop'),barIn=false,tick=false;
 function top(e){{if(e)e.preventDefault();scrollTo({{top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}})}}

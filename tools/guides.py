@@ -42,12 +42,12 @@ L = {
             toc="Trong bài", faq="Câu hỏi thường gặp", src="Nguồn tham khảo", rel="Đọc thêm",
             cta_h="Dọn Mac miễn phí, hợp pháp", cta_p="Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.",
             cta_btn="Tải Tidymint", cta_more="Xem cách cài", inst="#cai-dat",
-            nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
+            nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../huong-dan/","Hướng dẫn"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
  "en": dict(home="../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
             toc="On this page", faq="FAQ", src="Sources", rel="Read next",
             cta_h="Clean your Mac for free", cta_p="Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.",
             cta_btn="Download Tidymint", cta_more="How to install", inst="#install",
-            nav=[("../#features","Features"),("../#how","How it works"),("../#faq","FAQ"),(S.GH,"GitHub")]),
+            nav=[("../#features","Features"),("../#how","How it works"),("../guides/","Guides"),("../#faq","FAQ"),(S.GH,"GitHub")]),
 }
 
 def guide(g):
@@ -82,12 +82,19 @@ def guide(g):
         {"@type":"ListItem","position":1,"name":l["homename"],"item":"https://tidymint.app/" + pre},
         {"@type":"ListItem","position":2,"name":g["crumb"],"item":url}]},
     ]
+    hub = g.get("hub", False)
+    head_extra = g.get("lead", "") if hub else ('<p class="meta">%s: %s · %s</p><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
+        '<div class="toc" role="navigation" aria-label="%s"><b>%s</b><ol>%s</ol></div>') % (l["updated"], "{DSTR}", g["read"], l["tldr"], g["tldr"], l["toc"], l["toc"], toc)
+    tail = cta if hub else '<h2 id="faq">%s</h2>%s%s<h2>%s</h2><ul class="src">%s</ul>' % (l["faq"], faq, cta, l["src"], srcs)
+    if hub:
+        ld = [ld[2], {"@context":"https://schema.org","@type":"CollectionPage","name":g["h1"],"description":g["desc"],"url":url,"inLanguage":k}]
     hreflang = '<link rel="alternate" hreflang="%s" href="%s">' % (k, url)
     if alt:
         ok = "en" if k == "vi" else "vi"
         hreflang += '<link rel="alternate" hreflang="%s" href="https://tidymint.app/%s%s/">' % (ok, "vi/" if ok == "vi" else "", alt)
     d = datetime.date.fromisoformat(g["date"])
     dstr = d.strftime("%d/%m/%Y") if k == "vi" else d.strftime("%B %-d, %Y")
+    head_extra = head_extra.replace("{DSTR}", dstr)
     return f'''<!doctype html>
 <html lang="{k}">
 <head>
@@ -98,7 +105,7 @@ def guide(g):
 <link rel="canonical" href="{url}">
 {hreflang}
 <link rel="icon" href="{root}favicon.png">
-<meta property="og:type" content="article">
+<meta property="og:type" content="{"website" if hub else "article"}">
 <meta property="og:title" content="{g["title"]}">
 <meta property="og:description" content="{g["desc"]}">
 <meta property="og:image" content="https://tidymint.app/smart.jpg">
@@ -117,21 +124,15 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 <body id="top">
 <div class="topnav"><div class="wrap"><nav>
   <a class="brand" href="{home}"><img src="{root}icon.png" alt="">Tidymint</a>
-  <div class="navr"><div class="links">{nav}</div><a class="btn primary navcta" href="{S.DL}">{t["navcta"]}</a><div class="lang" role="group" aria-label="{t["aria_lang"]}"><a {vi_on}href="{vi_href}" data-l="vi">VI</a><a {en_on}href="{en_href}" data-l="en">EN</a></div></div>
+  <div class="navr"><div class="links">{nav}</div><a class="btn primary navcta" href="{S.DL}">{t["navcta"]}</a><div class="lang" role="group" aria-label="{t["aria_lang"]}"><a {vi_on}href="{vi_href}" data-l="vi">VI</a><a {en_on}href="{en_href}" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
 </nav></div></div>
 <div class="wrap">
 <article class="art">
   <p class="crumb"><a href="{home}">{l["homename"]}</a> › {g["crumb"]}</p>
   <h1>{g["h1"]}</h1>
-  <p class="meta">{l["updated"]}: {dstr} · {g["read"]}</p>
-  <div class="tldr"><span class="k">{l["tldr"]}</span><p>{g["tldr"]}</p></div>
-  <div class="toc" role="navigation" aria-label="{l["toc"]}"><b>{l["toc"]}</b><ol>{toc}</ol></div>
+  {head_extra}
   {body}
-  <h2 id="faq">{l["faq"]}</h2>
-  {faq}
-  {cta}
-  <h2>{l["src"]}</h2>
-  <ul class="src">{srcs}</ul>
+  {tail}
   {"<h2>%s</h2><div class=\"rel\">%s</div>" % (l["rel"], rel) if rel else ""}
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
@@ -144,6 +145,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 <button class="up" id="up" type="button" aria-label="{t["top"]}">↑ {t["top"]}</button>
 <div class="ck" id="ck" role="dialog" aria-live="polite"><p>{t["ck_text"]} <a href="{S.GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
 <script>
+(function(){{var b=document.getElementById('mbtn'),n=document.querySelector('.topnav');b.addEventListener('click',function(){{var o=n.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'✕':'☰'}});n.querySelectorAll('.links a').forEach(function(a){{a.addEventListener('click',function(){{n.classList.remove('open');b.setAttribute('aria-expanded',false);b.textContent='☰'}})}})}})();
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{{try{{localStorage.setItem('tm-lang',a.dataset.l)}}catch(e){{}}}}));
 (function(){{var up=document.getElementById('up'),bar=document.getElementById('toTop'),barIn=false,tick=false;
 function top(e){{if(e)e.preventDefault();scrollTo({{top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}})}}
@@ -171,13 +173,41 @@ def sitemap(guides):
             '  <url><loc>https://tidymint.app/vi/</loc><lastmod>%s</lastmod>'
             '<xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/>'
             '<xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>' % today]
+    rows += ['  <url><loc>https://tidymint.app/guides/</loc><lastmod>%s</lastmod></url>' % today,
+             '  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>%s</lastmod></url>' % today]
     for g in guides:
         pre = "vi/" if g["lang"] == "vi" else ""
         rows.append('  <url><loc>https://tidymint.app/%s%s/</loc><lastmod>%s</lastmod></url>' % (pre, g["slug"], g["date"]))
     return ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' + "\n".join(rows) + "\n</urlset>\n")
 
+HUB = {
+ "vi": dict(slug="huong-dan", title="Hướng dẫn dọn dẹp và tăng dung lượng Mac | Tidymint", crumb="Hướng dẫn",
+            h1="Hướng dẫn giữ máy Mac gọn gàng", desc="Các bài hướng dẫn dọn rác, gỡ ứng dụng và lấy lại dung lượng trên Mac, viết dễ hiểu, có nguồn chính thức.",
+            lead='<p class="lead" style="margin-top:6px">Bài viết dễ hiểu, có nguồn chính thức, chỉ cách làm tay trước rồi mới gợi ý công cụ.</p>'),
+ "en": dict(slug="guides", title="Mac Cleanup and Storage Guides | Tidymint", crumb="Guides",
+            h1="Guides to a tidy Mac", desc="Plain-language guides to clearing System Data, freeing up space and uninstalling apps on macOS, with official sources.",
+            lead='<p class="lead" style="margin-top:6px">Plain-language guides with official sources. Manual steps first, tools second.</p>'),
+}
+def hubpage(k):
+    h = dict(HUB[k]); items = [g for g in C.GUIDES if g["lang"] == k]
+    other = [g for g in C.GUIDES if g["lang"] != k]
+    cards = "".join('<a href="../%s/"><b>%s</b><br><span class="small">%s</span></a>' % (g["slug"], g["h1"], g["desc"]) for g in items)
+    if other:
+        lab = "In English" if k == "vi" else "Bằng tiếng Việt"
+        pref = "../../" if k == "vi" else "../vi/"
+        cards2 = "".join('<a href="%s%s/"><b>%s</b></a>' % (pref, g["slug"], g["h1"]) for g in other)
+        cards += '</div><h2>%s</h2><div class="rel">%s' % (lab, cards2)
+    h.update(lang=k, date=max(g["date"] for g in C.GUIDES), hub=True, read="", tldr="", toc=[], faq=[], sources=[],
+             body='<div class="rel">%s</div>' % cards, alt=("guides" if k == "vi" else "huong-dan"))
+    return h
+
 if __name__ == "__main__":
+    for k in ("vi", "en"):
+        h = hubpage(k)
+        out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        open(out, "w").write(guide(h)); print("wrote", os.path.relpath(out, ROOT))
     for g in C.GUIDES:
         out = os.path.join(ROOT, "docs", "vi" if g["lang"] == "vi" else "", g["slug"], "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
