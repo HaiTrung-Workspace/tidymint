@@ -1,7 +1,7 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
-    dict(ver="0.3.1", date="", status="next",
+    dict(ver="0.3.1", date="2026-10-27", status="released",
          en=["Clean by App: Zalo, Chrome, Edge, Cốc Cốc and CapCut, by type and by month, with messages and logins locked",
              "Undo the last clean from the Trash page",
              "Safety level and a plain explanation on every cleanup group",

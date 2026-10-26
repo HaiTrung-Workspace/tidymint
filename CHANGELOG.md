@@ -2,7 +2,7 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
-## Unreleased (next: 0.3.1)
+## 0.3.1 (2026-10-27)
 
 - Clean by App: Zalo, Chrome, Edge, Cốc Cốc and CapCut, by type and by month, with messages and logins locked
 - Undo the last clean from the Trash page
