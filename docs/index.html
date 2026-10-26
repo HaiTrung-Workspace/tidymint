@@ -6,6 +6,8 @@
 <title>Tidymint: free Mac cleaner for people who work with AI</title>
 <meta name="description" content="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, find duplicate files, uninstall apps completely and see what fills your disk. A free alternative to CleanMyMac.">
 <link rel="icon" href="favicon.png">
+<link rel="alternate" hreflang="en" href="https://tidymint.app/">
+<link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/">
 <meta property="og:title" content="Tidymint: keep your Mac in mint condition">
 <meta property="og:description" content="Free, open-source Mac cleaner built for people who work with AI tools.">
 <meta property="og:image" content="https://tidymint.app/smart.jpg">
@@ -52,6 +54,7 @@ pre{background:#00000059;border:1px solid var(--line);border-radius:12px;padding
 .signup form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 .signup input{min-width:280px;padding:13px 16px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
 .small{font-size:13px;color:var(--sub)}
+.steps{padding-left:22px;color:var(--sub)}.steps li{margin-bottom:10px}.steps b{color:var(--text)}
 #msg{min-height:22px;margin-top:10px;font-size:15px}
 footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 @media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
@@ -61,14 +64,14 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-siz
 <div class="wrap">
 <nav>
   <a class="brand" href="#"><img src="icon.png" alt="">Tidymint</a>
-  <div class="links"><a href="#features">Features</a><a href="#safety">Safety</a><a href="#install">Install</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div>
+  <div class="links"><a href="#features">Features</a><a href="#safety">Safety</a><a href="#install">Install</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a><a href="vi/">Tiếng Việt</a></div>
 </nav>
 
 <header class="hero">
   <h1>Keep your Mac in <span>mint condition</span>.</h1>
   <p>Tidymint is a free, open-source Mac cleaner built for people who work with AI tools. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.</p>
   <div class="cta">
-    <a class="btn primary" href="#install">Get Tidymint, free</a>
+    <a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download Tidymint, free</a>
     <a class="btn ghost" href="https://github.com/HaiTrung-Workspace/tidymint">View on GitHub</a>
   </div>
   <div class="badges"><span>✓ Free and open source (MIT)</span><span>✓ Everything goes to the Trash first</span><span>✓ Works offline, no tracking</span></div>
@@ -133,18 +136,20 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-siz
 
 <section id="install">
   <h2>Install</h2>
-  <p class="lead">Tidymint needs macOS 14 or later. A signed, one-click download is on the way. Today you can build it from source in about a minute:</p>
-<pre>xcode-select --install          # once, if you don't have the Command Line Tools
-git clone https://github.com/HaiTrung-Workspace/tidymint.git
-cd tidymint && ./build.sh --install</pre>
-  <p class="small">Then open Tidymint from Applications and allow Full Disk Access in System Settings &gt; Privacy &amp; Security, so it can measure every folder.</p>
+  <p class="lead">Tidymint needs macOS 14 or later and runs on Apple silicon and Intel Macs.</p>
+  <ol class="steps">
+    <li><b>Download</b> <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tidymint.zip</a>, open it and drag <b>Tidymint</b> to <b>Applications</b>.</li>
+    <li><b>First launch:</b> Tidymint is not notarized yet, so macOS blocks it the first time. Click <b>Done</b>, then open <b>System Settings &gt; Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> (<a href="https://support.apple.com/102445">Apple's guide</a>).</li>
+    <li><b>Full Disk Access:</b> in the same pane, turn on Tidymint under <b>Full Disk Access</b> so it can measure every folder.</li>
+  </ol>
+  <p class="small">Prefer to build it yourself? <code>git clone https://github.com/HaiTrung-Workspace/tidymint.git &amp;&amp; cd tidymint &amp;&amp; ./build.sh --install</code></p>
 
   <div class="signup" id="signup">
-    <h2 style="margin-bottom:6px">Get the one-click download first</h2>
-    <p class="small" style="margin:0">Leave your email and we will tell you when the signed app is ready.</p>
+    <h2 style="margin-bottom:6px">Get updates</h2>
+    <p class="small" style="margin:0">Mac tips and new releases, at most one email a month.</p>
     <form id="f">
       <input type="email" id="email" required placeholder="name@example.com" autocomplete="email">
-      <button class="btn primary" type="submit">Notify me</button>
+      <button class="btn primary" type="submit">Subscribe</button>
     </form>
     <div id="msg"></div>
     <p class="small">Get the latest updates. Unsubscribe any time.</p>

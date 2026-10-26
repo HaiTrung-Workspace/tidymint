@@ -60,7 +60,12 @@ Also: English and Vietnamese, five colour themes (Mint, Night Sky, Burgundy, Gol
 
 ## Install
 
-### Build from source (recommended)
+### Download
+
+1. Download **[Tidymint.zip](https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip)** (Apple silicon and Intel, macOS 14 or later), open it and drag **Tidymint** to Applications.
+2. Tidymint is not notarized yet, so macOS blocks the first launch. Click **Done**, open **System Settings > Privacy & Security**, scroll down and click **Open Anyway** ([Apple's guide](https://support.apple.com/102445)).
+
+### Build from source
 
 Requirements: macOS 14 or later, Xcode Command Line Tools (`xcode-select --install`).
 
@@ -105,4 +110,4 @@ MIT. See [LICENSE](LICENSE). The software is provided "as is", without warranty 
 
 ## Tiếng Việt
 
-**Tidymint** là app dọn ổ đĩa miễn phí, thay thế CleanMyMac mà không cần crack, mã nguồn mở cho macOS, dành cho người làm việc với AI. App chỉ chuyển file vào Thùng rác, không xoá vĩnh viễn. Cài đặt: chạy `./build.sh --install`, cấp quyền **Truy cập toàn bộ ổ đĩa**, rồi thêm **thư mục dự án** trong phần Cài đặt. Giao diện có tiếng Việt, tự chọn theo ngôn ngữ của máy.
+**Tidymint** là app dọn ổ đĩa miễn phí, thay thế CleanMyMac mà không cần crack, mã nguồn mở cho macOS, dành cho người làm việc với AI. App chỉ chuyển file vào Thùng rác, không xoá vĩnh viễn. Tải về và hướng dẫn mở app bằng tiếng Việt: [tidymint.app/vi](https://tidymint.app/vi/). Sau khi mở, cấp quyền **Truy cập toàn bộ ổ đĩa**, rồi thêm **thư mục dự án** trong phần Cài đặt. Giao diện có tiếng Việt, tự chọn theo ngôn ngữ của máy.
