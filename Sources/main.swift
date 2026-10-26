@@ -437,9 +437,15 @@ struct Sphere: View {
     var body: some View {
         let edge = Sphere.mix(color, .white, 0.2)
         ZStack {
-            Circle().fill(color.opacity(hot ? 0.40 : 0.30))
-            Circle().fill(RadialGradient(colors: [color.opacity(0), color.opacity(hot ? 0.38 : 0.26)], center: .center,
-                                         startRadius: r * 0.80, endRadius: r))
+            // One continuous radial gradient: darkest in the centre, getting lighter towards the edge with no hard step.
+            let k: Double = hot ? 1.25 : 1
+            Circle().fill(RadialGradient(gradient: Gradient(stops: [
+                .init(color: color.opacity(0.14 * k), location: 0.0),
+                .init(color: color.opacity(0.18 * k), location: 0.45),
+                .init(color: color.opacity(0.28 * k), location: 0.72),
+                .init(color: color.opacity(0.42 * k), location: 0.90),
+                .init(color: edge.opacity(0.55 * k), location: 1.0)]),
+                center: .center, startRadius: 0, endRadius: r))
             Circle().fill(LinearGradient(colors: [Color.white.opacity(0.06), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
             Circle().strokeBorder(edge.opacity(hot ? 0.55 : 0.32), lineWidth: 0.75)
         }
