@@ -44,8 +44,10 @@ dict(
 <tr><td>Xem "Dữ liệu hệ thống" gồm những gì</td><td class="n">Khó, phải mò Finder</td><td class="y">Có (bản đồ ổ đĩa)</td><td class="y">Có</td></tr>
 <tr><td>Gỡ app sạch cả phần sót lại</td><td class="n">Kéo vào Thùng rác chỉ xoá app, còn sót cài đặt</td><td class="y">Có</td><td class="y">Có</td></tr>
 <tr><td>Tìm file trùng, file lớn</td><td class="n">Chỉ xem được file lớn</td><td class="y">Có</td><td class="y">Có</td></tr>
-<tr><td>Quét mã độc</td><td class="y">macOS có sẵn XProtect</td><td class="n">Không</td><td class="y">Có</td></tr>
+<tr><td>Bảo vệ khỏi mã độc</td><td class="y">Có sẵn: XProtect, Gatekeeper</td><td>Dựa vào lớp sẵn có của macOS, không có bộ quét riêng</td><td class="y">Có bộ quét riêng</td></tr>
 <tr><td>Tối ưu hiệu năng, quản lý cập nhật app</td><td class="n">Không</td><td class="n">Không</td><td class="y">Có</td></tr>
+<tr><td>Hoàn tác sau khi dọn</td><td class="n">Không</td><td class="y">Có, mọi thứ vào Thùng rác trước</td><td>Tuỳ mục</td></tr>
+<tr><td>Giao diện tiếng Việt</td><td class="y">Có</td><td class="y">Có</td><td class="n">Không (12 ngôn ngữ, không có tiếng Việt)</td></tr>
 </table></div>
 
 <h2 id="lua-chon-mien-phi">4 lựa chọn miễn phí, hợp pháp</h2>
@@ -66,11 +68,14 @@ dict(
 <tr><td>Giá</td><td class="y">Miễn phí, không tài khoản</td><td>Khoảng 40 USD/năm/máy</td></tr>
 <tr><td>Mã nguồn</td><td class="y">Mở (ai cũng đọc được)</td><td>Đóng</td></tr>
 <tr><td>Khi dọn</td><td class="y">Chuyển vào Thùng rác, bạn kiểm tra rồi tự đổ</td><td>Dọn theo thiết lập của app</td></tr>
-<tr><td>Quét mã độc, tối ưu hiệu năng</td><td class="n">Không có</td><td class="y">Có</td></tr>
+<tr><td>Bảo vệ khỏi mã độc</td><td>Dựa vào XProtect và Gatekeeper sẵn trong macOS</td><td class="y">Có bộ quét riêng</td></tr>
+<tr><td>Tối ưu hiệu năng, cập nhật app</td><td class="n">Không có</td><td class="y">Có</td></tr>
+<tr><td>Thu thập dữ liệu sử dụng</td><td class="y">Không, không cần tài khoản</td><td>Có (thông tin máy, thống kê sử dụng, nhật ký dọn), theo chính sách riêng tư của MacPaw</td></tr>
+<tr><td>Tiếng Việt</td><td class="y">Có</td><td class="n">Không</td></tr>
 <tr><td>Apple công chứng (notarize)</td><td class="n">Chưa, lần đầu mở phải bấm "Vẫn mở"</td><td class="y">Có</td></tr>
 <tr><td>Hỗ trợ</td><td>Qua email và GitHub</td><td class="y">Đội hỗ trợ chuyên nghiệp</td></tr>
 </table></div>
-<p><b>Nên chọn CleanMyMac</b> nếu bạn muốn một app trọn gói có quét mã độc và sẵn sàng trả phí. <b>Nên chọn Tidymint</b> nếu bạn chỉ cần máy gọn, ổ trống, và muốn biết chính xác cái gì bị xoá.</p>
+<p><b>Nên chọn CleanMyMac</b> nếu bạn muốn một app trọn gói có bộ quét mã độc riêng và sẵn sàng trả phí. <b>Nên chọn Tidymint</b> nếu bạn chỉ cần máy gọn, ổ trống, và muốn biết chính xác cái gì bị xoá.</p>
 
 <h2 id="cai-tidymint">Cài Tidymint trong 2 phút</h2>
 <ol class="steps">
@@ -90,6 +95,8 @@ dict(
   ],
   sources=[
     ("MacPaw: các phiên bản CleanMyMac và thời gian dùng thử", "https://macpaw.com/support/cleanmymac/knowledgebase/editions"),
+    ("MacPaw: ngôn ngữ CleanMyMac hỗ trợ", "https://macpaw.com/support/cleanmymac/knowledgebase/languages"),
+    ("MacPaw: chính sách riêng tư CleanMyMac", "https://macpaw.com/legal/cleanmymac-privacy-policy"),
     ("PricingSaaS: bảng giá CleanMyMac (ghi nhận 08/2026)", "https://pricingsaas.com/companies/cleanmymac"),
     ("Jamf Threat Labs: mã độc trong app Mac lậu (01/2024)", "https://www.jamf.com/blog/jtl-malware-pirated-applications/"),
     ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/102445"),
@@ -328,8 +335,9 @@ dict(
 <tr><td>Explain what System Data contains</td><td class="n">No</td><td class="y">Yes (Space Lens)</td><td class="y">Yes</td></tr>
 <tr><td>Uninstall apps with leftovers</td><td class="n">Leaves leftovers</td><td class="y">Yes</td><td class="y">Yes</td></tr>
 <tr><td>Find duplicates and large files</td><td class="n">Large files only</td><td class="y">Yes</td><td class="y">Yes</td></tr>
-<tr><td>Malware scan</td><td class="y">XProtect, built in</td><td class="n">No</td><td class="y">Yes</td></tr>
+<tr><td>Malware protection</td><td class="y">Built in: XProtect, Gatekeeper</td><td>Relies on macOS's built-in layers, no scanner of its own</td><td class="y">Own scanner</td></tr>
 <tr><td>Performance tools, app updates</td><td class="n">No</td><td class="n">No</td><td class="y">Yes</td></tr>
+<tr><td>Undo after cleaning</td><td class="n">No</td><td class="y">Yes, everything goes to the Trash first</td><td>Some items</td></tr>
 </table></div>
 
 <h2 id="options">5 free alternatives</h2>
@@ -352,7 +360,10 @@ dict(
 <tr><td>Price</td><td class="y">Free, no account</td><td>About $40/year per Mac</td></tr>
 <tr><td>Source code</td><td class="y">Open (MIT)</td><td>Closed</td></tr>
 <tr><td>When cleaning</td><td class="y">Moves to Trash, you empty it</td><td>Follows the app's own settings</td></tr>
-<tr><td>Malware scan, performance tools</td><td class="n">No</td><td class="y">Yes</td></tr>
+<tr><td>Malware protection</td><td>Relies on XProtect and Gatekeeper built into macOS</td><td class="y">Own scanner</td></tr>
+<tr><td>Performance tools, app updates</td><td class="n">No</td><td class="y">Yes</td></tr>
+<tr><td>Usage data collection</td><td class="y">None, no account needed</td><td>Yes (device info, usage statistics, cleanup logs), per MacPaw's privacy policy</td></tr>
+<tr><td>Languages</td><td>English, Vietnamese</td><td>12 languages</td></tr>
 <tr><td>Apple notarization</td><td class="n">Not yet, needs "Open Anyway" once</td><td class="y">Yes</td></tr>
 <tr><td>Support</td><td>Email and GitHub</td><td class="y">Dedicated support team</td></tr>
 </table></div>
@@ -367,6 +378,8 @@ dict(
   ],
   sources=[
     ("MacPaw: CleanMyMac editions and trial", "https://macpaw.com/support/cleanmymac/knowledgebase/editions"),
+    ("MacPaw: languages CleanMyMac supports", "https://macpaw.com/support/cleanmymac/knowledgebase/languages"),
+    ("MacPaw: CleanMyMac privacy policy", "https://macpaw.com/legal/cleanmymac-privacy-policy"),
     ("PricingSaaS: CleanMyMac pricing (seen Aug 2026)", "https://pricingsaas.com/companies/cleanmymac"),
     ("Jamf Threat Labs: malware in pirated macOS apps", "https://www.jamf.com/blog/jtl-malware-pirated-applications/"),
     ("Apple: Safely open apps on your Mac", "https://support.apple.com/102445"),
