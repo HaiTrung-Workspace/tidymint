@@ -94,6 +94,284 @@ dict(
     ("Jamf Threat Labs: mã độc trong app Mac lậu (01/2024)", "https://www.jamf.com/blog/jtl-malware-pirated-applications/"),
     ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/102445"),
   ],
-  related=[("Trang chủ Tidymint", "{HOME}"), ("Mã nguồn trên GitHub", "https://github.com/HaiTrung-Workspace/tidymint")],
+  related=[("Cách xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="cleanmymac-alternative",
+),
+
+dict(
+  lang="vi", slug="xoa-ung-dung-macbook", date="2026-10-26", read="6 phút đọc",
+  title="Cách xóa ứng dụng trên MacBook sạch hoàn toàn (macOS 26) | Tidymint",
+  desc="Kéo app vào Thùng rác chưa xóa hết: cài đặt, bộ nhớ đệm vẫn còn. Hướng dẫn gỡ app trên MacBook đúng cách, kể cả macOS 26 Tahoe, và cách dọn phần sót lại.",
+  crumb="Xóa ứng dụng trên MacBook",
+  h1="Cách xóa ứng dụng trên MacBook sạch hoàn toàn",
+  tldr="Cách chuẩn của Apple: thoát app, tìm app trong <b>Finder › Ứng dụng</b>, dùng trình gỡ cài đặt riêng nếu app có, nếu không thì kéo app vào <b>Thùng rác</b> rồi đổ Thùng rác. Nhưng cách này thường <b>để lại cài đặt, bộ nhớ đệm và dữ liệu</b> trong thư mục Thư viện. Muốn gỡ sạch, hãy dọn thêm các thư mục đó, hoặc dùng app gỡ cài đặt miễn phí như Tidymint hay AppCleaner.",
+  toc=[("cach-1-finder","Cách 1: Xóa bằng Finder (cách của Apple)"),("cach-2-trinh-go","Cách 2: Dùng trình gỡ cài đặt của app"),
+       ("macos-26","Lưu ý trên macOS 26 Tahoe"),("phan-sot-lai","Dọn phần sót lại cho sạch"),("cach-3-app","Cách 3: Gỡ sạch bằng app miễn phí"),
+       ("khong-xoa-duoc","App không xóa được thì làm sao"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="cach-1-finder">Cách 1: Xóa bằng Finder (cách của Apple)</h2>
+<ol class="steps">
+<li><b>Thoát app</b> đang mở (nhấn Cmd+Q). Nếu app có biểu tượng trên thanh menu, thoát cả ở đó.</li>
+<li>Mở <b>Finder</b>, chọn <b>Ứng dụng</b> (Applications) ở thanh bên.</li>
+<li>Kéo app vào <b>Thùng rác</b>, hoặc chọn app rồi vào <b>Tệp › Chuyển vào Thùng rác</b>. Nếu được hỏi, nhập mật khẩu máy.</li>
+<li><b>Đổ Thùng rác</b> (Finder › Đổ Thùng rác) để lấy lại dung lượng thật sự.</li>
+</ol>
+<p>Apple lưu ý: xóa app <b>không xóa tài liệu bạn đã tạo</b> bằng app đó, và <b>không hủy gói thuê bao</b> đã mua trong app. Thuê bao phải hủy riêng trong App Store hoặc trên trang của hãng.</p>
+
+<h2 id="cach-2-trinh-go">Cách 2: Dùng trình gỡ cài đặt của app</h2>
+<p>Một số app lớn có trình gỡ riêng, ví dụ bộ Adobe, Microsoft Office, phần mềm diệt virus, driver máy in. Tìm file tên <b>Uninstall</b> hoặc <b>Uninstaller</b> trong thư mục của app, hoặc mục gỡ cài đặt trong phần Cài đặt của app.</p>
+<p>Apple khuyên đây là <b>cách tốt nhất</b> nếu app có, vì trình gỡ xóa được cả mục khởi động cùng máy, tiện ích mở rộng và dữ liệu nằm ở nơi khác.</p>
+
+<h2 id="macos-26">Lưu ý trên macOS 26 Tahoe</h2>
+<p>Trên các bản macOS cũ, bạn có thể vào Launchpad, giữ biểu tượng app đến khi rung rồi bấm dấu X. Từ <b>macOS 26 Tahoe</b>, Launchpad được gộp vào Spotlight và <b>không còn nút xóa app</b>. Vì vậy trên macOS 26, hãy dùng Finder (cách 1) hoặc trình gỡ cài đặt (cách 2). Không biết máy mình bản nào thì vào <b>menu Apple › Giới thiệu về máy Mac này</b>.</p>
+
+<h2 id="phan-sot-lai">Dọn phần sót lại cho sạch</h2>
+<p>Kéo app vào Thùng rác chỉ xóa file app chính. Các file app tạo ra trong lúc dùng vẫn nằm lại trong thư mục <b>Thư viện</b> (Library) của bạn, có app để lại vài GB.</p>
+<p>Để mở: trong Finder bấm <b>Đi › Đi tới thư mục</b> (Shift+Cmd+G), gõ <code>~/Library</code>. Phần sót lại thường nằm ở:</p>
+<div class="tbl"><table>
+<tr><th>Thư mục</th><th>Chứa gì</th></tr>
+<tr><td><code>~/Library/Application Support</code></td><td>Dữ liệu app (thường lớn nhất)</td></tr>
+<tr><td><code>~/Library/Caches</code></td><td>Bộ nhớ đệm</td></tr>
+<tr><td><code>~/Library/Preferences</code></td><td>File cài đặt (đuôi .plist)</td></tr>
+<tr><td><code>~/Library/Containers</code></td><td>Dữ liệu của app tải từ App Store</td></tr>
+<tr><td><code>~/Library/Saved Application State</code></td><td>Trạng thái cửa sổ đã lưu</td></tr>
+<tr><td><code>~/Library/LaunchAgents</code></td><td>Mục tự chạy cùng máy</td></tr>
+</table></div>
+<div class="warn"><p>Chỉ chuyển vào Thùng rác những thư mục <b>mang đúng tên app hoặc tên hãng</b> (ví dụ <code>com.spotify.client</code>). Không chắc thì để lại. Đừng xóa cả thư mục Library.</p></div>
+
+<h2 id="cach-3-app">Cách 3: Gỡ sạch bằng app miễn phí</h2>
+<p>Dò tay từng thư mục khá mất công và dễ nhầm. Các app gỡ cài đặt sẽ tự tìm phần sót lại giúp bạn:</p>
+<ul>
+<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Có thêm tab tìm <b>phần sót lại của app đã xóa từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, kiểm tra xong bạn mới tự đổ.</li>
+<li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xóa.</li>
+</ul>
+{CTA}
+
+<h2 id="khong-xoa-duoc">App không xóa được thì làm sao</h2>
+<ul>
+<li><b>Báo "đang được dùng"</b>: thoát hẳn app, kể cả biểu tượng trên thanh menu. Vẫn không được thì khởi động lại máy rồi thử lại.</li>
+<li><b>App của Apple</b> như Mail, Nhạc, Sách, Ghi chú, Bản đồ: là một phần của macOS nên không xóa được, và cũng không nên xóa.</li>
+<li><b>App vẫn tự chạy sau khi xóa</b>: còn mục khởi động trong <code>~/Library/LaunchAgents</code> hoặc <b>Cài đặt hệ thống › Cài đặt chung › Mục đăng nhập</b>. Tắt hoặc xóa mục đó.</li>
+</ul>
+""",
+  faq=[
+    ("Kéo app vào Thùng rác đã xóa hết chưa?", "Chưa. Cách này chỉ xóa file app chính. Cài đặt, bộ nhớ đệm và dữ liệu của app vẫn nằm trong thư mục Thư viện (~/Library) cho đến khi bạn tự dọn hoặc dùng app gỡ cài đặt."),
+    ("Xóa app trên Launchpad được không?", "Trên macOS 15 trở về trước thì được với app tải từ App Store. Từ macOS 26 Tahoe, Launchpad gộp vào Spotlight và không còn nút xóa, nên hãy xóa trong Finder."),
+    ("Xóa app có mất tài liệu không?", "Không. Tài liệu bạn tạo bằng app vẫn giữ nguyên. Chỉ dữ liệu riêng của app (trong Thư viện) mới bị xóa nếu bạn dọn phần sót lại."),
+    ("Xóa app có hủy thuê bao không?", "Không. Thuê bao mua qua App Store phải hủy trong App Store › tài khoản › Đăng ký. Thuê bao mua trên web phải hủy trên trang của hãng."),
+    ("Gỡ app bằng Tidymint có an toàn không?", "Tidymint chỉ chuyển app và phần sót lại vào Thùng rác, nên lỡ nhầm vẫn lấy lại được. App đang chạy được đánh dấu và không chọn sẵn."),
+  ],
+  sources=[
+    ("Apple: Gỡ cài đặt app trên máy Mac", "https://support.apple.com/en-lamr/102610"),
+    ("Switching to Mac: gỡ app trên macOS 26 Tahoe", "https://www.switchingtomac.com/how-to-uninstall-apps-on-mac/"),
+  ],
+  related=[("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Trang chủ Tidymint", "{HOME}")],
+),
+
+dict(
+  lang="en", slug="clear-system-data-mac", date="2026-10-26", read="8 min read",
+  title="How to Clear System Data on Mac (Safely) | Tidymint",
+  desc="System Data taking up 50 GB or more? Here is what it actually contains and 7 safe ways to shrink it on macOS, from caches and Time Machine snapshots to Xcode and Docker.",
+  crumb="Clear System Data on Mac",
+  h1="How to clear System Data on Mac, safely",
+  tldr="System Data is macOS's catch-all bucket for files that don't fit another category: caches, logs, local Time Machine snapshots, old iPhone backups, developer tools and more. You can shrink it safely by <b>restarting</b>, <b>emptying the Trash</b>, <b>deleting local snapshots</b>, <b>clearing user caches</b>, <b>removing old device backups</b> and cleaning <b>Xcode, Docker or AI model caches</b>. Never delete anything inside <code>/System</code> or <code>/private/var</code>.",
+  toc=[("what","What is System Data?"),("check","Check how big it is"),("steps","7 safe ways to shrink System Data"),
+       ("dont","What you should never delete"),("faster","The faster way: let an app find it"),("faq","FAQ")],
+  body="""
+<h2 id="what">What is System Data?</h2>
+<p>Apple describes System Data (called "Other" on older macOS) as a general category that measures storage used by Apple and third-party files that don't fit a more specific category. In practice, it usually includes:</p>
+<ul>
+<li>App and browser <b>caches</b>, logs and temporary files</li>
+<li><b>Local Time Machine snapshots</b> stored on your internal drive</li>
+<li>Old <b>iPhone and iPad backups</b></li>
+<li><b>Developer files</b>: Xcode build data, simulators, Docker disk images</li>
+<li>For AI work: downloaded <b>model files</b> and package caches</li>
+<li>Files macOS needs to run, like virtual memory and the sleep image (leave these alone)</li>
+</ul>
+<p>On a Mac that has been in use for a year or two, System Data can grow to 50 GB or more, and macOS gives you no button to clear it.</p>
+
+<h2 id="check">Check how big it is</h2>
+<p>Open <b>Apple menu › System Settings › General › Storage</b> (macOS 13 Ventura or later). Wait for the bar to finish calculating, then hover over the gray segment to see the System Data size. Note the number so you can see what each step frees.</p>
+
+<h2 id="steps">7 safe ways to shrink System Data</h2>
+<h3>1. Restart your Mac</h3>
+<p>A restart clears temporary files and swap. It is free, safe, and sometimes frees several gigabytes on its own.</p>
+<h3>2. Empty the Trash and your Downloads folder</h3>
+<p>Files in the Trash still take space until you empty it. Old installers (<code>.dmg</code>, <code>.pkg</code>, <code>.zip</code>) in Downloads are a common hidden cost.</p>
+<h3>3. Delete local Time Machine snapshots</h3>
+<p>If you use Time Machine, macOS keeps snapshots on your internal drive. macOS removes them when it needs space, but the Storage screen often counts them as System Data. To list and remove them, open Terminal:</p>
+<pre>tmutil listlocalsnapshots /
+sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
+<p>Replace the date with one from the list. Your backups on the external Time Machine drive are not affected.</p>
+<h3>4. Clear user caches</h3>
+<p>Quit your apps, then in Finder press <b>Shift+Cmd+G</b> and go to <code>~/Library/Caches</code>. Move the folders of apps you recognize to the Trash. Apps rebuild what they need, so the first launch afterward may be a little slower.</p>
+<div class="warn"><p>Use <code>~/Library/Caches</code> (with the tilde, your own folder), not <code>/Library/Caches</code> or <code>/System/Library/Caches</code>.</p></div>
+<h3>5. Remove old iPhone and iPad backups</h3>
+<p>Open <b>System Settings › General › Storage</b> and click the info button next to <b>iOS Files</b>. Delete backups of devices you no longer own or no longer need.</p>
+<h3>6. Clean developer leftovers</h3>
+<ul>
+<li><b>Xcode build data</b>: move <code>~/Library/Developer/Xcode/DerivedData</code> to the Trash. Xcode recreates it.</li>
+<li><b>Old simulators</b>: run <code>xcrun simctl delete unavailable</code>.</li>
+<li><b>Docker</b>: run <code>docker system prune</code> to remove unused images and containers.</li>
+<li><b>node_modules</b> in old projects you no longer work on.</li>
+</ul>
+<h3>7. Clean AI model caches</h3>
+<ul>
+<li><b>Ollama</b>: run <code>ollama list</code>, then <code>ollama rm model-name</code> for models you don't use.</li>
+<li><b>Hugging Face</b>: downloaded models live in <code>~/.cache/huggingface</code>.</li>
+</ul>
+<p>A single local model can be several gigabytes, so this is often the biggest win on an AI workstation.</p>
+
+<h2 id="dont">What you should never delete</h2>
+<ul>
+<li>Anything inside <code>/System</code>, <code>/private/var/vm</code> (virtual memory) or <code>/private/var/db</code></li>
+<li>The whole <code>~/Library</code> folder, or your Photos and Mail libraries</li>
+<li>Files you don't recognize. If you are not sure, leave it.</li>
+</ul>
+<p>Also be careful with "one click" cleaners that delete permanently. If something goes wrong, there is no undo.</p>
+
+<h2 id="faster">The faster way: let an app find it</h2>
+<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you: Smart Scan finds user and app caches, logs, npm cache, old downloads and project drafts; Space Lens draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>. Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
+{CTA}
+""",
+  faq=[
+    ("Is it safe to delete System Data on Mac?", "Parts of it, yes: caches, old downloads, local Time Machine snapshots, old device backups and developer build data are safe to remove. Files macOS needs to run, such as virtual memory, are not. Never delete anything inside /System or /private/var."),
+    ("Why is my System Data so large?", "The usual causes are local Time Machine snapshots, app and browser caches, old iPhone backups, Xcode and Docker data, and downloaded AI models. On developer and AI machines it can pass 100 GB."),
+    ("Will System Data shrink on its own?", "Partly. macOS removes local snapshots and some caches when space runs low, and a restart clears temporary files. It will not remove developer files, models or old backups for you."),
+    ("Does restarting clear System Data?", "It clears temporary files and swap, which can free a few gigabytes. Larger items like snapshots and caches need the other steps."),
+    ("Can Tidymint delete System Data?", "Tidymint finds the safe parts, such as caches, logs and old downloads, explains each folder, and moves only what you select to the Trash. It never touches Apple system folders."),
+  ],
+  sources=[
+    ("Apple: Free up storage space on Mac", "https://support.apple.com/ht206996"),
+    ("Macworld: How to delete Time Machine snapshots", "https://www.macworld.com/article/231067/how-to-delete-time-machine-snapshots-on-your-mac.html"),
+  ],
+  related=[("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/")],
+),
+
+dict(
+  lang="en", slug="free-up-space-mac", date="2026-10-26", read="7 min read",
+  title="How to Free Up Space on Mac: 10 Safe Ways | Tidymint",
+  desc="Mac storage almost full? 10 safe ways to free up space on macOS: storage recommendations, clearing cache, large and duplicate files, unused apps and leftovers, and more.",
+  crumb="Free up space on Mac",
+  h1="How to free up space on Mac: 10 safe ways",
+  tldr="Start with <b>System Settings › General › Storage</b> to see what is using space. Then work down this list: empty the Trash, clear Downloads, turn on <b>Optimize Storage</b>, <b>clear browser and app caches</b>, remove <b>large and duplicate files</b>, <b>uninstall apps</b> together with their leftovers, and delete old device backups. A free app like Tidymint can do most of this in one scan.",
+  toc=[("look","First, see what is using space"),("ways","10 safe ways"),("cache","How to clear cache on Mac"),("faster","Do it in one scan"),("faq","FAQ")],
+  body="""
+<h2 id="look">First, see what is using space</h2>
+<p>Open <b>Apple menu › System Settings › General › Storage</b>. The colored bar shows your biggest categories, and the list below lets you open Applications, Documents, Messages and more. If <b>System Data</b> is the largest, read our guide to <a href="{HOME}clear-system-data-mac/">clearing System Data</a>.</p>
+
+<h2 id="ways">10 safe ways</h2>
+<ol class="steps">
+<li><b>Empty the Trash.</b> Deleted files keep using space until you do. In Storage you can also turn on <b>Empty Trash Automatically</b> after 30 days.</li>
+<li><b>Clear Downloads.</b> Sort by size and remove old installers (<code>.dmg</code>, <code>.pkg</code>) and archives you have already opened.</li>
+<li><b>Turn on Optimize Storage.</b> If you pay for iCloud, macOS can keep only recent files on your Mac and download the rest on demand.</li>
+<li><b>Clear browser and app caches.</b> See the steps below.</li>
+<li><b>Find large files.</b> In Storage, open <b>Documents</b> and sort by size. Videos and old project exports are usually at the top.</li>
+<li><b>Remove duplicate files.</b> Photos and downloads often exist two or three times under different names.</li>
+<li><b>Uninstall apps you don't use</b>, together with their caches and settings. Dragging an app to the Trash leaves those behind.</li>
+<li><b>Delete old iPhone and iPad backups</b> under Storage › iOS Files.</li>
+<li><b>Clean Messages attachments.</b> Storage › Messages lists large photos and videos from old chats.</li>
+<li><b>Move big libraries to an external drive.</b> Apple supports moving your Photos library and iMovie projects.</li>
+</ol>
+
+<h2 id="cache">How to clear cache on Mac</h2>
+<h3>Safari</h3>
+<p>Open <b>Safari › Settings › Advanced</b> and turn on <b>Show features for web developers</b>. Then choose <b>Develop › Empty Caches</b>.</p>
+<h3>Chrome</h3>
+<p>Open <b>Chrome › Settings › Privacy and security › Delete browsing data</b>, tick <b>Cached images and files</b> only (leave passwords and cookies), and click <b>Delete data</b>.</p>
+<h3>App caches</h3>
+<p>Quit your apps, press <b>Shift+Cmd+G</b> in Finder and go to <code>~/Library/Caches</code>. Move folders of apps you recognize to the Trash. Chat and design apps like Slack, Notion and VS Code often keep gigabytes here.</p>
+<div class="warn"><p>Clearing caches frees space for a while, but apps rebuild them as you use them. It is maintenance, not a permanent fix. Large files, duplicates and unused apps give longer-lasting results.</p></div>
+
+<h2 id="faster">Do it in one scan</h2>
+<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that covers most of this list: Smart Scan for caches, logs and old downloads; Large &amp; Old Files (never pre-selected); Duplicates that keeps the best copy; an Uninstaller that finds leftovers, even from apps you removed long ago; and Space Lens to see where the space went. Everything goes to the Trash first.</p>
+{CTA}
+""",
+  faq=[
+    ("What takes up the most space on a Mac?", "Usually videos and photos, apps and their data, iPhone backups, and System Data such as caches and Time Machine snapshots. System Settings › General › Storage shows the breakdown for your Mac."),
+    ("Is it safe to clear cache on Mac?", "Yes, for your user caches in ~/Library/Caches and browser caches. Apps rebuild them as needed. Avoid system cache folders under /System or /Library."),
+    ("How much free space should a Mac have?", "There is no official number, but keeping at least 10 to 15 percent of the drive free gives macOS room for updates, swap and snapshots."),
+    ("Does Optimize Storage delete my files?", "No. Files stay in iCloud and download again when you open them. You need enough iCloud storage for this to work."),
+    ("Is Tidymint free?", "Yes. It is open source under the MIT licence, with no account, no subscription and no paid tier."),
+  ],
+  sources=[
+    ("Apple: Free up storage space on Mac", "https://support.apple.com/ht206996"),
+    ("Apple: Uninstall apps on your Mac", "https://support.apple.com/en-lamr/102610"),
+  ],
+  related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/")],
+),
+
+dict(
+  lang="en", slug="cleanmymac-alternative", date="2026-10-26", read="6 min read",
+  title="Free CleanMyMac Alternative (Open Source) | Tidymint",
+  desc="Looking for a free CleanMyMac alternative? Compare Tidymint, AppCleaner, Pearcleaner, OnyX and the tools built into macOS, with an honest look at what each one can't do.",
+  crumb="Free CleanMyMac alternative",
+  h1="The best free CleanMyMac alternatives",
+  tldr="CleanMyMac has no free tier, only a <b>7-day trial</b>, then about <b>$40 a year</b> for one Mac. If you mainly need to <b>clear caches, uninstall apps cleanly and get disk space back</b>, free options cover it: <b>Tidymint</b> (free, open source, all-in-one cleaner), <b>AppCleaner</b> and <b>Pearcleaner</b> (uninstallers), <b>OnyX</b> (maintenance for power users) and macOS's own Storage settings. None of them replace CleanMyMac's malware scanner.",
+  toc=[("price","What CleanMyMac costs"),("need","What do you actually need?"),("options","5 free alternatives"),("compare","Tidymint vs CleanMyMac"),("faq","FAQ")],
+  body="""
+<h2 id="price">What CleanMyMac costs</h2>
+<p>CleanMyMac by MacPaw offers a <b>7-day free trial</b> with full features. After that, pricing seen in August 2026 was:</p>
+<div class="tbl"><table>
+<tr><th>Plan</th><th>Billed yearly</th><th>Billed monthly</th></tr>
+<tr><td>1 Mac</td><td>about $40/year ($3.33/mo)</td><td>$9.95/mo</td></tr>
+<tr><td>2 Macs</td><td>about $64/year</td><td>$15.95/mo</td></tr>
+<tr><td>5 Macs</td><td>about $128/year</td><td>$32.95/mo</td></tr>
+</table></div>
+<p>A one-time purchase is also sold, but it does not include the next major version. Prices vary by country and tax.</p>
+<div class="warn"><p>Skip "free" cracked copies. A cleaner asks for Full Disk Access and your admin password, and Jamf Threat Labs has documented pirated Mac apps carrying backdoors.</p></div>
+
+<h2 id="need">What do you actually need?</h2>
+<div class="tbl"><table>
+<tr><th>Task</th><th>macOS built-in</th><th>Tidymint</th><th>CleanMyMac</th></tr>
+<tr><td>Clear caches, logs, temp files</td><td class="n">Manual</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+<tr><td>Explain what System Data contains</td><td class="n">No</td><td class="y">Yes (Space Lens)</td><td class="y">Yes</td></tr>
+<tr><td>Uninstall apps with leftovers</td><td class="n">Leaves leftovers</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+<tr><td>Find duplicates and large files</td><td class="n">Large files only</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+<tr><td>Malware scan</td><td class="y">XProtect, built in</td><td class="n">No</td><td class="y">Yes</td></tr>
+<tr><td>Performance tools, app updates</td><td class="n">No</td><td class="n">No</td><td class="y">Yes</td></tr>
+</table></div>
+
+<h2 id="options">5 free alternatives</h2>
+<h3>1. Tidymint: free, open-source all-in-one cleaner</h3>
+<p><a href="{HOME}">Tidymint</a> covers cleanup, duplicates, large files, an uninstaller, a bubble map of your disk and a menu bar indicator. Its defining rule: <b>everything goes to the Trash</b>, nothing is deleted permanently until you empty it. It is MIT-licensed, works offline and is available in English and Vietnamese. Built with AI and developer workflows in mind, it also knows folders like <code>.ollama</code> and project drafts.</p>
+<h3>2. AppCleaner: the classic uninstaller</h3>
+<p>Free. Drag an app onto its window and it lists the related files to remove. Does one thing well.</p>
+<h3>3. Pearcleaner: open-source uninstaller</h3>
+<p>Free and open source. A modern uninstaller that also finds orphaned files from apps you already removed.</p>
+<h3>4. OnyX: maintenance for power users</h3>
+<p>Free and long-running. Many cleaning and system options, but the interface assumes you know macOS well.</p>
+<h3>5. macOS Storage settings</h3>
+<p><b>System Settings › General › Storage</b> offers Optimize Storage, Empty Trash Automatically and lists of large documents. Completely safe, but it doesn't touch caches or explain System Data.</p>
+{CTA}
+
+<h2 id="compare">Tidymint vs CleanMyMac</h2>
+<p>To be clear: Tidymint does not replace all of CleanMyMac. It focuses on cleaning and disk space.</p>
+<div class="tbl"><table>
+<tr><th></th><th>Tidymint</th><th>CleanMyMac</th></tr>
+<tr><td>Price</td><td class="y">Free, no account</td><td>About $40/year per Mac</td></tr>
+<tr><td>Source code</td><td class="y">Open (MIT)</td><td>Closed</td></tr>
+<tr><td>When cleaning</td><td class="y">Moves to Trash, you empty it</td><td>Follows the app's own settings</td></tr>
+<tr><td>Malware scan, performance tools</td><td class="n">No</td><td class="y">Yes</td></tr>
+<tr><td>Apple notarization</td><td class="n">Not yet, needs "Open Anyway" once</td><td class="y">Yes</td></tr>
+<tr><td>Support</td><td>Email and GitHub</td><td class="y">Dedicated support team</td></tr>
+</table></div>
+<p><b>Pick CleanMyMac</b> if you want an all-in-one suite with malware protection and are happy to pay. <b>Pick Tidymint</b> if you want a clean Mac, free disk space and to see exactly what gets removed.</p>
+""",
+  faq=[
+    ("Is there a free version of CleanMyMac?", "No. There is a 7-day free trial with full features, available from the MacPaw Store, the App Store and Setapp. After that you need a subscription or a one-time purchase."),
+    ("Is CleanMyMac worth it?", "It is a polished suite with a malware scanner and support. If you only need cleanup and uninstalling, free tools do those jobs."),
+    ("Is Tidymint safe?", "Tidymint only moves items to the Trash, so anything can be put back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and its source code is public."),
+    ("Why does macOS block Tidymint the first time?", "It is not notarized by Apple yet, which requires a paid developer account. Open it once via System Settings › Privacy & Security › Open Anyway, as Apple describes."),
+    ("Does Tidymint work on Intel Macs?", "Yes. It runs on macOS 14 or later on both Apple silicon and Intel."),
+  ],
+  sources=[
+    ("MacPaw: CleanMyMac editions and trial", "https://macpaw.com/support/cleanmymac/knowledgebase/editions"),
+    ("PricingSaaS: CleanMyMac pricing (seen Aug 2026)", "https://pricingsaas.com/companies/cleanmymac"),
+    ("Jamf Threat Labs: malware in pirated macOS apps", "https://www.jamf.com/blog/jtl-malware-pirated-applications/"),
+    ("Apple: Safely open apps on your Mac", "https://support.apple.com/102445"),
+  ],
+  related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/")],
+  alt="cleanmymac-mien-phi",
 ),
 ]
