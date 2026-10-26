@@ -1,6 +1,15 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.3.2", date="", status="next",
+         en=["Star White: a light theme, with every colour checked for contrast (WCAG AA or better)",
+             "New mint-leaf icon with a serrated leaf; the wordmark shows \"mint\" in leaf green",
+             "Text and buttons take their colour from the theme everywhere, so light themes stay readable",
+             "Remaining English strings in the Vietnamese interface translated; dates follow the app language"],
+         vi=["Star White: giao diện sáng, mọi màu chữ đã đo tương phản (đạt WCAG AA trở lên)",
+             "Biểu tượng lá bạc hà mới có răng cưa; chữ \"mint\" trong logo mang màu lá",
+             "Chữ và nút lấy màu theo giao diện ở mọi chỗ, giao diện sáng không còn chữ trắng",
+             "Dịch nốt các dòng còn tiếng Anh trong bản tiếng Việt; ngày tháng theo ngôn ngữ app"]),
     dict(ver="0.3.1", date="2026-10-27", status="released",
          en=["Clean by App: Zalo, Chrome, Edge, Cốc Cốc and CapCut, by type and by month, with messages and logins locked",
              "Undo the last clean from the Trash page",

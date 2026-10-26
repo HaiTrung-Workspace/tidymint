@@ -105,6 +105,7 @@ def guide(g):
 <link rel="canonical" href="{url}">
 {hreflang}
 <link rel="icon" href="{root}favicon.png">
+<link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <meta property="og:type" content="{"website" if hub else "article"}">
 <meta property="og:title" content="{g["title"]}">
 <meta property="og:description" content="{g["desc"]}">
@@ -123,7 +124,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 </head>
 <body id="top">
 <div class="topnav"><div class="wrap"><nav>
-  <a class="brand" href="{home}"><img src="{root}icon.png" alt="">Tidymint</a>
+  <a class="brand" href="{home}"><img src="{root}icon.png" alt=""><span>Tidy<span class="mint">mint</span></span></a>
   <div class="navr"><div class="links">{nav}</div><a class="btn primary navcta" href="{S.DL}">{t["navcta"]}</a><div class="lang" role="group" aria-label="{t["aria_lang"]}"><a {vi_on}href="{vi_href}" data-l="vi">VI</a><a {en_on}href="{en_href}" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
 </nav></div></div>
 <div class="wrap">
@@ -137,7 +138,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
 <div class="fcols">
-  <div><a class="brand" href="{home}"><img src="{root}icon.png" alt="">Tidymint</a><p>{t["f_blurb"]}</p></div>
+  <div><a class="brand" href="{home}"><img src="{root}icon.png" alt=""><span>Tidy<span class="mint">mint</span></span></a><p>{t["f_blurb"]}</p></div>
   {fcols}
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>

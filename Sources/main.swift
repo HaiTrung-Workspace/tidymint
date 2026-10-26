@@ -21,6 +21,7 @@ struct Palette {
     let bubbles: [UInt32]     // Space Lens
     let icon: [UInt32]        // app icon background, top to bottom
     var leaf: UInt32 = 0x5ff0c0   // mint leaf on the app icon
+    var light = false             // light background: text and overlays flip to dark ink
 }
 
 let palettes: [Palette] = [
@@ -40,6 +41,10 @@ let palettes: [Palette] = [
             bg: [0x110c0a, 0x35200f, 0x7d3a19], accent: [0xffcf73, 0xff7a3d], link: 0xffcf73,
             bubbles: [0xff7a3d, 0xffcf73, 0xe85d4a, 0xf2a65a, 0x5b8bd9, 0xc9a96e, 0xff9f80, 0x8fb3e0],
             icon: [0x3a1f12, 0xb5532a, 0xffb15c]),
+    Palette(id: "starwhite", nameEN: "Star White", nameVI: "Star White (trắng ánh sao)",
+            bg: [0xfafaf8, 0xeef0ee, 0xdfe4e1], accent: [0x0a7556, 0x086b4e], link: 0x086b4e,
+            bubbles: [0x0f8f68, 0x2fd39f, 0x3b82f6, 0x8b5cf6, 0xf59e0b, 0x14b8a6, 0x6366f1, 0x84cc16],
+            icon: [0xe9fbf3, 0xcdf1e2, 0xa8e3cd], leaf: 0x2fd39f, light: true),
     Palette(id: "pride", nameEN: "Pride", nameVI: "Pride (cầu vồng)",
             bg: [0x14111c, 0x1f1830, 0x2b2044], accent: [0xff5e5e, 0xffa94d, 0xffe066, 0x69db7c, 0x4dabf7, 0xb197fc], link: 0xffe066,
             bubbles: [0xff5e5e, 0xffa94d, 0xffe066, 0x69db7c, 0x4dabf7, 0xb197fc, 0xf783ac, 0x63e6be],
@@ -51,16 +56,24 @@ var appTheme: String = UserDefaults.standard.string(forKey: "theme").flatMap { i
 enum Theme {
     static var p: Palette { palettes.first { $0.id == appTheme } ?? palettes[0] }
     static var bg: LinearGradient { LinearGradient(colors: p.bg.map { Color(hex: $0) }, startPoint: .topLeading, endPoint: .bottomTrailing) }
-    static let sidebar = Color.black.opacity(0.22)
-    static let card = Color.white.opacity(0.08)
-    static let cardHi = Color.white.opacity(0.14)
+    /// Text and overlay colour: white on dark themes, near-black on light ones.
+    static var ink: Color { p.light ? Color(hex: 0x0b1f18) : .white }
+    static var text: Color { ink }
+    /// Dark overlay for bars and the sidebar (a light theme uses a soft grey instead of black).
+    static var shade: Color { p.light ? Color(hex: 0x9aa39f) : .black }
+    static var sidebar: Color { shade.opacity(p.light ? 0.16 : 0.22) }
+    static var card: Color { ink.opacity(p.light ? 0.06 : 0.08) }
+    static var cardHi: Color { ink.opacity(p.light ? 0.11 : 0.14) }
     static var accent: LinearGradient { LinearGradient(colors: p.accent.map { Color(hex: $0) }, startPoint: .leading, endPoint: .trailing) }
     static var accentSolid: Color { Color(hex: p.accent[p.accent.count - 1]) }
     static var link: Color { Color(hex: p.link) }
-    static let green = Color(hex: 0x6ee7a8)
-    static let warn = Color(hex: 0xffc56b)
-    static let danger = Color(hex: 0xff6b6b)
-    static let sub = Color.white.opacity(0.62)
+    /// Status colours: pastel on dark themes, deeper on light ones so they keep contrast on a pale background.
+    static var green: Color { p.light ? Color(hex: 0x0a7556) : Color(hex: 0x6ee7a8) }
+    static var warn: Color { p.light ? Color(hex: 0xa15c00) : Color(hex: 0xffc56b) }
+    static var danger: Color { p.light ? Color(hex: 0xb91c1c) : Color(hex: 0xff6b6b) }
+    static var sub: Color { ink.opacity(p.light ? 0.7 : 0.62) }
+    /// "mint" in the wordmark: the leaf colour on dark themes, the (darker) link green on light ones so it stays readable.
+    static var brandMint: Color { p.light ? link : Color(hex: p.leaf) }
     static var bubbles: [Color] { p.bubbles.map { Color(hex: $0) } }
 }
 
@@ -88,6 +101,11 @@ func fmt(_ b: Int64) -> String {
 var appLang: String = UserDefaults.standard.string(forKey: "lang")
     ?? ((Locale.preferredLanguages.first ?? "en").hasPrefix("vi") ? "vi" : "en")
 func t(_ en: String, _ vi: String) -> String { appLang == "vi" ? vi : en }
+/// Date in the app language (e.g. "Sep 15, 2026" / "15 thg 9, 2026").
+func shortDate(_ d: Date) -> String {
+    let f = DateFormatter(); f.locale = Locale(identifier: appLang == "vi" ? "vi_VN" : "en_US"); f.dateStyle = .medium; f.timeStyle = .none
+    return f.string(from: d)
+}
 
 /// Replacement for @State.
 final class Flag: ObservableObject { @Published var v = false }
@@ -95,7 +113,7 @@ final class Flag: ObservableObject { @Published var v = false }
 /// macOS-style hover: soft highlight behind the row.
 struct HoverBG: ViewModifier {
     var radius: CGFloat = 8
-    var color: Color = Color.white.opacity(0.08)
+    var color: Color = Theme.ink.opacity(0.08)
     @StateObject private var h = Flag()
     func body(content: Content) -> some View {
         content
@@ -114,7 +132,7 @@ struct HoverLift: ViewModifier {
     }
 }
 extension View {
-    func hoverBG(_ radius: CGFloat = 8, _ color: Color = Color.white.opacity(0.08)) -> some View { modifier(HoverBG(radius: radius, color: color)) }
+    func hoverBG(_ radius: CGFloat = 8, _ color: Color = Theme.ink.opacity(0.08)) -> some View { modifier(HoverBG(radius: radius, color: color)) }
     func hoverLift() -> some View { modifier(HoverLift()) }
 }
 
@@ -678,7 +696,7 @@ func pack(_ nodes: [Node], in size: CGSize) -> [Bubble] {
     for (i, n) in nodes.enumerated() {
         let r = CGFloat(100 * sqrt(Double(n.size) / maxS))
         guard r > 0.5 else { continue }
-        let col = n.otherCount > 0 ? Color.white.opacity(0.35) : Theme.bubbles[i % Theme.bubbles.count]
+        let col = n.otherCount > 0 ? Theme.ink.opacity(0.35) : Theme.bubbles[i % Theme.bubbles.count]
         if bs.isEmpty { bs.append(Bubble(node: n, x: 0, y: 0, r: r, color: col)); continue }
         var best: (CGFloat, CGFloat, CGFloat)? = nil
         for b in bs {
@@ -727,7 +745,7 @@ struct Sphere: View {
                 .init(color: color.opacity(0.42 * k), location: 0.90),
                 .init(color: edge.opacity(0.55 * k), location: 1.0)]),
                 center: .center, startRadius: 0, endRadius: r))
-            Circle().fill(LinearGradient(colors: [Color.white.opacity(0.06), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
+            Circle().fill(LinearGradient(colors: [Theme.ink.opacity(0.06), Theme.ink.opacity(0)], startPoint: .top, endPoint: .center))
             Circle().strokeBorder(edge.opacity(hot ? 0.55 : 0.32), lineWidth: 0.75)
         }
         .shadow(color: color.opacity(hot ? 0.5 : 0.3), radius: max(3, r * 0.12))
@@ -2102,7 +2120,7 @@ struct CheckBox: View {
     var body: some View {
         Image(systemName: state == 2 ? "checkmark.square.fill" : (state == 1 ? "minus.square.fill" : "square"))
             .font(.system(size: 17, weight: .medium))
-            .foregroundStyle(state == 0 ? AnyShapeStyle(Color.white.opacity(0.5)) : AnyShapeStyle(Theme.accent))
+            .foregroundStyle(state == 0 ? AnyShapeStyle(Theme.ink.opacity(0.5)) : AnyShapeStyle(Theme.accent))
     }
 }
 
@@ -2123,10 +2141,10 @@ struct GhostButton: View {
     let title: String; let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Text(title).font(.system(size: 14, weight: .medium)).foregroundColor(.white)
+            Text(title).font(.system(size: 14, weight: .medium)).foregroundColor(Theme.text)
                 .padding(.horizontal, 22).padding(.vertical, 10)
-                .background(Capsule().stroke(Color.white.opacity(0.35), lineWidth: 1))
-                .hoverBG(20, Color.white.opacity(0.1))
+                .background(Capsule().stroke(Theme.ink.opacity(0.35), lineWidth: 1))
+                .hoverBG(20, Theme.ink.opacity(0.1))
         }.buttonStyle(.plain).hoverLift()
     }
 }
@@ -2155,7 +2173,7 @@ struct Header: View {
     let title: String; let sub: String
     var body: some View {
         VStack(spacing: 6) {
-            Text(title).font(.system(size: 28, weight: .bold)).foregroundColor(.white)
+            Text(title).font(.system(size: 28, weight: .bold)).foregroundColor(Theme.text)
             Text(sub).font(.system(size: 14)).foregroundColor(Theme.sub).multilineTextAlignment(.center)
         }
     }
@@ -2165,7 +2183,7 @@ struct Scanning: View {
     let text: String
     var body: some View {
         VStack(spacing: 18) {
-            ProgressView().controlSize(.large).tint(.white)
+            ProgressView().controlSize(.large).tint(Theme.text)
             Text(text).foregroundColor(Theme.sub)
         }
     }
@@ -2180,7 +2198,7 @@ struct ItemRow: View {
             Button { item.selected.toggle() } label: { CheckBox(state: item.selected ? 2 : 0) }.buttonStyle(.plain)
             Image(nsImage: NSWorkspace.shared.icon(forFile: item.url.path)).resizable().frame(width: 22, height: 22)
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.name).foregroundColor(.white).font(.system(size: 13)).lineLimit(1)
+                Text(item.name).foregroundColor(Theme.text).font(.system(size: 13)).lineLimit(1)
                 HStack(spacing: 6) {
                     Text(item.shortPath).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1).truncationMode(.middle)
                     if !item.note.isEmpty {
@@ -2192,12 +2210,12 @@ struct ItemRow: View {
             }
             Spacer()
             if showDate, let d = item.date {
-                Text("Last opened ").foregroundColor(Theme.sub).font(.system(size: 11)) + Text(d, style: .date).foregroundColor(Theme.sub).font(.system(size: 11))
+                Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: 11))
             }
-            Text(fmt(item.size)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
+            Text(fmt(item.size)).foregroundColor(Theme.text).font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
         }
         .padding(.vertical, 6).padding(.horizontal, 12)
-        .hoverBG(8, Color.white.opacity(0.07))
+        .hoverBG(8, Theme.ink.opacity(0.07))
         .contentShape(Rectangle())
         .contextMenu {
             Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(item.url) }
@@ -2219,9 +2237,9 @@ struct Tile: View {
             VStack(alignment: .leading, spacing: 10) {
                 Image(systemName: icon).font(.system(size: 26)).foregroundStyle(Theme.accent)
                 Text(title).foregroundColor(Theme.sub).font(.system(size: 13))
-                Text(value).foregroundColor(.white).font(.system(size: 24, weight: .bold))
+                Text(value).foregroundColor(Theme.text).font(.system(size: 24, weight: .bold))
                 Text(sub).foregroundColor(Theme.sub).font(.system(size: 12))
-                Text("Review").font(.system(size: 12, weight: .semibold)).foregroundColor(.white).padding(.top, 4)
+                Text(t("Review", "Xem")).font(.system(size: 12, weight: .semibold)).foregroundColor(Theme.text).padding(.top, 4)
             }
             .padding(20).frame(width: 200, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 18).fill(hover.v ? Theme.cardHi : Theme.card))
@@ -2243,8 +2261,8 @@ struct SmartView: View {
                 if let v = vm.newVersion {
                     Button { NSWorkspace.shared.open(Updates.page) } label: {
                         Label(t("Tidymint \(v) is available. Download", "Đã có Tidymint \(v). Tải về"), systemImage: "arrow.down.circle")
-                            .font(.system(size: 12, weight: .medium)).foregroundColor(.white)
-                            .padding(.horizontal, 12).padding(.vertical, 6).background(Capsule().fill(Color.white.opacity(0.12)))
+                            .font(.system(size: 12, weight: .medium)).foregroundColor(Theme.text)
+                            .padding(.horizontal, 12).padding(.vertical, 6).background(Capsule().fill(Theme.ink.opacity(0.12)))
                     }.buttonStyle(.plain).hoverLift()
                 }
                 BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
@@ -2257,7 +2275,7 @@ struct SmartView: View {
             case .done:
                 Image(systemName: "checkmark.circle.fill").font(.system(size: 54)).foregroundColor(Theme.green)
                 Text(vm.lastFreed > 0 ? t("\(fmt(vm.lastFreed)) tidier", "Gọn thêm \(fmt(vm.lastFreed))") : t("Already tidy", "Máy đang gọn rồi"))
-                    .font(.system(size: 40, weight: .bold)).foregroundColor(.white)
+                    .font(.system(size: 40, weight: .bold)).foregroundColor(Theme.text)
                 Text(vm.lastFreed > 0
                      ? t("\(vm.lastCount) items moved to the Trash. Nothing is lost yet: empty the Trash to free the space for real, or undo if you change your mind.",
                          "Đã chuyển \(vm.lastCount) mục vào Thùng rác. Chưa mất gì cả: đổ Thùng rác thì ổ mới trống thật, hoặc bấm Hoàn tác nếu đổi ý.")
@@ -2271,7 +2289,7 @@ struct SmartView: View {
                 }
                 Button { vm.page = .byapp } label: {
                     (Text(t("Want more room? ", "Muốn gọn hơn nữa? ")).foregroundColor(Theme.sub)
-                     + Text(t("Clean by App", "Dọn theo ứng dụng")).foregroundColor(.white).underline()
+                     + Text(t("Clean by App", "Dọn theo ứng dụng")).foregroundColor(Theme.text).underline()
                      + Text(t(" lists what Zalo, Chrome and CapCut keep.", " cho xem Zalo, Chrome, CapCut đang giữ gì.")).foregroundColor(Theme.sub))
                         .font(.system(size: 12))
                 }.buttonStyle(.plain).padding(.top, 6)
@@ -2279,7 +2297,7 @@ struct SmartView: View {
                 if ConCao.shouldShow() { ConCaoHint().frame(maxWidth: 520) }
             default:
                 Text(vm.junkSelected > 0 ? t("\(fmt(vm.junkSelected)) safe to clean", "\(fmt(vm.junkSelected)) an toàn để dọn") : t("Already tidy", "Máy đang gọn rồi"))
-                    .font(.system(size: 40, weight: .bold)).foregroundColor(.white)
+                    .font(.system(size: 40, weight: .bold)).foregroundColor(Theme.text)
                 Text(vm.junkSelected > 0
                      ? t("Apps rebuild all of this on their own. Everything goes to the Trash first.", "Toàn bộ phần này app tự tạo lại được. Mọi thứ vào Thùng rác trước.")
                      : t("Nothing safe to clean right now. Try Clean by App or Large Files for things only you can decide on.", "Không có gì an toàn để dọn lúc này. Thử Dọn theo ứng dụng hoặc File lớn, là phần chỉ bạn quyết được."))
@@ -2289,10 +2307,10 @@ struct SmartView: View {
                     ForEach(vm.cats.filter { $0.selectedSize > 0 }) { c in
                         HStack(spacing: 10) {
                             Image(systemName: c.icon).foregroundStyle(Theme.accent).frame(width: 20)
-                            Text(c.title).foregroundColor(.white).font(.system(size: 13))
+                            Text(c.title).foregroundColor(Theme.text).font(.system(size: 13))
                             Text(c.desc).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1)
                             Spacer()
-                            Text(fmt(c.selectedSize)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit())
+                            Text(fmt(c.selectedSize)).foregroundColor(Theme.text).font(.system(size: 13, weight: .medium).monospacedDigit())
                         }.padding(.horizontal, 14).padding(.vertical, 8).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
                     }
                 }.frame(maxWidth: 560)
@@ -2319,7 +2337,7 @@ struct HomeCard: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1)
-                Text(value).foregroundColor(.white).font(.system(size: 16, weight: .semibold))
+                Text(value).foregroundColor(Theme.text).font(.system(size: 16, weight: .semibold))
                 Text(sub).foregroundColor(Theme.sub).font(.system(size: 11))
             }
             .padding(14).frame(width: 190, alignment: .leading)
@@ -2341,7 +2359,7 @@ struct CleanupView: View {
             Scanning(text: t("Looking for junk...", "Đang tìm rác...")).frame(maxWidth: .infinity, maxHeight: .infinity)
         case .summary:
             VStack(spacing: 24) {
-                Text(fmt(vm.junkTotal)).font(.system(size: 54, weight: .bold)).foregroundColor(.white)
+                Text(fmt(vm.junkTotal)).font(.system(size: 54, weight: .bold)).foregroundColor(Theme.text)
                 Text(t("can be cleaned. \(fmt(vm.junkSelected)) is rebuilt by apps on their own and is pre-selected.", "có thể dọn. \(fmt(vm.junkSelected)) là phần app tự tạo lại được, đã chọn sẵn.")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     GhostButton(title: t("Review Details", "Xem chi tiết")) { vm.phase = .review }
@@ -2353,7 +2371,7 @@ struct CleanupView: View {
         case .done:
             VStack(spacing: 20) {
                 Image(systemName: "checkmark.circle.fill").font(.system(size: 64)).foregroundColor(Theme.green)
-                Text(t("All done!", "Xong rồi!")).font(.system(size: 28, weight: .bold)).foregroundColor(.white)
+                Text(t("All done!", "Xong rồi!")).font(.system(size: 28, weight: .bold)).foregroundColor(Theme.text)
                 Text(vm.lastResult).foregroundColor(Theme.sub).multilineTextAlignment(.center)
                 Text(t("Last step: review the Trash, then empty it.", "Bước cuối: xem lại Thùng rác rồi đổ.")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
@@ -2373,15 +2391,15 @@ struct ReviewView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(.white)
+                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
-                Text("Cleanup Details").font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
+                Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: 17, weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select All", "Chọn tất cả")) { vm.setAll(true) }
                     Button(t("Deselect All", "Bỏ chọn tất cả")) { vm.setAll(false) }
                     Button(t("Smart Selection", "Chọn thông minh")) { vm.scanJunk(thenReview: true) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(.white)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
 
             ScrollView {
@@ -2392,21 +2410,21 @@ struct ReviewView: View {
                                 Button { vm.toggleCat(cat.id) } label: { CheckBox(state: cat.state) }.buttonStyle(.plain)
                                 Image(systemName: cat.icon).font(.system(size: 18)).foregroundStyle(Theme.accent).frame(width: 26)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(cat.title).foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                                    Text(cat.title).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold))
                                     Text(cat.desc).foregroundColor(Theme.sub).font(.system(size: 11))
                                 }
                                 Spacer()
                                 SafetyBadge(level: cat.safety, why: cat.why)
-                                Text("\(cat.items.count) items").foregroundColor(Theme.sub).font(.system(size: 12))
-                                Text(fmt(cat.selectedSize) + " / " + fmt(cat.total)).foregroundColor(.white)
+                                Text(t("\(cat.items.count) items", "\(cat.items.count) mục")).foregroundColor(Theme.sub).font(.system(size: 12))
+                                Text(fmt(cat.selectedSize) + " / " + fmt(cat.total)).foregroundColor(Theme.text)
                                     .font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 150, alignment: .trailing)
                                 Image(systemName: "chevron.down").rotationEffect(.degrees(cat.expanded ? 0 : -90)).foregroundColor(Theme.sub)
                             }
-                            .padding(14).hoverBG(14, Color.white.opacity(0.06)).contentShape(Rectangle())
+                            .padding(14).hoverBG(14, Theme.ink.opacity(0.06)).contentShape(Rectangle())
                             .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { cat.expanded.toggle() } }
 
                             if cat.expanded {
-                                Divider().background(Color.white.opacity(0.1))
+                                Divider().background(Theme.ink.opacity(0.1))
                                 ForEach($cat.items) { $it in ItemRow(item: $it, vm: vm) }.padding(.leading, 26)
                             }
                         }
@@ -2417,12 +2435,12 @@ struct ReviewView: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("\(fmt(vm.junkSelected)) selected").foregroundColor(.white).font(.system(size: 15, weight: .semibold))
-                    Text("Moved to the Trash, not deleted yet. Right-click an item for more.").foregroundColor(Theme.sub).font(.system(size: 11))
+                    Text(t("\(fmt(vm.junkSelected)) selected", "Đã chọn \(fmt(vm.junkSelected))")).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
+                    Text(t("Moved to the Trash, not deleted yet. Right-click an item for more.", "Chỉ chuyển vào Thùng rác, chưa xoá hẳn. Chuột phải vào một mục để xem thêm.")).foregroundColor(Theme.sub).font(.system(size: 11))
                 }
                 Spacer()
                 PrimaryButton(title: t("Clean", "Dọn"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
-            }.padding(.horizontal, 24).padding(.vertical, 14).background(Color.black.opacity(0.25))
+            }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
         }
     }
 }
@@ -2458,7 +2476,7 @@ struct AppList: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(t("Clean by App", "Dọn theo ứng dụng")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                    Text(t("Clean by App", "Dọn theo ứng dụng")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
                     Text(t("\(vm.appReports.count) apps, \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })) can be cleaned.", "\(vm.appReports.count) app, có thể dọn \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable }))."))
                         .font(.system(size: 12)).foregroundColor(Theme.sub)
                 }
@@ -2479,7 +2497,7 @@ struct AppList: View {
                                 Image(nsImage: appIcon(r.rule.bundleIDs)).resizable().frame(width: 40, height: 40)
                                 VStack(alignment: .leading, spacing: 3) {
                                     HStack(spacing: 8) {
-                                        Text(r.rule.name).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                                        Text(r.rule.name).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                                         if r.running {
                                             Text(t("Open", "Đang mở")).font(.system(size: 10, weight: .semibold)).foregroundColor(Theme.warn)
                                                 .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(Theme.warn.opacity(0.15)))
@@ -2489,12 +2507,12 @@ struct AppList: View {
                                 }
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 2) {
-                                    Text(fmt(r.total)).foregroundColor(.white).font(.system(size: 15, weight: .semibold).monospacedDigit())
+                                    Text(fmt(r.total)).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold).monospacedDigit())
                                     Text(t("\(fmt(r.cleanable)) cleanable", "dọn được \(fmt(r.cleanable))")).font(.system(size: 11)).foregroundColor(Theme.sub)
                                 }
                                 Image(systemName: "chevron.right").foregroundColor(Theme.sub)
                             }
-                            .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card)).hoverBG(14, Color.white.opacity(0.06))
+                            .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card)).hoverBG(14, Theme.ink.opacity(0.06))
                             .contentShape(Rectangle()).onTapGesture { vm.appSel = r.id; vm.appAge = 0 }
                         }
                     }.padding(.horizontal, 24).padding(.bottom, 16)
@@ -2512,11 +2530,11 @@ struct AppDetail: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(.white)
+                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
                     Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
-                    Text(report.rule.name).font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
+                    Text(report.rule.name).font(.system(size: 17, weight: .semibold)).foregroundColor(Theme.text)
                     Text(fmt(report.total)).font(.system(size: 13)).foregroundColor(Theme.sub)
                 }
                 Spacer()
@@ -2534,7 +2552,7 @@ struct AppDetail: View {
                 HStack(spacing: 10) {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
                     Text(t("\(report.rule.name) is open. Quit it before cleaning so it does not write to these files.", "\(report.rule.name) đang mở. Tắt app trước khi dọn để app không ghi vào các file này."))
-                        .font(.system(size: 12)).foregroundColor(.white)
+                        .font(.system(size: 12)).foregroundColor(Theme.text)
                     Spacer()
                     GhostButton(title: t("Quit \(report.rule.name)", "Tắt \(report.rule.name)")) { vm.quitApp(report.id) }
                 }.padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.warn.opacity(0.12))).padding(.horizontal, 24).padding(.bottom, 10)
@@ -2549,19 +2567,19 @@ struct AppDetail: View {
                                 if locked { Image(systemName: "lock.fill").foregroundColor(Theme.danger).frame(width: 18) }
                                 else { Button { vm.toggleAppGroup(report.id, g.id) } label: { CheckBox(state: g.state) }.buttonStyle(.plain) }
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(g.section.title).foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                                    Text(g.section.title).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold))
                                     Text(g.section.why).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(2)
                                 }
                                 Spacer()
                                 SafetyBadge(level: g.section.safety, why: g.section.why)
-                                Text(locked ? fmt(g.total) : fmt(g.selected) + " / " + fmt(g.total)).foregroundColor(.white)
+                                Text(locked ? fmt(g.total) : fmt(g.selected) + " / " + fmt(g.total)).foregroundColor(Theme.text)
                                     .font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 150, alignment: .trailing)
                                 Image(systemName: "chevron.down").rotationEffect(.degrees(g.expanded ? 0 : -90)).foregroundColor(Theme.sub).opacity(locked ? 0 : 1)
                             }
-                            .padding(14).hoverBG(14, Color.white.opacity(0.06)).contentShape(Rectangle())
+                            .padding(14).hoverBG(14, Theme.ink.opacity(0.06)).contentShape(Rectangle())
                             .onTapGesture { if !locked { vm.toggleAppExpand(report.id, g.id) } }
                             if g.expanded && !locked {
-                                Divider().background(Color.white.opacity(0.1))
+                                Divider().background(Theme.ink.opacity(0.1))
                                 ForEach(g.rows) { row in
                                     HStack(spacing: 12) {
                                         Button { vm.toggleAppRow(report.id, g.id, row.id) } label: { CheckBox(state: row.selected ? 2 : 0) }.buttonStyle(.plain)
@@ -2569,13 +2587,13 @@ struct AppDetail: View {
                                             Image(nsImage: NSWorkspace.shared.icon(forFile: u.path)).resizable().frame(width: 22, height: 22)
                                         } else { Image(systemName: "calendar").foregroundColor(Theme.sub).frame(width: 22) }
                                         VStack(alignment: .leading, spacing: 2) {
-                                            Text(row.title).foregroundColor(.white).font(.system(size: 13)).lineLimit(1)
+                                            Text(row.title).foregroundColor(Theme.text).font(.system(size: 13)).lineLimit(1)
                                             Text(row.sub).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1).truncationMode(.middle)
                                         }
                                         Spacer()
-                                        Text(fmt(row.size)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
+                                        Text(fmt(row.size)).foregroundColor(Theme.text).font(.system(size: 13, weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
                                     }
-                                    .padding(.vertical, 6).padding(.horizontal, 12).hoverBG(8, Color.white.opacity(0.07)).contentShape(Rectangle())
+                                    .padding(.vertical, 6).padding(.horizontal, 12).hoverBG(8, Theme.ink.opacity(0.07)).contentShape(Rectangle())
                                     .contextMenu { Button(t("Reveal in Finder", "Mở trong Finder")) { if let u = row.urls.first { vm.reveal(u) } } }
                                 }.padding(.leading, 26)
                             }
@@ -2587,12 +2605,12 @@ struct AppDetail: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(t("\(fmt(report.selected)) selected", "Đã chọn \(fmt(report.selected))")).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                    Text(t("\(fmt(report.selected)) selected", "Đã chọn \(fmt(report.selected))")).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                     Text(t("Everything goes to the Trash first. Undo is on the Trash page.", "Mọi thứ vào Thùng rác trước. Hoàn tác ở trang Thùng rác.")).foregroundColor(Theme.sub).font(.system(size: 11))
                 }
                 Spacer()
                 PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanApp(report.id) }, disabled: report.selected == 0)
-            }.padding(.horizontal, 24).padding(.vertical, 14).background(Color.black.opacity(0.25))
+            }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
         }
         .onAppear { vm.refreshAppRunning() }
     }
@@ -2613,14 +2631,14 @@ struct LargeView: View {
                 Scanning(text: t("Looking for large files...", "Đang tìm file lớn...")).frame(maxWidth: .infinity, maxHeight: .infinity)
             default:
                 HStack {
-                    Text("Large Files (\(vm.large.count))").font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
+                    Text(t("Large Files (\(vm.large.count))", "File lớn (\(vm.large.count))")).font(.system(size: 17, weight: .semibold)).foregroundColor(Theme.text)
                     Spacer()
-                    Picker("", selection: $sortByDate.v) { Text("By Size").tag(false); Text("Oldest Opened").tag(true) }
+                    Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(.white).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 if vm.large.isEmpty {
-                    Text("No files over 100 MB.").foregroundColor(Theme.sub).frame(maxHeight: .infinity)
+                    Text(t("No files over 100 MB.", "Không có file nào trên 100 MB.")).foregroundColor(Theme.sub).frame(maxHeight: .infinity)
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 2) {
@@ -2632,10 +2650,10 @@ struct LargeView: View {
                     }
                 }
                 HStack {
-                    Text("\(fmt(vm.largeSelected)) selected").foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                    Text(t("\(fmt(vm.largeSelected)) selected", "Đã chọn \(fmt(vm.largeSelected))")).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                     Spacer()
                     PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanLarge() }, disabled: vm.largeSelected == 0)
-                }.padding(.horizontal, 24).padding(.vertical, 14).background(Color.black.opacity(0.25))
+                }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
             }
         }
     }
@@ -2663,11 +2681,11 @@ struct LensView: View {
                 // breadcrumb
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = [] } label: { Image(systemName: "house") }.buttonStyle(.plain).foregroundColor(.white)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = [] } label: { Image(systemName: "house") }.buttonStyle(.plain).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: 10)).foregroundColor(Theme.sub)
                             Button(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent) { vm.lensUp(to: i) }
-                                .buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? .white : Theme.sub)
+                                .buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
                         }
                     }
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -2678,7 +2696,7 @@ struct LensView: View {
                         Text(t("Measured \(vm.lensDone)/\(vm.lensTotal)", "Đã đo \(vm.lensDone)/\(vm.lensTotal)") + (vm.lensCurrent.isEmpty ? "" : t(" · now: ", " · đang đo: ") + vm.lensCurrent))
                             .font(.system(size: 11)).foregroundColor(Theme.sub).lineLimit(1)
                         Spacer()
-                        Button(t("Stop", "Dừng")) { vm.stopLens() }.buttonStyle(.plain).font(.system(size: 11, weight: .semibold)).foregroundColor(.white)
+                        Button(t("Stop", "Dừng")) { vm.stopLens() }.buttonStyle(.plain).font(.system(size: 11, weight: .semibold)).foregroundColor(Theme.text)
                     }.padding(.horizontal, 24).padding(.bottom, 8)
                 }
                 if vm.lensBusy && vm.lensNodes.isEmpty {
@@ -2692,7 +2710,7 @@ struct LensView: View {
                                     HStack(spacing: 10) {
                                         Image(nsImage: NSWorkspace.shared.icon(forFile: n.url.path)).resizable().frame(width: 20, height: 20)
                                         VStack(alignment: .leading, spacing: 1) {
-                                            Text(n.name).foregroundColor(.white).font(.system(size: 12)).lineLimit(1)
+                                            Text(n.name).foregroundColor(Theme.text).font(.system(size: 12)).lineLimit(1)
                                             if n.otherCount == 0, let info = folderInfo(n.url) {
                                                 Text(info).foregroundColor(Theme.sub).font(.system(size: 10)).lineLimit(1)
                                             }
@@ -2708,7 +2726,7 @@ struct LensView: View {
                                     .contextMenu { nodeMenu(n) }
                                 }
                             }.padding(.horizontal, 12)
-                        }.frame(width: 280).background(Color.black.opacity(0.15))
+                        }.frame(width: 280).background(Theme.shade.opacity(0.15))
                         // bubbles
                         GeometryReader { g in
                             let total = max(vm.lensNodes.reduce(0) { $0 + $1.size }, 1)
@@ -2723,9 +2741,9 @@ struct LensView: View {
                                             VStack(spacing: 2) {
                                                 Text(b.node.name).font(.system(size: max(9, min(14, b.r / 5)), weight: .semibold)).lineLimit(1)
                                                 Text(fmt(b.node.size) + " · " + pctText).font(.system(size: max(8, min(12, b.r / 6))))
-                                            }.foregroundColor(.white).frame(width: b.r * 1.6).shadow(color: .black.opacity(0.5), radius: 2, y: 1)
+                                            }.foregroundColor(.white).frame(width: b.r * 1.6).shadow(color: .black.opacity(Theme.p.light ? 0.7 : 0.5), radius: Theme.p.light ? 3 : 2, y: 1)
                                         } else if b.r > 14 {
-                                            Text(pctText).font(.system(size: 9, weight: .semibold)).foregroundColor(.white)
+                                            Text(pctText).font(.system(size: 9, weight: .semibold)).foregroundColor(Theme.text)
                                         }
                                     }
                                     .frame(width: b.r * 2, height: b.r * 2)
@@ -2745,10 +2763,10 @@ struct LensView: View {
                     }
                 }
                 HStack {
-                    Text("Total: \(fmt(vm.lensNodes.reduce(0) { $0 + $1.size }))").foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                    Text(t("Total: ", "Tổng: ") + fmt(vm.lensNodes.reduce(0) { $0 + $1.size })).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold))
                     Spacer()
-                    Text("Click to open a folder. Right-click for Reveal, Move to Trash, Ignore.").foregroundColor(Theme.sub).font(.system(size: 11))
-                }.padding(.horizontal, 24).padding(.vertical, 12).background(Color.black.opacity(0.25))
+                    Text(t("Click to open a folder. Right-click for Reveal, Move to Trash, Ignore.", "Bấm để mở thư mục. Chuột phải để Hiện trong Finder, Chuyển vào Thùng rác, Bỏ qua.")).foregroundColor(Theme.sub).font(.system(size: 11))
+                }.padding(.horizontal, 24).padding(.vertical, 12).background(Theme.shade.opacity(0.25))
             }
         }
     }
@@ -2757,7 +2775,7 @@ struct LensView: View {
         if n.isDir { Button(t("Open", "Mở")) { vm.openLens(n.url) } }
         Divider()
         if Scanner.blocked(n.url.path) {
-            Text("Protected: cannot be removed here")
+            Text(t("Protected: cannot be removed here", "Được bảo vệ: không xoá từ đây được"))
         } else {
             Button(t("Move to Trash...", "Chuyển vào Thùng rác...")) { DispatchQueue.main.async { vm.trashNode(n) } }
         }
@@ -2770,13 +2788,13 @@ struct TrashView: View {
     var body: some View {
         VStack(spacing: 24) {
             Image(systemName: vm.trashCount == 0 ? "trash" : "trash.fill").font(.system(size: 70)).foregroundStyle(Theme.accent)
-            Text(fmt(vm.trashSize)).font(.system(size: 46, weight: .bold)).foregroundColor(.white)
+            Text(fmt(vm.trashSize)).font(.system(size: 46, weight: .bold)).foregroundColor(Theme.text)
             Text(vm.trashCount == 0 ? t("The Trash is empty.", "Thùng rác trống.") : t("\(vm.trashCount) items in the Trash", "\(vm.trashCount) mục trong Thùng rác")).foregroundColor(Theme.sub)
             HStack(spacing: 14) {
                 GhostButton(title: t("Open Trash", "Mở Thùng rác")) { NSWorkspace.shared.open(Scanner.trashURL) }
                 PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
             }
-            Text("Emptying cannot be undone. Take a quick look first.").font(.system(size: 12)).foregroundColor(Theme.sub)
+            Text(t("Emptying cannot be undone. Take a quick look first.", "Dọn sạch rồi thì không lấy lại được. Liếc qua một lượt trước đã.")).font(.system(size: 12)).foregroundColor(Theme.sub)
             if let s = vm.undoable {
                 VStack(spacing: 8) {
                     Text(t("Last clean: \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi: \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
@@ -2795,26 +2813,26 @@ struct IgnoreView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Ignore List").font(.system(size: 22, weight: .bold)).foregroundColor(.white)
-                Text("Items here are never shown in scans. Right-click any item in Cleanup, Large Files or Space Lens to add it.")
+                Text(t("Ignore List", "Danh sách bỏ qua")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
+                Text(t("Items here are never shown in scans. Right-click any item in Cleanup, Large Files or Space Lens to add it.", "Mục ở đây không bao giờ hiện trong kết quả quét. Chuột phải vào một mục ở Dọn rác chi tiết, File lớn hoặc Bản đồ ổ đĩa để thêm."))
                     .foregroundColor(Theme.sub).font(.system(size: 12))
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 16)
             if vm.ignored.isEmpty {
-                Text("Nothing ignored yet.").foregroundColor(Theme.sub).frame(maxWidth: .infinity, maxHeight: .infinity)
+                Text(t("Nothing ignored yet.", "Chưa bỏ qua mục nào.")).foregroundColor(Theme.sub).frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
                     LazyVStack(spacing: 4) {
                         ForEach(vm.ignored, id: \.self) { p in
                             HStack(spacing: 10) {
                                 Image(nsImage: NSWorkspace.shared.icon(forFile: p)).resizable().frame(width: 20, height: 20)
-                                Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(.white).font(.system(size: 12))
+                                Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: 12))
                                     .lineLimit(1).truncationMode(.middle)
                                 Spacer()
                                 Button(t("Remove", "Gỡ")) { vm.unignore(p) }.buttonStyle(.plain).foregroundColor(Theme.link)
                             }
                             .padding(.horizontal, 12).padding(.vertical, 8)
                             .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
-                            .hoverBG(10, Color.white.opacity(0.06))
+                            .hoverBG(10, Theme.ink.opacity(0.06))
                         }
                     }.padding(.horizontal, 24)
                 }
@@ -2843,12 +2861,12 @@ struct NavItem: View {
                 Spacer()
             }
             .font(.system(size: 13, weight: vm.page == p ? .semibold : .regular))
-            .foregroundColor(.white.opacity(vm.page == p ? 1 : 0.75))
+            .foregroundColor(vm.page == p ? .white : Theme.ink.opacity(0.8))
             .padding(.horizontal, 12).padding(.vertical, 8)
             // Selected item uses the theme colour; Smart Scan always keeps a light theme tint as the main entry point.
             .background(RoundedRectangle(cornerRadius: 8).fill(vm.page == p ? AnyShapeStyle(Theme.accentSolid.opacity(0.8))
-                : (p == .smart ? AnyShapeStyle(Theme.accentSolid.opacity(0.22)) : AnyShapeStyle(Color.clear))))
-            .hoverBG(8, Color.white.opacity(0.07))
+                : (p == .smart ? AnyShapeStyle(Theme.accentSolid.opacity(Theme.p.light ? 0.12 : 0.22)) : AnyShapeStyle(Color.clear))))
+            .hoverBG(8, Theme.ink.opacity(0.07))
             .contentShape(Rectangle())
         }.buttonStyle(.plain).id(p)
     }
@@ -2863,15 +2881,15 @@ struct LangSwitch: View {
                 Button { vm.setLang(l) } label: {
                     Text(l.uppercased())
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(.white.opacity(vm.lang == l ? 1 : 0.55))
+                        .foregroundColor(Theme.ink.opacity(vm.lang == l ? 1 : 0.55))
                         .frame(width: 22, height: 16)
-                        .background(RoundedRectangle(cornerRadius: 4).fill(vm.lang == l ? Color.white.opacity(0.22) : .clear))
+                        .background(RoundedRectangle(cornerRadius: 4).fill(vm.lang == l ? Theme.ink.opacity(0.22) : .clear))
                         .contentShape(Rectangle())
                 }.buttonStyle(.plain)
             }
         }
         .padding(2)
-        .background(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.2), lineWidth: 1))
+        .background(RoundedRectangle(cornerRadius: 6).stroke(Theme.ink.opacity(0.2), lineWidth: 1))
         .help(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
     }
 }
@@ -2894,7 +2912,7 @@ struct Sidebar: View {
             // Fixed header, kept clear of the window's traffic-light buttons.
             HStack(spacing: 8) {
                 Image(nsImage: cachedIcon(Theme.p)).resizable().frame(width: 28, height: 28)
-                Text("Tidymint").font(.system(size: 15, weight: .bold)).foregroundColor(.white)
+                (Text("Tidy").foregroundColor(Theme.text) + Text("mint").foregroundColor(Theme.brandMint)).font(.system(size: 15, weight: .bold))
             }.padding(.top, 44).padding(.bottom, 12)
             // The menu scrolls when the window is short, so nothing overlaps.
             // A fade and a "More" chevron show that items are hidden below (and a fade at the top when scrolled).
@@ -2944,13 +2962,13 @@ struct Sidebar: View {
             .onChange(of: vm.page) { _, pg in withAnimation(.easeInOut(duration: 0.25)) { proxy.scrollTo(pg, anchor: .center) } }
             .overlay(alignment: .top) {
                 if edges.moreAbove {
-                    LinearGradient(colors: [Color.black.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(colors: [Theme.shade.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
                         .frame(height: 22).allowsHitTesting(false)
                 }
             }
             .overlay(alignment: .bottom) {
                 if edges.moreBelow {
-                    LinearGradient(colors: [.clear, Color.black.opacity(0.45)], startPoint: .top, endPoint: .bottom)
+                    LinearGradient(colors: [.clear, Theme.shade.opacity(0.45)], startPoint: .top, endPoint: .bottom)
                         .frame(height: 28).allowsHitTesting(false)
                 }
             }
@@ -2961,24 +2979,24 @@ struct Sidebar: View {
                         Text(t("More", "Xem thêm")).font(.system(size: 10, weight: .semibold))
                         Image(systemName: "chevron.down").font(.system(size: 9, weight: .bold))
                     }
-                    .foregroundColor(.white.opacity(0.85))
+                    .foregroundColor(Theme.ink.opacity(0.85))
                     .padding(.horizontal, 10).padding(.vertical, 3)
-                    .background(Capsule().fill(Color.white.opacity(0.14)))
+                    .background(Capsule().fill(Theme.ink.opacity(0.14)))
                 }.buttonStyle(.plain).hoverLift().padding(.vertical, 4).frame(maxWidth: .infinity)
             }
             }
             }
-            Divider().overlay(Color.white.opacity(0.08)).padding(.bottom, 10)
+            Divider().overlay(Theme.ink.opacity(0.08)).padding(.bottom, 10)
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text("Macintosh HD").font(.system(size: 11)).foregroundColor(Theme.sub)
                     Spacer()
                     LangSwitch(vm: vm)
                 }
-                (Text(String(format: t("%.0f GB free", "Trống %.0f GB"), vm.freeGB)).font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
+                (Text(String(format: t("%.0f GB free", "Trống %.0f GB"), vm.freeGB)).font(.system(size: 13, weight: .semibold)).foregroundColor(Theme.text)
                  + Text(String(format: " / %.0f GB", vm.totalGB)).font(.system(size: 12)).foregroundColor(Theme.sub))
                 DiskBar(free: vm.freeGB, total: vm.totalGB, low: vm.freeGB > 0 && vm.freeGB < vm.lowSpaceGB,
-                        usedColor: Color.white.opacity(0.28))
+                        usedColor: Theme.ink.opacity(0.28))
                 Text(String(format: t("%.0f GB used", "Đã dùng %.0f GB"), max(0, vm.totalGB - vm.freeGB)))
                     .font(.system(size: 10)).foregroundColor(Theme.sub)
             }.padding(.bottom, 16)
@@ -3014,7 +3032,7 @@ struct RootView: View {
         .background(Theme.bg)
         .frame(minWidth: 980, minHeight: 600)
         .id(vm.theme)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(Theme.p.light ? .light : .dark)
         .ignoresSafeArea()
         .onAppear { vm.checkUpdates() }
     }
@@ -3072,15 +3090,15 @@ struct AppsView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(t("Uninstaller", "Gỡ app")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                Text(t("Uninstaller", "Gỡ app")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
                 Spacer()
                 Picker("", selection: $vm.appsTab) {
                     Text(t("Apps", "App") + " (\(vm.apps.count))").tag(0)
                     Text(t("Leftovers", "File sót") + " (\(vm.leftovers.count))").tag(1)
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
-                if vm.appsBusy { ProgressView().controlSize(.small).tint(.white).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(.white).padding(.leading, 6)
+                if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             if !vm.appsMsg.isEmpty {
                 Text(vm.appsMsg).font(.system(size: 12)).foregroundColor(Theme.green).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
@@ -3104,9 +3122,9 @@ struct AppsView: View {
                         HStack(spacing: 10) {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: a.url.path)).resizable().frame(width: 26, height: 26)
                             VStack(alignment: .leading, spacing: 1) {
-                                Text(a.name).foregroundColor(.white).font(.system(size: 13)).lineLimit(1)
+                                Text(a.name).foregroundColor(Theme.text).font(.system(size: 13)).lineLimit(1)
                                 if let d = a.lastUsed {
-                                    (Text(t("Last opened ", "Mở lần cuối ")) + Text(d, style: .date)).foregroundColor(Theme.sub).font(.system(size: 10))
+                                    Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: 10))
                                 } else {
                                     Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: 10))
                                 }
@@ -3116,19 +3134,19 @@ struct AppsView: View {
                         }
                         .padding(.horizontal, 10).padding(.vertical, 6)
                         .background(RoundedRectangle(cornerRadius: 8).fill(vm.selApp == a.id ? Theme.cardHi : Color.clear))
-                        .hoverBG(8, Color.white.opacity(0.07))
+                        .hoverBG(8, Theme.ink.opacity(0.07))
                         .contentShape(Rectangle())
                         .onTapGesture { vm.loadRelated(a.id) }
                     }
                 }.padding(.horizontal, 12)
-            }.frame(width: 320).background(Color.black.opacity(0.15))
+            }.frame(width: 320).background(Theme.shade.opacity(0.15))
 
             if let i = vm.apps.firstIndex(where: { $0.id == vm.selApp }) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 12) {
                         Image(nsImage: NSWorkspace.shared.icon(forFile: vm.apps[i].url.path)).resizable().frame(width: 48, height: 48)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(vm.apps[i].name).font(.system(size: 18, weight: .bold)).foregroundColor(.white)
+                            Text(vm.apps[i].name).font(.system(size: 18, weight: .bold)).foregroundColor(Theme.text)
                             Text(vm.apps[i].bundleID).font(.system(size: 11)).foregroundColor(Theme.sub)
                         }
                     }.padding(20)
@@ -3137,9 +3155,9 @@ struct AppsView: View {
                             HStack(spacing: 12) {
                                 CheckBox(state: 2)
                                 Image(nsImage: NSWorkspace.shared.icon(forFile: vm.apps[i].url.path)).resizable().frame(width: 22, height: 22)
-                                Text(t("Application", "Ứng dụng")).foregroundColor(.white).font(.system(size: 13))
+                                Text(t("Application", "Ứng dụng")).foregroundColor(Theme.text).font(.system(size: 13))
                                 Spacer()
-                                Text(fmt(vm.apps[i].size)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit())
+                                Text(fmt(vm.apps[i].size)).foregroundColor(Theme.text).font(.system(size: 13, weight: .medium).monospacedDigit())
                             }.padding(.vertical, 6).padding(.horizontal, 12)
                             ForEach($vm.apps[i].related) { $it in ItemRow(item: $it, vm: vm) }
                             if vm.apps[i].related.isEmpty {
@@ -3150,10 +3168,10 @@ struct AppsView: View {
                     }
                     HStack {
                         let tot = vm.apps[i].size + vm.apps[i].related.filter(\.selected).reduce(0) { $0 + $1.size }
-                        Text(t("Total ", "Tổng ") + fmt(tot)).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                        Text(t("Total ", "Tổng ") + fmt(tot)).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                         Spacer()
                         PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) })
-                    }.padding(.horizontal, 20).padding(.vertical, 14).background(Color.black.opacity(0.25))
+                    }.padding(.horizontal, 20).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
                 }
             } else {
                 VStack(spacing: 10) {
@@ -3183,10 +3201,10 @@ struct AppsView: View {
                 }
             }
             HStack {
-                Text(t("\(fmt(sel)) selected", "Đã chọn \(fmt(sel))")).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                Text(t("\(fmt(sel)) selected", "Đã chọn \(fmt(sel))")).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                 Spacer()
                 PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanList(which) }, disabled: sel == 0)
-            }.padding(.horizontal, 24).padding(.vertical, 14).background(Color.black.opacity(0.25))
+            }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
         }
     }
 }
@@ -3199,7 +3217,7 @@ struct DupesView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Duplicates", "File trùng")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                    Text(t("Duplicates", "File trùng")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
                     Text(t("Identical files (same content, any name) over 1 MB in Documents, Downloads, Desktop, Pictures, Movies, Music.",
                            "File giống hệt nhau về nội dung (dù khác tên), trên 1 MB, trong Documents, Downloads, Desktop, Pictures, Movies, Music."))
                         .font(.system(size: 12)).foregroundColor(Theme.sub)
@@ -3208,8 +3226,8 @@ struct DupesView: View {
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(.white)
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(.white).padding(.leading, 6)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             if !vm.dupMsg.isEmpty {
                 Text(vm.dupMsg).font(.system(size: 12)).foregroundColor(Theme.green).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
@@ -3233,17 +3251,17 @@ struct DupesView: View {
                                     Button { vm.dupToggleGroup(g.id) } label: { CheckBox(state: vm.dupGroupState(g)) }.buttonStyle(.plain)
                                     Image(nsImage: NSWorkspace.shared.icon(forFile: g.items[0].url.path)).resizable().frame(width: 26, height: 26)
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(g.items[0].name).foregroundColor(.white).font(.system(size: 13, weight: .semibold)).lineLimit(1)
+                                        Text(g.items[0].name).foregroundColor(Theme.text).font(.system(size: 13, weight: .semibold)).lineLimit(1)
                                         Text(t("\(g.items.count) copies × \(fmt(g.size))", "\(g.items.count) bản × \(fmt(g.size))")).foregroundColor(Theme.sub).font(.system(size: 11))
                                     }
                                     Spacer()
-                                    Text(t("extra ", "thừa ") + fmt(g.wasted)).foregroundColor(.white).font(.system(size: 13, weight: .medium).monospacedDigit())
+                                    Text(t("extra ", "thừa ") + fmt(g.wasted)).foregroundColor(Theme.text).font(.system(size: 13, weight: .medium).monospacedDigit())
                                     Image(systemName: "chevron.down").rotationEffect(.degrees(g.expanded ? 0 : -90)).foregroundColor(Theme.sub)
                                 }
-                                .padding(12).hoverBG(14, Color.white.opacity(0.06)).contentShape(Rectangle())
+                                .padding(12).hoverBG(14, Theme.ink.opacity(0.06)).contentShape(Rectangle())
                                 .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { g.expanded.toggle() } }
                                 if g.expanded {
-                                    Divider().background(Color.white.opacity(0.1))
+                                    Divider().background(Theme.ink.opacity(0.1))
                                     ForEach(Array($g.items.enumerated()), id: \.element.id) { idx, $it in
                                         HStack(spacing: 0) {
                                             ItemRow(item: $it, vm: vm, showDate: true)
@@ -3260,16 +3278,16 @@ struct DupesView: View {
                 }
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(t("\(fmt(vm.dupSelected)) selected", "Đã chọn \(fmt(vm.dupSelected))")).foregroundColor(.white).font(.system(size: 15, weight: .semibold))
+                        Text(t("\(fmt(vm.dupSelected)) selected", "Đã chọn \(fmt(vm.dupSelected))")).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                         Text(t("At least one copy of every file is always kept.", "Mỗi file luôn giữ lại ít nhất một bản.")).foregroundColor(Theme.sub).font(.system(size: 11))
                     }
                     Spacer()
-                    if vm.refsBusy { ProgressView().controlSize(.small).tint(.white).padding(.trailing, 6) }
+                    if vm.refsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.trailing, 6) }
                     GhostButton(title: vm.dupAllExtrasSelected ? t("Deselect all", "Bỏ chọn tất cả") : t("Select all extra copies", "Chọn mọi bản thừa")) {
                         vm.dupAutoSelect(all: !vm.dupAllExtrasSelected)
                     }.padding(.trailing, 8)
                     PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanDupes() }, disabled: vm.dupSelected == 0)
-                }.padding(.horizontal, 24).padding(.vertical, 14).background(Color.black.opacity(0.25))
+                }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
             }
         }
     }
@@ -3283,14 +3301,14 @@ struct CloudView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Cloud Cleanup", "Dữ liệu đám mây")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                    Text(t("Cloud Cleanup", "Dữ liệu đám mây")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
                     Text(t("How much of Google Drive, iCloud and other cloud folders is stored on this Mac. Files that live only in the cloud count as 0.",
                            "Google Drive, iCloud và các thư mục mây đang chiếm bao nhiêu trên máy. File chỉ nằm trên mây tính là 0."))
                         .foregroundColor(Theme.sub).font(.system(size: 12))
                 }
                 Spacer()
-                if vm.cloudBusy { ProgressView().controlSize(.small).tint(.white) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(.white)
+                if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: 12)).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -3303,18 +3321,18 @@ struct CloudView: View {
                                 Image(systemName: p.isICloud ? "icloud.fill" : "externaldrive.connected.to.line.below")
                                     .font(.system(size: 18)).foregroundStyle(Theme.accent).frame(width: 26)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(p.name).foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                                    Text(p.name).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold))
                                     if !p.account.isEmpty { Text(p.account).foregroundColor(Theme.sub).font(.system(size: 11)) }
                                 }
                                 Spacer()
                                 Text(t("on this Mac: ", "trên máy: ")).foregroundColor(Theme.sub).font(.system(size: 12))
-                                Text(fmt(p.local)).foregroundColor(.white).font(.system(size: 14, weight: .semibold).monospacedDigit())
+                                Text(fmt(p.local)).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold).monospacedDigit())
                                 Image(systemName: "chevron.down").rotationEffect(.degrees(p.expanded ? 0 : -90)).foregroundColor(Theme.sub)
                             }
-                            .padding(14).hoverBG(14, Color.white.opacity(0.06)).contentShape(Rectangle())
+                            .padding(14).hoverBG(14, Theme.ink.opacity(0.06)).contentShape(Rectangle())
                             .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { p.expanded.toggle() } }
                             if p.expanded {
-                                Divider().background(Color.white.opacity(0.1))
+                                Divider().background(Theme.ink.opacity(0.1))
                                 if !p.isICloud {
                                     Text(t("macOS only lets the Drive app remove downloads. Click Show in Finder, then right-click > Remove Download.",
                                            "macOS chỉ cho app Drive gỡ bản tải xuống. Bấm Mở trong Finder, rồi chuột phải > Remove Download (Xoá bản tải xuống)."))
@@ -3326,7 +3344,7 @@ struct CloudView: View {
                                 ForEach(p.items) { n in
                                     HStack(spacing: 10) {
                                         Image(nsImage: NSWorkspace.shared.icon(forFile: n.url.path)).resizable().frame(width: 20, height: 20)
-                                        Text(n.url.lastPathComponent).foregroundColor(.white).font(.system(size: 12)).lineLimit(1)
+                                        Text(n.url.lastPathComponent).foregroundColor(Theme.text).font(.system(size: 12)).lineLimit(1)
                                         Spacer()
                                         Text(fmt(n.size)).foregroundColor(Theme.sub).font(.system(size: 12).monospacedDigit())
                                         if p.isICloud {
@@ -3334,8 +3352,8 @@ struct CloudView: View {
                                                 .buttonStyle(.plain).font(.system(size: 11, weight: .semibold)).foregroundColor(Theme.link)
                                         }
                                         Button(t("Show in Finder", "Mở trong Finder")) { vm.reveal(n.url) }
-                                            .buttonStyle(.plain).font(.system(size: 11)).foregroundColor(.white.opacity(0.8))
-                                    }.padding(.horizontal, 14).padding(.vertical, 6).hoverBG(8, Color.white.opacity(0.07))
+                                            .buttonStyle(.plain).font(.system(size: 11)).foregroundColor(Theme.ink.opacity(0.8))
+                                    }.padding(.horizontal, 14).padding(.vertical, 6).hoverBG(8, Theme.ink.opacity(0.07))
                                 }
                             }
                         }.background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
@@ -3353,7 +3371,7 @@ struct SettingsView: View {
     @ObservedObject var vm: VM
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 18) {
-            Text(t("Settings", "Cài đặt")).font(.system(size: 22, weight: .bold)).foregroundColor(.white).padding(.top, 34)
+            Text(t("Settings", "Cài đặt")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
             settingRow(t("Theme", "Giao diện màu"), t("Inspired by Apple's 2026 colours.", "Lấy cảm hứng từ bảng màu Apple 2026.")) {
                 HStack(spacing: 10) {
                     ForEach(palettes, id: \.id) { pl in
@@ -3361,9 +3379,9 @@ struct SettingsView: View {
                             VStack(spacing: 4) {
                                 Circle().fill(LinearGradient(colors: pl.bg.map { Color(hex: $0) } + pl.accent.suffix(1).map { Color(hex: $0) }, startPoint: .topLeading, endPoint: .bottomTrailing))
                                     .frame(width: 30, height: 30)
-                                    .overlay(Circle().stroke(Color.white.opacity(vm.theme == pl.id ? 0.95 : 0.25), lineWidth: vm.theme == pl.id ? 2 : 1))
+                                    .overlay(Circle().stroke(Theme.ink.opacity(vm.theme == pl.id ? 0.95 : 0.25), lineWidth: vm.theme == pl.id ? 2 : 1))
                                 Text(appLang == "vi" ? pl.nameVI.components(separatedBy: " (").first ?? pl.nameVI : pl.nameEN)
-                                    .font(.system(size: 10)).foregroundColor(vm.theme == pl.id ? .white : Theme.sub)
+                                    .font(.system(size: 10)).foregroundColor(vm.theme == pl.id ? Theme.text : Theme.sub)
                             }
                         }.buttonStyle(.plain).hoverLift().help(appLang == "vi" ? pl.nameVI : pl.nameEN)
                     }
@@ -3372,7 +3390,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(t("Project folders", "Thư mục dự án")).foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                        Text(t("Project folders", "Thư mục dự án")).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold))
                         Text(t("Where you keep code or AI workspaces. Drafts (_tmp, _to_delete) are found here, duplicates here are never pre-selected, and links are checked here before deleting.",
                                "Nơi chứa code hoặc thư mục làm việc với AI. App tìm nháp (_tmp, _to_delete) ở đây, không tick sẵn file trùng ở đây, và kiểm tra liên kết ở đây trước khi xoá."))
                             .foregroundColor(Theme.sub).font(.system(size: 11)).fixedSize(horizontal: false, vertical: true)
@@ -3383,17 +3401,17 @@ struct SettingsView: View {
                 ForEach(vm.projects, id: \.self) { p in
                     HStack(spacing: 8) {
                         Image(systemName: "folder").foregroundColor(Theme.link)
-                        Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(.white).font(.system(size: 12)).lineLimit(1).truncationMode(.middle)
+                        Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: 12)).lineLimit(1).truncationMode(.middle)
                         Spacer()
                         Button(t("Remove", "Gỡ")) { vm.removeProjectFolder(p) }.buttonStyle(.plain).font(.system(size: 12)).foregroundColor(Theme.link)
-                    }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Color.white.opacity(0.06))
+                    }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
                 }
             }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
             settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
                        vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
                                             : t("Checked once a day against GitHub. Nothing about your Mac is sent.", "Kiểm tra mỗi ngày một lần trên GitHub. Không gửi thông tin gì về máy.")) {
                 HStack(spacing: 10) {
-                    if vm.updChecking { ProgressView().controlSize(.small).tint(.white) }
+                    if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }
                     if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }) }
                     else { GhostButton(title: t("Check now", "Kiểm tra ngay")) { vm.checkUpdates(force: true) } }
                 }
@@ -3420,7 +3438,7 @@ struct SettingsView: View {
     func settingRow<C: View>(_ title: String, _ sub: String, @ViewBuilder _ control: () -> C) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 3) {
-                Text(title).foregroundColor(.white).font(.system(size: 14, weight: .semibold))
+                Text(title).foregroundColor(Theme.text).font(.system(size: 14, weight: .semibold))
                 Text(sub).foregroundColor(Theme.sub).font(.system(size: 11))
             }
             Spacer()
@@ -3470,7 +3488,7 @@ struct MenuView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 22, height: 22)
-                Text("Tidymint").font(.system(size: 13, weight: .bold))
+                (Text("Tidy") + Text("mint").foregroundColor(Theme.brandMint)).font(.system(size: 13, weight: .bold))
                 Spacer()
             }
             VStack(alignment: .leading, spacing: 4) {
@@ -3560,6 +3578,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.applicationIconImage = makeAppIcon(Theme.p)
         // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
         // `--page <name> --window <W>x<H>` opens a page at a fixed size.
+        if let i = a.firstIndex(of: "--export-icon"), i + 1 < a.count {
+            // Writes the 1024px app icon for Resources/AppIcon.png, then quits. Used by build tooling.
+            let img = makeAppIcon(Theme.p)
+            if let tiff = img.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff), let png = rep.representation(using: .png, properties: [:]) {
+                try? png.write(to: URL(fileURLWithPath: a[i + 1]))
+            }
+            exit(0)
+        }
         if a.contains("--demo") { Demo.load(sharedVM) }
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
@@ -3594,12 +3620,15 @@ func cachedIcon(_ p: Palette) -> NSImage {
 
 func makeAppIcon(_ p: Palette) -> NSImage {
     let img = NSImage(size: NSSize(width: 1024, height: 1024), flipped: true) { _ in
-        let dark = NSColor(hex: p.bg[0])
+        // "dark" tints ports, veins and shadows; on a light palette it is a graphite grey, not the pale background.
+        let dark = p.light ? NSColor(hex: 0x2b3431) : NSColor(hex: p.bg[0])
+        // Mac mini body: white on dark palettes, Apple-style silver on light ones so it stands out from the pale tile.
+        let shell = p.light ? NSColor(hex: 0xc9ccd0) : NSColor.white.withAlphaComponent(0.92)
         let body = NSBezierPath(roundedRect: NSRect(x: 100, y: 100, width: 824, height: 824), xRadius: 190, yRadius: 190)
         NSGraphicsContext.saveGraphicsState()
         let sh = NSShadow(); sh.shadowOffset = NSSize(width: 0, height: -16); sh.shadowBlurRadius = 40
         sh.shadowColor = NSColor.black.withAlphaComponent(0.4); sh.set()
-        dark.setFill(); body.fill()
+        (p.light ? NSColor(hex: p.icon[0]) : dark).setFill(); body.fill()
         NSGraphicsContext.restoreGraphicsState()
         let cols = p.icon.map { NSColor(hex: $0) }
         let locs = (0..<cols.count).map { CGFloat($0) / CGFloat(max(cols.count - 1, 1)) }
@@ -3612,9 +3641,9 @@ func makeAppIcon(_ p: Palette) -> NSImage {
         // body (2.54:1)
         let mini = NSBezierPath(roundedRect: NSRect(x: 222, y: 460, width: 580, height: 228), xRadius: 40, yRadius: 40)
         NSGraphicsContext.saveGraphicsState(); sh.shadowColor = NSColor.black.withAlphaComponent(0.35); sh.set()
-        NSColor.white.withAlphaComponent(0.92).setFill(); mini.fill()
+        shell.setFill(); mini.fill()
         NSGraphicsContext.restoreGraphicsState()
-        NSGradient(colors: [NSColor.white.withAlphaComponent(0.0), dark.withAlphaComponent(0.18)], atLocations: [0, 1], colorSpace: .sRGB)?
+        NSGradient(colors: [NSColor.white.withAlphaComponent(p.light ? 0.45 : 0.0), dark.withAlphaComponent(p.light ? 0.22 : 0.18)], atLocations: [0, 1], colorSpace: .sRGB)?
             .draw(in: mini, angle: -45)
         NSColor.white.withAlphaComponent(0.8).setFill()
         NSBezierPath(roundedRect: NSRect(x: 262, y: 466, width: 500, height: 6), xRadius: 3, yRadius: 3).fill()
@@ -3635,23 +3664,85 @@ func makeAppIcon(_ p: Palette) -> NSImage {
         NSBezierPath(ovalIn: NSRect(x: 707, y: 560, width: 30, height: 30)).fill()
         NSColor.black.setFill()
         NSBezierPath(ovalIn: NSRect(x: 715, y: 568, width: 14, height: 14)).fill()
-        // mint leaf above the Mac mini (stem leans right, like a fresh sprig)
+        // Mint leaf above the Mac mini: serrated edge, dark veins, short stem (geometry in tools/leaf.py)
         let leaf = NSBezierPath()
-        leaf.move(to: NSPoint(x: 640, y: 450))
-        leaf.curve(to: NSPoint(x: 600, y: 196), controlPoint1: NSPoint(x: 555, y: 365), controlPoint2: NSPoint(x: 540, y: 255))
-        leaf.curve(to: NSPoint(x: 640, y: 450), controlPoint1: NSPoint(x: 745, y: 226), controlPoint2: NSPoint(x: 795, y: 360))
+        leaf.move(to: NSPoint(x: 693.0, y: 427.6))
+        leaf.quad(to: NSPoint(x: 708.0, y: 410.4), control: NSPoint(x: 707.1, y: 417.1))
+        leaf.quad(to: NSPoint(x: 718.4, y: 394.6), control: NSPoint(x: 723.4, y: 399.6))
+        leaf.line(to: NSPoint(x: 733.7, y: 377.3))
+        leaf.quad(to: NSPoint(x: 732.2, y: 364.9), control: NSPoint(x: 739.5, y: 369.2))
+        leaf.line(to: NSPoint(x: 743.2, y: 348.9))
+        leaf.quad(to: NSPoint(x: 737.6, y: 337.7), control: NSPoint(x: 747.0, y: 341.4))
+        leaf.line(to: NSPoint(x: 744.6, y: 322.8))
+        leaf.quad(to: NSPoint(x: 735.1, y: 312.7), control: NSPoint(x: 746.4, y: 315.9))
+        leaf.line(to: NSPoint(x: 738.6, y: 298.9))
+        leaf.quad(to: NSPoint(x: 725.8, y: 289.7), control: NSPoint(x: 738.8, y: 292.4))
+        leaf.line(to: NSPoint(x: 726.3, y: 276.7))
+        leaf.quad(to: NSPoint(x: 710.8, y: 268.3), control: NSPoint(x: 725.1, y: 270.6))
+        leaf.line(to: NSPoint(x: 708.9, y: 256.0))
+        leaf.quad(to: NSPoint(x: 691.6, y: 248.1), control: NSPoint(x: 706.8, y: 250.2))
+        leaf.line(to: NSPoint(x: 688.1, y: 236.2))
+        leaf.quad(to: NSPoint(x: 669.6, y: 228.7), control: NSPoint(x: 685.4, y: 230.6))
+        leaf.line(to: NSPoint(x: 665.4, y: 217.1))
+        leaf.quad(to: NSPoint(x: 646.5, y: 209.6), control: NSPoint(x: 658.9, y: 212.5))
+        leaf.quad(to: NSPoint(x: 635.2, y: 200.0), control: NSPoint(x: 647.4, y: 202.9))
+        leaf.quad(to: NSPoint(x: 624.9, y: 190.1), control: NSPoint(x: 636.6, y: 193.2))
+        leaf.quad(to: NSPoint(x: 624.9, y: 190.1), control: NSPoint(x: 652.4, y: 310.7))
+        leaf.quad(to: NSPoint(x: 621.4, y: 204.0), control: NSPoint(x: 616.6, y: 198.9))
+        leaf.quad(to: NSPoint(x: 616.9, y: 218.1), control: NSPoint(x: 608.9, y: 214.0))
+        leaf.line(to: NSPoint(x: 604.9, y: 234.4))
+        leaf.quad(to: NSPoint(x: 607.5, y: 246.5), control: NSPoint(x: 599.6, y: 242.4))
+        leaf.line(to: NSPoint(x: 595.8, y: 262.7))
+        leaf.quad(to: NSPoint(x: 599.1, y: 274.6), control: NSPoint(x: 590.9, y: 270.6))
+        leaf.line(to: NSPoint(x: 588.5, y: 290.5))
+        leaf.quad(to: NSPoint(x: 593.5, y: 301.9), control: NSPoint(x: 584.4, y: 298.1))
+        leaf.line(to: NSPoint(x: 584.8, y: 317.3))
+        leaf.quad(to: NSPoint(x: 592.1, y: 328.0), control: NSPoint(x: 581.9, y: 324.5))
+        leaf.line(to: NSPoint(x: 586.1, y: 342.6))
+        leaf.quad(to: NSPoint(x: 596.4, y: 352.5), control: NSPoint(x: 584.7, y: 349.4))
+        leaf.line(to: NSPoint(x: 593.8, y: 366.1))
+        leaf.quad(to: NSPoint(x: 607.6, y: 375.0), control: NSPoint(x: 594.1, y: 372.4))
+        leaf.line(to: NSPoint(x: 608.7, y: 387.5))
+        leaf.quad(to: NSPoint(x: 626.5, y: 395.2), control: NSPoint(x: 611.1, y: 393.2))
+        leaf.line(to: NSPoint(x: 631.8, y: 406.6))
+        leaf.quad(to: NSPoint(x: 653.9, y: 413.1), control: NSPoint(x: 640.0, y: 410.6))
+        leaf.quad(to: NSPoint(x: 671.2, y: 421.0), control: NSPoint(x: 656.0, y: 418.9))
+        leaf.quad(to: NSPoint(x: 693.0, y: 427.6), control: NSPoint(x: 675.5, y: 426.1))
+        leaf.close()
         NSGraphicsContext.saveGraphicsState()
-        let lg = NSShadow(); lg.shadowOffset = NSSize(width: 0, height: -6); lg.shadowBlurRadius = 18
-        lg.shadowColor = NSColor.black.withAlphaComponent(0.3); lg.set()
+        let lg = NSShadow(); lg.shadowOffset = NSSize(width: 6, height: 14); lg.shadowBlurRadius = 20
+        lg.shadowColor = NSColor.black.withAlphaComponent(0.38); lg.set()
         NSColor(hex: p.leaf).setFill(); leaf.fill()
         NSGraphicsContext.restoreGraphicsState()
-        NSGradient(colors: [NSColor.white.withAlphaComponent(0.35), NSColor.white.withAlphaComponent(0)], atLocations: [0, 1], colorSpace: .sRGB)?
+        NSGradient(colors: [NSColor.white.withAlphaComponent(0.32), NSColor.white.withAlphaComponent(0)], atLocations: [0, 1], colorSpace: .sRGB)?
             .draw(in: leaf, angle: -60)
-        let vein = NSBezierPath(); vein.move(to: NSPoint(x: 606, y: 232)); vein.curve(to: NSPoint(x: 638, y: 440), controlPoint1: NSPoint(x: 618, y: 300), controlPoint2: NSPoint(x: 632, y: 380))
-        vein.lineWidth = 10; vein.lineCapStyle = .round; dark.withAlphaComponent(0.75).setStroke(); vein.stroke()
+        let v = NSBezierPath(); v.lineWidth = 6; v.lineCapStyle = .round
+        v.move(to: NSPoint(x: 689.9, y: 416.6)); v.curve(to: NSPoint(x: 629.1, y: 204.7), controlPoint1: NSPoint(x: 673.1, y: 358.2), controlPoint2: NSPoint(x: 652.1, y: 285.1))
+        v.move(to: NSPoint(x: 682.5, y: 391.0)); v.curve(to: NSPoint(x: 700.3, y: 338.5), controlPoint1: NSPoint(x: 692.5, y: 374.3), controlPoint2: NSPoint(x: 700.4, y: 356.3))
+        v.move(to: NSPoint(x: 682.5, y: 391.0)); v.curve(to: NSPoint(x: 639.6, y: 355.9), controlPoint1: NSPoint(x: 665.2, y: 382.2), controlPoint2: NSPoint(x: 648.9, y: 371.0))
+        v.move(to: NSPoint(x: 670.0, y: 347.2)); v.curve(to: NSPoint(x: 703.5, y: 290.2), controlPoint1: NSPoint(x: 687.0, y: 328.5), controlPoint2: NSPoint(x: 701.3, y: 308.6))
+        v.move(to: NSPoint(x: 670.0, y: 347.2)); v.curve(to: NSPoint(x: 611.3, y: 316.6), controlPoint1: NSPoint(x: 645.6, y: 340.4), controlPoint2: NSPoint(x: 622.9, y: 331.0))
+        v.move(to: NSPoint(x: 657.4, y: 303.4)); v.curve(to: NSPoint(x: 689.4, y: 246.7), controlPoint1: NSPoint(x: 673.8, y: 284.8), controlPoint2: NSPoint(x: 687.5, y: 265.1))
+        v.move(to: NSPoint(x: 657.4, y: 303.4)); v.curve(to: NSPoint(x: 600.2, y: 272.3), controlPoint1: NSPoint(x: 633.6, y: 296.3), controlPoint2: NSPoint(x: 611.6, y: 286.9))
+        v.move(to: NSPoint(x: 644.8, y: 259.5)); v.curve(to: NSPoint(x: 663.0, y: 206.9), controlPoint1: NSPoint(x: 655.0, y: 242.8), controlPoint2: NSPoint(x: 663.1, y: 224.6))
+        v.move(to: NSPoint(x: 644.8, y: 259.5)); v.curve(to: NSPoint(x: 601.5, y: 224.5), controlPoint1: NSPoint(x: 627.3, y: 250.7), controlPoint2: NSPoint(x: 610.8, y: 239.6))
+        dark.withAlphaComponent(0.8).setStroke(); v.stroke()
+        let st = NSBezierPath(); st.lineWidth = 9; st.lineCapStyle = .round
+        st.move(to: NSPoint(x: 693.0, y: 427.6)); st.curve(to: NSPoint(x: 696.5, y: 450.3), controlPoint1: NSPoint(x: 694.7, y: 437.0), controlPoint2: NSPoint(x: 695.9, y: 444.5))
+        NSColor(hex: p.leaf).setStroke(); st.stroke()
         return true
     }
     return img
+}
+
+extension NSBezierPath {
+    /// Quadratic curve expressed as a cubic (NSBezierPath has no quadratic segment).
+    func quad(to p: NSPoint, control q: NSPoint) {
+        let p0 = currentPoint
+        let c1 = NSPoint(x: p0.x + 2 / 3 * (q.x - p0.x), y: p0.y + 2 / 3 * (q.y - p0.y))
+        let c2 = NSPoint(x: p.x + 2 / 3 * (q.x - p.x), y: p.y + 2 / 3 * (q.y - p.y))
+        curve(to: p, controlPoint1: c1, controlPoint2: c2)
+    }
 }
 
 extension NSColor {
@@ -3687,18 +3778,18 @@ struct StartupView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(t("Startup Items", "Tự chạy khi bật máy")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                Text(t("Startup Items", "Tự chạy khi bật máy")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
                 Text(t("Background helpers that start with your Mac, each with who signed it. This is not antivirus: Tidymint states facts, you decide. For a second opinion use KnockKnock (free, open source) or Malwarebytes.",
                        "Các tiến trình chạy ngầm khi bật máy, kèm ai đã ký chúng. Đây không phải diệt virus: Tidymint chỉ nêu sự thật, bạn tự quyết. Muốn kiểm thêm, dùng KnockKnock (miễn phí, mã mở) hoặc Malwarebytes."))
                     .foregroundColor(Theme.sub).font(.system(size: 12))
                 HStack(spacing: 8) {
-                    if vm.launchBusy { ProgressView().controlSize(.small).tint(.white); Text(t("Checking signatures...", "Đang kiểm chữ ký...")).foregroundColor(Theme.sub).font(.system(size: 12)) }
+                    if vm.launchBusy { ProgressView().controlSize(.small).tint(Theme.text); Text(t("Checking signatures...", "Đang kiểm chữ ký...")).foregroundColor(Theme.sub).font(.system(size: 12)) }
                     else if vm.launchAttention > 0 {
                         Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
-                        Text(t("\(vm.launchAttention) items worth a look. Hover a badge to see why.", "\(vm.launchAttention) mục đáng để ý. Rê chuột lên nhãn để xem lý do.")).foregroundColor(.white).font(.system(size: 12))
+                        Text(t("\(vm.launchAttention) items worth a look. Hover a badge to see why.", "\(vm.launchAttention) mục đáng để ý. Rê chuột lên nhãn để xem lý do.")).foregroundColor(Theme.text).font(.system(size: 12))
                     } else if !vm.launch.isEmpty {
                         Image(systemName: "checkmark.shield").foregroundColor(Theme.green)
-                        Text(t("Nothing unusual in \(vm.launch.count) items.", "Không có gì bất thường trong \(vm.launch.count) mục.")).foregroundColor(.white).font(.system(size: 12))
+                        Text(t("Nothing unusual in \(vm.launch.count) items.", "Không có gì bất thường trong \(vm.launch.count) mục.")).foregroundColor(Theme.text).font(.system(size: 12))
                     }
                 }.padding(.top, 4)
             }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
@@ -3718,14 +3809,14 @@ struct StartupView: View {
             }
             HStack(spacing: 12) {
                 Text(vm.launchMsg.isEmpty ? t("\(vm.launch.count) items", "\(vm.launch.count) mục") : vm.launchMsg)
-                    .foregroundColor(.white).font(.system(size: 13)).lineLimit(2)
+                    .foregroundColor(Theme.text).font(.system(size: 13)).lineLimit(2)
                 Spacer()
                 GhostButton(title: t("Open Login Items settings", "Mở cài đặt Mục đăng nhập")) {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!)
                 }
                 PrimaryButton(title: t("Remove selected", "Gỡ mục đã chọn"), action: { vm.removeLaunch() },
                               disabled: !vm.launch.contains { $0.selected && $0.scope == 0 })
-            }.padding(.horizontal, 24).padding(.vertical, 12).background(Color.black.opacity(0.25))
+            }.padding(.horizontal, 24).padding(.vertical, 12).background(Theme.shade.opacity(0.25))
         }
         .onAppear { vm.scanLaunch() }
     }
@@ -3743,7 +3834,7 @@ struct LaunchRow: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
-                    Text(e.owner).foregroundColor(.white).font(.system(size: 13, weight: .medium)).lineLimit(1)
+                    Text(e.owner).foregroundColor(Theme.text).font(.system(size: 13, weight: .medium)).lineLimit(1)
                     if e.orphan { badge(t("App removed", "App đã gỡ"), Theme.danger) }
                     if e.running == true { badge(t("Running", "Đang chạy"), Theme.green) }
                     if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).help(e.sign.help) }
@@ -3756,7 +3847,7 @@ struct LaunchRow: View {
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
-        .hoverBG(10, Color.white.opacity(0.06))
+        .hoverBG(10, Theme.ink.opacity(0.06))
         .help(e.program)
     }
     func badge(_ s: String, _ c: Color) -> some View {
@@ -3777,7 +3868,7 @@ struct StatsView: View {
         let points = log.compactMap { e in e.freeGB.map { (e.date, $0) } }
         let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
         VStack(alignment: .leading, spacing: 16) {
-            Text(t("Statistics", "Thống kê")).font(.system(size: 22, weight: .bold)).foregroundColor(.white).padding(.top, 34)
+            Text(t("Statistics", "Thống kê")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
             HStack(spacing: 12) {
                 statCard(t("Freed in total", "Tổng đã giải phóng"), fmt(freed))
                 statCard(t("Cleanups", "Số lần dọn"), "\(runs)")
@@ -3811,12 +3902,12 @@ struct StatsView: View {
                     ForEach(log.reversed().prefix(60)) { e in
                         HStack(alignment: .top, spacing: 10) {
                             Text(df.string(from: e.date)).font(.system(size: 11).monospacedDigit()).foregroundColor(Theme.sub).frame(width: 78, alignment: .leading)
-                            Text(e.text).font(.system(size: 12)).foregroundColor(e.text.hasPrefix("ERROR") ? Theme.danger : .white).lineLimit(2)
+                            Text(e.text).font(.system(size: 12)).foregroundColor(e.text.hasPrefix("ERROR") ? Theme.danger : Theme.text).lineLimit(2)
                             Spacer()
                             if e.freed > 0 { Text("+" + fmt(e.freed)).font(.system(size: 11, weight: .semibold)).foregroundColor(Theme.green) }
                         }
                         .padding(.horizontal, 10).padding(.vertical, 6)
-                        .hoverBG(8, Color.white.opacity(0.06))
+                        .hoverBG(8, Theme.ink.opacity(0.06))
                     }
                 }
             }
@@ -3827,10 +3918,10 @@ struct StatsView: View {
     func statCard(_ title: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title).font(.system(size: 11)).foregroundColor(Theme.sub)
-            Text(value).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+            Text(value).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
         }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
         .background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
-        .hoverBG(12, Color.white.opacity(0.05))
+        .hoverBG(12, Theme.ink.opacity(0.05))
     }
 }
 
@@ -3948,8 +4039,8 @@ struct FieldBox<C: View>: View {
             Text(title).font(.system(size: 12, weight: .semibold)).foregroundColor(Theme.sub)
             content()
                 .padding(.horizontal, 10).padding(.vertical, 8)
-                .background(RoundedRectangle(cornerRadius: 8).fill(Color.black.opacity(0.25)))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.15), lineWidth: 1))
+                .background(RoundedRectangle(cornerRadius: 8).fill(Theme.shade.opacity(0.25)))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.ink.opacity(0.15), lineWidth: 1))
         }
     }
 }
@@ -3961,7 +4052,7 @@ struct ContactView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Contact the developer", "Liên hệ nhà phát triển")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                    Text(t("Contact the developer", "Liên hệ nhà phát triển")).font(.system(size: 22, weight: .bold)).foregroundColor(Theme.text)
                     Text(t("Feedback, bug reports and questions go straight to the developer. An email address is needed so you can get a reply.",
                            "Góp ý, báo lỗi, câu hỏi đều tới thẳng nhà phát triển. Cần email để có thể trả lời bạn."))
                         .foregroundColor(Theme.sub).font(.system(size: 12))
@@ -3973,18 +4064,18 @@ struct ContactView: View {
                 HStack(spacing: 8) {
                     ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in
                         Button { f.kind = k } label: {
-                            Text(label).font(.system(size: 12, weight: .medium)).foregroundColor(.white)
+                            Text(label).font(.system(size: 12, weight: .medium)).foregroundColor(f.kind == k ? .white : Theme.text)
                                 .padding(.horizontal, 14).padding(.vertical, 6)
                                 .background(Capsule().fill(f.kind == k ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.card)))
                         }.buttonStyle(.plain).hoverLift()
                     }
                 }
                 FieldBox(title: t("Your email (required)", "Email của bạn (bắt buộc)")) {
-                    TextField("name@example.com", text: $f.email).textFieldStyle(.plain).foregroundColor(.white)
+                    TextField("name@example.com", text: $f.email).textFieldStyle(.plain).foregroundColor(Theme.text)
                         .onSubmit { submit(newsletter: true) }
                 }
                 FieldBox(title: t("Message", "Nội dung")) {
-                    TextEditor(text: $f.message).font(.system(size: 13)).foregroundColor(.white)
+                    TextEditor(text: $f.message).font(.system(size: 13)).foregroundColor(Theme.text)
                         .scrollContentBackground(.hidden).frame(minHeight: 140)
                 }
                 Toggle(isOn: $f.includeInfo) {
@@ -3995,7 +4086,7 @@ struct ContactView: View {
                     Text(f.result).font(.system(size: 13, weight: .medium)).foregroundColor(f.ok ? Theme.green : Theme.warn)
                 }
                 HStack(spacing: 10) {
-                    if f.sending { ProgressView().controlSize(.small).tint(.white) }
+                    if f.sending { ProgressView().controlSize(.small).tint(Theme.text) }
                     Spacer()
                     // Return (outside the message box) = the main button.
                     Button { submit(newsletter: true) } label: {
@@ -4006,8 +4097,8 @@ struct ContactView: View {
                     Button { submit(newsletter: false) } label: {
                         Text(t("Send only", "Chỉ gửi")).font(.system(size: 12)).foregroundColor(Theme.sub)
                             .padding(.horizontal, 12).padding(.vertical, 6)
-                            .background(Capsule().stroke(Color.white.opacity(0.25), lineWidth: 1))
-                    }.buttonStyle(.plain).hoverBG(14, Color.white.opacity(0.08)).disabled(f.sending)
+                            .background(Capsule().stroke(Theme.ink.opacity(0.25), lineWidth: 1))
+                    }.buttonStyle(.plain).hoverBG(14, Theme.ink.opacity(0.08)).disabled(f.sending)
                 }
                 HStack(spacing: 6) {
                     Spacer()
@@ -4053,17 +4144,17 @@ struct InviteCard: View {
     var body: some View {
         if !f.hidden {
             VStack(alignment: .leading, spacing: 10) {
-                Text(t("Want monthly tips to keep your Mac lean?", "Nhận mẹo giữ máy gọn mỗi tháng?")).font(.system(size: 15, weight: .semibold)).foregroundColor(.white)
+                Text(t("Want monthly tips to keep your Mac lean?", "Nhận mẹo giữ máy gọn mỗi tháng?")).font(.system(size: 15, weight: .semibold)).foregroundColor(Theme.text)
                 Text(Backend.newsletterText).font(.system(size: 11)).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 if f.ok {
                     Text(t("Thanks! You're on the list.", "Cảm ơn bạn! Đã đăng ký.")).foregroundColor(Theme.green).font(.system(size: 13, weight: .medium))
                 } else {
                     HStack(spacing: 8) {
-                        TextField("name@example.com", text: $f.email).textFieldStyle(.plain).foregroundColor(.white)
+                        TextField("name@example.com", text: $f.email).textFieldStyle(.plain).foregroundColor(Theme.text)
                             .onSubmit { join() }
                             .padding(.horizontal, 10).padding(.vertical, 7)
-                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.black.opacity(0.25)))
-                        if f.sending { ProgressView().controlSize(.small).tint(.white) }
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Theme.shade.opacity(0.25)))
+                        if f.sending { ProgressView().controlSize(.small).tint(Theme.text) }
                         Button { join() } label: {
                             Text(t("Subscribe", "Nhận bản tin")).font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
                                 .padding(.horizontal, 16).padding(.vertical, 7).background(Capsule().fill(Theme.accent))
@@ -4077,7 +4168,7 @@ struct InviteCard: View {
                 }
             }
             .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
-            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.12), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Theme.ink.opacity(0.12), lineWidth: 1))
         }
     }
     func join() {
