@@ -64,6 +64,8 @@ Also: English and Vietnamese, five colour themes (Mint, Night Sky, Burgundy, Gol
 
 ### Download
 
+> **Official site:** tidymint.app. Downloads come only from this GitHub repository. There is no other website and no paid version.
+
 1. Download **[Tidymint.zip](https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip)** (Apple silicon and Intel, macOS 14 or later), open it and drag **Tidymint** to Applications.
 2. Tidymint is not notarized yet, so macOS blocks the first launch. Click **Done**, open **System Settings > Privacy & Security**, scroll down and click **Open Anyway** ([Apple's guide](https://support.apple.com/102445)).
 
