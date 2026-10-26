@@ -7,6 +7,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GH = "https://github.com/HaiTrung-Workspace/tidymint"
 DL = GH + "/releases/latest/download/Tidymint.zip"
 GA_ID = "G-19HEJDJPN3"
+# Line icons (Lucide style, MIT): 24px grid, 1.75 stroke, currentColor. Used in feature and audience cards.
+ICONS = {'scan': '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4M22 5h-4"/>', 'dupes': '<rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>', 'lens': '<circle cx="8.5" cy="14.5" r="5.5"/><circle cx="17" cy="7.5" r="4"/><circle cx="18.5" cy="18" r="2.5"/>', 'apps': '<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12M3.3 7 12 12l8.7-5"/>', 'large': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M12 11v7M9 15l3 3 3-3"/>', 'menu': '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>', 'ai': '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>', 'dev': '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>', 'video': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 12h18M3 7.5h4M3 16.5h4M17 7.5h4M17 16.5h4"/>', 'drive': '<path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M6 16h.01M10 16h.01"/>'}
+def icon(k):
+    return '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">%s</svg>' % ICONS[k]
 ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec"
 BASE_CSS = open(os.path.join(ROOT, "tools", "site.css")).read()
 EXTRA_CSS = """
@@ -26,7 +30,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0
 .def p{color:var(--sub)}.def ul{color:var(--sub);padding-left:20px}
 .how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:h}
 .how .card{counter-increment:h;position:relative;padding-top:56px}.how .card:before{content:counter(h);position:absolute;left:20px;top:18px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
-.ico{font-size:22px;display:block;margin-bottom:8px}
+.ico{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;margin-bottom:12px;color:var(--leaf);background:#2fd39f14;border:1px solid #2fd39f33}.ico svg{display:block}
 details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
 summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
 details p{color:var(--sub);margin:0 0 16px}
@@ -93,9 +97,9 @@ T = {
   how_tag="How it works", how_h="Three steps, you stay in control",
   how=[("Scan","One click looks through caches, logs, old downloads, large files and duplicates. Nothing is touched yet."),("Review","Every item is grouped, sized and explained. Risky items are never pre-selected, files still used by your scripts are flagged."),("Clean","Selected items move to the Trash. Check the Trash, then empty it when you are ready.")],
   feat_tag="Features", feat_h="Everything in one small app",
-  feats=[("🧹","Smart Scan","Caches, logs, npm cache, old downloads and drafts in your project folders."),("🗂️","Duplicates","Identical files found by content. Keeps the best copy, checks your scripts before deleting."),("🫧","Space Lens","A bubble map of what fills your disk, with notes for common folders."),("🧩","Uninstaller","Removes apps with their caches, preferences and leftovers."),("📦","Large & old files","Files over 100 MB, sorted by size or last opened. Never pre-selected."),("📊","Menu bar","Free space, RAM and Trash at a glance, with low-space alerts.")],
+  feats=[("scan","Smart Scan","Caches, logs, npm cache, old downloads and drafts in your project folders."),("dupes","Duplicates","Identical files found by content. Keeps the best copy, checks your scripts before deleting."),("lens","Space Lens","A bubble map of what fills your disk, with notes for common folders."),("apps","Uninstaller","Removes apps with their caches, preferences and leftovers."),("large","Large & old files","Files over 100 MB, sorted by size or last opened. Never pre-selected."),("menu","Menu bar","Free space, RAM and Trash at a glance, with low-space alerts.")],
   use_tag="Made for", use_h="Who fills their Mac the fastest",
-  uses=[("🤖","AI work","Model weights, Hugging Face and Ollama caches, generated images."),("👩‍💻","Developers","node_modules, npm and Homebrew caches, old builds."),("🎬","Video and photo","Exports, render drafts and duplicate assets."),("💻","256 GB Macs","Every gigabyte counts on a small SSD.")],
+  uses=[("ai","AI work","Model weights, Hugging Face and Ollama caches, generated images."),("dev","Developers","node_modules, npm and Homebrew caches, old builds."),("video","Video and photo","Exports, render drafts and duplicate assets."),("drive","256 GB Macs","Every gigabyte counts on a small SSD.")],
   faq_h="Questions",
   faq=[("Is Tidymint really free?","Yes. It is open source under the MIT licence, with no account, no subscription and no paid tier."),
        ("Is it safe?","Tidymint only moves items to the Trash, so you can put anything back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and risky items are never pre-selected."),
@@ -141,9 +145,9 @@ T = {
   how_tag="Cách dùng", how_h="Ba bước, bạn luôn là người quyết",
   how=[("Quét","Một cú bấm xem qua bộ nhớ đệm, nhật ký, Downloads cũ, file lớn và file trùng. Chưa động vào gì."),("Xem lại","Từng mục được chia nhóm, ghi dung lượng và giải thích. Mục rủi ro không bao giờ chọn sẵn, file còn được script dùng sẽ được đánh dấu."),("Dọn","Mục đã chọn chuyển vào Thùng rác. Xem lại Thùng rác rồi tự đổ khi sẵn sàng.")],
   feat_tag="Tính năng", feat_h="Đủ cả trong một app nhỏ",
-  feats=[("🧹","Quét thông minh","Bộ nhớ đệm, nhật ký, npm cache, Downloads cũ và file nháp trong thư mục dự án."),("🗂️","File trùng","Tìm theo nội dung. Giữ bản tốt nhất, kiểm tra script trước khi xoá."),("🫧","Bản đồ ổ đĩa","Bong bóng cho thấy cái gì chiếm ổ, kèm giải thích thư mục hay gặp."),("🧩","Gỡ app","Gỡ app cùng bộ nhớ đệm, cài đặt và phần sót lại."),("📦","File lớn và cũ","File trên 100 MB, xếp theo dung lượng hoặc lần mở cuối. Không chọn sẵn."),("📊","Thanh menu","Xem nhanh dung lượng trống, RAM, Thùng rác; báo khi ổ sắp đầy.")],
+  feats=[("scan","Quét thông minh","Bộ nhớ đệm, nhật ký, npm cache, Downloads cũ và file nháp trong thư mục dự án."),("dupes","File trùng","Tìm theo nội dung. Giữ bản tốt nhất, kiểm tra script trước khi xoá."),("lens","Bản đồ ổ đĩa","Bong bóng cho thấy cái gì chiếm ổ, kèm giải thích thư mục hay gặp."),("apps","Gỡ app","Gỡ app cùng bộ nhớ đệm, cài đặt và phần sót lại."),("large","File lớn và cũ","File trên 100 MB, xếp theo dung lượng hoặc lần mở cuối. Không chọn sẵn."),("menu","Thanh menu","Xem nhanh dung lượng trống, RAM, Thùng rác; báo khi ổ sắp đầy.")],
   use_tag="Dành cho", use_h="Ai hay đầy ổ nhất",
-  uses=[("🤖","Người làm AI","File model, bộ nhớ đệm Hugging Face, Ollama, ảnh tạo bằng AI."),("👩‍💻","Lập trình viên","node_modules, npm, Homebrew, bản build cũ."),("🎬","Làm video, ảnh","File xuất, bản nháp render, ảnh trùng."),("💻","Mac 256 GB","Ổ nhỏ thì từng GB đều quý.")],
+  uses=[("ai","Người làm AI","File model, bộ nhớ đệm Hugging Face, Ollama, ảnh tạo bằng AI."),("dev","Lập trình viên","node_modules, npm, Homebrew, bản build cũ."),("video","Làm video, ảnh","File xuất, bản nháp render, ảnh trùng."),("drive","Mac 256 GB","Ổ nhỏ thì từng GB đều quý.")],
   faq_h="Hỏi đáp",
   faq=[("Tidymint có miễn phí thật không?","Có. App mã nguồn mở theo giấy phép MIT, không tài khoản, không thuê bao, không có bản trả phí."),
        ("Có an toàn không?","Tidymint chỉ chuyển vào Thùng rác nên lấy lại được hết. App không bao giờ động tới Ảnh, Mail, mật khẩu, thư mục đám mây hay bộ nhớ đệm hệ thống của Apple, và mục rủi ro không bao giờ chọn sẵn."),
@@ -186,8 +190,8 @@ def page(k):
     nav = "".join('<a href="%s">%s</a>' % (h, l) for h, l in t["nav"])
     vi_on, en_on = ('class="on" ', '') if k == "vi" else ('', 'class="on" ')
     vi_href, en_href = ("./", "../") if k == "vi" else ("vi/", "./")
-    feats = "".join('<div class="card"><span class="ico">%s</span><b>%s</b><span>%s</span></div>' % f for f in t["feats"])
-    uses = "".join('<div class="card"><span class="ico">%s</span><b>%s</b><span>%s</span></div>' % u for u in t["uses"])
+    feats = "".join('<div class="card"><span class="ico">%s</span><b>%s</b><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["feats"])
+    uses = "".join('<div class="card"><span class="ico">%s</span><b>%s</b><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["uses"])
     how = "".join('<div class="card"><b>%s</b><span>%s</span></div>' % h for h in t["how"])
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), html.escape(a)) for q, a in t["faq"])
     inst = "".join("<li>%s</li>" % s for s in t["inst"])
