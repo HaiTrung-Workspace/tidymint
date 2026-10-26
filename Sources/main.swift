@@ -1317,10 +1317,23 @@ enum Phase { case idle, scanning, summary, review, done }
     // Startup items (LaunchAgents / LaunchDaemons)
     @Published var launch: [LaunchEntry] = []
     @Published var launchMsg = ""
+    @Published var launchBusy = false
     func scanLaunch() {
         launch = Startup.scan()
         launchMsg = ""
+        launchBusy = true
+        let snapshot = launch
+        Task.detached(priority: .utility) {
+            var results: [UUID: (SignState, [LaunchFlag])] = [:]
+            for e in snapshot { results[e.id] = Startup.inspect(e) }
+            let r = results
+            await MainActor.run {
+                for i in self.launch.indices { if let v = r[self.launch[i].id] { self.launch[i].sign = v.0; self.launch[i].flags = v.1 } }
+                self.launchBusy = false
+            }
+        }
     }
+    var launchAttention: Int { launch.filter(\.attention).count }
     func removeLaunch() {
         let sel = launch.filter { $0.selected && $0.scope == 0 }
         guard !sel.isEmpty, confirm(t("Remove \(sel.count) startup items?", "Gỡ \(sel.count) mục tự chạy?"),
@@ -1742,6 +1755,66 @@ func moveToUserTrash(_ u: URL) throws -> URL {
 
 // MARK: - Startup model
 
+/// Code-signing state of the program a launch item starts. Facts from codesign/spctl, no verdict.
+enum SignState {
+    case unknown, apple, developer(String), adhoc, unsigned, invalid, script, empty
+    var label: String {
+        switch self {
+        case .unknown: return ""
+        case .empty: return t("Empty, does nothing", "Rỗng, không làm gì")
+        case .apple: return "Apple"
+        case .developer(let n): return n
+        case .adhoc: return t("Ad-hoc signed", "Ký tạm")
+        case .unsigned: return t("Unsigned", "Chưa ký")
+        case .invalid: return t("Signature invalid or revoked", "Chữ ký hỏng hoặc bị thu hồi")
+        case .script: return t("Script", "Script")
+        }
+    }
+    var color: Color {
+        switch self {
+        case .unknown, .apple, .adhoc, .script, .empty: return Theme.sub
+        case .developer: return Theme.green
+        case .unsigned: return Theme.warn
+        case .invalid: return Theme.danger
+        }
+    }
+    var help: String {
+        switch self {
+        case .apple: return t("Signed by Apple.", "Do Apple ký.")
+        case .developer: return t("Signed with an Apple Developer ID. The maker is known.", "Ký bằng Developer ID của Apple. Biết được hãng làm ra.")
+        case .adhoc: return t("Signed without a registered identity. Common for tools from Homebrew or built locally; fine if you installed it yourself.", "Ký không có danh tính đăng ký. Thường gặp ở tool cài qua Homebrew hoặc tự build; ổn nếu bạn tự cài.")
+        case .unsigned: return t("No signature, so the maker cannot be confirmed. Check that it belongs to software you know.", "Không có chữ ký nên không xác nhận được ai làm ra. Kiểm tra xem nó thuộc phần mềm bạn biết không.")
+        case .invalid: return t("The signature does not verify, or Apple revoked the certificate. Apple revokes certificates when it finds a problem.", "Chữ ký không khớp, hoặc Apple đã thu hồi chứng chỉ. Apple thu hồi khi phát hiện có vấn đề.")
+        case .script: return t("Starts a script. Scripts cannot be signed, so make sure it belongs to software you know.", "Khởi động một script. Script không ký được, hãy chắc nó thuộc phần mềm bạn biết.")
+        case .empty: return t("The file names no program, so it starts nothing. Usually left behind by an updater that removed itself. Safe to remove.", "File không ghi chương trình nào nên không khởi động gì. Thường là vỏ còn lại của trình cập nhật đã tự gỡ. Gỡ được.")
+        case .unknown: return ""
+        }
+    }
+}
+
+/// Structural red flags, the patterns adware uses to persist. Each one is "worth a look", never "malware".
+enum LaunchFlag: Hashable {
+    case fakeApple, hiddenDir, tempDir, randomName, inlineScript
+    var label: String {
+        switch self {
+        case .fakeApple: return t("Looks like an Apple name", "Tên giống của Apple")
+        case .hiddenDir: return t("In a hidden folder", "Nằm trong thư mục ẩn")
+        case .tempDir: return t("In a temp or shared folder", "Nằm trong thư mục tạm")
+        case .randomName: return t("Random-looking name", "Tên như chuỗi ngẫu nhiên")
+        case .inlineScript: return t("Runs a shell command", "Chạy thẳng lệnh shell")
+        }
+    }
+    var help: String {
+        switch self {
+        case .fakeApple: return t("The label starts with com.apple but the program is not in an Apple system folder. Apple never installs items here.", "Nhãn bắt đầu bằng com.apple nhưng chương trình không nằm trong thư mục hệ thống của Apple. Apple không bao giờ cài mục ở đây.")
+        case .hiddenDir: return t("Normal software does not hide its program in a dot-folder.", "Phần mềm bình thường không giấu chương trình trong thư mục có dấu chấm.")
+        case .tempDir: return t("Anything can write to temp and shared folders; normal software does not run from there at startup.", "Ai cũng ghi được vào thư mục tạm và thư mục chia sẻ; phần mềm bình thường không khởi động từ đó.")
+        case .randomName: return t("Generated-looking names are a common way to avoid being recognised.", "Tên sinh ngẫu nhiên là cách phổ biến để tránh bị nhận ra.")
+        case .inlineScript: return t("Runs a command through a shell instead of an app, so there is nothing to sign.", "Chạy lệnh qua shell thay vì mở app, nên không có gì để ký.")
+        }
+    }
+}
+
 struct LaunchEntry: Identifiable {
     let id = UUID()
     let url: URL
@@ -1750,6 +1823,12 @@ struct LaunchEntry: Identifiable {
     let scope: Int          // 0: this user (~/Library), 1: all users agent, 2: all users daemon (needs admin)
     let running: Bool?
     let orphan: Bool
+    var sign: SignState = .unknown
+    var flags: [LaunchFlag] = []
+    var attention: Bool {
+        if case .invalid = sign { return true }
+        return !flags.isEmpty
+    }
     var selected = false
     var owner: String {
         let l = label.lowercased()
@@ -1789,6 +1868,74 @@ enum Startup {
             }
         }
         return out.sorted { ($0.scope, $0.owner.lowercased()) < ($1.scope, $1.owner.lowercased()) }
+    }
+
+    static func run(_ exe: String, _ args: [String]) -> (Int32, String) {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: exe); p.arguments = args
+        let pipe = Pipe(); p.standardOutput = pipe; p.standardError = pipe
+        do { try p.run() } catch { return (-1, "") }
+        let d = pipe.fileHandleForReading.readDataToEndOfFile(); p.waitUntilExit()
+        return (p.terminationStatus, String(data: d, encoding: .utf8) ?? "")
+    }
+
+    static let interpreters: Set<String> = ["sh", "bash", "zsh", "python", "python3", "perl", "ruby", "osascript", "node"]
+
+    /// The thing to check with codesign: the .app bundle when the program sits inside one, else the program itself.
+    static func signTarget(_ program: String) -> String {
+        if let r = program.range(of: ".app/") { return String(program[..<r.upperBound].dropLast()) }
+        return program
+    }
+
+    /// Signature state and red flags for one item. Facts only; runs codesign and spctl, so call it off the main thread.
+    static func inspect(_ e: LaunchEntry) -> (SignState, [LaunchFlag]) {
+        var flags: [LaunchFlag] = []
+        let d = NSDictionary(contentsOf: e.url) as? [String: Any] ?? [:]
+        let args = d["ProgramArguments"] as? [String] ?? []
+        let prog = e.program
+        let exeName = (prog as NSString).lastPathComponent
+        let isInterp = interpreters.contains(exeName)
+        if isInterp && args.contains("-c") { flags.append(.inlineScript) }
+        let appleDirs = ["/System/", "/usr/", "/bin/", "/sbin/", "/Library/Apple/", "/Applications/Safari.app", "/Applications/Xcode.app"]
+        if e.label.hasPrefix("com.apple."), !prog.isEmpty, !appleDirs.contains(where: { prog.hasPrefix($0) }) { flags.append(.fakeApple) }
+        let comps = prog.split(separator: "/").map(String.init)
+        if comps.dropLast().contains(where: { $0.hasPrefix(".") }) { flags.append(.hiddenDir) }
+        for tmp in ["/tmp/", "/private/tmp/", "/var/folders/", "/private/var/folders/", "/Users/Shared/", "/private/var/tmp/"] where prog.hasPrefix(tmp) { flags.append(.tempDir); break }
+        let last = e.label.split(separator: ".").last.map(String.init) ?? e.label
+        let lettersDigits = last.filter { $0.isLetter || $0.isNumber }
+        if lettersDigits.count >= 14, last.contains(where: { $0.isNumber }), !last.contains("-"), last.lowercased() == last, Set(last).count > 8 {
+            flags.append(.randomName)
+        }
+        // Signature
+        var sign: SignState = .unknown
+        let scriptExts: Set<String> = ["sh", "py", "rb", "pl", "scpt", "applescript", "js", "command"]
+        let target = isInterp ? (args.dropFirst().first { !$0.hasPrefix("-") } ?? prog) : signTarget(prog)
+        if prog.isEmpty && args.isEmpty {
+            sign = .empty
+        } else if isInterp || scriptExts.contains((target as NSString).pathExtension.lowercased()) {
+            sign = .script
+        } else if !prog.isEmpty, FileManager.default.fileExists(atPath: target) {
+            let (code, out) = run("/usr/bin/codesign", ["-dv", "--verbose=2", target])
+            if code != 0 && out.contains("not signed") { sign = .unsigned }
+            else if code != 0 { sign = .invalid }
+            else if out.contains("Signature=adhoc") { sign = .adhoc }
+            else if out.contains("Authority=Software Signing") && out.contains("Authority=Apple Root CA") && !out.contains("Developer ID") { sign = .apple }
+            else if let line = out.split(separator: "\n").first(where: { $0.hasPrefix("Authority=Developer ID Application:") || $0.hasPrefix("Authority=Apple Development:") || $0.hasPrefix("Authority=Apple Distribution:") }) {
+                var n = String(line.split(separator: ":", maxSplits: 1).last ?? "").trimmingCharacters(in: .whitespaces)
+                if let p = n.range(of: " (") { n = String(n[..<p.lowerBound]) }
+                sign = .developer(n)
+            } else if out.contains("Authority=Apple Mac OS Application Signing") || out.contains("Authority=Apple Worldwide Developer Relations") { sign = .developer(t("App Store app", "App từ App Store")) }
+            else { sign = .developer(t("Signed", "Có ký")) }
+            // A signed program that verifies but Gatekeeper rejects usually means a revoked certificate.
+            if case .developer = sign {
+                let (vc, _) = run("/usr/bin/codesign", ["-v", target])
+                if vc != 0 { sign = .invalid }
+                else {
+                    let (_, so) = run("/usr/sbin/spctl", ["-a", "-t", "exec", "-vv", target])
+                    if so.contains("rejected") && (so.contains("revoked") || so.contains("CSSMERR_TP_CERT_REVOKED")) { sign = .invalid }
+                }
+            }
+        }
+        return (sign, flags)
     }
 }
 
@@ -3387,9 +3534,19 @@ struct StartupView: View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(t("Startup Items", "Tự chạy khi bật máy")).font(.system(size: 22, weight: .bold)).foregroundColor(.white)
-                Text(t("Background helpers that start with your Mac. Many come from updaters you do not need running all the time.",
-                       "Các tiến trình chạy ngầm khi bật máy. Nhiều mục là trình tự cập nhật, không cần chạy suốt."))
+                Text(t("Background helpers that start with your Mac, each with who signed it. This is not antivirus: Tidymint states facts, you decide. For a second opinion use KnockKnock (free, open source) or Malwarebytes.",
+                       "Các tiến trình chạy ngầm khi bật máy, kèm ai đã ký chúng. Đây không phải diệt virus: Tidymint chỉ nêu sự thật, bạn tự quyết. Muốn kiểm thêm, dùng KnockKnock (miễn phí, mã mở) hoặc Malwarebytes."))
                     .foregroundColor(Theme.sub).font(.system(size: 12))
+                HStack(spacing: 8) {
+                    if vm.launchBusy { ProgressView().controlSize(.small).tint(.white); Text(t("Checking signatures...", "Đang kiểm chữ ký...")).foregroundColor(Theme.sub).font(.system(size: 12)) }
+                    else if vm.launchAttention > 0 {
+                        Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
+                        Text(t("\(vm.launchAttention) items worth a look. Hover a badge to see why.", "\(vm.launchAttention) mục đáng để ý. Rê chuột lên nhãn để xem lý do.")).foregroundColor(.white).font(.system(size: 12))
+                    } else if !vm.launch.isEmpty {
+                        Image(systemName: "checkmark.shield").foregroundColor(Theme.green)
+                        Text(t("Nothing unusual in \(vm.launch.count) items.", "Không có gì bất thường trong \(vm.launch.count) mục.")).foregroundColor(.white).font(.system(size: 12))
+                    }
+                }.padding(.top, 4)
             }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 4) {
@@ -3435,6 +3592,8 @@ struct LaunchRow: View {
                     Text(e.owner).foregroundColor(.white).font(.system(size: 13, weight: .medium)).lineLimit(1)
                     if e.orphan { badge(t("App removed", "App đã gỡ"), Theme.danger) }
                     if e.running == true { badge(t("Running", "Đang chạy"), Theme.green) }
+                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).help(e.sign.help) }
+                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).help(f.help) }
                 }
                 Text(e.label).foregroundColor(Theme.sub).font(.system(size: 11)).lineLimit(1).truncationMode(.middle)
             }
