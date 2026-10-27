@@ -30,6 +30,7 @@ ART_CSS = """
 .art td.y{color:var(--leaf)}.art td.n{color:#ff9a9a}
 .box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}
 .box h3{margin:0 0 6px}.box p{margin:0 0 14px}
+.gsearch input{width:100%;max-width:520px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:15px;outline:none}.gsearch input:focus{border-color:var(--leaf)}.gsec h2{margin-top:28px}
 .pair{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 6px}.pair img{flex:1 1 0;min-width:0;max-width:360px}.pair-arrow{flex:none;width:44px;height:44px;border-radius:50%;background:#2fd39f14;border:1px solid #2fd39f33;color:var(--leaf);display:flex;align-items:center;justify-content:center}.pair-arrow svg{width:22px;height:22px}@media (max-width:640px){.pair{flex-direction:column}.pair img{max-width:100%}.pair-arrow svg{transform:rotate(90deg)}}
 .warn{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 18px;margin:18px 0}.warn p{margin:0}
 .art code{overflow-wrap:anywhere}.art pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -194,17 +195,42 @@ HUB = {
             h1="Guides to a tidy Mac", desc="Plain-language guides to clearing System Data, freeing up space and uninstalling apps on macOS, with official sources.",
             lead='<p class="lead" style="margin-top:6px">Plain-language guides with official sources. Manual steps first, tools second.</p>'),
 }
+# Guide topics, in display order. A guide without "topic" lands in "disk".
+TOPICS = [
+    ("start", "Bắt đầu", "Getting started"),
+    ("disk", "Hiểu ổ đĩa Mac", "Understanding your Mac's disk"),
+    ("apps", "Dọn theo từng app", "App by app"),
+    ("compare", "So sánh app dọn máy", "Cleaner apps compared"),
+]
+SEARCH_JS = """<script>
+(function(){var q=document.getElementById('gq');if(!q)return;var cards=[].slice.call(document.querySelectorAll('.rel a[data-t]'));
+var secs=[].slice.call(document.querySelectorAll('.gsec'));var none=document.getElementById('gnone');
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+q.addEventListener('input',function(){var v=norm(q.value.trim());var n=0;
+cards.forEach(function(c){var hit=!v||norm(c.getAttribute('data-t')).indexOf(v)>-1;c.style.display=hit?'':'none';if(hit)n++;});
+secs.forEach(function(s){s.style.display=s.querySelector('.rel a:not([style*="none"])')?'':'none';});
+if(none)none.style.display=n?'none':'';});})();
+</script>"""
 def hubpage(k):
     h = dict(HUB[k]); items = [g for g in C.GUIDES if g["lang"] == k]
     other = [g for g in C.GUIDES if g["lang"] != k]
-    cards = "".join('<a href="../%s/"><b>%s</b><br><span class="small">%s</span></a>' % (g["slug"], g["h1"], g["desc"]) for g in items)
+    ph = "Tìm bài: Zalo, System Data, Adobe..." if k == "vi" else "Search guides: Zalo, System Data, Adobe..."
+    body = '<p class="gsearch"><input id="gq" type="search" placeholder="%s" aria-label="%s"></p>' % (ph, ph)
+    body += '<p id="gnone" class="small" style="display:none">%s</p>' % ("Không có bài nào khớp." if k == "vi" else "No guide matches.")
+    for tid, tvi, ten in TOPICS:
+        grp = sorted([g for g in items if g.get("topic", "disk") == tid], key=lambda g: g["date"], reverse=True)
+        if not grp: continue
+        cards = "".join('<a href="../%s/" data-t="%s"><b>%s</b><br><span class="small">%s</span></a>'
+                        % (g["slug"], html.escape(g["h1"] + " " + g["desc"], quote=True), g["h1"], g["desc"]) for g in grp)
+        body += '<div class="gsec"><h2>%s</h2><div class="rel">%s</div></div>' % (tvi if k == "vi" else ten, cards)
     if other:
         lab = "In English" if k == "vi" else "Bằng tiếng Việt"
         pref = "../../" if k == "vi" else "../vi/"
-        cards2 = "".join('<a href="%s%s/"><b>%s</b></a>' % (pref, g["slug"], g["h1"]) for g in other)
-        cards += '</div><h2>%s</h2><div class="rel">%s' % (lab, cards2)
+        cards2 = "".join('<a href="%s%s/" data-t="%s"><b>%s</b></a>' % (pref, g["slug"], html.escape(g["h1"], quote=True), g["h1"]) for g in sorted(other, key=lambda g: g["date"], reverse=True))
+        body += '<div class="gsec"><h2>%s</h2><div class="rel">%s</div></div>' % (lab, cards2)
+    body += SEARCH_JS
     h.update(lang=k, date=max(g["date"] for g in C.GUIDES), hub=True, read="", tldr="", toc=[], faq=[], sources=[],
-             body='<div class="rel">%s</div>' % cards, alt=("guides" if k == "vi" else "huong-dan"))
+             body=body, alt=("guides" if k == "vi" else "huong-dan"))
     return h
 
 CL = {

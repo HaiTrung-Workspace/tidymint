@@ -3,7 +3,7 @@
 
 GUIDES = [
 dict(
-  lang="vi", slug="cleanmymac-mien-phi", date="2026-10-26", read="8 phút đọc",
+  lang="vi", slug="cleanmymac-mien-phi", topic="compare", date="2026-10-26", read="8 phút đọc",
   title="CleanMyMac miễn phí? Cách thay bản crack hợp pháp | Tidymint",
   desc="CleanMyMac không có bản miễn phí, chỉ dùng thử 7 ngày. Bản crack có rủi ro mã độc. Đây là các cách dọn Mac miễn phí và hợp pháp, kèm bảng so sánh.",
   crumb="CleanMyMac miễn phí",
@@ -106,7 +106,7 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="xoa-ung-dung-macbook", date="2026-10-26", read="6 phút đọc",
+  lang="vi", slug="xoa-ung-dung-macbook", topic="disk", date="2026-10-26", read="6 phút đọc",
   title="Cách xóa ứng dụng trên MacBook sạch hoàn toàn | Tidymint",
   desc="Kéo app vào Thùng rác chưa xóa hết: cài đặt, bộ nhớ đệm vẫn còn. Hướng dẫn gỡ app trên MacBook đúng cách, kể cả macOS 26 Tahoe, và cách dọn phần sót lại.",
   crumb="Xóa ứng dụng trên MacBook",
@@ -176,7 +176,7 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="zalo-chiem-dung-luong-macbook", date="2026-10-27", read="6 phút đọc",
+  lang="vi", slug="zalo-chiem-dung-luong-macbook", topic="apps", date="2026-10-27", read="6 phút đọc",
   title="Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào | Tidymint",
   desc="Zalo trên Mac lưu ảnh, file và bộ nhớ đệm trong thư mục ZaloData, có máy vài chục GB. Cách xem Zalo đang chiếm bao nhiêu, phần nào xoá được, phần nào mất tin nhắn.",
   crumb="Zalo chiếm dung lượng MacBook",
@@ -250,7 +250,7 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="cai-dat", date="2026-10-27", read="4 phút đọc",
+  lang="vi", slug="cai-dat", topic="start", date="2026-10-27", read="4 phút đọc",
   title="Cài Tidymint trên Mac: từng bước có ảnh | Tidymint",
   desc="Tải Tidymint, mở lần đầu khi macOS báo bị chặn, bấm Vẫn mở trong Quyền riêng tư và Bảo mật, cấp quyền Truy cập toàn bộ ổ đĩa. Mỗi bước một ảnh chụp màn hình.",
   crumb="Cài đặt từng bước",
@@ -303,7 +303,7 @@ dict(
 ),
 
 dict(
-  lang="en", slug="install", date="2026-10-27", read="4 min read",
+  lang="en", slug="install", topic="start", date="2026-10-27", read="4 min read",
   title="Install Tidymint on Mac: Step by Step With Screenshots | Tidymint",
   desc="Download Tidymint, get past the first-launch block, click Open Anyway in Privacy & Security and grant Full Disk Access. One screenshot per step.",
   crumb="Install step by step",
@@ -355,7 +355,7 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="mac-tu-day-o", date="2026-10-27", read="7 phút đọc",
+  lang="vi", slug="mac-tu-day-o", topic="disk", date="2026-10-27", read="7 phút đọc",
   title="Vì sao Mac tự đầy ổ dù không tải gì, và cách chặn | Tidymint",
   desc="Ổ Mac cứ đầy dần dù bạn không tải gì? Sáu thứ âm thầm ngốn chỗ: snapshot Time Machine, bộ nhớ đệm, sao lưu iPhone, Mail, đồ lập trình, model AI.",
   crumb="Mac tự đầy ổ",
@@ -444,7 +444,7 @@ dict(
 ),
 
 dict(
-  lang="en", slug="mac-storage-keeps-filling-up", date="2026-10-27", read="7 min read",
+  lang="en", slug="mac-storage-keeps-filling-up", topic="disk", date="2026-10-27", read="7 min read",
   title="Why Your Mac Keeps Filling Up by Itself | Tidymint",
   desc="Mac storage grows while you change nothing? Six things quietly eat space: snapshots, caches, iPhone backups, Mail, dev tools, AI models. How to stop each one.",
   crumb="Mac keeps filling up",
@@ -532,7 +532,7 @@ dict(
   alt="mac-tu-day-o",
 ),
 dict(
-  lang="vi", slug="adobe-chiem-dung-luong-mac", date="2026-10-27", read="6 phút đọc",
+  lang="vi", slug="adobe-chiem-dung-luong-mac", topic="apps", date="2026-10-27", read="6 phút đọc",
   title="Adobe chiếm bao nhiêu GB trên Mac, dọn chỗ nào | Tidymint",
   desc="Photoshop, Premiere, Lightroom ngốn hàng chục GB trên Mac. Phần nào là app, phần nào là Media Cache, Camera Raw, file tạm xoá được, và cách đặt giới hạn.",
   crumb="Adobe chiếm dung lượng",
@@ -623,7 +623,7 @@ dict(
   alt="adobe-storage-mac",
 ),
 dict(
-  lang="en", slug="adobe-storage-mac", date="2026-10-27", read="6 min read",
+  lang="en", slug="adobe-storage-mac", topic="apps", date="2026-10-27", read="6 min read",
   title="Adobe Taking Up Space on Mac? What You Can Delete | Tidymint",
   desc="Photoshop, Premiere and Lightroom eat tens of GB on a Mac. Which part is the apps, which is cache you can clear (Media Cache, Camera Raw), and how to cap it.",
   crumb="Adobe storage",
@@ -717,7 +717,7 @@ dict(
 
 
 dict(
-  lang="en", slug="clear-system-data-mac", date="2026-10-26", read="8 min read",
+  lang="en", slug="clear-system-data-mac", topic="disk", date="2026-10-26", read="8 min read",
   title="How to Clear System Data on Mac (Safely) | Tidymint",
   desc="System Data taking 50 GB or more? What it actually contains and 7 safe ways to shrink it: caches, Time Machine snapshots, Xcode, Docker.",
   crumb="Clear System Data on Mac",
@@ -797,7 +797,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 ),
 
 dict(
-  lang="en", slug="free-up-space-mac", date="2026-10-26", read="7 min read",
+  lang="en", slug="free-up-space-mac", topic="disk", date="2026-10-26", read="7 min read",
   title="How to Free Up Space on Mac: 10 Safe Ways | Tidymint",
   desc="Mac storage almost full? 10 safe ways to free up space on macOS: clear cache, find large and duplicate files, remove unused apps and leftovers.",
   crumb="Free up space on Mac",
@@ -850,7 +850,7 @@ dict(
 ),
 
 dict(
-  lang="en", slug="cleanmymac-alternative", date="2026-10-26", read="6 min read",
+  lang="en", slug="cleanmymac-alternative", topic="compare", date="2026-10-26", read="6 min read",
   title="Free CleanMyMac Alternative (Open Source) | Tidymint",
   desc="Free CleanMyMac alternative? Compare Tidymint, AppCleaner, Pearcleaner, OnyX and the tools built into macOS, including what each one can't do.",
   crumb="Free CleanMyMac alternative",
