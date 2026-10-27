@@ -28,7 +28,7 @@ ART_CSS = """
 .art th,.art td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;color:#cfe6dc}
 .art th{background:#ffffff0d;color:var(--text)}
 .art td.y{color:var(--leaf)}.art td.n{color:#ff9a9a}
-.box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}
+.box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}.box-cta{justify-content:flex-start;margin-top:14px}.box-cta .btn{flex:1 1 0;justify-content:center;white-space:nowrap}.box-cta{flex-wrap:nowrap}.box-cta .hm{display:none}@media (max-width:600px){.box-cta{gap:10px}.box-cta .btn{padding:12px 10px;font-size:15px}.box-cta .hs{display:none}.box-cta .hm{display:inline}}
 .box h3{margin:0 0 6px}.box p{margin:0 0 14px}
 .gsearch input{width:100%;max-width:520px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:inherit;font:inherit;font-size:15px;outline:none}.gsearch input:focus{border-color:var(--leaf)}.gsec h2{margin-top:28px}
 .pair{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 6px}.pair img{flex:1 1 0;min-width:0;max-width:360px}.pair-arrow{flex:none;width:44px;height:44px;border-radius:50%;background:#2fd39f14;border:1px solid #2fd39f33;color:var(--leaf);display:flex;align-items:center;justify-content:center}.pair-arrow svg{width:22px;height:22px}@media (max-width:640px){.pair{flex-direction:column}.pair img{max-width:100%}.pair-arrow svg{transform:rotate(90deg)}}
@@ -44,12 +44,12 @@ L = {
  "vi": dict(home="../", homename="Trang chủ", guides="Hướng dẫn", updated="Cập nhật", tldr="Tóm tắt nhanh",
             toc="Trong bài", faq="Câu hỏi thường gặp", src="Nguồn tham khảo", rel="Đọc thêm",
             cta_h="Dọn Mac miễn phí, hợp pháp", cta_p="Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.",
-            cta_btn="Tải Tidymint", cta_more="Xem cách cài", inst="#cai-dat",
+            cta_btn="Tải <span class=\"hs\">Tidymint</span><span class=\"hm\">về</span>", cta_more="Xem cách cài", inst="#cai-dat",
             nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../huong-dan/","Hướng dẫn"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
  "en": dict(home="../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
             toc="On this page", faq="FAQ", src="Sources", rel="Read next",
             cta_h="Clean your Mac for free", cta_p="Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.",
-            cta_btn="Download Tidymint", cta_more="How to install", inst="#install",
+            cta_btn="Download <span class=\"hs\">Tidymint</span>", cta_more="How to install", inst="#install",
             nav=[("../#features","Features"),("../#how","How it works"),("../guides/","Guides"),("../#faq","FAQ"),(S.GH,"GitHub")]),
 }
 
@@ -70,8 +70,8 @@ def guide(g):
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), a) for q, a in g["faq"])
     srcs = "".join('<li><a href="%s" rel="nofollow">%s</a></li>' % (u, n) for n, u in g["sources"])
     rel = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
-    cta = ('<div class="box"><h3>%s</h3><p>%s</p><a class="btn primary" href="%s">%s <span class="arr">↓</span></a> '
-           '<a class="btn ghost" href="%s%s">%s</a></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
+    cta = ('<div class="box"><h3>%s</h3><p>%s</p><div class="cta box-cta"><a class="btn primary" href="%s">%s <span class="arr">↓</span></a>'
+           '<a class="btn ghost" href="%s%s">%s</a></div></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
     body = g["body"].replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
     strip = lambda s: html.unescape(__import__("re").sub("<[^>]+>", "", s))
