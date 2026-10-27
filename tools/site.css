@@ -31,7 +31,7 @@ h2{font-size:clamp(26px,3.4vw,38px);margin:0 0 12px;letter-spacing:-.01em}
 .feature ul{color:var(--sub);padding-left:20px;margin:0}
 .feature img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
 .shots2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.shots2 img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid.uses{grid-template-columns:1fr 1fr}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.grid.uses{grid-template-columns:repeat(4,1fr)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
 .card b{display:block;margin-bottom:6px}
 .card span{color:var(--sub);font-size:15px}
