@@ -146,7 +146,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
 </div>
-<button class="up" id="up" type="button" aria-label="{t["top"]}">↑ {t["top"]}</button>
+<button class="up" id="up" type="button" aria-label="{t["top"]}" title="{t["top"]}">↑</button>
 <div class="ck" id="ck" role="dialog" aria-live="polite"><p>{t["ck_text"]} <a href="{S.GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
 <script>
 (function(){{var b=document.getElementById('mbtn'),n=document.querySelector('.topnav');function close(){{n.classList.remove('open');b.setAttribute('aria-expanded',false);b.textContent='☰'}}b.addEventListener('click',function(e){{e.stopPropagation();var o=n.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'✕':'☰'}});n.querySelectorAll('.links a').forEach(function(a){{a.addEventListener('click',close)}});document.addEventListener('click',function(e){{if(n.classList.contains('open')&&!n.contains(e.target))close()}});document.addEventListener('keydown',function(e){{if(e.key==='Escape'&&n.classList.contains('open')){{close();b.focus()}}}})}})();

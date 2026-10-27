@@ -63,7 +63,7 @@ footer span a{color:var(--leaf);text-decoration:underline;text-decoration-color:
 .topbar{text-align:center;padding:8px 0 28px}
 .topbar a{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid #ffffff33;color:var(--text);font-size:14px;font-weight:600}
 .topbar a:hover{text-decoration:none}
-.up{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);opacity:0;pointer-events:none;z-index:20;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1px solid #2fd39f66;background:#0b2620f2;color:var(--text);font-family:inherit;font-size:14px;font-weight:600;box-shadow:0 12px 30px #0008;cursor:pointer;transition:transform .25s ease,opacity .25s ease,box-shadow .18s ease,border-color .18s ease}
+.up{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);opacity:0;pointer-events:none;z-index:20;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid #2fd39f66;background:#0b2620f2;color:var(--text);font-family:inherit;font-size:18px;font-weight:600;box-shadow:0 12px 30px #0008;cursor:pointer;transition:transform .25s ease,opacity .25s ease,box-shadow .18s ease,border-color .18s ease}
 .up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
 .up.show:active{transform:translate(-50%,0) scale(.98)}
 summary{user-select:none}
@@ -314,7 +314,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
 </div>
-<button class="up" id="up" type="button" aria-label="{t["top"]}">↑ {t["top"]}</button>
+<button class="up" id="up" type="button" aria-label="{t["top"]}" title="{t["top"]}">↑</button>
 <div class="ck" id="ck" role="dialog" aria-live="polite"><p>{t["ck_text"]} <a href="{GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
 <script>
 (function(){{var b=document.getElementById('mbtn'),n=document.querySelector('.topnav');function close(){{n.classList.remove('open');b.setAttribute('aria-expanded',false);b.textContent='☰'}}b.addEventListener('click',function(e){{e.stopPropagation();var o=n.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'✕':'☰'}});n.querySelectorAll('.links a').forEach(function(a){{a.addEventListener('click',close)}});document.addEventListener('click',function(e){{if(n.classList.contains('open')&&!n.contains(e.target))close()}});document.addEventListener('keydown',function(e){{if(e.key==='Escape'&&n.classList.contains('open')){{close();b.focus()}}}})}})();
