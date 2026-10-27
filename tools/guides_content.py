@@ -531,6 +531,190 @@ dict(
   related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
   alt="mac-tu-day-o",
 ),
+dict(
+  lang="vi", slug="adobe-chiem-dung-luong-mac", date="2026-10-27", read="6 phút đọc",
+  title="Adobe chiếm bao nhiêu GB trên Mac, dọn chỗ nào | Tidymint",
+  desc="Photoshop, Premiere, Lightroom ngốn hàng chục GB trên Mac. Phần nào là app, phần nào là Media Cache, Camera Raw, file tạm xoá được, và cách đặt giới hạn.",
+  crumb="Adobe chiếm dung lượng",
+  h1="Adobe chiếm bao nhiêu GB trên Mac và chỗ nào dọn được",
+  tldr="Bộ Adobe trên Mac gồm hai phần rất khác nhau: <b>phần cài đặt</b> (app, thư viện dùng chung, Camera Raw, plug-in) chiếm 10–15 GB và không dọn được, và <b>phần bộ nhớ đệm</b> (Media Cache của Premiere và After Effects, bộ nhớ đệm Camera Raw của Lightroom và Photoshop, file tạm Photoshop) có thể phình tới hàng trăm GB nhưng xoá được và app tự tạo lại. Bài này chỉ đúng chỗ của từng phần, kèm số đo thật trên một máy chỉ cài Photoshop.",
+  toc=[("hai-phan","Hai phần của Adobe trên ổ"),("do","Số đo thật trên một máy chỉ có Photoshop"),("media-cache","Media Cache của Premiere và After Effects"),("camera-raw","Bộ nhớ đệm Camera Raw"),("temp","File tạm Photoshop"),("cu","Bản cũ và bộ cài"),("gioi-han","Đặt giới hạn để không phải dọn lại"),("tidymint","Tìm nhanh với Tidymint")],
+  body="""
+<h2 id="hai-phan">Hai phần của Adobe trên ổ</h2>
+<p>Nhiều người mở mục Dung lượng thấy Adobe chiếm vài chục GB rồi đi xoá cache mà số vẫn không giảm. Lý do: phần lớn dung lượng Adobe là <b>phần cài đặt</b>, không phải rác.</p>
+<ul>
+<li><b>Phần cài đặt:</b> bản thân app (Photoshop khoảng 6 GB, Premiere và After Effects mỗi cái tương tự), thư viện dùng chung ở <code>/Library/Application Support/Adobe</code> (Camera Raw, plug-in, CEP, Creative Cloud), và app Creative Cloud. Phần này chỉ giảm khi gỡ app hoặc gỡ bản cũ.</li>
+<li><b>Phần bộ nhớ đệm:</b> Media Cache của Premiere và After Effects, bộ nhớ đệm Camera Raw, file tạm của Photoshop, bản tải về của Creative Cloud. Phần này app tự tạo lại, xoá được, và là nơi "Dữ liệu hệ thống" phình lên.</li>
+</ul>
+<p>Trên diễn đàn Adobe có người đo thư mục <code>~/Library/Caches/Adobe</code> tới 350 GB trên ổ 1 TB, xoá xong và đặt giới hạn 30 GB thì ổ trống thêm hơn 500 GB. Đó là phần thứ hai.</p>
+
+<h2 id="do">Số đo thật trên một máy chỉ có Photoshop</h2>
+<p>Máy đo: Mac mini, chỉ cài Photoshop 2026 và Creative Cloud, không dùng Premiere, Lightroom. Số đo ngày 27/10/2026.</p>
+<table>
+<tr><th>Chỗ</th><th>Dung lượng</th><th>Dọn được?</th></tr>
+<tr><td><code>/Applications/Adobe Photoshop 2026</code></td><td>6,2 GB</td><td>Không, là app</td></tr>
+<tr><td><code>/Library/Application Support/Adobe/CameraRaw</code> (hồ sơ ống kính, model AI của Camera Raw)</td><td>2,2 GB</td><td>Không nên, Photoshop cần khi mở ảnh RAW</td></tr>
+<tr><td><code>/Library/Application Support/Adobe</code> phần còn lại (Desktop Common, Plug-Ins, CEP, thư viện CC)</td><td>2,4 GB</td><td>Không, thư viện dùng chung</td></tr>
+<tr><td><code>/Applications/Utilities/Adobe Creative Cloud</code> và các app Adobe Sync, Experience</td><td>0,6 GB</td><td>Không</td></tr>
+<tr><td><code>~/Library/Application Support/Adobe</code> (cài đặt cá nhân, CoreSync)</td><td>126 MB</td><td>Phần nhỏ</td></tr>
+<tr><td><code>~/Library/Application Support/Adobe/Adobe Photoshop 2021</code></td><td>3 MB</td><td>Sót của bản cũ, xoá được</td></tr>
+<tr><td>Bộ nhớ đệm Camera Raw, Media Cache</td><td>0</td><td>Có, khi tồn tại</td></tr>
+</table>
+<p>Tổng 11,5 GB, trong đó phần xoá được chỉ vài MB. Máy này không có Premiere và không mở ảnh RAW nên hai thư mục bộ nhớ đệm lớn nhất chưa xuất hiện. Máy dựng video hoặc chỉnh ảnh RAW hằng ngày sẽ có thêm các khoản dưới đây.</p>
+
+<h2 id="media-cache">Media Cache của Premiere và After Effects</h2>
+<ul>
+<li><b>Là gì:</b> mỗi clip đưa vào Premiere hay After Effects được dựng sẵn file âm thanh và chỉ mục (.cfa, .pek, .ims) để kéo tua mượt. Theo Adobe, trên macOS chúng nằm trong <code>~/Library/Application Support/Adobe/Common</code> (hai thư mục Media Cache Files và Media Cache). Mặc định Premiere <b>không tự xoá</b> ("Do not delete cache files automatically" là lựa chọn mặc định), nên dự án xong rồi file vẫn nằm đó.</li>
+<li><b>Nhận ra:</b> hai thư mục trên to hơn vài GB, hoặc mục Dung lượng ghi "Dữ liệu hệ thống" tăng vọt sau mỗi dự án video.</li>
+<li><b>Sửa:</b> trong Premiere mở <b>Premiere › Settings › Media Cache</b>, bấm <b>Delete</b> cạnh "Remove Media Cache Files", chọn <b>Delete unused media cache files</b> (chỉ bỏ phần của clip không còn tìm thấy) hoặc <b>Delete all media cache files from the system</b> (đóng hết dự án trước; file được dựng lại tự động khi dự án cần). Cùng mục đó bật <b>Automatically delete cache files older than</b> (Adobe mặc định 90 ngày khi bật) hoặc <b>Automatically delete oldest cache files when cache exceeds</b> (mặc định 10% dung lượng ổ). After Effects: <b>After Effects › Preferences › Media &amp; Disk Cache</b>, bấm <b>Empty Disk Cache</b> và <b>Clean Database &amp; Cache</b>. Xoá tay bằng Finder cũng được khi đã thoát app: theo hướng dẫn của Adobe, xoá nội dung thư mục Common rồi đổ Thùng rác; mở lại dự án sẽ chờ dựng lại.</li>
+</ul>
+
+<h2 id="camera-raw">Bộ nhớ đệm Camera Raw</h2>
+<ul>
+<li><b>Là gì:</b> Lightroom Classic và Camera Raw trong Photoshop giữ dữ liệu ảnh gốc của mỗi ảnh RAW đã mở để lần sau dựng bản xem nhanh hơn. Theo Adobe, Lightroom Classic mặc định giới hạn cache này ở <b>5 GB</b>, và chính Adobe gợi ý nâng lên 10–20 GB để Develop nhanh hơn, nên nhiều máy đang để rất cao. Thư mục thường mang tên <code>Adobe Camera Raw 2</code> trong <code>~/Library/Caches</code> (hoặc nơi bạn tự chọn).</li>
+<li><b>Nhận ra:</b> thư mục trên to, hoặc trong Lightroom Classic vào <b>Preferences › File Handling › Camera Raw Cache Settings</b> thấy Maximum Size đặt cao.</li>
+<li><b>Sửa:</b> cùng chỗ đó bấm <b>Purge Cache</b> rồi hạ Maximum Size; trong Photoshop, mục tương ứng nằm ở Camera Raw Preferences › Performance. Xoá không ảnh hưởng ảnh gốc hay chỉnh sửa đã lưu (chỉnh sửa nằm trong catalog và file XMP), chỉ mở lại ảnh sẽ chậm hơn một nhịp.</li>
+</ul>
+
+<h2 id="temp">File tạm Photoshop</h2>
+<ul>
+<li><b>Là gì:</b> khi thiếu RAM, Photoshop ghi tạm ra ổ (scratch disk), có thể hàng chục GB với file lớn và nhiều bước History. Thoát app bình thường thì phần này được trả lại; Adobe khuyên để trống ít nhất 100 GB trên ổ scratch.</li>
+<li><b>Nhận ra:</b> ổ hết chỗ hoặc báo "Scratch disk full" ngay trong phiên Photoshop, và đầy lên theo thao tác.</li>
+<li><b>Sửa:</b> thoát Photoshop (nếu app treo thì khởi động lại máy, macOS tự dọn thư mục tạm). Giảm số History States trong <b>Photoshop › Settings › Performance</b> (mặc định 50) để bớt ghi tạm, và ở <b>Settings › Scratch Disks</b> chọn ổ còn nhiều chỗ. Trên Windows Adobe hướng dẫn xoá tay file "Photoshop Temp" ở ổ C; trên Mac Adobe không chỉ xoá tay, chỉ cần thoát app và khởi động lại.</li>
+</ul>
+
+<h2 id="cu">Bản cũ và bộ cài</h2>
+<ul>
+<li><b>Là gì:</b> mỗi năm Adobe ra bản mới (Photoshop 2025, 2026), mỗi bản 5–6 GB. Khi cập nhật, hộp thoại Update của Creative Cloud có ô <b>Remove old versions</b> bật sẵn; ai từng bỏ tick (để giữ plug-in cũ chẳng hạn) thì máy đang có cả hai bản.</li>
+<li><b>Nhận ra:</b> trong <code>/Applications</code> có hai thư mục cùng tên app khác năm.</li>
+<li><b>Sửa:</b> gỡ bản cũ bằng app Creative Cloud (mục Installed, nút ba chấm, Uninstall), không kéo vào Thùng rác vì sẽ sót phần trong Library. Lần cập nhật sau để nguyên ô Remove old versions.</li>
+</ul>
+
+<h2 id="gioi-han">Đặt giới hạn để không phải dọn lại</h2>
+<ol class="steps">
+<li>Premiere: bật một trong hai lựa chọn tự xoá Media Cache (theo ngày hoặc theo dung lượng); với máy 256–512 GB, 30 ngày hoặc 20–30 GB là vừa. Adobe lưu ý thiết lập có hiệu lực sau khi mở lại app và dọn theo tuần.</li>
+<li>Camera Raw: giữ Maximum Size ở 5–10 GB trừ khi chỉnh RAW mỗi ngày.</li>
+<li>Creative Cloud: khi cập nhật, để nguyên ô Remove old versions.</li>
+<li>Máy dựng video nhiều: chuyển Media Cache sang ổ SSD ngoài (cùng mục Media Cache, nút Browse; Adobe cũng khuyên dùng SSD riêng), ổ trong chỉ còn app.</li>
+</ol>
+
+<h2 id="tidymint">Tìm nhanh với Tidymint</h2>
+<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ từng thư mục thành quả bóng to nhỏ theo dung lượng thật, nên hai thư mục Media Cache và Camera Raw lộ ra ngay nếu chúng đang phình, và trang <b>Gỡ app</b> liệt kê bản Adobe cũ cùng phần sót lại. Mọi thứ chỉ chuyển vào Thùng rác và có Hoàn tác.</p>
+{CTA}
+""",
+  faq=[
+    ("Xoá bộ nhớ đệm Adobe có mất ảnh hay dự án không?", "Không. Media Cache, bộ nhớ đệm Camera Raw và file tạm là bản dựng sẵn từ file gốc; file gốc và dự án nằm ở chỗ bạn lưu. Xoá xong app dựng lại, chỉ chậm hơn lúc mở."),
+    ("Sao xoá cache rồi mà Adobe vẫn chiếm 10 GB?", "Đó là phần cài đặt: app, thư viện dùng chung, Camera Raw, plug-in. Chỉ giảm khi gỡ app hoặc gỡ bản cũ."),
+    ("Thư mục CameraRaw 2 GB trong /Library/Application Support có xoá được không?", "Không nên. Đó là hồ sơ ống kính và model AI của Camera Raw, không phải bộ nhớ đệm. Xoá thì Photoshop tải lại hoặc lỗi khi mở ảnh RAW."),
+    ("Xoá Media Cache bằng Finder hay trong Premiere?", "Trong Premiere an toàn hơn vì app biết file nào dự án đang mở còn dùng. Xoá bằng Finder chỉ nên làm khi đã thoát mọi app Adobe."),
+    ("Tidymint có dọn Adobe tự động không?", "Chưa có luật riêng cho Adobe. Bản đồ ổ đĩa và Gỡ app giúp tìm và gỡ bản cũ; phần bộ nhớ đệm bạn dọn theo bài này."),
+  ],
+  sources=[
+    ("Adobe: Xoá media cache bằng Settings trong Premiere", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/clear-media-cache-using-preferences.html"),
+    ("Adobe: Xoá file media cache thủ công (đường dẫn trên macOS)", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/delete-media-cache-files-manually.html"),
+    ("Adobe: Tự động quản lý file Media Cache", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/automatically-manage-your-media-cache-files.html"),
+    ("Adobe: Tối ưu hiệu năng Lightroom Classic (Camera Raw cache mặc định 5 GB)", "https://helpx.adobe.com/lightroom-classic/desktop/technical-support/performance-guidelines/optimize-performance-lightroom.html"),
+    ("Adobe: Lỗi scratch disk đầy trong Photoshop", "https://helpx.adobe.com/photoshop/desktop/troubleshoot/performance-stability-issues/troubleshoot-scratch-disk-full-errors-in-photoshop.html"),
+    ("Adobe: Lỗi Unable to allocate memory trong After Effects (Empty Disk Cache)", "https://helpx.adobe.com/after-effects/desktop/troubleshooting/fixed-and-known-issues/allocate-memory-error.html"),
+    ("Adobe: Nâng cấp mượt lên bản Creative Cloud mới (Remove Old Versions)", "https://helpx.adobe.com/x-productkb/global/ensure_smooth_update_creative_cloud.html"),
+    ("Adobe Community: Adobe cache chiếm quá nhiều Dữ liệu hệ thống (350 GB)", "https://community.adobe.com/questions-712/adobe-cache-takes-up-too-much-space-in-my-macbook-s-system-data-1177582"),
+  ],
+  related=[("Vì sao Mac tự đầy ổ dù không tải gì", "{HOME}mac-tu-day-o/"), ("Xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="adobe-storage-mac",
+),
+dict(
+  lang="en", slug="adobe-storage-mac", date="2026-10-27", read="6 min read",
+  title="Adobe Taking Up Space on Mac? What You Can Delete | Tidymint",
+  desc="Photoshop, Premiere and Lightroom eat tens of GB on a Mac. Which part is the apps, which is Media Cache, Camera Raw cache and scratch files you can clear, and how to cap it.",
+  crumb="Adobe storage",
+  h1="How much space Adobe takes on a Mac, and what you can actually delete",
+  tldr="Adobe on a Mac is two very different things: the <b>installation</b> (apps, shared libraries, Camera Raw, plug-ins) at 10–15 GB that you cannot trim, and the <b>caches</b> (Premiere and After Effects Media Cache, the Camera Raw cache used by Lightroom and Photoshop, Photoshop scratch files) that can grow to hundreds of GB but are safe to clear because the apps rebuild them. This guide points at each one, with real numbers from a Mac that only has Photoshop installed.",
+  toc=[("two-parts","The two parts of Adobe on your disk"),("measured","Real numbers from a Photoshop-only Mac"),("media-cache","Premiere and After Effects Media Cache"),("camera-raw","Camera Raw cache"),("scratch","Photoshop scratch files"),("old","Old versions and installers"),("caps","Set limits so you never clean again"),("tidymint","Find it fast with Tidymint")],
+  body="""
+<h2 id="two-parts">The two parts of Adobe on your disk</h2>
+<p>People open Storage settings, see Adobe at tens of GB, clear a cache, and the number barely moves. The reason: most of Adobe's footprint is the <b>installation</b>, not junk.</p>
+<ul>
+<li><b>Installation:</b> the apps themselves (Photoshop about 6 GB, Premiere and After Effects similar), the shared libraries in <code>/Library/Application Support/Adobe</code> (Camera Raw, plug-ins, CEP, Creative Cloud), and the Creative Cloud app. This only shrinks when you uninstall an app or an old version.</li>
+<li><b>Caches:</b> Premiere and After Effects Media Cache, the Camera Raw cache, Photoshop scratch files, Creative Cloud downloads. The apps rebuild these, they are safe to clear, and they are what makes "System Data" balloon.</li>
+</ul>
+<p>On Adobe's own forum a user measured <code>~/Library/Caches/Adobe</code> at 350 GB on a 1 TB drive; after clearing it and setting a 30 GB cap, free space rose by more than 500 GB. That is the second part.</p>
+
+<h2 id="measured">Real numbers from a Photoshop-only Mac</h2>
+<p>Machine: a Mac mini with Photoshop 2026 and Creative Cloud only, no Premiere, no Lightroom. Measured 27 Oct 2026.</p>
+<table>
+<tr><th>Where</th><th>Size</th><th>Can it go?</th></tr>
+<tr><td><code>/Applications/Adobe Photoshop 2026</code></td><td>6.2 GB</td><td>No, it is the app</td></tr>
+<tr><td><code>/Library/Application Support/Adobe/CameraRaw</code> (lens profiles, Camera Raw AI models)</td><td>2.2 GB</td><td>Better not, Photoshop needs it for RAW files</td></tr>
+<tr><td>Rest of <code>/Library/Application Support/Adobe</code> (Desktop Common, Plug-Ins, CEP, CC Libraries)</td><td>2.4 GB</td><td>No, shared libraries</td></tr>
+<tr><td><code>/Applications/Utilities/Adobe Creative Cloud</code> plus Adobe Sync and Experience</td><td>0.6 GB</td><td>No</td></tr>
+<tr><td><code>~/Library/Application Support/Adobe</code> (your settings, CoreSync)</td><td>126 MB</td><td>Small</td></tr>
+<tr><td><code>~/Library/Application Support/Adobe/Adobe Photoshop 2021</code></td><td>3 MB</td><td>Leftover from an old version, yes</td></tr>
+<tr><td>Camera Raw cache, Media Cache</td><td>0</td><td>Yes, when present</td></tr>
+</table>
+<p>11.5 GB in total, of which only a few MB can go. This Mac has no Premiere and never opens RAW files, so the two big caches have not appeared yet. A Mac that edits video or RAW photos every day will have the items below on top.</p>
+
+<h2 id="media-cache">Premiere and After Effects Media Cache</h2>
+<ul>
+<li><b>What it is:</b> for every clip you import, Premiere and After Effects build audio and index files (.cfa, .pek, .ims) so scrubbing stays smooth. According to Adobe, on macOS they live in <code>~/Library/Application Support/Adobe/Common</code> (the Media Cache Files and Media Cache folders). By default Premiere <b>does not delete them</b> ("Do not delete cache files automatically" is the default), so finished projects leave their cache behind.</li>
+<li><b>How to spot it:</b> those folders are several GB, or System Data jumps after every video project.</li>
+<li><b>Fix:</b> in Premiere open <b>Premiere › Settings › Media Cache</b>, click <b>Delete</b> next to "Remove Media Cache Files", then choose <b>Delete unused media cache files</b> (only clips that can no longer be found) or <b>Delete all media cache files from the system</b> (close all projects first; files are recreated automatically when a project needs them). In the same pane turn on <b>Automatically delete cache files older than</b> (Adobe's default once enabled is 90 days) or <b>Automatically delete oldest cache files when cache exceeds</b> (default 10% of the volume). After Effects: <b>After Effects › Preferences › Media &amp; Disk Cache</b>, then <b>Empty Disk Cache</b> and <b>Clean Database &amp; Cache</b>. Deleting by hand in Finder also works once the apps are closed: Adobe's own guide says to delete the contents of the Common folder and empty the Trash; the next project open waits while the cache rebuilds.</li>
+</ul>
+
+<h2 id="camera-raw">Camera Raw cache</h2>
+<ul>
+<li><b>What it is:</b> Lightroom Classic and Camera Raw in Photoshop keep the original image data of every RAW file you opened so previews build faster next time. According to Adobe, Lightroom Classic caps this at <b>5 GB</b> by default, and Adobe itself suggests raising it to 10–20 GB for a faster Develop module, so many Macs run it high. The folder is usually called <code>Adobe Camera Raw 2</code> inside <code>~/Library/Caches</code> (or wherever you pointed it).</li>
+<li><b>How to spot it:</b> that folder is big, or in Lightroom Classic <b>Preferences › File Handling › Camera Raw Cache Settings</b> shows a high Maximum Size.</li>
+<li><b>Fix:</b> in the same place click <b>Purge Cache</b>, then lower Maximum Size; in Photoshop the equivalent sits under Camera Raw Preferences › Performance. Purging does not touch your originals or your edits (those live in the catalog and XMP files); reopening an image is just a beat slower.</li>
+</ul>
+
+<h2 id="scratch">Photoshop scratch files</h2>
+<ul>
+<li><b>What it is:</b> when RAM runs out, Photoshop writes to disk (the scratch disk), potentially tens of GB with large files and many History steps. A normal quit gives the space back; Adobe recommends keeping at least 100 GB free on the scratch drive.</li>
+<li><b>How to spot it:</b> the disk fills up or Photoshop reports "Scratch disk full" during a session, growing as you work.</li>
+<li><b>Fix:</b> quit Photoshop (if it hung, restart the Mac; macOS clears its temp folder). Lower History States in <b>Photoshop › Settings › Performance</b> (default 50) to write less, and pick a drive with room under <b>Settings › Scratch Disks</b>. On Windows Adobe tells you to delete "Photoshop Temp" files by hand on the C: drive; on the Mac Adobe gives no manual deletion step, quitting and restarting is enough.</li>
+</ul>
+
+<h2 id="old">Old versions and installers</h2>
+<ul>
+<li><b>What it is:</b> Adobe ships a new version every year (Photoshop 2025, 2026), 5–6 GB each. The Creative Cloud update dialog has <b>Remove old versions</b> ticked by default; anyone who unticked it (to keep old plug-ins, say) now has both versions installed.</li>
+<li><b>How to spot it:</b> two folders with the same app name and different years in <code>/Applications</code>.</li>
+<li><b>Fix:</b> uninstall the old version through the Creative Cloud app (Installed, three-dot menu, Uninstall), not by dragging to the Trash, which leaves the Library parts behind. Next update, leave Remove old versions ticked.</li>
+</ul>
+
+<h2 id="caps">Set limits so you never clean again</h2>
+<ol class="steps">
+<li>Premiere: turn on one of the two automatic Media Cache options (by age or by size); on a 256–512 GB Mac, 30 days or 20–30 GB is plenty. Adobe notes the setting takes effect after a restart of the app and then runs weekly.</li>
+<li>Camera Raw: keep Maximum Size at 5–10 GB unless you edit RAW daily.</li>
+<li>Creative Cloud: leave Remove old versions ticked when updating.</li>
+<li>Heavy video work: move the Media Cache to an external SSD (same Media Cache pane, Browse; Adobe recommends a dedicated SSD too) so the internal drive only holds the apps.</li>
+</ol>
+
+<h2 id="tidymint">Find it fast with Tidymint</h2>
+<p>Tidymint's <b>Space Lens</b> draws every folder as a bubble sized by its real footprint, so a swollen Media Cache or Camera Raw folder stands out at once, and <b>Uninstaller</b> lists old Adobe versions with their leftovers. Everything goes to the Trash and can be undone.</p>
+{CTA}
+""",
+  faq=[
+    ("Does clearing Adobe caches lose photos or projects?", "No. Media Cache, the Camera Raw cache and scratch files are built from your originals; the originals and projects stay where you saved them. The apps rebuild the caches, just slower on the next open."),
+    ("I cleared the cache and Adobe still takes 10 GB. Why?", "That is the installation: apps, shared libraries, Camera Raw, plug-ins. It only shrinks when you uninstall an app or an old version."),
+    ("Can I delete the 2 GB CameraRaw folder in /Library/Application Support?", "Better not. Those are lens profiles and Camera Raw AI models, not a cache. Remove them and Photoshop re-downloads them or fails on RAW files."),
+    ("Delete Media Cache in Finder or inside Premiere?", "Inside Premiere is safer because the app knows which files open projects still use. Finder only once every Adobe app is closed."),
+    ("Does Tidymint clean Adobe automatically?", "There is no dedicated Adobe rule yet. Space Lens and Uninstaller help you find and remove old versions; clear the caches as described here."),
+  ],
+  sources=[
+    ("Adobe: Clear media cache using preferences in Premiere", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/clear-media-cache-using-preferences.html"),
+    ("Adobe: Delete media cache files manually (macOS path)", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/delete-media-cache-files-manually.html"),
+    ("Adobe: Automatically manage your Media Cache files", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/automatically-manage-your-media-cache-files.html"),
+    ("Adobe: Optimize Lightroom Classic performance (Camera Raw cache defaults to 5 GB)", "https://helpx.adobe.com/lightroom-classic/desktop/technical-support/performance-guidelines/optimize-performance-lightroom.html"),
+    ("Adobe: Troubleshoot scratch disk full errors in Photoshop", "https://helpx.adobe.com/photoshop/desktop/troubleshoot/performance-stability-issues/troubleshoot-scratch-disk-full-errors-in-photoshop.html"),
+    ("Adobe: Unable to allocate memory error in After Effects (Empty Disk Cache)", "https://helpx.adobe.com/after-effects/desktop/troubleshooting/fixed-and-known-issues/allocate-memory-error.html"),
+    ("Adobe: Ensure a smooth upgrade to the next Creative Cloud version (Remove Old Versions)", "https://helpx.adobe.com/x-productkb/global/ensure_smooth_update_creative_cloud.html"),
+    ("Adobe Community: Adobe cache takes up too much space in System Data (350 GB)", "https://community.adobe.com/questions-712/adobe-cache-takes-up-too-much-space-in-my-macbook-s-system-data-1177582"),
+  ],
+  related=[("Why a Mac keeps filling up by itself", "{HOME}mac-storage-keeps-filling-up/"), ("How to clear System Data on a Mac", "{HOME}clear-system-data-mac/"), ("Tidymint home", "{HOME}")],
+  alt="adobe-chiem-dung-luong-mac",
+),
+
+
 
 dict(
   lang="en", slug="clear-system-data-mac", date="2026-10-26", read="8 min read",

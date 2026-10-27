@@ -25,6 +25,8 @@
 - How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/
 - Why a Mac keeps filling up by itself and how to stop it: https://tidymint.app/mac-storage-keeps-filling-up/
 - (Vietnamese) Vì sao Mac tự đầy ổ và cách xử lý: https://tidymint.app/vi/mac-tu-day-o/
+- How much space Adobe takes on a Mac and what to delete: https://tidymint.app/adobe-storage-mac/
+- (Vietnamese) Adobe chiếm bao nhiêu GB trên Mac, dọn chỗ nào: https://tidymint.app/vi/adobe-chiem-dung-luong-mac/
 - How to free up space on Mac (incl. clearing cache): https://tidymint.app/free-up-space-mac/
 - Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
 - (Vietnamese) CleanMyMac miễn phí, lựa chọn hợp pháp: https://tidymint.app/vi/cleanmymac-mien-phi/
