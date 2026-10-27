@@ -81,7 +81,7 @@ dict(
 <ol class="steps">
 <li><b>Tải về:</b> bấm <a href="{DL}">Tải Tidymint</a>, mở file zip, kéo Tidymint vào thư mục <b>Ứng dụng</b>.</li>
 <li><b>Mở lần đầu:</b> macOS báo không mở được vì app chưa được Apple công chứng. Bấm <b>Xong</b>.</li>
-<li><b>Cho phép:</b> vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo xuống, bấm <b>Vẫn mở</b>.</li>
+<li><b>Cho phép:</b> vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b> (giữa trang), bấm <b>Vẫn mở</b> rồi <b>Mở</b>. Không thấy nút thì nhấp đúp app lần nữa rồi quay lại.</li>
 <li><b>Cấp quyền đọc ổ đĩa</b> trong mục <b>Truy cập toàn bộ ổ đĩa</b> để app đo được mọi thư mục.</li>
 </ol>
 <p>Hướng dẫn có hình chi tiết ở <a href="{HOME}#cai-dat">trang chủ</a>. Ứng dụng cần macOS 14 trở lên, chạy được trên cả máy chip Apple và Intel.</p>
