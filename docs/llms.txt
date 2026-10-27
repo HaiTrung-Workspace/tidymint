@@ -25,3 +25,4 @@
 - Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
 - (Vietnamese) CleanMyMac miễn phí, lựa chọn hợp pháp: https://tidymint.app/vi/cleanmymac-mien-phi/
 - (Vietnamese) Cách xóa ứng dụng trên MacBook sạch hoàn toàn: https://tidymint.app/vi/xoa-ung-dung-macbook/
+- (Vietnamese) Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào: https://tidymint.app/vi/zalo-chiem-dung-luong-macbook/
