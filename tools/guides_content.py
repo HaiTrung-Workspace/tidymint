@@ -101,7 +101,7 @@ dict(
     ("Jamf Threat Labs: mã độc trong app Mac lậu (01/2024)", "https://www.jamf.com/blog/jtl-malware-pirated-applications/"),
     ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/102445"),
   ],
-  related=[("Cách xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("Cách xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="cleanmymac-alternative",
 ),
 
