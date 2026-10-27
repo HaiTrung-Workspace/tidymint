@@ -273,7 +273,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <section id="{i["f"]}">
   <span class="tag">{t["feat_tag"]}</span><h2>{t["feat_h"]}</h2>
   <div class="grid" style="margin-top:24px">{feats}</div>
-  <div class="feature" style="margin-top:48px"><img src="{shot}byapp.jpg" alt="{t["byapp_alt"]}" loading="lazy" width="1600" height="1013"><img src="{shot}dupes.jpg" alt="{t["dupes_alt"]}" loading="lazy" width="1600" height="1013"></div>
+  <div class="shots2" style="margin-top:48px"><img src="{shot}byapp.jpg" alt="{t["byapp_alt"]}" loading="lazy" width="1600" height="1013"><img src="{shot}dupes.jpg" alt="{t["dupes_alt"]}" loading="lazy" width="1600" height="1013"></div>
 </section>
 
 <section>
