@@ -213,7 +213,6 @@ if(none)none.style.display=n?'none':'';});})();
 </script>"""
 def hubpage(k):
     h = dict(HUB[k]); items = [g for g in C.GUIDES if g["lang"] == k]
-    other = [g for g in C.GUIDES if g["lang"] != k]
     ph = "Tìm bài: Zalo, System Data, Adobe..." if k == "vi" else "Search guides: Zalo, System Data, Adobe..."
     body = '<p class="gsearch"><input id="gq" type="search" placeholder="%s" aria-label="%s"></p>' % (ph, ph)
     body += '<p id="gnone" class="small" style="display:none">%s</p>' % ("Không có bài nào khớp." if k == "vi" else "No guide matches.")
@@ -223,11 +222,6 @@ def hubpage(k):
         cards = "".join('<a href="../%s/" data-t="%s"><b>%s</b><br><span class="small">%s</span></a>'
                         % (g["slug"], html.escape(g["h1"] + " " + g["desc"], quote=True), g["h1"], g["desc"]) for g in grp)
         body += '<div class="gsec"><h2>%s</h2><div class="rel">%s</div></div>' % (tvi if k == "vi" else ten, cards)
-    if other:
-        lab = "In English" if k == "vi" else "Bằng tiếng Việt"
-        pref = "../../" if k == "vi" else "../vi/"
-        cards2 = "".join('<a href="%s%s/" data-t="%s"><b>%s</b></a>' % (pref, g["slug"], html.escape(g["h1"], quote=True), g["h1"]) for g in sorted(other, key=lambda g: g["date"], reverse=True))
-        body += '<div class="gsec"><h2>%s</h2><div class="rel">%s</div></div>' % (lab, cards2)
     body += SEARCH_JS
     h.update(lang=k, date=max(g["date"] for g in C.GUIDES), hub=True, read="", tldr="", toc=[], faq=[], sources=[],
              body=body, alt=("guides" if k == "vi" else "huong-dan"))
