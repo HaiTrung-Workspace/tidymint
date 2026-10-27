@@ -280,7 +280,7 @@ enum Scanner {
 
     static func size(_ url: URL) -> Int64 {
         var isDir: ObjCBool = false
-        guard fm.fileExists(atPath: url.path, isDirectory: &isDir) else { return 0 }
+        guard fm.fileExists(atPath: url.path, isDirectory: &isDir), !isLibrary(url.path) else { return 0 }
         let keys: [URLResourceKey] = [.totalFileAllocatedSizeKey, .fileAllocatedSizeKey]
         if !isDir.boolValue {
             let v = try? url.resourceValues(forKeys: Set(keys))
@@ -289,6 +289,7 @@ enum Scanner {
         var total: Int64 = 0
         if let en = fm.enumerator(at: url, includingPropertiesForKeys: keys, options: [], errorHandler: { _, _ in true }) {
             for case let f as URL in en {
+                if isLibrary(f.path) { en.skipDescendants(); continue }
                 if let v = try? f.resourceValues(forKeys: Set(keys)) {
                     total += Int64(v.totalFileAllocatedSize ?? v.fileAllocatedSize ?? 0)
                 }
@@ -325,8 +326,14 @@ enum Scanner {
         return k
     }
 
+    /// Without Full Disk Access, touching the Photos or Music libraries makes macOS pop a permission dialog
+    /// for each, even though the app only measures them. They are never cleaned, so in that case they are left out.
+    static var limited = false
+    static let libraries = ["Photos Library.photoslibrary", "/Pictures/Photos Library", "/Music/Music/", "/Music/iTunes/", ".musiclibrary"]
+    static func isLibrary(_ p: String) -> Bool { limited && libraries.contains { p.contains($0) } }
+
     static func blocked(_ p: String) -> Bool { never.contains { p.contains($0) } }
-    static func skip(_ p: String) -> Bool { blocked(p) || IgnoreList.contains(p) }
+    static func skip(_ p: String) -> Bool { blocked(p) || isLibrary(p) || IgnoreList.contains(p) }
 
     /// Chat and app databases with their journals. A folder holding one is never offered as a whole.
     static let dbExts: Set<String> = ["db", "sqlite", "sqlite3", "db-wal", "db-shm", "sqlite-wal", "sqlite-shm", "wal", "shm", "realm"]
@@ -1660,6 +1667,24 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
 
+    // Full Disk Access. Without it macOS hides Mail, Safari, Messages and similar folders from the scan,
+    // silently, so the numbers look smaller than they are. Checked at launch and whenever the app comes back
+    // to the front (the user usually returns straight from System Settings).
+    @Published var fullDiskAccess = true
+    static let fdaSettings = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!
+    func checkFullDiskAccess() {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let probes = ["/Library/Safari", "/Library/Mail", "/Library/Messages", "/Library/Cookies"].map { home + $0 }
+        var denied = false
+        defer { Scanner.limited = !fullDiskAccess }
+        for p in probes where FileManager.default.fileExists(atPath: p) {
+            do { _ = try FileManager.default.contentsOfDirectory(atPath: p); fullDiskAccess = true; return }
+            catch { denied = true }
+        }
+        // No protected folder exists at all (fresh account): nothing to prove either way, do not nag.
+        fullDiskAccess = !denied
+    }
+
     // Updates
     @Published var newVersion: String? = nil
     @Published var updChecking = false
@@ -2011,7 +2036,12 @@ func folderInfo(_ u: URL) -> String? {
         ".ollama": ("Ollama AI models. Remove unused ones with 'ollama rm'.", "Model AI của Ollama. Gỡ model không dùng bằng 'ollama rm'."),
         "LM Studio": ("LM Studio AI models. Manage them inside the app.", "Model AI của LM Studio. Quản lý trong app.")
     ]
-    if let v = m[n] { return t(v.0, v.1) }
+    if let v = m[n] {
+        if Scanner.limited && (n == "Pictures" || n == "Music") {
+            return t(v.0, v.1) + t(" Library not counted: needs Full Disk Access.", " Chưa tính thư viện: cần quyền Truy cập toàn bộ ổ đĩa.")
+        }
+        return t(v.0, v.1)
+    }
     if p.contains("/Library/Containers/") || p.contains("/Library/Application Support/") { return t("Data of one app.", "Dữ liệu của một app.") }
     return nil
 }
@@ -2251,6 +2281,16 @@ struct SmartView: View {
     @ObservedObject var vm: VM
     var body: some View {
         VStack(spacing: 22) {
+            if !vm.fullDiskAccess && vm.phase != .scanning {
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
+                    Text(t("Full Disk Access is off, so Mail, Safari and Messages stay hidden from the scan. Turn on Tidymint in System Settings, then come back.",
+                           "Chưa có quyền Truy cập toàn bộ ổ đĩa, nên Mail, Safari, Tin nhắn bị ẩn khỏi lượt quét. Bật Tidymint trong Cài đặt hệ thống rồi quay lại."))
+                        .font(.system(size: 12)).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    GhostButton(title: t("Open Settings", "Mở Cài đặt")) { NSWorkspace.shared.open(VM.fdaSettings) }
+                }.padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.warn.opacity(0.12))).frame(maxWidth: 620)
+            }
             switch vm.phase {
             case .scanning:
                 Scanning(text: t("Scanning your Mac...", "Đang quét máy..."))
@@ -2268,7 +2308,7 @@ struct SmartView: View {
                 BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
                 Text(t("Nothing is moved until you press Clean.", "Chưa dọn gì cho tới khi bạn bấm Dọn.")).font(.system(size: 12)).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
-                    HomeCard(title: t("Zalo, Chrome, CapCut...", "Zalo, Chrome, CapCut..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
+                    HomeCard(title: t("Chrome, Edge, CapCut...", "Zalo, Chrome, CapCut..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
                     HomeCard(title: t("Photos, videos, old files", "Ảnh, video, file cũ"), value: t("Large Files", "File lớn"), sub: t("you choose", "bạn tự chọn")) { vm.page = .large }
                     HomeCard(title: t("Trash", "Thùng rác"), value: fmt(vm.trashSize), sub: t("empty it to free space for real", "đổ là trống thật")) { vm.page = .trash }
                 }.padding(.top, 6)
@@ -3276,17 +3316,25 @@ struct DupesView: View {
                         }
                     }.padding(.horizontal, 24).padding(.bottom, 16)
                 }
+                if vm.refsBusy {
+                    // The link check greps every project folder, which can take minutes. Say so where the eye is.
+                    HStack(spacing: 10) {
+                        ProgressView().controlSize(.small).tint(Theme.warn)
+                        Text(t("Checking links in your project folders, this can take a few minutes. Feel free to use other pages meanwhile.",
+                               "Đang kiểm tra liên kết trong thư mục dự án, có thể mất vài phút. Bạn cứ dùng trang khác trong lúc chờ."))
+                            .font(.system(size: 12)).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
+                    }.padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.warn.opacity(0.12))).padding(.horizontal, 24).padding(.bottom, 8)
+                }
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(t("\(fmt(vm.dupSelected)) selected", "Đã chọn \(fmt(vm.dupSelected))")).foregroundColor(Theme.text).font(.system(size: 15, weight: .semibold))
                         Text(t("At least one copy of every file is always kept.", "Mỗi file luôn giữ lại ít nhất một bản.")).foregroundColor(Theme.sub).font(.system(size: 11))
                     }
                     Spacer()
-                    if vm.refsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.trailing, 6) }
                     GhostButton(title: vm.dupAllExtrasSelected ? t("Deselect all", "Bỏ chọn tất cả") : t("Select all extra copies", "Chọn mọi bản thừa")) {
                         vm.dupAutoSelect(all: !vm.dupAllExtrasSelected)
-                    }.padding(.trailing, 8)
-                    PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanDupes() }, disabled: vm.dupSelected == 0)
+                    }.padding(.trailing, 8).disabled(vm.refsBusy)
+                    PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanDupes() }, disabled: vm.dupSelected == 0 || vm.refsBusy)
                 }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
             }
         }
@@ -3556,6 +3604,10 @@ func menuBarImage(free: Double, total: Double, low: Bool) -> NSImage {
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+    func applicationDidBecomeActive(_ n: Notification) {
+        if !CommandLine.arguments.contains("--demo") { sharedVM.checkFullDiskAccess() }
+    }
+
     func applicationDidFinishLaunching(_ n: Notification) {
         // Developer helper: `Tidymint --export-icon <theme> <out.png>` writes the 1024px icon and quits.
         let a = CommandLine.arguments
@@ -3585,6 +3637,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         NSApp.applicationIconImage = makeAppIcon(Theme.p)
+        if !a.contains("--demo") { sharedVM.checkFullDiskAccess() }
         // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
         // `--page <name> --window <W>x<H>` opens a page at a fixed size.
         if let i = a.firstIndex(of: "--export-icon"), i + 1 < a.count {

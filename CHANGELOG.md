@@ -4,6 +4,9 @@ All notable changes to Tidymint. Dates are release dates.
 
 ## Unreleased (next: 0.3.3)
 
+- Reminder on the home page when Full Disk Access is off, with a button to the right setting
+- Fewer permission pop-ups when Full Disk Access is off
+- Duplicate finder says when the link check is running
 - Only one copy of Tidymint runs at a time: launching a new build quits the old one
 - Install guide with a screenshot for every step
 

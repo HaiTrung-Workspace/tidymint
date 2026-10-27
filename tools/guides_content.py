@@ -292,7 +292,7 @@ dict(
     ("Bấm Vẫn mở có nguy hiểm không?", "Bạn đang cho phép một app cụ thể, không tắt bảo vệ của máy. Chỉ bấm với app tải từ trang chính thức tidymint.app hoặc GitHub của dự án."),
     ("Máy tiếng Việt thì các nút tên gì?", "Quyền riêng tư và Bảo mật, mục Bảo mật, nút Vẫn mở, hộp thoại Mở, Truy cập toàn bộ ổ đĩa. Vị trí giống hệt ảnh."),
     ("Cập nhật bản mới có phải làm lại không?", "Có, mỗi bản tải mới đều bị chặn một lần cho tới khi app được công chứng. Làm lại bước 3 đến 5, mất khoảng một phút."),
-    ("Không cấp Truy cập toàn bộ ổ đĩa thì sao?", "App vẫn chạy và dọn được bộ nhớ đệm, file lớn, file trùng trong thư mục người dùng. Chỉ các thư mục được macOS bảo vệ như Mail, Tin nhắn hiện trống."),
+    ("Không cấp Truy cập toàn bộ ổ đĩa thì sao?", "App vẫn chạy và dọn được bộ nhớ đệm, file lớn, file trùng trong thư mục người dùng. Chỉ các thư mục được macOS bảo vệ như Mail, Tin nhắn hiện trống. Lần quét đầu, macOS sẽ hỏi riêng quyền vào Desktop, Documents, Downloads, bấm Cho phép là được; app cũng hiện một dải nhắc trên trang chủ kèm nút mở thẳng mục cài đặt này."),
   ],
   sources=[
     ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/102445"),
@@ -344,7 +344,7 @@ dict(
     ("Why does macOS block Tidymint?", "Tidymint has no Apple Developer account yet (99 USD a year) and so is not notarized. Every unnotarized app is blocked the same way. The source code is public on GitHub."),
     ("Is clicking Open Anyway safe?", "You are allowing one specific app, not switching off protection. Only do it for apps downloaded from the official site tidymint.app or the project's GitHub."),
     ("Do I have to repeat this for updates?", "Yes, each new download is blocked once until the app is notarized. Repeat steps 3 to 5, about a minute."),
-    ("What if I skip Full Disk Access?", "The app still runs and cleans caches, large and duplicate files in your home folder. Only macOS-protected folders such as Mail and Messages show as empty."),
+    ("What if I skip Full Disk Access?", "The app still runs and cleans caches, large and duplicate files in your home folder. Only macOS-protected folders such as Mail and Messages show as empty. On the first scan macOS asks separately for Desktop, Documents and Downloads: click Allow. The home page also shows a reminder with a button that opens this setting."),
   ],
   sources=[
     ("Apple: Safely open apps on your Mac", "https://support.apple.com/102445"),
@@ -352,6 +352,184 @@ dict(
   ],
   related=[("Free CleanMyMac alternative (open source)", "{HOME}cleanmymac-alternative/"), ("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Tidymint home", "{HOME}")],
   alt="cai-dat",
+),
+
+dict(
+  lang="vi", slug="mac-tu-day-o", date="2026-10-27", read="7 phút đọc",
+  title="Vì sao Mac tự đầy ổ dù không tải gì, và cách chặn | Tidymint",
+  desc="Ổ Mac cứ đầy dần dù bạn không tải gì? Sáu thứ âm thầm ngốn chỗ: snapshot Time Machine, bộ nhớ đệm, sao lưu iPhone, Mail, đồ lập trình, model AI.",
+  crumb="Mac tự đầy ổ",
+  h1="Vì sao Mac tự đầy ổ dù bạn không tải gì, và cách chặn",
+  tldr="Mac tự tăng vài GB trong khi bạn không làm gì thường là do một trong sáu chỗ: <b>snapshot Time Machine</b>, <b>bộ nhớ đệm app và trình duyệt</b>, <b>bản sao lưu iPhone/iPad</b>, <b>file đính kèm Mail và Tin nhắn</b>, <b>đồ lập trình</b> (Xcode, Docker, node_modules) hoặc <b>model AI tải về</b>. Bài này chỉ cách tìm xem máy bạn đang phình ở đâu và chặn nó quay lại, không xoá nhầm thứ cần giữ.",
+  toc=[("vi-sao","Vì sao ổ tăng khi bạn không làm gì"),("tim","Truy tìm thủ phạm"),("snapshot","Snapshot Time Machine"),("cache","Bộ nhớ đệm tự tạo lại"),
+       ("sao-luu","Sao lưu iPhone, iPad"),("mail","Đính kèm Mail và Tin nhắn"),("dev","Đồ lập trình"),("ai","Model AI và app tạo ảnh"),("chan","Dọn dẹp đơn giản với Tidymint"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="vi-sao">Vì sao ổ tăng khi bạn không làm gì</h2>
+<p>macOS và các app ghi file liên tục mà không hỏi: mỗi giờ một snapshot trước khi sao lưu, mỗi trang web một bộ nhớ đệm, mỗi ảnh bạn mở trong Tin nhắn một bản sao. Phần lớn rơi vào <b>Dữ liệu hệ thống</b> (máy cũ gọi là <b>Khác</b>), cái túi mà mục Dung lượng trong Cài đặt không giải thích được. Vì thế con số cứ leo lên trong khi thư mục Tài liệu vẫn y nguyên.</p>
+<p><b>Tin tốt:</b> gần như toàn bộ đều tự tạo lại được, hoặc là bản sao của thứ bạn vẫn còn ở chỗ khác, nên bỏ đi không mất gì.</p>
+<p><b>Tin xấu:</b> phải biết chỗ mà tìm, vì Finder giấu hầu hết các thư mục này.</p>
+
+<h2 id="tim">Truy tìm thủ phạm</h2>
+<ol class="steps">
+<li>Mở <b>menu Apple › Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>, ghi lại số của <b>Dữ liệu hệ thống</b>. Hôm sau xem lại. Lệch vài GB thì thủ phạm là một trong sáu mục dưới.</li>
+<li>Trong Finder bấm <b>Shift+Cmd+G</b>, gõ <code>~/Library</code>, Enter. Chuyển sang xem dạng danh sách, sắp theo dung lượng (Hiển thị › Hiện tuỳ chọn hiển thị › Tính toán tất cả kích cỡ). <code>Caches</code>, <code>Application Support</code> và <code>Containers</code> thường đứng đầu.</li>
+<li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
+</ol>
+<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp; app miễn phí, mã nguồn mở.</p>
+
+<h2 id="snapshot">Snapshot Time Machine</h2>
+<ul>
+<li><b>Là gì:</b> khi ổ Time Machine không cắm, macOS giữ snapshot mỗi giờ ngay trên ổ trong máy và chỉ dọn bớt khi sắp hết chỗ. Máy dùng nhiều có thể giữ 20–80 GB, Finder không hiện.</li>
+<li><b>Nhận ra:</b> <code>tmutil listlocalsnapshots /</code> ra nhiều ngày, hoặc mục Dung lượng ghi "Time Machine" hay "Sao lưu" là một khoản lớn.</li>
+<li><b>Sửa:</b> cắm ổ sao lưu cho chạy xong một lượt, hoặc gõ <code>tmutil thinlocalsnapshots / 999999999999 4</code> để bỏ ngay. Chúng sẽ quay lại theo thiết kế, nên máy nào lúc nào cũng chật thì cân nhắc tắt Time Machine và sao lưu cách khác.</li>
+</ul>
+
+<h2 id="cache">Bộ nhớ đệm tự tạo lại</h2>
+<ul>
+<li><b>Là gì:</b> <code>~/Library/Caches</code> và thư mục riêng của từng app trong <code>~/Library/Application Support</code>. Trình duyệt, Slack, Discord, Spotify, Zalo, Notion và nói chung app viết bằng Electron là thủ phạm quen; riêng trình duyệt đã 2–5 GB.</li>
+<li><b>Nhận ra:</b> thư mục mang tên app hoặc mã app (<code>com.google.Chrome</code>, <code>com.spotify.client</code>) to và nội dung bên trong đã vài ngày tuổi.</li>
+<li><b>Sửa:</b> thoát app, chuyển thư mục cache vào Thùng rác, mở lại app. App tự tạo lại phần cần. Không đụng <code>Database</code>, <code>.db</code>, <code>.sqlite</code> hay <code>Preferences</code>, đó là chỗ chứa đăng nhập và tin nhắn. Một số app có nút riêng: Chrome › Xoá dữ liệu duyệt web, Spotify › Cài đặt › Lưu trữ, Zalo › Cài đặt › Quản lý dữ liệu.</li>
+</ul>
+
+<h2 id="sao-luu">Sao lưu iPhone, iPad</h2>
+<ul>
+<li><b>Là gì:</b> mỗi lần sao lưu thiết bị vào Mac, một bản đầy đủ nằm ở <code>~/Library/Application Support/MobileSync/Backup</code>. Một bản sao lưu điện thoại 10–100 GB, và máy cũ đã bán vẫn để bản sao lưu lại mãi.</li>
+<li><b>Nhận ra:</b> mục Dung lượng ghi "Tệp iOS", hoặc thư mục trên rất to.</li>
+<li><b>Sửa:</b> trong Finder chọn thiết bị ở thanh bên, bấm <b>Quản lý bản sao lưu</b>, xoá bản của máy không còn dùng. Giữ bản mới nhất của máy đang dùng.</li>
+</ul>
+
+<h2 id="mail">Đính kèm Mail và Tin nhắn</h2>
+<ul>
+<li><b>Là gì:</b> Mail tải mọi file đính kèm của mọi tài khoản vào <code>~/Library/Mail</code>; Tin nhắn giữ mọi ảnh, video ai gửi cho bạn trong <code>~/Library/Messages/Attachments</code>. Cả hai lớn dần từng ngày và không bao giờ tự co lại.</li>
+<li><b>Sửa:</b> Mail › Cài đặt › Tài khoản › tài khoản của bạn › Tải tệp đính kèm: chọn <b>Gần đây</b> hoặc <b>Không</b>, rồi Hộp thư › Xoá các mục đã xoá. Với Tin nhắn, trong mục Dung lượng mở <b>Tin nhắn</b> và xoá các đính kèm lớn ở đó, hoặc đặt Cài đặt › Cài đặt chung › Giữ tin nhắn trong một năm. App dọn máy phải để yên hai thư mục này, Tidymint làm đúng vậy.</li>
+</ul>
+
+<h2 id="dev">Đồ lập trình</h2>
+<ul>
+<li><b>Là gì:</b> <code>DerivedData</code> của Xcode, máy ảo iOS và file hỗ trợ thiết bị cũ (<code>~/Library/Developer</code>, hay 30–100 GB); file ổ đĩa duy nhất của Docker Desktop chỉ có phình không co; <code>node_modules</code> trong mọi dự án; bộ nhớ đệm Homebrew, npm, pip.</li>
+<li><b>Sửa:</b> Xcode › Settings › Locations › DerivedData, xoá thư mục; <code>xcrun simctl delete unavailable</code>; Docker › Settings › Resources › Disk image size, rồi <code>docker system prune</code>; <code>npm cache clean --force</code>, <code>brew cleanup</code>. <code>node_modules</code> của dự án vài tháng không mở thì bỏ được, <code>npm install</code> là có lại.</li>
+</ul>
+
+<h2 id="ai">Model AI và app tạo ảnh</h2>
+<ul>
+<li><b>Là gì:</b> Ollama cất mọi model bạn từng tải trong <code>~/.ollama</code> (4–40 GB mỗi cái); Hugging Face đệm file tải về ở <code>~/.cache/huggingface</code>; các app Stable Diffusion giữ checkpoint và mọi ảnh đã tạo. Ít thứ nào trong số này hiện tên dễ hiểu ở mục Dung lượng.</li>
+<li><b>Sửa:</b> <code>ollama list</code> rồi <code>ollama rm &lt;model&gt;</code> với model không dùng nữa; xoá mục cũ trong cache Hugging Face; chuyển ảnh đã tạo ra ổ ngoài. Đây là nhóm thư mục làm nhiều người bất ngờ nhất, nên Bản đồ ổ đĩa của Tidymint gọi tên chúng rõ ràng.</li>
+</ul>
+{CTA}
+<h2 id="chan">Dọn dẹp đơn giản với Tidymint</h2>
+<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
+<h3>Để ổ không đầy lại</h3>
+<ul>
+<li><b>Khởi động lại mỗi tuần.</b> macOS dọn file tạm và phần "có thể xoá" khi khởi động lại.</li>
+<li><b>Đổ Thùng rác.</b> File trong Thùng rác vẫn tính dung lượng. Finder › Cài đặt › Nâng cao › Xoá các mục khỏi Thùng rác sau 30 ngày sẽ làm hộ bạn.</li>
+<li><b>Đặt giới hạn ở app nào cho phép:</b> đính kèm Mail để Gần đây, Tin nhắn giữ một năm, Docker giới hạn file ổ đĩa, Spotify giới hạn cache.</li>
+<li><b>Mỗi tháng xem một lần.</b> Năm phút nhìn bản đồ ổ đĩa đỡ hơn một lần hoảng khi hiện "ổ đĩa sắp đầy".</li>
+</ul>
+<p>Lỡ "dọn dẹp" quá tay? Đừng lo, Tidymint chỉ chuyển dữ liệu thừa vào Thùng rác, mọi thứ vẫn hoàn tác được nếu bạn đổi ý.</p>
+""",
+  faq=[
+    ("Ổ Mac cứ tăng dần có phải virus không?", "Gần như không bao giờ. Phần tăng đến từ snapshot, bộ nhớ đệm, sao lưu và nhật ký mà macOS cùng app bình thường tự ghi. Quét bảo mật không hại gì, nhưng cách sửa là quản lý các thư mục đó, không phải cài diệt virus."),
+    ("Sao Dữ liệu hệ thống tự lên xuống?", "macOS tạo snapshot Time Machine mỗi giờ và xoá khi cần chỗ, đồng thời dọn cache khi ổ chật. Con số bạn thấy là mục tiêu di động, nên so hai ngày cách nhau hữu ích hơn nhìn một lần."),
+    ("Xoá cả thư mục Caches được không?", "Chuyển ~/Library/Caches vào Thùng rác nhìn chung an toàn, app tự tạo lại. Lần mở đầu sẽ chậm hơn và một số app mất nội dung ngoại tuyến. Tuyệt đối không xoá tay /System hay /private/var."),
+    ("Dọn các thư mục này có mất ảnh hay tài liệu không?", "Không. Tài liệu, Màn hình chính, Ảnh và thư viện Ảnh nằm riêng. Các thư mục trong bài chứa bản sao, bộ nhớ đệm và sao lưu. Tránh xa cơ sở dữ liệu của Mail, Tin nhắn, thư viện Ảnh trừ khi dùng đúng cài đặt của app."),
+    ("Tidymint có tự sửa chuyện này không?", "App tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá."),
+  ],
+  sources=[
+    ("Apple: Giải phóng dung lượng lưu trữ trên máy Mac", "https://support.apple.com/vi-vn/102624"),
+    ("Apple: Giới thiệu về snapshot cục bộ của Time Machine", "https://support.apple.com/vi-vn/102154"),
+    ("Apple: Định vị và quản lý bản sao lưu iPhone, iPad", "https://support.apple.com/vi-vn/108809"),
+  ],
+  related=[("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="mac-storage-keeps-filling-up",
+),
+
+dict(
+  lang="en", slug="mac-storage-keeps-filling-up", date="2026-10-27", read="7 min read",
+  title="Why Your Mac Keeps Filling Up by Itself | Tidymint",
+  desc="Mac storage grows while you change nothing? Six things quietly eat space: snapshots, caches, iPhone backups, Mail, dev tools, AI models. How to stop each one.",
+  crumb="Mac keeps filling up",
+  h1="Why your Mac keeps filling up on its own, and how to stop it",
+  tldr="A Mac that gains gigabytes while you do nothing is usually growing in one of six places: <b>Time Machine local snapshots</b>, <b>app and browser caches</b>, <b>iPhone or iPad backups</b>, <b>Mail attachments</b>, <b>developer tools</b> (Xcode, Docker, node_modules) or <b>AI model downloads</b>. This guide shows how to find which one it is on your Mac and how to stop it coming back, without deleting anything you need.",
+  toc=[("why","Why storage grows when you change nothing"),("find","Track down the culprit"),("snapshots","Time Machine local snapshots"),("caches","Caches that rebuild themselves"),
+       ("backups","iPhone and iPad backups"),("mail","Mail and Messages attachments"),("dev","Developer tools"),("ai","AI models and image generators"),("stop","Free up the space with Tidymint"),("faq","FAQ")],
+  body="""
+<h2 id="why">Why storage grows when you change nothing</h2>
+<p>macOS and the apps on it write files constantly without asking: a snapshot every hour before a backup, a cache for every web page, a copy of every photo you open in Messages. Most of this lands in <b>System Data</b> (older Macs call it <b>Other</b>), a bucket that Storage settings cannot explain. That is why the number keeps climbing while your Documents folder stays the same.</p>
+<p><b>The good news:</b> almost all of it is either rebuilt automatically or is a copy of something you still have elsewhere, so it can go without loss.</p>
+<p><b>The bad news:</b> you have to know where to look, because Finder hides most of these folders.</p>
+
+<h2 id="find">Track down the culprit</h2>
+<ol class="steps">
+<li>Open <b>Apple menu › System Settings › General › Storage</b> and note the size of <b>System Data</b>. Come back a day later and compare. If it moved by gigabytes, the culprit is one of the six below.</li>
+<li>In Finder press <b>Shift+Cmd+G</b>, type <code>~/Library</code> and press Enter. Switch to list view, sort by size (View › Show View Options › Calculate all sizes). <code>Caches</code>, <code>Application Support</code> and <code>Containers</code> are usually the top three.</li>
+<li>In Terminal, <code>tmutil listlocalsnapshots /</code> lists Time Machine snapshots. More than two or three means they are holding space.</li>
+</ol>
+<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones; it is free and open source.</p>
+
+<h2 id="snapshots">Time Machine local snapshots</h2>
+<ul>
+<li><b>What it is:</b> when a Time Machine disk is not connected, macOS keeps hourly snapshots on the internal drive and thins them out when space gets tight. On a busy Mac they can hold 20 to 80 GB and they are invisible in Finder.</li>
+<li><b>How to tell:</b> <code>tmutil listlocalsnapshots /</code> shows several dates, or Storage settings lists "Time Machine" or "Backups" as a big item.</li>
+<li><b>Fix:</b> plug in the backup drive and let a backup finish, or run <code>tmutil thinlocalsnapshots / 999999999999 4</code> to drop them now. They come back by design, so if your Mac is always tight on space, consider turning Time Machine off and using another backup method.</li>
+</ul>
+
+<h2 id="caches">Caches that rebuild themselves</h2>
+<ul>
+<li><b>What it is:</b> <code>~/Library/Caches</code> and the per-app folders in <code>~/Library/Application Support</code>. Browsers, Slack, Discord, Spotify, Zalo, Notion and Electron apps in general are the usual suspects; a browser alone can hold 2 to 5 GB.</li>
+<li><b>How to tell:</b> the folders named after an app or a bundle id (<code>com.google.Chrome</code>, <code>com.spotify.client</code>) are large and their contents are days old.</li>
+<li><b>Fix:</b> quit the app, move its cache folder to the Trash, reopen the app. It rebuilds what it needs. Do not touch <code>Database</code>, <code>.db</code>, <code>.sqlite</code> or <code>Preferences</code>; that is where logins and messages live. Some apps have their own button: Chrome › Clear browsing data, Spotify › Settings › Storage, Zalo › Settings › Data management.</li>
+</ul>
+
+<h2 id="backups">iPhone and iPad backups</h2>
+<ul>
+<li><b>What it is:</b> every time you back up a device to the Mac, a full copy goes to <code>~/Library/Application Support/MobileSync/Backup</code>. A phone backup is 10 to 100 GB, and old devices leave their backups behind forever.</li>
+<li><b>How to tell:</b> Storage settings shows "iOS Files" or that folder is huge.</li>
+<li><b>Fix:</b> in Finder select your device in the sidebar, click <b>Manage Backups</b>, delete backups of devices you no longer own. Keep the newest one for the phone you use.</li>
+</ul>
+
+<h2 id="mail">Mail and Messages attachments</h2>
+<ul>
+<li><b>What it is:</b> Mail downloads every attachment of every account into <code>~/Library/Mail</code>; Messages keeps every photo and video anyone sent you in <code>~/Library/Messages/Attachments</code>. Both grow by the day and never shrink on their own.</li>
+<li><b>Fix:</b> Mail › Settings › Accounts › your account › Download Attachments: set to <b>Recent</b> or <b>None</b>, then Mailbox › Erase Deleted Items. For Messages, in Storage settings open <b>Messages</b> and delete large attachments from there, or set Settings › General › Keep Messages to one year. Cleaner apps should leave these folders alone, and Tidymint does.</li>
+</ul>
+
+<h2 id="dev">Developer tools</h2>
+<ul>
+<li><b>What it is:</b> Xcode's <code>DerivedData</code>, iOS simulators and old device support files (<code>~/Library/Developer</code>, often 30 to 100 GB); Docker Desktop's single disk image that only ever grows; <code>node_modules</code> folders in every project; Homebrew, npm and pip caches.</li>
+<li><b>Fix:</b> Xcode › Settings › Locations › DerivedData, delete the folder; <code>xcrun simctl delete unavailable</code>; Docker › Settings › Resources › Disk image size, then <code>docker system prune</code>; <code>npm cache clean --force</code>, <code>brew cleanup</code>. Old <code>node_modules</code> in projects you have not opened for months can go; <code>npm install</code> brings them back.</li>
+</ul>
+
+<h2 id="ai">AI models and image generators</h2>
+<ul>
+<li><b>What it is:</b> Ollama stores every model you have ever pulled in <code>~/.ollama</code> (4 to 40 GB each); Hugging Face caches downloads in <code>~/.cache/huggingface</code>; Stable Diffusion front ends keep checkpoints and every generated image. Few of these show up in Storage settings under a name you would recognise.</li>
+<li><b>Fix:</b> <code>ollama list</code> then <code>ollama rm &lt;model&gt;</code> for models you no longer use; delete old entries in the Hugging Face cache; move generated images to an external drive. These are the folders that surprise people most, so they are called out by name in Tidymint's Space Lens.</li>
+</ul>
+{CTA}
+<h2 id="stop">Free up the space with Tidymint</h2>
+<p>The six places above are exactly what Tidymint scans: <b>Clean Now</b> groups caches, logs and old installers with a safety label on each group and cleans only when you click; <b>Space Lens</b> draws snapshots, iPhone backups, Xcode, Docker and Ollama folders as bubbles with plain-language notes; <b>Clean by App</b> handles Zalo, Chrome and CapCut month by month. Everything goes to the Trash, with Undo. Free and open source.</p>
+<h3>Keep it from coming back</h3>
+<ul>
+<li><b>Restart once a week.</b> macOS purges temporary files and purgeable space on restart.</li>
+<li><b>Empty the Trash.</b> Files in the Trash still count. Finder › Settings › Advanced › Remove items from the Trash after 30 days does it for you.</li>
+<li><b>Set limits where the app allows it:</b> Mail attachments to Recent, Messages to one year, Docker disk image size, Spotify cache size.</li>
+<li><b>Check once a month.</b> Five minutes in a disk map beats a panic when the "disk almost full" warning appears.</li>
+</ul>
+<p>Cleaned a bit too much? No worries: Tidymint only moves leftovers to the Trash, so everything can be undone if you change your mind.</p>
+""",
+  faq=[
+    ("Is it a virus if my Mac storage keeps growing?", "Almost never. The growth comes from snapshots, caches, backups and logs that macOS and ordinary apps write by design. A security scan does no harm, but the fix is managing those folders, not an antivirus."),
+    ("Why does System Data go up and down by itself?", "macOS creates Time Machine local snapshots hourly and deletes them when space is needed, and it purges caches under pressure. The number you see is a moving target, which is why a day-apart comparison is more useful than one reading."),
+    ("Can I delete the Caches folder entirely?", "Moving ~/Library/Caches to the Trash is generally safe; apps rebuild it. Expect slower first launches and lost offline content in some apps. Never delete /System or /private/var by hand."),
+    ("Will clearing these folders delete my photos or documents?", "No. Documents, Desktop, Pictures and your Photos library are separate. The folders in this guide hold copies, caches and backups. Keep away from Mail, Messages and Photos library databases unless you are using the app's own settings."),
+    ("Does Tidymint fix this automatically?", "It finds the folders, labels each group safe, review or locked, and moves what you tick to the Trash with an Undo. It does not run in the background or delete on its own."),
+  ],
+  sources=[
+    ("Apple: Free up storage space on your Mac", "https://support.apple.com/102624"),
+    ("Apple: About Time Machine local snapshots", "https://support.apple.com/102154"),
+    ("Apple: Locate and manage backups of your iPhone, iPad, and iPod touch", "https://support.apple.com/108809"),
+  ],
+  related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
+  alt="mac-tu-day-o",
 ),
 
 dict(
