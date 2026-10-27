@@ -4268,24 +4268,32 @@ struct InviteCard: View {
             sizes.map { AppRow(id: sec + "\($0.0)", title: AppRules.monthLabel(month($0.0)), sub: t("\($0.2) files", "\($0.2) file"), size: mb($0.1), count: $0.2, urls: [], month: month($0.0), selected: false) }
         }
         func row(_ p: String, _ size: Double, _ sel: Bool) -> AppRow { AppRow(id: p, title: (p as NSString).lastPathComponent, sub: "~/" + p, size: mb(size), count: 1, urls: [u(p)], month: nil, selected: sel) }
-        let zalo = AppRules.all[0], chrome = AppRules.all[1]
+        let zalo = AppRules.all[0], chrome = AppRules.all[1], capcut = AppRules.all[4]
         let z = "Library/Application Support/ZaloData/"
-        vm.appReports = [
-            AppReport(rule: zalo, groups: [
+        let zaloReport = AppReport(rule: zalo, groups: [
                 AppGroup(id: "cache", section: zalo.sections[0], rows: [row(z + "media/update", 312, true), row(z + "Cache", 210, true), row(z + "media/1234567890123456789/ZaloDownloads/fileThumb", 101, true), row(z + "resp_cache", 1.4, true)], expanded: true),
                 AppGroup(id: "picture", section: zalo.sections[1], rows: ageRows("p", [(0, 180, 412), (1, 260, 590), (2, 310, 702), (4, 420, 1210), (7, 390, 980), (13, 530, 1430)]), expanded: true),
                 AppGroup(id: "video", section: zalo.sections[2], rows: ageRows("v", [(1, 96, 3), (6, 240, 7)])),
                 AppGroup(id: "file", section: zalo.sections[3], rows: ageRows("f", [(0, 12, 9), (3, 40, 22)])),
                 AppGroup(id: "db", section: zalo.sections[4], rows: [row(z + "Database", 520, false)]),
-            ], running: true),
-            AppReport(rule: chrome, groups: [
-                AppGroup(id: "cache", section: chrome.sections[0], rows: [row("Library/Caches/Google/Chrome/Default/Code Cache", 300, true), row("Library/Application Support/Google/Chrome/Default/Service Worker/CacheStorage", 1300, true), row("Library/Application Support/Google/Chrome/component_crx_cache", 240, true)]),
-                AppGroup(id: "ai", section: chrome.sections[1], rows: [row("Library/Application Support/Google/Chrome/OptGuideOnDeviceModel", 4000, false)]),
-                AppGroup(id: "profile", section: chrome.sections[2], rows: [row("Library/Application Support/Google/Chrome/Default/History", 48, false)]),
-            ], running: false),
-        ]
+            ], running: true)
+        let en = appLang == "en"
+        let chromeReport = AppReport(rule: chrome, groups: [
+                AppGroup(id: "cache", section: chrome.sections[0], rows: [row("Library/Caches/Google/Chrome/Default/Code Cache", 300, true), row("Library/Application Support/Google/Chrome/Default/Service Worker/CacheStorage", 1300, true), row("Library/Application Support/Google/Chrome/component_crx_cache", 240, true)], expanded: en),
+                AppGroup(id: "ai", section: chrome.sections[1], rows: [row("Library/Application Support/Google/Chrome/OptGuideOnDeviceModel", 4000, false)], expanded: en),
+                AppGroup(id: "profile", section: chrome.sections[2], rows: [row("Library/Application Support/Google/Chrome/Default/History", 48, false)], expanded: en),
+            ], running: en)
+        let c = "Movies/CapCut/User Data/"
+        let capcutReport = AppReport(rule: capcut, groups: [
+                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/recognize", 410, true), row(c + "Cache/audioWave", 95, true)]),
+                AppGroup(id: "projects", section: capcut.sections[1], rows: [row(c + "Projects", 6200, false)]),
+            ], running: false)
+        // English screenshots lead with apps a US reader knows; Vietnamese ones lead with Zalo.
+        vm.appReports = en ? [chromeReport, capcutReport, zaloReport] : [zaloReport, chromeReport, capcutReport]
         vm.appScanned = true
-        if detail { vm.appSel = "zalo"; vm.selectOlder("zalo", months: 6) }
+        if detail {
+            if en { vm.appSel = "chrome" } else { vm.appSel = "zalo"; vm.selectOlder("zalo", months: 6) }
+        }
     }
     static func load(_ vm: VM) {
         vm.cats = [
