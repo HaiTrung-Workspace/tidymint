@@ -29,6 +29,7 @@ ART_CSS = """
 .art td.y{color:var(--leaf)}.art td.n{color:#ff9a9a}
 .box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}
 .box h3{margin:0 0 6px}.box p{margin:0 0 14px}
+.pair{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 6px}.pair img{flex:1 1 0;min-width:0;max-width:360px}.pair-arrow{flex:none;width:44px;height:44px;border-radius:50%;background:#2fd39f14;border:1px solid #2fd39f33;color:var(--leaf);display:flex;align-items:center;justify-content:center}.pair-arrow svg{width:22px;height:22px}@media (max-width:640px){.pair{flex-direction:column}.pair img{max-width:100%}.pair-arrow svg{transform:rotate(90deg)}}
 .warn{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 18px;margin:18px 0}.warn p{margin:0}
 .art code{overflow-wrap:anywhere}.art pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
 .src{font-size:14px}.src li{font-size:14px;color:var(--sub)}

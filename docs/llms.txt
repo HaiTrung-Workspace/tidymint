@@ -20,6 +20,8 @@
 - Contact: hello@tidymint.app
 
 ## Guides
+- Install step by step with screenshots: https://tidymint.app/install/
+- (Vietnamese) Cài đặt từng bước có ảnh: https://tidymint.app/vi/cai-dat/
 - How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/
 - How to free up space on Mac (incl. clearing cache): https://tidymint.app/free-up-space-mac/
 - Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
