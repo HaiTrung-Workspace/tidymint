@@ -60,10 +60,11 @@ def guide(g):
     root = "../../" if k == "vi" else "../"          # path to site root for assets
     home = "../" if k == "vi" else "../"             # path to this language's home page
     alt = g.get("alt")                               # counterpart guide url path, if any
+    # No counterpart in the other language: go to that language's guides hub, not the home page.
     if k == "vi":
-        vi_href, en_href = "./", ("../../" + alt + "/" if alt else "../../")
+        vi_href, en_href = "./", ("../../" + alt + "/" if alt else "../../guides/")
     else:
-        vi_href, en_href = ("../vi/" + alt + "/" if alt else "../vi/"), "./"
+        vi_href, en_href = ("../vi/" + alt + "/" if alt else "../vi/huong-dan/"), "./"
     vi_on, en_on = ('class="on" ', '') if k == "vi" else ('', 'class="on" ')
     nav = "".join('<a href="%s">%s</a>' % (h, n) for h, n in l["nav"])
     toc = "".join('<li><a href="#%s">%s</a></li>' % (i, n) for i, n in g["toc"])
