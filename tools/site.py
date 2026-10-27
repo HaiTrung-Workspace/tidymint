@@ -81,8 +81,8 @@ summary{user-select:none}
 
 T = {
 "en": dict(
-  lang="en", path="", other="vi/", title="Free Mac Cleaner, CleanMyMac Alternative | Tidymint",
-  desc="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicates, uninstall apps fully. Everything goes to the Trash first.",
+  lang="en", path="", other="vi/", title="Free App to Free Up Storage on Mac (Open Source) | Tidymint",
+  desc="Free, open-source macOS disk space app. See what fills your Mac, clear caches and System Data, find duplicates, uninstall apps fully. Trash first, with Undo.",
   nav=[("#features","Features"),("#how","How it works"),("guides/","Guides"),("#faq","FAQ"),(GH,"GitHub")], navcta="Download",
   h1='Keep your Mac in <span>mint condition</span>.',
   sub="Tidymint is a free, open-source Mac cleaner. Clear caches and System Data, remove duplicate files, uninstall apps completely and see exactly what fills your disk.",
