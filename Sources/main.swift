@@ -3476,6 +3476,11 @@ struct SettingsView: View {
                        t("Notify when more than 90% of RAM is in use (at most once an hour).", "Báo khi RAM dùng trên 90% (tối đa 1 giờ báo một lần).")) {
                 Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden()
             }
+            settingRow(t("Support the project", "Ủng hộ dự án"),
+                       t("Tidymint is free and stays free. Sponsorships go toward the Apple Developer account (notarization, no Open Anyway step) and time for new features.",
+                         "Tidymint miễn phí và sẽ luôn miễn phí. Tiền ủng hộ dùng cho tài khoản Apple Developer (công chứng app, bỏ bước Vẫn mở) và thời gian làm tính năng mới.")) {
+                GhostButton(title: t("Sponsor on GitHub", "Ủng hộ trên GitHub")) { NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/HaiTrung-Workspace")!) }
+            }
             if appLang == "vi" {
                 settingRow("Cùng tác giả: Cồn Cào", "Kiến thức đồ uống tiếng Việt: whisky, sake, cocktail.") {
                     Link("concao.org", destination: ConCao.url("settings")).font(.system(size: 12)).foregroundColor(Theme.link).tint(Theme.link)
