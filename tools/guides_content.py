@@ -625,7 +625,7 @@ dict(
 dict(
   lang="en", slug="adobe-storage-mac", date="2026-10-27", read="6 min read",
   title="Adobe Taking Up Space on Mac? What You Can Delete | Tidymint",
-  desc="Photoshop, Premiere and Lightroom eat tens of GB on a Mac. What is the apps, what is Media Cache, Camera Raw cache and scratch files you can clear, and how to cap it.",
+  desc="Photoshop, Premiere and Lightroom eat tens of GB on a Mac. Which part is the apps, which is cache you can clear (Media Cache, Camera Raw, scratch), and how to cap it.",
   crumb="Adobe storage",
   h1="How much space Adobe takes on a Mac, and what you can actually delete",
   tldr="Adobe on a Mac is two very different things: the <b>installation</b> (apps, shared libraries, Camera Raw, plug-ins) at 10–15 GB that you cannot trim, and the <b>caches</b> (Premiere and After Effects Media Cache, the Camera Raw cache used by Lightroom and Photoshop, Photoshop scratch files) that can grow to hundreds of GB but are safe to clear because the apps rebuild them. This guide points at each one, with real numbers from a Mac that only has Photoshop installed.",
