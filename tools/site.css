@@ -30,6 +30,7 @@ h2{font-size:clamp(26px,3.4vw,38px);margin:0 0 12px;letter-spacing:-.01em}
 .feature p{color:var(--sub);margin:0 0 10px}
 .feature ul{color:var(--sub);padding-left:20px;margin:0}
 .feature img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.shots2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.shots2 img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
 .card b{display:block;margin-bottom:6px}
@@ -42,4 +43,4 @@ pre{background:#00000059;border:1px solid var(--line);border-radius:12px;padding
 .steps{padding-left:22px;color:var(--sub)}.steps li{margin-bottom:10px}.steps b{color:var(--text)}
 #msg{min-height:22px;margin-top:10px;font-size:15px}
 footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
-@media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
+@media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.shots2{grid-template-columns:1fr}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
