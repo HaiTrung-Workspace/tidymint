@@ -93,12 +93,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0
 details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
 summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
 details p{color:var(--sub);margin:0 0 16px}
+.ins{display:grid;grid-template-columns:340px 1fr;gap:48px;align-items:start}.tl{list-style:none;margin:0;padding:0;position:relative}.tl:before{content:"";position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--line)}.tl li{position:relative;padding:0 0 28px 60px;color:var(--sub)}.tl li:last-child{padding-bottom:0}.tl .n{position:absolute;left:4px;top:0;width:32px;height:32px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}.tl h4{margin:4px 0 4px;font-size:18px;color:var(--text)}.tl p{margin:0}.tl b{color:var(--text)}.opt{font-size:13px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:8px;font-weight:500;vertical-align:middle}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
 .note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}
 .fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
 .fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols .brand{display:flex;align-items:center;gap:10px;padding:0;font-size:18px;color:var(--text)}.fcols .brand:hover{text-decoration:none}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
 footer{border-top:0;padding:0 0 28px}
-@media (max-width:820px){.def,.fcols{grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,1fr);gap:10px}.grid.uses{grid-template-columns:1fr 1fr}.grid .card{padding:14px}.grid .card span{font-size:14px}.grid .card .hd b{font-size:15px}.vs{gap:12px}.vs .col{padding:18px}.vs h3{font-size:18px}.how{gap:8px}.how .arr{width:26px;height:26px}.how .arr svg{width:14px;height:14px}.how .card{padding:16px}.how .card span{font-size:14px}.navcta{display:none}}
+@media (max-width:820px){.def,.fcols{grid-template-columns:1fr}.ins{grid-template-columns:1fr;gap:24px}.grid{grid-template-columns:repeat(3,1fr);gap:10px}.grid.uses{grid-template-columns:1fr 1fr}.grid .card{padding:14px}.grid .card span{font-size:14px}.grid .card .hd b{font-size:15px}.vs{gap:12px}.vs .col{padding:18px}.vs h3{font-size:18px}.how{gap:8px}.how .arr{width:26px;height:26px}.how .arr svg{width:14px;height:14px}.how .card{padding:16px}.how .card span{font-size:14px}.navcta{display:none}}
 @media (max-width:600px){.vs,.how,.grid,.grid.uses{grid-template-columns:1fr}.how .arr svg{transform:rotate(90deg)}}
 
 /* Hover only on things that can be clicked. Nothing moves its box on hover (moving boxes made the
@@ -191,11 +192,15 @@ summary{user-select:none}
 </section>
 
 <section id="cai-dat">
-  <h2>Cài đặt</h2>
-  <p class="lead">Cần macOS 14 trở lên, chạy được cả máy chip Apple và máy Intel.</p>
-  <div class="note">Tidymint chưa được Apple công chứng nên lần mở đầu macOS sẽ chặn, như mọi app chưa công chứng. <a href="https://github.com/sponsors/HaiTrung-Workspace">Ủng hộ dự án</a> giúp mua tài khoản Apple Developer: khi đó app mở là chạy, cập nhật tới nhanh hơn.</div>
-  <ol class="steps"><li><b>Tải về:</b> bấm <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint</a>, mở file <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).</li><li><b>Mở lần đầu:</b> nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.</li><li><b>Cho phép mở:</b> vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b> (giữa trang), bấm <b>Vẫn mở</b> (Open Anyway) rồi xác nhận bằng mật khẩu máy. <a href="cai-dat/">Hướng dẫn từng bước có ảnh</a>.</li><li><b>Truy cập toàn bộ ổ đĩa</b> (không bắt buộc): trong Quyền riêng tư &amp; Bảo mật, mở <b>Truy cập toàn bộ ổ đĩa</b> và bật Tidymint để quét được cả Mail, Tin nhắn, Library. <a href="cai-dat/#b6">Xem cách làm</a>.</li></ol>
-  <p class="small">Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Mã nguồn công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>.</p>
+  <div class="ins">
+    <div>
+      <h2>Cài đặt</h2>
+      <p class="lead">Cần macOS 14 trở lên, chạy được cả máy chip Apple và máy Intel.</p>
+      <div class="note">Tidymint chưa được Apple công chứng nên lần mở đầu macOS sẽ chặn, như mọi app chưa công chứng. <a href="https://github.com/sponsors/HaiTrung-Workspace">Ủng hộ dự án</a> giúp mua tài khoản Apple Developer: khi đó app mở là chạy, cập nhật tới nhanh hơn.</div>
+      <p class="small">Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Mã nguồn công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>.</p>
+    </div>
+    <ol class="tl"><li><span class="n">1</span><h4>Tải về</h4><p>Bấm <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint</a>, mở <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).</p></li><li><span class="n">2</span><h4>Mở lần đầu</h4><p>Nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.</p></li><li><span class="n">3</span><h4>Cho phép mở</h4><p>Vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b>, bấm <b>Vẫn mở</b> (Open Anyway) rồi xác nhận bằng mật khẩu máy. <a href="cai-dat/">Hướng dẫn từng bước có ảnh</a>.</p></li><li><span class="n">4</span><h4>Truy cập toàn bộ ổ đĩa <span class="opt">không bắt buộc</span></h4><p>Trong Quyền riêng tư &amp; Bảo mật, mở <b>Truy cập toàn bộ ổ đĩa</b> và bật Tidymint để quét được cả Mail, Tin nhắn, Library. <a href="cai-dat/#s6">Xem cách làm</a>.</p></li></ol>
+  </div>
   <div class="signup" id="dang-ky" style="margin-top:36px">
     <h2 style="margin-bottom:6px">Nhận tin khi có bản mới</h2>
     <p class="small" style="margin:0">Mẹo giữ máy gọn và thông báo phiên bản mới, mỗi tháng tối đa một thư.</p>

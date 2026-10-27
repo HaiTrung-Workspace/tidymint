@@ -78,11 +78,11 @@ dict(
 <p><b>Nên chọn CleanMyMac</b> nếu bạn muốn một app trọn gói có bộ quét mã độc riêng và sẵn sàng trả phí. <b>Nên chọn Tidymint</b> nếu bạn chỉ cần máy gọn, ổ trống, và muốn biết chính xác cái gì bị xoá.</p>
 
 <h2 id="cai-tidymint">Cài Tidymint trong 2 phút</h2>
-<ol class="steps">
-<li><b>Tải về:</b> bấm <a href="{DL}">Tải Tidymint</a>, mở file zip, kéo Tidymint vào thư mục <b>Ứng dụng</b>.</li>
-<li><b>Mở lần đầu:</b> macOS báo không mở được vì app chưa được Apple công chứng. Bấm <b>Xong</b>.</li>
-<li><b>Cho phép:</b> vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b> (giữa trang), bấm <b>Vẫn mở</b> rồi <b>Mở</b>. Không thấy nút thì nhấp đúp app lần nữa rồi quay lại.</li>
-<li><b>Cấp quyền đọc ổ đĩa</b> trong mục <b>Truy cập toàn bộ ổ đĩa</b> để app đo được mọi thư mục.</li>
+<ol class="tl">
+<li><span class="n">1</span><h4>Tải về</h4><p>Bấm <a href="{DL}">Tải Tidymint</a>, mở file zip, kéo Tidymint vào thư mục <b>Ứng dụng</b>.</p></li>
+<li><span class="n">2</span><h4>Mở lần đầu</h4><p>macOS báo không mở được vì app chưa được Apple công chứng. Bấm <b>Xong</b>.</p></li>
+<li><span class="n">3</span><h4>Cho phép mở</h4><p>Vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b>, bấm <b>Vẫn mở</b> rồi <b>Mở</b>. Không thấy nút thì nhấp đúp app lần nữa rồi quay lại.</p></li>
+<li><span class="n">4</span><h4>Truy cập toàn bộ ổ đĩa <span class="opt">không bắt buộc</span></h4><p>Bật Tidymint trong mục <b>Truy cập toàn bộ ổ đĩa</b> để app đo được mọi thư mục.</p></li>
 </ol>
 <p>Hướng dẫn có hình chi tiết ở <a href="{HOME}#cai-dat">trang chủ</a>. Ứng dụng cần macOS 14 trở lên, chạy được trên cả máy chip Apple và Intel.</p>
 """,

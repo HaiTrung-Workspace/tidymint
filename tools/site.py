@@ -36,12 +36,13 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0
 details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
 summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
 details p{color:var(--sub);margin:0 0 16px}
+.ins{display:grid;grid-template-columns:340px 1fr;gap:48px;align-items:start}.tl{list-style:none;margin:0;padding:0;position:relative}.tl:before{content:"";position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--line)}.tl li{position:relative;padding:0 0 28px 60px;color:var(--sub)}.tl li:last-child{padding-bottom:0}.tl .n{position:absolute;left:4px;top:0;width:32px;height:32px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}.tl h4{margin:4px 0 4px;font-size:18px;color:var(--text)}.tl p{margin:0}.tl b{color:var(--text)}.opt{font-size:13px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:8px;font-weight:500;vertical-align:middle}
 .steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
 .note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}
 .fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
 .fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols .brand{display:flex;align-items:center;gap:10px;padding:0;font-size:18px;color:var(--text)}.fcols .brand:hover{text-decoration:none}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
 footer{border-top:0;padding:0 0 28px}
-@media (max-width:820px){.def,.fcols{grid-template-columns:1fr}.grid{grid-template-columns:repeat(3,1fr);gap:10px}.grid.uses{grid-template-columns:1fr 1fr}.grid .card{padding:14px}.grid .card span{font-size:14px}.grid .card .hd b{font-size:15px}.vs{gap:12px}.vs .col{padding:18px}.vs h3{font-size:18px}.how{gap:8px}.how .arr{width:26px;height:26px}.how .arr svg{width:14px;height:14px}.how .card{padding:16px}.how .card span{font-size:14px}.navcta{display:none}}
+@media (max-width:820px){.def,.fcols{grid-template-columns:1fr}.ins{grid-template-columns:1fr;gap:24px}.grid{grid-template-columns:repeat(3,1fr);gap:10px}.grid.uses{grid-template-columns:1fr 1fr}.grid .card{padding:14px}.grid .card span{font-size:14px}.grid .card .hd b{font-size:15px}.vs{gap:12px}.vs .col{padding:18px}.vs h3{font-size:18px}.how{gap:8px}.how .arr{width:26px;height:26px}.how .arr svg{width:14px;height:14px}.how .card{padding:16px}.how .card span{font-size:14px}.navcta{display:none}}
 @media (max-width:600px){.vs,.how,.grid,.grid.uses{grid-template-columns:1fr}.how .arr svg{transform:rotate(90deg)}}
 
 /* Hover only on things that can be clicked. Nothing moves its box on hover (moving boxes made the
@@ -116,10 +117,10 @@ T = {
        ("Is there a Windows or iPhone version?","A Windows version is in development, no release date yet. iPhone: no, iOS does not let apps clean other apps' data.")],
   inst_h="Install", inst_lead="macOS 14 or later, Apple silicon and Intel.",
   inst_note="Tidymint is not notarized by Apple yet, so macOS blocks the first launch, like any app without notarization. <a href=\"%s\">Sponsoring the project</a> pays for the Apple Developer account: then the app just opens and updates arrive faster." % "https://github.com/sponsors/HaiTrung-Workspace",
-  inst=['<b>Download</b> <a href="%s">Tidymint.zip</a>, open it and drag <b>Tidymint</b> to <b>Applications</b>.' % DL,
-        '<b>First launch:</b> double-click Tidymint. When macOS says it cannot be opened, click <b>Done</b>.',
-        '<b>Allow it:</b> open <b>System Settings › Privacy &amp; Security</b>, scroll to the <b>Security</b> heading (halfway down) and click <b>Open Anyway</b>, then confirm with your password. <a href="install/">Step-by-step guide with screenshots</a>.',
-        '<b>Full Disk Access</b> (optional): in Privacy &amp; Security, open <b>Full Disk Access</b> and turn on Tidymint, so Mail, Messages and Library are measured too. <a href="install/#s6">How</a>.'],
+  inst=[("Download",'Click <a href="%s">Download Tidymint</a>, open <b>Tidymint.zip</b> in Downloads and drag <b>Tidymint</b> to <b>Applications</b>.' % DL),
+        ("First launch",'Double-click Tidymint. When macOS says it cannot be opened, click <b>Done</b>. Do not choose Move to Trash.'),
+        ("Allow it",'Open <b>System Settings › Privacy &amp; Security</b>, scroll to the <b>Security</b> heading and click <b>Open Anyway</b>, then confirm with your password. <a href="install/">Step-by-step guide with screenshots</a>.'),
+        ("Full Disk Access <span class=\"opt\">optional</span>",'In Privacy &amp; Security, open <b>Full Disk Access</b> and turn on Tidymint, so Mail, Messages and Library are measured too. <a href="install/#s6">How</a>.')],
   inst_small='Steps from Apple: <a href="https://support.apple.com/102445">Safely open apps on your Mac</a>. Source code and build steps are on <a href="%s">GitHub</a>.' % GH,
   sign_h="Get updates", sign_p="Mac tips and new releases, at most one email a month.", sign_ph="name@example.com", sign_btn="Subscribe",
   consent="Get the latest updates. Unsubscribe any time.",
@@ -166,10 +167,10 @@ T = {
        ("Có bản Windows hay iPhone không?","Bản Windows đang làm, chưa có ngày ra. iPhone: không, iOS không cho app dọn dữ liệu app khác.")],
   inst_h="Cài đặt", inst_lead="Cần macOS 14 trở lên, chạy được cả máy chip Apple và máy Intel.",
   inst_note="Tidymint chưa được Apple công chứng nên lần mở đầu macOS sẽ chặn, như mọi app chưa công chứng. <a href=\"%s\">Ủng hộ dự án</a> giúp mua tài khoản Apple Developer: khi đó app mở là chạy, cập nhật tới nhanh hơn." % "https://github.com/sponsors/HaiTrung-Workspace",
-  inst=['<b>Tải về:</b> bấm <a href="%s">Tải Tidymint</a>, mở file <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).' % DL,
-        '<b>Mở lần đầu:</b> nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.',
-        '<b>Cho phép mở:</b> vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b> (giữa trang), bấm <b>Vẫn mở</b> (Open Anyway) rồi xác nhận bằng mật khẩu máy. <a href="cai-dat/">Hướng dẫn từng bước có ảnh</a>.',
-        '<b>Truy cập toàn bộ ổ đĩa</b> (không bắt buộc): trong Quyền riêng tư &amp; Bảo mật, mở <b>Truy cập toàn bộ ổ đĩa</b> và bật Tidymint để quét được cả Mail, Tin nhắn, Library. <a href="cai-dat/#b6">Xem cách làm</a>.'],
+  inst=[("Tải về",'Bấm <a href="%s">Tải Tidymint</a>, mở <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).' % DL),
+        ("Mở lần đầu",'Nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.'),
+        ("Cho phép mở",'Vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b>, bấm <b>Vẫn mở</b> (Open Anyway) rồi xác nhận bằng mật khẩu máy. <a href="cai-dat/">Hướng dẫn từng bước có ảnh</a>.'),
+        ("Truy cập toàn bộ ổ đĩa <span class=\"opt\">không bắt buộc</span>",'Trong Quyền riêng tư &amp; Bảo mật, mở <b>Truy cập toàn bộ ổ đĩa</b> và bật Tidymint để quét được cả Mail, Tin nhắn, Library. <a href="cai-dat/#s6">Xem cách làm</a>.')],
   inst_small='Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Mã nguồn công khai trên <a href="%s">GitHub</a>.' % GH,
   sign_h="Nhận tin khi có bản mới", sign_p="Mẹo giữ máy gọn và thông báo phiên bản mới, mỗi tháng tối đa một thư.", sign_ph="ten@example.com", sign_btn="Đăng ký",
   consent="Nhận thông tin cập nhật mới nhất. Huỷ bất kỳ lúc nào.",
@@ -203,7 +204,7 @@ def page(k):
     arr = '<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>'
     how = arr.join('<div class="card"><div class="hd"><span class="n"></span><b>%s</b></div><span>%s</span></div>' % h for h in t["how"])
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), html.escape(a)) for q, a in t["faq"])
-    inst = "".join("<li>%s</li>" % s.replace("{img}", img) for s in t["inst"])
+    inst = "".join('<li><span class="n">%d</span><h4>%s</h4><p>%s</p></li>' % (k+1, a, b.replace("{img}", img)) for k, (a, b) in enumerate(t["inst"]))
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % l for l in links)) for h, links in t["f_cols"])
     m = t["msg"]
     redirect = "" if k == "vi" else "try{if(!localStorage.getItem('tm-lang')&&/^vi\\b/i.test(navigator.language||'')&&!location.hash)location.replace('vi/')}catch(e){}\n"
@@ -288,11 +289,15 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 </section>
 
 <section id="{i["i"]}">
-  <h2>{t["inst_h"]}</h2>
-  <p class="lead">{t["inst_lead"]}</p>
-  <div class="note">{t["inst_note"]}</div>
-  <ol class="steps">{inst}</ol>
-  <p class="small">{t["inst_small"]}</p>
+  <div class="ins">
+    <div>
+      <h2>{t["inst_h"]}</h2>
+      <p class="lead">{t["inst_lead"]}</p>
+      <div class="note">{t["inst_note"]}</div>
+      <p class="small">{t["inst_small"]}</p>
+    </div>
+    <ol class="tl">{inst}</ol>
+  </div>
   <div class="signup" id="{i["s"]}" style="margin-top:36px">
     <h2 style="margin-bottom:6px">{t["sign_h"]}</h2>
     <p class="small" style="margin:0">{t["sign_p"]}</p>
