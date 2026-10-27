@@ -3457,9 +3457,11 @@ struct SettingsView: View {
             }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
             settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
                        vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
-                                            : t("Checked once a day against GitHub. Nothing about your Mac is sent.", "Kiểm tra mỗi ngày một lần trên GitHub. Không gửi thông tin gì về máy.")) {
+                                            : t("Checks GitHub once a day for a new version; nothing about your Mac is sent. Tidymint is free and will stay free. Sponsorships go toward the Apple Developer account ($99/year): with it, Apple verifies the app, new users just open it and it runs, no trip to Settings > Security, and each update reaches you faster.",
+                                                "Kiểm tra bản mới mỗi ngày một lần trên GitHub, không gửi thông tin gì về máy. Tidymint miễn phí và sẽ luôn miễn phí. Mỗi khoản ủng hộ góp vào tài khoản Apple Developer (99 USD/năm): có nó, app được Apple xác nhận, người mới cài chỉ cần mở là chạy, không phải qua bước Cài đặt > Bảo mật, và mỗi bản cập nhật tới tay bạn nhanh hơn.")) {
                 HStack(spacing: 10) {
                     if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }
+                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/HaiTrung-Workspace")!) })
                     if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }) }
                     else { GhostButton(title: t("Check now", "Kiểm tra ngay")) { vm.checkUpdates(force: true) } }
                 }
@@ -3475,11 +3477,6 @@ struct SettingsView: View {
             settingRow(t("High memory alert", "Cảnh báo RAM cao"),
                        t("Notify when more than 90% of RAM is in use (at most once an hour).", "Báo khi RAM dùng trên 90% (tối đa 1 giờ báo một lần).")) {
                 Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden()
-            }
-            settingRow(t("Support the project", "Ủng hộ dự án"),
-                       t("Tidymint is free and stays free. Sponsorships go toward the Apple Developer account (notarization, no Open Anyway step) and time for new features.",
-                         "Tidymint miễn phí và sẽ luôn miễn phí. Tiền ủng hộ dùng cho tài khoản Apple Developer (công chứng app, bỏ bước Vẫn mở) và thời gian làm tính năng mới.")) {
-                GhostButton(title: t("Sponsor on GitHub", "Ủng hộ trên GitHub")) { NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/HaiTrung-Workspace")!) }
             }
             if appLang == "vi" {
                 settingRow("Cùng tác giả: Cồn Cào", "Kiến thức đồ uống tiếng Việt: whisky, sake, cocktail.") {
