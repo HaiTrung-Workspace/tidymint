@@ -245,7 +245,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <header class="hero">
   <h1>{t["h1"]}</h1>
   <p>{t["sub"]}</p>
-  <div class="cta"><a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">→</span></a><a class="btn ghost" href="#{i["i"]}">{t["cta2"]}</a></div>
+  <div class="cta"><a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost" href="#{i["i"]}">{t["cta2"]}</a></div>
   <div class="badges">{"".join("<span>%s</span>" % b for b in t["badges"])}</div>
   <div class="shot"><img src="{shot}smart.jpg" alt="{t["shot_alt"]}" width="1600" height="1013"></div>
 </header>
@@ -304,7 +304,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 
 <section style="text-align:center;padding-top:20px">
   <h2>{t["end_h"]}</h2><p class="lead" style="margin:0 auto 24px">{t["end_p"]}</p>
-  <a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">→</span></a>
+  <a class="btn primary" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a>
 </section>
 
 <div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
