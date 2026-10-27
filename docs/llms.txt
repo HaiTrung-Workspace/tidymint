@@ -23,6 +23,8 @@
 - Install step by step with screenshots: https://tidymint.app/install/
 - (Vietnamese) Cài đặt từng bước có ảnh: https://tidymint.app/vi/cai-dat/
 - How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/
+- Why a Mac keeps filling up by itself and how to stop it: https://tidymint.app/mac-storage-keeps-filling-up/
+- (Vietnamese) Vì sao Mac tự đầy ổ và cách xử lý: https://tidymint.app/vi/mac-tu-day-o/
 - How to free up space on Mac (incl. clearing cache): https://tidymint.app/free-up-space-mac/
 - Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
 - (Vietnamese) CleanMyMac miễn phí, lựa chọn hợp pháp: https://tidymint.app/vi/cleanmymac-mien-phi/

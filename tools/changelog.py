@@ -2,9 +2,15 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.3.3", date="", status="next",
-         en=["Only one copy of Tidymint runs at a time: launching a new build quits the old one",
+         en=["Reminder on the home page when Full Disk Access is off, with a button to the right setting",
+             "Fewer permission pop-ups when Full Disk Access is off",
+             "Duplicate finder says when the link check is running",
+             "Only one copy of Tidymint runs at a time: launching a new build quits the old one",
              "Install guide with a screenshot for every step"],
-         vi=["Chỉ một bản Tidymint chạy tại một lúc: mở bản mới sẽ tự tắt bản cũ",
+         vi=["Nhắc trên trang chủ khi chưa có quyền Truy cập toàn bộ ổ đĩa, kèm nút mở đúng mục cài đặt",
+             "Bớt hộp xin quyền khi chưa có quyền Truy cập toàn bộ ổ đĩa",
+             "Tìm file trùng báo rõ khi đang kiểm tra liên kết",
+             "Chỉ một bản Tidymint chạy tại một lúc: mở bản mới sẽ tự tắt bản cũ",
              "Hướng dẫn cài đặt có ảnh cho từng bước"]),
     dict(ver="0.3.2", date="2026-10-27", status="released",
          en=["New: Star White, a light theme",

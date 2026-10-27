@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vì sao Mac tự đầy ổ dù không tải gì, và cách chặn | Tidymint</title>
+<meta name="description" content="Ổ Mac cứ đầy dần dù bạn không tải gì? Sáu thứ âm thầm ngốn chỗ: snapshot Time Machine, bộ nhớ đệm, sao lưu iPhone, Mail, đồ lập trình, model AI.">
+<link rel="canonical" href="https://tidymint.app/vi/mac-tu-day-o/">
+<link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/mac-tu-day-o/"><link rel="alternate" hreflang="en" href="https://tidymint.app/mac-storage-keeps-filling-up/">
+<link rel="icon" href="../../favicon.png">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vì sao Mac tự đầy ổ dù không tải gì, và cách chặn | Tidymint">
+<meta property="og:description" content="Ổ Mac cứ đầy dần dù bạn không tải gì? Sáu thứ âm thầm ngốn chỗ: snapshot Time Machine, bộ nhớ đệm, sao lưu iPhone, Mail, đồ lập trình, model AI.">
+<meta property="og:image" content="https://tidymint.app/smart.jpg">
+<meta property="og:url" content="https://tidymint.app/vi/mac-tu-day-o/">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
+var tmC=null;try{tmC=localStorage.getItem('tm-consent');var nt=new URLSearchParams(location.search).get('notrack');if(nt==='1')localStorage.setItem('tm-notrack','1');if(nt==='0')localStorage.removeItem('tm-notrack');if(localStorage.getItem('tm-notrack')==='1')window['ga-disable-G-19HEJDJPN3']=true}catch(e){}
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:tmC==='yes'?'granted':'denied',wait_for_update:500});
+gtag('js',new Date());gtag('config','G-19HEJDJPN3');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-19HEJDJPN3"></script>
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Article", "headline": "Vì sao Mac tự đầy ổ dù bạn không tải gì, và cách chặn", "description": "Ổ Mac cứ đầy dần dù bạn không tải gì? Sáu thứ âm thầm ngốn chỗ: snapshot Time Machine, bộ nhớ đệm, sao lưu iPhone, Mail, đồ lập trình, model AI.", "inLanguage": "vi", "datePublished": "2026-10-27", "dateModified": "2026-10-27", "mainEntityOfPage": "https://tidymint.app/vi/mac-tu-day-o/", "image": "https://tidymint.app/smart.jpg", "author": {"@type": "Organization", "name": "Tidymint", "url": "https://tidymint.app/"}, "publisher": {"@type": "Organization", "name": "Tidymint", "logo": {"@type": "ImageObject", "url": "https://tidymint.app/icon.png"}}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Ổ Mac cứ tăng dần có phải virus không?", "acceptedAnswer": {"@type": "Answer", "text": "Gần như không bao giờ. Phần tăng đến từ snapshot, bộ nhớ đệm, sao lưu và nhật ký mà macOS cùng app bình thường tự ghi. Quét bảo mật không hại gì, nhưng cách sửa là quản lý các thư mục đó, không phải cài diệt virus."}}, {"@type": "Question", "name": "Sao Dữ liệu hệ thống tự lên xuống?", "acceptedAnswer": {"@type": "Answer", "text": "macOS tạo snapshot Time Machine mỗi giờ và xoá khi cần chỗ, đồng thời dọn cache khi ổ chật. Con số bạn thấy là mục tiêu di động, nên so hai ngày cách nhau hữu ích hơn nhìn một lần."}}, {"@type": "Question", "name": "Xoá cả thư mục Caches được không?", "acceptedAnswer": {"@type": "Answer", "text": "Chuyển ~/Library/Caches vào Thùng rác nhìn chung an toàn, app tự tạo lại. Lần mở đầu sẽ chậm hơn và một số app mất nội dung ngoại tuyến. Tuyệt đối không xoá tay /System hay /private/var."}}, {"@type": "Question", "name": "Dọn các thư mục này có mất ảnh hay tài liệu không?", "acceptedAnswer": {"@type": "Answer", "text": "Không. Tài liệu, Màn hình chính, Ảnh và thư viện Ảnh nằm riêng. Các thư mục trong bài chứa bản sao, bộ nhớ đệm và sao lưu. Tránh xa cơ sở dữ liệu của Mail, Tin nhắn, thư viện Ảnh trừ khi dùng đúng cài đặt của app."}}, {"@type": "Question", "name": "Tidymint có tự sửa chuyện này không?", "acceptedAnswer": {"@type": "Answer", "text": "App tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá."}}]}, {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Trang chủ", "item": "https://tidymint.app/vi/"}, {"@type": "ListItem", "position": 2, "name": "Mac tự đầy ổ", "item": "https://tidymint.app/vi/mac-tu-day-o/"}]}]</script>
+<style>
+:root{--bg:#030c09;--bg2:#061712;--card:#0c231cb3;--line:#ffffff1f;--text:#f0fff9;--sub:#b9d6cb;--mint:#2fd39f;--mint2:#0f8f68;--leaf:#5ff0c0}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:radial-gradient(1200px 600px at 80% -10%,#145c4740,transparent),linear-gradient(180deg,var(--bg),var(--bg2) 60%,var(--bg))}
+a{color:var(--leaf);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;position:sticky;top:0;z-index:10;background:#06150fcc;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 100vmax #06150fcc;clip-path:inset(0 -100vmax)}.navr{display:flex;align-items:center;gap:22px}.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--text)}
+.brand img{width:36px;height:36px}.brand .mint{color:var(--leaf)}
+nav .links{display:flex;gap:22px;font-size:15px}nav .links a{color:var(--sub)}
+.hero{text-align:center;padding:56px 0 24px}
+.hero h1{font-size:clamp(34px,5.5vw,60px);line-height:1.08;margin:0 0 16px;letter-spacing:-.02em}
+.hero h1 span{background:linear-gradient(90deg,var(--leaf),var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:clamp(17px,2vw,20px);color:var(--sub);max-width:680px;margin:0 auto 28px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:999px;font-weight:600;font-size:16px;border:0;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--mint),var(--mint2));color:#fff;box-shadow:0 8px 24px #0f8f6855}
+.btn.ghost{border:1px solid #ffffff40;color:var(--text);background:transparent}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.badges{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:22px;color:var(--sub);font-size:14px}
+.shot{margin:40px auto 0;max-width:1040px}
+.shot img{width:100%;height:auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 30px 80px #0009}
+section{padding:72px 0}
+h2{font-size:clamp(26px,3.4vw,38px);margin:0 0 12px;letter-spacing:-.01em}
+.lead{color:var(--sub);max-width:640px;margin:0 0 36px}
+.feature{display:grid;grid-template-columns:1fr 1.35fr;gap:40px;align-items:center;margin-bottom:64px}
+.feature:nth-child(even) .text{order:2}
+.feature h3{font-size:24px;margin:0 0 10px}
+.feature p{color:var(--sub);margin:0 0 10px}
+.feature ul{color:var(--sub);padding-left:20px;margin:0}
+.feature img{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card b{display:block;margin-bottom:6px}
+.card span{color:var(--sub);font-size:15px}
+pre{background:#00000059;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d6fff0}
+.signup{background:linear-gradient(135deg,#145c4755,#0b262099);border:1px solid var(--line);border-radius:20px;padding:36px;text-align:center}
+.signup form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.signup input{min-width:280px;padding:13px 16px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
+.small{font-size:13px;color:var(--sub)}
+.steps{padding-left:22px;color:var(--sub)}.steps li{margin-bottom:10px}.steps b{color:var(--text)}
+#msg{min-height:22px;margin-top:10px;font-size:15px}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+@media (max-width:820px){.feature{grid-template-columns:1fr;gap:18px}.feature:nth-child(even) .text{order:0}.grid{grid-template-columns:1fr}nav .links{display:none}.signup{padding:24px}.signup input{min-width:0;width:100%}}
+
+.topnav{position:sticky;top:0;z-index:10;background:#030c09e6;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #ffffff12}
+nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.navr{display:flex;align-items:center;gap:22px}
+.lang{display:inline-flex;border:1px solid #ffffff33;border-radius:8px;padding:2px;gap:2px;font-size:13px;font-weight:600}
+.lang a{padding:3px 9px;border-radius:6px;color:var(--sub)}.lang a:hover{text-decoration:none;color:var(--text)}.lang a.on{background:#ffffff26;color:var(--text)}
+.navcta{padding:7px 14px;font-size:14px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vs .col{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.vs .col.good{border-color:#2fd39f66;background:linear-gradient(160deg,#145c4766,#10302780)}
+.vs h3{margin:0 0 12px;font-size:20px}.vs ul{list-style:none;padding:0;margin:0}.vs li{padding:8px 0 8px 30px;position:relative;color:var(--sub);border-top:1px solid var(--line)}
+.vs li:before{position:absolute;left:4px;top:8px;font-weight:700}.vs .bad li:before{content:"✕";color:#ff7a7a}.vs .good li:before{content:"✓";color:var(--leaf)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf);margin-bottom:8px}
+.def{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center}
+.def p{color:var(--sub)}.def ul{color:var(--sub);padding-left:20px}
+.how{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:12px;counter-reset:h}.how .arr{flex:none;width:36px;height:36px;border-radius:50%;background:#2fd39f14;border:1px solid #2fd39f33;color:var(--leaf);display:flex;align-items:center;justify-content:center;justify-self:center;align-self:center}.how .arr svg{width:20px;height:20px}
+.card .hd{display:flex;align-items:center;gap:12px;margin-bottom:10px}.card .hd b{margin:0;font-size:17px}
+.how .card{counter-increment:h}.how .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}.how .n:before{content:counter(h)}
+.ico{flex:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;color:var(--leaf);background:#2fd39f14;border:1px solid #2fd39f33}.ico svg{display:block}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin-bottom:10px}
+summary{cursor:pointer;padding:16px 0;font-weight:600;list-style:none}summary::-webkit-details-marker{display:none}summary:after{content:"+";float:right;color:var(--leaf);font-size:20px;line-height:1}details[open] summary:after{content:"−"}
+details p{color:var(--sub);margin:0 0 16px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 20px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 58px;margin-bottom:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--sub)}.steps li b{color:var(--text)}.steps li:before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--mint2);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.note{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 16px;color:var(--sub);font-size:15px;margin-bottom:20px}
+.fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
+.fcols h4{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols .brand{display:flex;align-items:center;gap:10px;padding:0;font-size:18px;color:var(--text)}.fcols .brand:hover{text-decoration:none}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
+footer{border-top:0;padding:0 0 28px}
+@media (max-width:820px){.vs,.def,.how,.fcols{grid-template-columns:1fr}.how .arr svg{transform:rotate(90deg)}.navcta{display:none}}
+
+/* Hover only on things that can be clicked. Nothing moves its box on hover (moving boxes made the
+   pointer slip off the edge and flicker); feedback is a glow ring, border and background change. */
+.btn,.topbar a,.lang a,details,nav .links a,.fcols a{transition:box-shadow .18s ease,border-color .18s ease,background-color .18s ease,color .18s ease}
+.btn:hover{filter:none}
+@media (hover:hover){
+ .btn.primary:hover{box-shadow:0 0 0 3px #2fd39f40,0 10px 26px #0f8f6866}
+ .btn.ghost:hover{border-color:#2fd39faa;background-color:#ffffff0d}
+ .topbar a:hover{border-color:#2fd39faa;background-color:#ffffff0d;box-shadow:0 0 0 3px #2fd39f26}
+ details:hover{border-color:#2fd39f66}
+ nav .links a:hover{color:var(--text);text-decoration:none}.fcols a:hover{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+footer span a{color:var(--leaf);text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px}footer span a:hover{text-decoration-color:var(--leaf)}
+ .lang a:hover{background-color:#ffffff14}
+ .up:hover{border-color:#2fd39f;box-shadow:0 14px 36px #0f8f6866}
+}
+.btn:active,.topbar a:active{filter:brightness(.92)}
+.arr{display:inline-block;transition:transform .18s ease}a:hover .arr{transform:translateX(4px)}
+.topbar{text-align:center;padding:8px 0 28px}
+.topbar a{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid #ffffff33;color:var(--text);font-size:14px;font-weight:600}
+.topbar a:hover{text-decoration:none}
+.up{position:fixed;left:50%;bottom:22px;transform:translate(-50%,90px);opacity:0;pointer-events:none;z-index:20;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1px solid #2fd39f66;background:#0b2620f2;color:var(--text);font-family:inherit;font-size:14px;font-weight:600;box-shadow:0 12px 30px #0008;cursor:pointer;transition:transform .25s ease,opacity .25s ease,box-shadow .18s ease,border-color .18s ease}
+.up.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.up.show:active{transform:translate(-50%,0) scale(.98)}
+summary{user-select:none}
+.ck{position:fixed;left:16px;bottom:16px;z-index:30;max-width:380px;background:#0b2620f7;border:1px solid #2fd39f55;border-radius:14px;padding:14px 16px;box-shadow:0 12px 30px #0009;font-size:14px;color:var(--sub);display:none}
+.ck.show{display:block}.ck p{margin:0 0 10px}.ck .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ck button{font:600 14px/1 inherit;font-family:inherit;padding:9px 16px;border-radius:999px;cursor:pointer;border:1px solid #ffffff33;background:transparent;color:var(--text)}
+.ck button.yes{background:linear-gradient(90deg,var(--mint),var(--mint2));border:0;color:#fff}
+.linkbtn{background:none;border:0;padding:0;color:var(--sub);font:inherit;cursor:pointer;text-decoration:underline}
+@media (max-width:820px){.ck{left:12px;right:12px;max-width:none}}
+.topnav nav{clip-path:none;box-shadow:none;background:transparent;position:static}
+.mbtn{display:none;background:none;border:1px solid #ffffff33;border-radius:8px;color:var(--text);font:600 18px/1 inherit;font-family:inherit;width:38px;height:34px;cursor:pointer;align-items:center;justify-content:center}
+@media (max-width:820px){.mbtn{display:inline-flex}.navr{gap:10px}
+ .topnav.open nav .links{display:flex;flex-direction:column;gap:0;position:absolute;top:100%;left:0;right:0;background:#030c09;padding:6px 20px 14px;z-index:30;border-bottom:1px solid #ffffff1a;box-shadow:0 18px 30px #0008}
+ .topnav.open nav .links a{padding:13px 0;border-bottom:1px solid #ffffff12;color:var(--text);font-size:16px}.topnav.open nav .links a:last-child{border-bottom:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.crumb{font-size:14px;color:var(--sub);margin:28px 0 0}.crumb a{color:var(--sub)}
+.art{max-width:760px;margin:0 auto;padding:12px 0 40px}
+.art h1{font-size:clamp(30px,4.4vw,46px);line-height:1.15;letter-spacing:-.02em;margin:14px 0 14px}
+.art .meta{color:var(--sub);font-size:14px;margin:0 0 26px}
+.art h2{font-size:clamp(23px,2.8vw,30px);margin:46px 0 12px;scroll-margin-top:80px}
+.art h3{font-size:19px;margin:28px 0 8px}
+.art p,.art li{color:#cfe6dc;font-size:17px;line-height:1.7}.art li{margin-bottom:6px}
+.art strong,.art b{color:var(--text)}
+.tldr{background:linear-gradient(135deg,#145c4755,#0b262099);border:1px solid #2fd39f55;border-radius:14px;padding:18px 22px;margin:0 0 26px}
+.tldr p{margin:0}.tldr .k{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--leaf);margin-bottom:6px}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;margin:0 0 10px}
+.toc b{display:block;margin-bottom:6px}.toc ol{margin:0;padding-left:20px}.toc li{font-size:15px;margin:3px 0}.toc a{color:var(--sub)}
+.tbl{overflow-x:auto;margin:18px 0}
+.art table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+.art th,.art td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;color:#cfe6dc}
+.art th{background:#ffffff0d;color:var(--text)}
+.art td.y{color:var(--leaf)}.art td.n{color:#ff9a9a}
+.box{border-radius:16px;padding:22px 24px;margin:30px 0;background:linear-gradient(135deg,#145c4766,#10302780);border:1px solid #2fd39f66}
+.box h3{margin:0 0 6px}.box p{margin:0 0 14px}
+.pair{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 6px}.pair img{flex:1 1 0;min-width:0;max-width:360px}.pair-arrow{flex:none;width:44px;height:44px;border-radius:50%;background:#2fd39f14;border:1px solid #2fd39f33;color:var(--leaf);display:flex;align-items:center;justify-content:center}.pair-arrow svg{width:22px;height:22px}@media (max-width:640px){.pair{flex-direction:column}.pair img{max-width:100%}.pair-arrow svg{transform:rotate(90deg)}}
+.warn{background:#ffb02014;border:1px solid #ffb02055;border-radius:12px;padding:14px 18px;margin:18px 0}.warn p{margin:0}
+.art code{overflow-wrap:anywhere}.art pre{max-width:100%;white-space:pre-wrap;overflow-wrap:anywhere}
+.src{font-size:14px}.src li{font-size:14px;color:var(--sub)}
+.rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
+.rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
+@media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+</style>
+</head>
+<body id="top">
+<div class="topnav"><div class="wrap"><nav>
+  <a class="brand" href="../"><img src="../../icon.png" alt=""><span>Tidy<span class="mint">mint</span></span></a>
+  <div class="navr"><div class="links"><a href="../#tinh-nang">Tính năng</a><a href="../#cach-dung">Cách dùng</a><a href="../huong-dan/">Hướng dẫn</a><a href="../#hoi-dap">Hỏi đáp</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><a class="btn primary navcta" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải về</a><div class="lang" role="group" aria-label="Ngôn ngữ"><a class="on" href="./" data-l="vi">VI</a><a href="../../mac-storage-keeps-filling-up/" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
+</nav></div></div>
+<div class="wrap">
+<article class="art">
+  <p class="crumb"><a href="../">Trang chủ</a> › Mac tự đầy ổ</p>
+  <h1>Vì sao Mac tự đầy ổ dù bạn không tải gì, và cách chặn</h1>
+  <p class="meta">Cập nhật: 27/10/2026 · 7 phút đọc</p><div class="tldr"><span class="k">Tóm tắt nhanh</span><p>Mac tự tăng vài GB trong khi bạn không làm gì thường là do một trong sáu chỗ: <b>snapshot Time Machine</b>, <b>bộ nhớ đệm app và trình duyệt</b>, <b>bản sao lưu iPhone/iPad</b>, <b>file đính kèm Mail và Tin nhắn</b>, <b>đồ lập trình</b> (Xcode, Docker, node_modules) hoặc <b>model AI tải về</b>. Bài này chỉ cách tìm xem máy bạn đang phình ở đâu và chặn nó quay lại, không xoá nhầm thứ cần giữ.</p></div><div class="toc" role="navigation" aria-label="Trong bài"><b>Trong bài</b><ol><li><a href="#vi-sao">Vì sao ổ tăng khi bạn không làm gì</a></li><li><a href="#tim">Truy tìm thủ phạm</a></li><li><a href="#snapshot">Snapshot Time Machine</a></li><li><a href="#cache">Bộ nhớ đệm tự tạo lại</a></li><li><a href="#sao-luu">Sao lưu iPhone, iPad</a></li><li><a href="#mail">Đính kèm Mail và Tin nhắn</a></li><li><a href="#dev">Đồ lập trình</a></li><li><a href="#ai">Model AI và app tạo ảnh</a></li><li><a href="#chan">Dọn dẹp đơn giản với Tidymint</a></li><li><a href="#faq">Câu hỏi thường gặp</a></li></ol></div>
+  
+<h2 id="vi-sao">Vì sao ổ tăng khi bạn không làm gì</h2>
+<p>macOS và các app ghi file liên tục mà không hỏi: mỗi giờ một snapshot trước khi sao lưu, mỗi trang web một bộ nhớ đệm, mỗi ảnh bạn mở trong Tin nhắn một bản sao. Phần lớn rơi vào <b>Dữ liệu hệ thống</b> (máy cũ gọi là <b>Khác</b>), cái túi mà mục Dung lượng trong Cài đặt không giải thích được. Vì thế con số cứ leo lên trong khi thư mục Tài liệu vẫn y nguyên.</p>
+<p><b>Tin tốt:</b> gần như toàn bộ đều tự tạo lại được, hoặc là bản sao của thứ bạn vẫn còn ở chỗ khác, nên bỏ đi không mất gì.</p>
+<p><b>Tin xấu:</b> phải biết chỗ mà tìm, vì Finder giấu hầu hết các thư mục này.</p>
+
+<h2 id="tim">Truy tìm thủ phạm</h2>
+<ol class="steps">
+<li>Mở <b>menu Apple › Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>, ghi lại số của <b>Dữ liệu hệ thống</b>. Hôm sau xem lại. Lệch vài GB thì thủ phạm là một trong sáu mục dưới.</li>
+<li>Trong Finder bấm <b>Shift+Cmd+G</b>, gõ <code>~/Library</code>, Enter. Chuyển sang xem dạng danh sách, sắp theo dung lượng (Hiển thị › Hiện tuỳ chọn hiển thị › Tính toán tất cả kích cỡ). <code>Caches</code>, <code>Application Support</code> và <code>Containers</code> thường đứng đầu.</li>
+<li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
+</ol>
+<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp; app miễn phí, mã nguồn mở.</p>
+
+<h2 id="snapshot">Snapshot Time Machine</h2>
+<ul>
+<li><b>Là gì:</b> khi ổ Time Machine không cắm, macOS giữ snapshot mỗi giờ ngay trên ổ trong máy và chỉ dọn bớt khi sắp hết chỗ. Máy dùng nhiều có thể giữ 20–80 GB, Finder không hiện.</li>
+<li><b>Nhận ra:</b> <code>tmutil listlocalsnapshots /</code> ra nhiều ngày, hoặc mục Dung lượng ghi "Time Machine" hay "Sao lưu" là một khoản lớn.</li>
+<li><b>Sửa:</b> cắm ổ sao lưu cho chạy xong một lượt, hoặc gõ <code>tmutil thinlocalsnapshots / 999999999999 4</code> để bỏ ngay. Chúng sẽ quay lại theo thiết kế, nên máy nào lúc nào cũng chật thì cân nhắc tắt Time Machine và sao lưu cách khác.</li>
+</ul>
+
+<h2 id="cache">Bộ nhớ đệm tự tạo lại</h2>
+<ul>
+<li><b>Là gì:</b> <code>~/Library/Caches</code> và thư mục riêng của từng app trong <code>~/Library/Application Support</code>. Trình duyệt, Slack, Discord, Spotify, Zalo, Notion và nói chung app viết bằng Electron là thủ phạm quen; riêng trình duyệt đã 2–5 GB.</li>
+<li><b>Nhận ra:</b> thư mục mang tên app hoặc mã app (<code>com.google.Chrome</code>, <code>com.spotify.client</code>) to và nội dung bên trong đã vài ngày tuổi.</li>
+<li><b>Sửa:</b> thoát app, chuyển thư mục cache vào Thùng rác, mở lại app. App tự tạo lại phần cần. Không đụng <code>Database</code>, <code>.db</code>, <code>.sqlite</code> hay <code>Preferences</code>, đó là chỗ chứa đăng nhập và tin nhắn. Một số app có nút riêng: Chrome › Xoá dữ liệu duyệt web, Spotify › Cài đặt › Lưu trữ, Zalo › Cài đặt › Quản lý dữ liệu.</li>
+</ul>
+
+<h2 id="sao-luu">Sao lưu iPhone, iPad</h2>
+<ul>
+<li><b>Là gì:</b> mỗi lần sao lưu thiết bị vào Mac, một bản đầy đủ nằm ở <code>~/Library/Application Support/MobileSync/Backup</code>. Một bản sao lưu điện thoại 10–100 GB, và máy cũ đã bán vẫn để bản sao lưu lại mãi.</li>
+<li><b>Nhận ra:</b> mục Dung lượng ghi "Tệp iOS", hoặc thư mục trên rất to.</li>
+<li><b>Sửa:</b> trong Finder chọn thiết bị ở thanh bên, bấm <b>Quản lý bản sao lưu</b>, xoá bản của máy không còn dùng. Giữ bản mới nhất của máy đang dùng.</li>
+</ul>
+
+<h2 id="mail">Đính kèm Mail và Tin nhắn</h2>
+<ul>
+<li><b>Là gì:</b> Mail tải mọi file đính kèm của mọi tài khoản vào <code>~/Library/Mail</code>; Tin nhắn giữ mọi ảnh, video ai gửi cho bạn trong <code>~/Library/Messages/Attachments</code>. Cả hai lớn dần từng ngày và không bao giờ tự co lại.</li>
+<li><b>Sửa:</b> Mail › Cài đặt › Tài khoản › tài khoản của bạn › Tải tệp đính kèm: chọn <b>Gần đây</b> hoặc <b>Không</b>, rồi Hộp thư › Xoá các mục đã xoá. Với Tin nhắn, trong mục Dung lượng mở <b>Tin nhắn</b> và xoá các đính kèm lớn ở đó, hoặc đặt Cài đặt › Cài đặt chung › Giữ tin nhắn trong một năm. App dọn máy phải để yên hai thư mục này, Tidymint làm đúng vậy.</li>
+</ul>
+
+<h2 id="dev">Đồ lập trình</h2>
+<ul>
+<li><b>Là gì:</b> <code>DerivedData</code> của Xcode, máy ảo iOS và file hỗ trợ thiết bị cũ (<code>~/Library/Developer</code>, hay 30–100 GB); file ổ đĩa duy nhất của Docker Desktop chỉ có phình không co; <code>node_modules</code> trong mọi dự án; bộ nhớ đệm Homebrew, npm, pip.</li>
+<li><b>Sửa:</b> Xcode › Settings › Locations › DerivedData, xoá thư mục; <code>xcrun simctl delete unavailable</code>; Docker › Settings › Resources › Disk image size, rồi <code>docker system prune</code>; <code>npm cache clean --force</code>, <code>brew cleanup</code>. <code>node_modules</code> của dự án vài tháng không mở thì bỏ được, <code>npm install</code> là có lại.</li>
+</ul>
+
+<h2 id="ai">Model AI và app tạo ảnh</h2>
+<ul>
+<li><b>Là gì:</b> Ollama cất mọi model bạn từng tải trong <code>~/.ollama</code> (4–40 GB mỗi cái); Hugging Face đệm file tải về ở <code>~/.cache/huggingface</code>; các app Stable Diffusion giữ checkpoint và mọi ảnh đã tạo. Ít thứ nào trong số này hiện tên dễ hiểu ở mục Dung lượng.</li>
+<li><b>Sửa:</b> <code>ollama list</code> rồi <code>ollama rm &lt;model&gt;</code> với model không dùng nữa; xoá mục cũ trong cache Hugging Face; chuyển ảnh đã tạo ra ổ ngoài. Đây là nhóm thư mục làm nhiều người bất ngờ nhất, nên Bản đồ ổ đĩa của Tidymint gọi tên chúng rõ ràng.</li>
+</ul>
+<div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint <span class="arr">→</span></a> <a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div>
+<h2 id="chan">Dọn dẹp đơn giản với Tidymint</h2>
+<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
+<h3>Để ổ không đầy lại</h3>
+<ul>
+<li><b>Khởi động lại mỗi tuần.</b> macOS dọn file tạm và phần "có thể xoá" khi khởi động lại.</li>
+<li><b>Đổ Thùng rác.</b> File trong Thùng rác vẫn tính dung lượng. Finder › Cài đặt › Nâng cao › Xoá các mục khỏi Thùng rác sau 30 ngày sẽ làm hộ bạn.</li>
+<li><b>Đặt giới hạn ở app nào cho phép:</b> đính kèm Mail để Gần đây, Tin nhắn giữ một năm, Docker giới hạn file ổ đĩa, Spotify giới hạn cache.</li>
+<li><b>Mỗi tháng xem một lần.</b> Năm phút nhìn bản đồ ổ đĩa đỡ hơn một lần hoảng khi hiện "ổ đĩa sắp đầy".</li>
+</ul>
+<p>Lỡ "dọn dẹp" quá tay? Đừng lo, Tidymint chỉ chuyển dữ liệu thừa vào Thùng rác, mọi thứ vẫn hoàn tác được nếu bạn đổi ý.</p>
+
+  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Ổ Mac cứ tăng dần có phải virus không?</summary><p>Gần như không bao giờ. Phần tăng đến từ snapshot, bộ nhớ đệm, sao lưu và nhật ký mà macOS cùng app bình thường tự ghi. Quét bảo mật không hại gì, nhưng cách sửa là quản lý các thư mục đó, không phải cài diệt virus.</p></details><details><summary>Sao Dữ liệu hệ thống tự lên xuống?</summary><p>macOS tạo snapshot Time Machine mỗi giờ và xoá khi cần chỗ, đồng thời dọn cache khi ổ chật. Con số bạn thấy là mục tiêu di động, nên so hai ngày cách nhau hữu ích hơn nhìn một lần.</p></details><details><summary>Xoá cả thư mục Caches được không?</summary><p>Chuyển ~/Library/Caches vào Thùng rác nhìn chung an toàn, app tự tạo lại. Lần mở đầu sẽ chậm hơn và một số app mất nội dung ngoại tuyến. Tuyệt đối không xoá tay /System hay /private/var.</p></details><details><summary>Dọn các thư mục này có mất ảnh hay tài liệu không?</summary><p>Không. Tài liệu, Màn hình chính, Ảnh và thư viện Ảnh nằm riêng. Các thư mục trong bài chứa bản sao, bộ nhớ đệm và sao lưu. Tránh xa cơ sở dữ liệu của Mail, Tin nhắn, thư viện Ảnh trừ khi dùng đúng cài đặt của app.</p></details><details><summary>Tidymint có tự sửa chuyện này không?</summary><p>App tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá.</p></details><div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint <span class="arr">→</span></a> <a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/vi-vn/102624" rel="nofollow">Apple: Giải phóng dung lượng lưu trữ trên máy Mac</a></li><li><a href="https://support.apple.com/vi-vn/102154" rel="nofollow">Apple: Giới thiệu về snapshot cục bộ của Time Machine</a></li><li><a href="https://support.apple.com/vi-vn/108809" rel="nofollow">Apple: Định vị và quản lý bản sao lưu iPhone, iPad</a></li></ul>
+  <h2>Đọc thêm</h2><div class="rel"><a href="../zalo-chiem-dung-luong-macbook/">Zalo chiếm bao nhiêu GB trên MacBook <span class="arr">→</span></a><a href="../xoa-ung-dung-macbook/">Xóa ứng dụng trên MacBook sạch hoàn toàn <span class="arr">→</span></a><a href="../">Trang chủ Tidymint <span class="arr">→</span></a></div>
+</article>
+<div class="topbar"><a href="#top" id="toTop">↑ Lên đầu trang</a></div>
+<div class="fcols">
+  <div><a class="brand" href="../"><img src="../../icon.png" alt=""><span>Tidy<span class="mint">mint</span></span></a><p>Ứng dụng dọn dẹp MacBook miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành. Trang chính thức duy nhất: tidymint.app, tải chỉ từ GitHub.</p></div>
+  <div><h4>Sản phẩm</h4><a href="../#tinh-nang">Tính năng</a><a href="../#cach-dung">Cách dùng</a><a href="../#cai-dat">Cài đặt</a><a href="../lich-su-cap-nhat/">Lịch sử cập nhật</a><a href="https://github.com/HaiTrung-Workspace/tidymint/releases">Các phiên bản</a></div><div><h4>Hướng dẫn</h4><a href="../cai-dat/">Cài đặt từng bước</a><a href="../cleanmymac-mien-phi/">CleanMyMac miễn phí?</a><a href="../zalo-chiem-dung-luong-macbook/">Zalo chiếm dung lượng</a><a href="../xoa-ung-dung-macbook/">Xóa ứng dụng trên MacBook</a><a href="https://github.com/HaiTrung-Workspace/tidymint">Mã nguồn</a><a href="https://github.com/HaiTrung-Workspace/tidymint/issues">Báo lỗi</a></div><div><h4>Pháp lý</h4><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a><a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/LICENSE">Giấy phép MIT</a><a href="mailto:hello@tidymint.app">hello@tidymint.app</a></div>
+</div>
+<footer><span>© 2026 Tidymint · Cùng tác giả: <a href="https://concao.org/?utm_source=tidymint&amp;utm_medium=web&amp;utm_campaign=footer">Cồn Cào</a> · <button class="linkbtn" id="ckOpen" type="button">Cài đặt cookie</button></span></footer>
+</div>
+<button class="up" id="up" type="button" aria-label="Lên đầu trang">↑ Lên đầu trang</button>
+<div class="ck" id="ck" role="dialog" aria-live="polite"><p>Website dùng cookie Google Analytics để đếm lượt truy cập. Bản thân app Tidymint không theo dõi gì. <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">Quyền riêng tư</a></p><div class="row"><button class="yes" id="ckY" type="button">Đồng ý</button><button id="ckN" type="button">Từ chối</button></div></div>
+<script>
+(function(){var b=document.getElementById('mbtn'),n=document.querySelector('.topnav');function close(){n.classList.remove('open');b.setAttribute('aria-expanded',false);b.textContent='☰'}b.addEventListener('click',function(e){e.stopPropagation();var o=n.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'✕':'☰'});n.querySelectorAll('.links a').forEach(function(a){a.addEventListener('click',close)});document.addEventListener('click',function(e){if(n.classList.contains('open')&&!n.contains(e.target))close()});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&n.classList.contains('open')){close();b.focus()}})})();
+document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('tm-lang',a.dataset.l)}catch(e){}}));
+(function(){var up=document.getElementById('up'),bar=document.getElementById('toTop'),barIn=false,tick=false;
+function top(e){if(e)e.preventDefault();scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+up.addEventListener('click',top);bar.addEventListener('click',top);
+function upd(){tick=false;up.classList.toggle('show',scrollY>600&&!barIn)}
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){barIn=es[0].isIntersecting;upd()}).observe(bar);
+addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});upd();})();
+(function(){var ck=document.getElementById('ck');
+function show(v){ck.classList.toggle('show',v)}
+function set(v){try{localStorage.setItem('tm-consent',v)}catch(e){};gtag('consent','update',{analytics_storage:v==='yes'?'granted':'denied'});show(false)}
+document.getElementById('ckY').onclick=function(){set('yes')};document.getElementById('ckN').onclick=function(){set('no')};
+document.getElementById('ckOpen').onclick=function(){show(true)};
+if(!tmC)show(true);
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','download_click',{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide'})})});})();
+</script>
+</body>
+</html>
