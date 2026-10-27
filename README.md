@@ -113,6 +113,10 @@ Use **Contact** inside the app (an email address is required so you can get a re
 
 Self-hosting the collector: `backend/Code.gs` is a Google Apps Script that appends submissions to a Google Sheet. Deploy it as a web app and put its URL in `Backend.endpoint`.
 
+## Support the project
+
+Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://github.com/sponsors/HaiTrung-Workspace). Sponsorships go toward the Apple Developer account (so the app can be notarized and open without warnings) and time for new features.
+
 ## License
 
 MIT. See [LICENSE](LICENSE). The software is provided "as is", without warranty of any kind. Review what you select before cleaning.
