@@ -2,6 +2,7 @@
 """Generate docs/index.html (English) and docs/vi/index.html (Vietnamese) from one template.
 Run from the repository root: python3 tools/site.py"""
 import json, os, html
+from stamp import stamp
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GH = "https://github.com/HaiTrung-Workspace/tidymint"
@@ -350,5 +351,5 @@ document.getElementById('f').addEventListener('submit', async (e) => {{
 if __name__ == "__main__":
     for k, out in (("en", "docs/index.html"), ("vi", "docs/vi/index.html")):
         with open(os.path.join(ROOT, out), "w") as f:
-            f.write(page(k))
+            f.write(stamp(page(k), os.path.join(ROOT, out), ROOT))
         print("wrote", out)

@@ -4,7 +4,7 @@
 GUIDES = [
 dict(
   lang="vi", slug="cleanmymac-mien-phi", date="2026-10-26", read="8 phút đọc",
-  title="CleanMyMac miễn phí? Lựa chọn hợp pháp thay bản crack | Tidymint",
+  title="CleanMyMac miễn phí? Cách thay bản crack hợp pháp | Tidymint",
   desc="CleanMyMac không có bản miễn phí, chỉ dùng thử 7 ngày. Bản crack có rủi ro mã độc. Đây là các cách dọn Mac miễn phí và hợp pháp, kèm bảng so sánh.",
   crumb="CleanMyMac miễn phí",
   h1="CleanMyMac miễn phí: có cách nào hợp pháp không?",
@@ -107,7 +107,7 @@ dict(
 
 dict(
   lang="vi", slug="xoa-ung-dung-macbook", date="2026-10-26", read="6 phút đọc",
-  title="Cách xóa ứng dụng trên MacBook sạch hoàn toàn (macOS 26) | Tidymint",
+  title="Cách xóa ứng dụng trên MacBook sạch hoàn toàn | Tidymint",
   desc="Kéo app vào Thùng rác chưa xóa hết: cài đặt, bộ nhớ đệm vẫn còn. Hướng dẫn gỡ app trên MacBook đúng cách, kể cả macOS 26 Tahoe, và cách dọn phần sót lại.",
   crumb="Xóa ứng dụng trên MacBook",
   h1="Cách xóa ứng dụng trên MacBook sạch hoàn toàn",
@@ -535,7 +535,7 @@ dict(
 dict(
   lang="en", slug="clear-system-data-mac", date="2026-10-26", read="8 min read",
   title="How to Clear System Data on Mac (Safely) | Tidymint",
-  desc="System Data taking up 50 GB or more? Here is what it actually contains and 7 safe ways to shrink it on macOS, from caches and Time Machine snapshots to Xcode and Docker.",
+  desc="System Data taking 50 GB or more? What it actually contains and 7 safe ways to shrink it: caches, Time Machine snapshots, Xcode, Docker.",
   crumb="Clear System Data on Mac",
   h1="How to clear System Data on Mac, safely",
   tldr="System Data is macOS's catch-all bucket for files that don't fit another category: caches, logs, local Time Machine snapshots, old iPhone backups, developer tools and more. You can shrink it safely by <b>restarting</b>, <b>emptying the Trash</b>, <b>deleting local snapshots</b>, <b>clearing user caches</b>, <b>removing old device backups</b> and cleaning <b>Xcode, Docker or AI model caches</b>. Never delete anything inside <code>/System</code> or <code>/private/var</code>.",
@@ -615,7 +615,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 dict(
   lang="en", slug="free-up-space-mac", date="2026-10-26", read="7 min read",
   title="How to Free Up Space on Mac: 10 Safe Ways | Tidymint",
-  desc="Mac storage almost full? 10 safe ways to free up space on macOS: storage recommendations, clearing cache, large and duplicate files, unused apps and leftovers, and more.",
+  desc="Mac storage almost full? 10 safe ways to free up space on macOS: clear cache, find large and duplicate files, remove unused apps and leftovers.",
   crumb="Free up space on Mac",
   h1="How to free up space on Mac: 10 safe ways",
   tldr="Start with <b>System Settings › General › Storage</b> to see what is using space. Then work down this list: empty the Trash, clear Downloads, turn on <b>Optimize Storage</b>, <b>clear browser and app caches</b>, remove <b>large and duplicate files</b>, <b>uninstall apps</b> together with their leftovers, and delete old device backups. A free app like Tidymint can do most of this in one scan.",
@@ -668,7 +668,7 @@ dict(
 dict(
   lang="en", slug="cleanmymac-alternative", date="2026-10-26", read="6 min read",
   title="Free CleanMyMac Alternative (Open Source) | Tidymint",
-  desc="Looking for a free CleanMyMac alternative? Compare Tidymint, AppCleaner, Pearcleaner, OnyX and the tools built into macOS, with an honest look at what each one can't do.",
+  desc="Free CleanMyMac alternative? Compare Tidymint, AppCleaner, Pearcleaner, OnyX and the tools built into macOS, including what each one can't do.",
   crumb="Free CleanMyMac alternative",
   h1="The best free CleanMyMac alternatives",
   tldr="CleanMyMac has no free tier, only a <b>7-day trial</b>, then about <b>$40 a year</b> for one Mac. If you mainly need to <b>clear caches, uninstall apps cleanly and get disk space back</b>, free options cover it: <b>Tidymint</b> (free, open source, all-in-one cleaner), <b>AppCleaner</b> and <b>Pearcleaner</b> (uninstallers), <b>OnyX</b> (maintenance for power users) and macOS's own Storage settings. None of them replace CleanMyMac's malware scanner.",

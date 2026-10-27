@@ -2,7 +2,7 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
-## Unreleased (next: 0.3.3)
+## 0.3.3 (2026-10-27)
 
 - Reminder on the home page when Full Disk Access is off, with a button to the right setting
 - Fewer permission pop-ups when Full Disk Access is off

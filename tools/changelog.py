@@ -1,7 +1,7 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
-    dict(ver="0.3.3", date="", status="next",
+    dict(ver="0.3.3", date="2026-10-27", status="released",
          en=["Reminder on the home page when Full Disk Access is off, with a button to the right setting",
              "Fewer permission pop-ups when Full Disk Access is off",
              "Duplicate finder says when the link check is running",

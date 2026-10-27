@@ -2,6 +2,7 @@
 """Generate guide pages (docs/<lang>/<slug>/index.html) and refresh sitemap.xml.
 Content lives in tools/guides_content.py. Run from the repository root: python3 tools/guides.py"""
 import importlib.util, json, os, html, datetime
+from stamp import stamp
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _spec = importlib.util.spec_from_file_location("tmsite", os.path.join(ROOT, "tools", "site.py"))
@@ -230,16 +231,16 @@ if __name__ == "__main__":
         h = changelogpage(k)
         out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        open(out, "w").write(guide(h)); print("wrote", os.path.relpath(out, ROOT))
+        open(out, "w").write(stamp(guide(h), out, ROOT)); print("wrote", os.path.relpath(out, ROOT))
     for k in ("vi", "en"):
         h = hubpage(k)
         out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        open(out, "w").write(guide(h)); print("wrote", os.path.relpath(out, ROOT))
+        open(out, "w").write(stamp(guide(h), out, ROOT)); print("wrote", os.path.relpath(out, ROOT))
     for g in C.GUIDES:
         out = os.path.join(ROOT, "docs", "vi" if g["lang"] == "vi" else "", g["slug"], "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        open(out, "w").write(guide(g))
+        open(out, "w").write(stamp(guide(g), out, ROOT))
         print("wrote", os.path.relpath(out, ROOT))
     open(os.path.join(ROOT, "docs", "sitemap.xml"), "w").write(sitemap(C.GUIDES))
     print("wrote docs/sitemap.xml")
