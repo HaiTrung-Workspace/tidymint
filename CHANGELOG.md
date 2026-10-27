@@ -2,6 +2,15 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.3.4 (2026-10-27)
+
+- New: text size (Small, Default, Large) in Settings
+- Sidebar shows a spinner while a page scans and a dot when a result is waiting
+- Trash in the sidebar shows when it has something in it
+- Support the project button in Settings
+- Low disk space alert takes any number of GB; 0 turns it off
+- Space Lens moved to the top of Advanced; Cleanup details now opens from Clean Now
+
 ## 0.3.3 (2026-10-27)
 
 - Reminder on the home page when Full Disk Access is off, with a button to the right setting

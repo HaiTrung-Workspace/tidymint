@@ -1,6 +1,19 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.3.4", date="2026-10-27", status="released",
+         en=["New: text size (Small, Default, Large) in Settings",
+             "Sidebar shows a spinner while a page scans and a dot when a result is waiting",
+             "Trash in the sidebar shows when it has something in it",
+             "Support the project button in Settings",
+             "Low disk space alert takes any number of GB; 0 turns it off",
+             "Space Lens moved to the top of Advanced; Cleanup details now opens from Clean Now"],
+         vi=["Mới: cỡ chữ Nhỏ, Mặc định, Lớn trong Cài đặt",
+             "Menu trái hiện vòng xoay khi trang đang quét và chấm báo khi có kết quả chờ xem",
+             "Thùng rác trên menu cho thấy đang có rác hay không",
+             "Nút Ủng hộ dự án trong Cài đặt",
+             "Cảnh báo ổ sắp đầy nhập số GB tuỳ ý, 0 là tắt",
+             "Bản đồ ổ đĩa lên đầu mục Nâng cao; Dọn rác chi tiết mở từ Dọn ngay"]),
     dict(ver="0.3.3", date="2026-10-27", status="released",
          en=["Reminder on the home page when Full Disk Access is off, with a button to the right setting",
              "Fewer permission pop-ups when Full Disk Access is off",
