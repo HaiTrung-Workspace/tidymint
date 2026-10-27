@@ -172,7 +172,81 @@ dict(
     ("Apple: Gỡ cài đặt app trên máy Mac", "https://support.apple.com/en-lamr/102610"),
     ("Switching to Mac: gỡ app trên macOS 26 Tahoe", "https://www.switchingtomac.com/how-to-uninstall-apps-on-mac/"),
   ],
-  related=[("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+),
+
+dict(
+  lang="vi", slug="zalo-chiem-dung-luong-macbook", date="2026-10-27", read="6 phút đọc",
+  title="Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào | Tidymint",
+  desc="Zalo trên Mac lưu ảnh, file và bộ nhớ đệm trong thư mục ZaloData, có máy vài chục GB. Cách xem Zalo đang chiếm bao nhiêu, phần nào xoá được, phần nào mất tin nhắn.",
+  crumb="Zalo chiếm dung lượng MacBook",
+  h1="Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào",
+  tldr="Zalo cất mọi thứ trong thư mục ẩn <code>~/Library/Application Support/ZaloData</code>. Phần nặng nhất là <b>ảnh và file trong tin nhắn</b> (thư mục <code>media</code>), rồi đến tin nhắn (<code>Database</code>, không được xoá) và bộ nhớ đệm (xoá thoải mái). Thoát Zalo trước, chuyển các thư mục cache vào Thùng rác, ảnh cũ thì tự chọn. Trên máy của tác giả, ZaloData chiếm 3,6 GB, trong đó 2,5 GB là ảnh và file.",
+  toc=[("o-dau","Zalo trên Mac lưu dữ liệu ở đâu?"),("ben-trong","Bên trong ZaloData có gì, phần nào nặng?"),
+       ("don-tay","Xoá bộ nhớ đệm Zalo bằng tay"),("anh-cu","Bỏ ảnh cũ, giữ ảnh mới"),("zalo-tu-don","Zalo có tự dọn không?"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="o-dau">Zalo trên Mac lưu dữ liệu ở đâu?</h2>
+<p>Zalo cất toàn bộ dữ liệu của bạn trong một thư mục ẩn: <code>~/Library/Application Support/ZaloData</code>. Finder không hiện thư mục Library theo mặc định, nên nhiều người không biết nó tồn tại và chỉ thấy mục <b>Dữ liệu hệ thống</b> trong Cài đặt phình lên.</p>
+<ol class="steps">
+<li>Trong Finder bấm <b>Shift+Cmd+G</b> (Đi tới thư mục).</li>
+<li>Dán <code>~/Library/Application Support/ZaloData</code>, nhấn Enter.</li>
+<li>Chuột phải vào thư mục <b>ZaloData</b>, chọn <b>Lấy thông tin</b> để xem tổng dung lượng.</li>
+</ol>
+<p>Trên máy của tác giả (MacBook 228 GB, đo ngày 27/10/2026), ZaloData chiếm <b>3,6 GB</b>, và đó là sau khi đã xoá bớt; trước đó cũng hơn 10 GB. Trên diễn đàn VOZ có người lấy lại gần 30 GB chỉ bằng cách cài lại Zalo (máy Windows, 2024). Dùng nhiều nhóm, nhận nhiều ảnh thì vài chục GB là chuyện thường.</p>
+
+<h2 id="ben-trong">Bên trong ZaloData có gì, phần nào nặng?</h2>
+<p>Thư mục <code>media</code> là phần nặng nhất: ảnh, video, file bạn nhận trong tin nhắn, Zalo tải về để hiển thị. Trên máy của tác giả, <code>media</code> chiếm 2,5 GB trên tổng 3,6 GB, riêng thư mục con <code>resource</code> đã 2 GB.</p>
+<div class="tbl"><table>
+<tr><th>Thư mục</th><th>Chứa gì</th><th>Máy tác giả</th><th>Xoá được không</th></tr>
+<tr><td><code>media/…/ZaloDownloads/resource</code></td><td>Ảnh, sticker, file đính kèm đã tải để hiển thị</td><td>2 068 MB</td><td>Được, nhưng mất bản trên máy này</td></tr>
+<tr><td><code>media/…/ZaloDownloads/picture</code></td><td>Ảnh trong tin nhắn</td><td>101 MB</td><td>Như trên</td></tr>
+<tr><td><code>media/…/ZaloDownloads/file</code></td><td>File người khác gửi</td><td>52 MB</td><td>Xem trước khi xoá, có thể là file công việc</td></tr>
+<tr><td><code>Database</code>, <code>Partitions</code>, các file <code>.db</code></td><td>Tin nhắn, danh bạ, chỉ mục tìm kiếm</td><td>827 MB</td><td><b>Không.</b> Xoá là mất tin nhắn trên máy</td></tr>
+<tr><td><code>Cache</code>, <code>Code Cache</code>, <code>GPUCache</code>, <code>DawnCache</code>, <code>resp_cache</code></td><td>Bộ nhớ đệm giao diện</td><td>215 MB</td><td>Được, Zalo tự tạo lại</td></tr>
+<tr><td><code>media/update</code></td><td>Bản cài Zalo tải về để cập nhật</td><td>0 (có máy 100–300 MB)</td><td>Được, tải lại khi có bản mới</td></tr>
+<tr><td><code>…/ZaloDownloads/fileThumb</code>, <code>richThumb</code>, <code>sticker</code></td><td>Ảnh thu nhỏ, sticker</td><td>nhỏ</td><td>Được, tự tải lại</td></tr>
+</table></div>
+<div class="warn"><p>Xoá ảnh trong <code>media</code> là xoá <b>bản lưu trên máy này</b>. Ảnh gần đây thường tải lại được khi mở lại cuộc trò chuyện; ảnh cũ có thể không còn trên máy chủ Zalo. Tin nhắn chữ không bị ảnh hưởng vì nằm ở <code>Database</code>.</p></div>
+
+<h2 id="don-tay">Xoá bộ nhớ đệm Zalo bằng tay</h2>
+<ol class="steps">
+<li><b>Thoát Zalo hẳn</b> (Cmd+Q, kể cả biểu tượng trên thanh menu). Zalo đang mở sẽ ghi lại hoặc khoá file.</li>
+<li>Mở <code>~/Library/Application Support/ZaloData</code>.</li>
+<li>Kéo các thư mục <code>Cache</code>, <code>Code Cache</code>, <code>GPUCache</code>, <code>DawnCache</code>, <code>resp_cache</code> và <code>media/update</code> vào <b>Thùng rác</b>.</li>
+<li>Mở lại Zalo, dùng vài phút xem có gì lạ không, rồi mới <b>Đổ Thùng rác</b>.</li>
+</ol>
+<p>Không đụng vào <code>Database</code>, <code>Partitions</code> và các file đuôi <code>.db</code>.</p>
+
+<h2 id="anh-cu">Bỏ ảnh cũ, giữ ảnh mới</h2>
+<p>Trong <code>ZaloDownloads/picture</code> và <code>resource</code>, file xếp được theo ngày. Trong Finder chọn xem dạng <b>Danh sách</b>, sắp theo <b>Ngày sửa đổi</b>, chọn các file cũ hơn 6 tháng rồi kéo vào Thùng rác. Ảnh nào cần giữ thì lưu ra thư mục Ảnh trước.</p>
+<p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint miễn phí, mã nguồn mở, do một người Việt làm.</p>
+<img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1013" loading="lazy">
+{CTA}
+
+<h2 id="zalo-tu-don">Zalo có tự dọn không?</h2>
+<p>Có, và nên thử trước khi dọn tay. Trong Zalo trên Mac, vào <b>Cài đặt › Quản lý dữ liệu</b>. Màn hình <b>Dữ liệu Zalo</b> chia dữ liệu làm ba phần:</p>
+<img src="../zalo-quan-ly-du-lieu.jpg" alt="Màn hình Quản lý dữ liệu của Zalo trên Mac: Tin nhắn media 2,2 GB, Bộ nhớ đệm 103 MB, Dữ liệu hệ thống 590 MB" width="1200" height="968" loading="lazy">
+<ul>
+<li><b>Tin nhắn media</b> (ảnh, video, file, ghi âm lưu trên máy): bấm mũi tên để xoá theo từng cuộc trò chuyện. Đây là phần nặng nhất, trùng với thư mục <code>media</code> ở trên.</li>
+<li><b>Bộ nhớ đệm</b>: bấm biểu tượng thùng rác là xoá ngay, không mất gì.</li>
+<li><b>Dữ liệu hệ thống</b> (tin nhắn văn bản và dữ liệu để app chạy): không xoá được ở đây, và cũng không nên.</li>
+</ul>
+<p>Hai điểm Zalo chưa làm: không cho xem ảnh nào cũ, ảnh nào nặng để chọn, và xoá là xoá hẳn, không qua Thùng rác. Muốn chọn theo tháng và có đường lùi thì dọn tay theo bảng ở trên, hoặc dùng Tidymint.</p>
+""",
+  faq=[
+    ("Xoá cả thư mục ZaloData có sao không?", "Mất toàn bộ tin nhắn, ảnh và file đã lưu trên máy này, và phải đăng nhập lại. Chỉ nên xoá các thư mục bộ nhớ đệm như hướng dẫn."),
+    ("Xoá bộ nhớ đệm Zalo có phải đăng nhập lại không?", "Không. Thông tin đăng nhập nằm ngoài các thư mục cache. Chỉ xoá cả ZaloData mới phải đăng nhập lại."),
+    ("Dữ liệu hệ thống giảm bao nhiêu sau khi dọn Zalo?", "Đúng bằng phần bạn đã xoá, sau khi Đổ Thùng rác và khởi động lại máy để macOS tính lại."),
+    ("Zalo Web có chiếm nhiều như vậy không?", "Không. Bản web lưu trong bộ nhớ đệm trình duyệt, xoá cache trình duyệt là hết."),
+    ("Xoá trong Cài đặt › Quản lý dữ liệu của Zalo có lấy lại được không?", "Không. Zalo xoá thẳng, không qua Thùng rác. Ảnh cần giữ thì lưu ra ngoài trước."),
+    ("Dọn Zalo bằng Tidymint có mất tin nhắn không?", "Không. Tidymint khoá mục tin nhắn và đăng nhập, không bao giờ chọn. Ảnh trong tin nhắn thì để bạn tự chọn theo tháng, và mọi thứ chỉ chuyển vào Thùng rác."),
+  ],
+  sources=[
+    ("Apple: Tìm hiểu dung lượng lưu trữ trên máy Mac (Dữ liệu hệ thống)", "https://support.apple.com/vi-vn/102624"),
+    ("VOZ: Zalo ngốn nhiều dung lượng của máy quá (3/2024)", "https://voz.vn/t/zalo-ngon-nhieu-dung-luong-cua-may-qua.930107/"),
+  ],
+  related=[("Xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="",
 ),
 
 dict(
