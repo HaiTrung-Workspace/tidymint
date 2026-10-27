@@ -200,7 +200,7 @@ def page(k):
     uses = "".join('<div class="card"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span>%s</span></div>' % (icon(k), h, d) for k, h, d in t["uses"])
     how = "".join('<div class="card"><div class="hd"><span class="n"></span><b>%s</b></div><span>%s</span></div>' % h for h in t["how"])
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), html.escape(a)) for q, a in t["faq"])
-    inst = "".join("<li>%s</li>" % s for s in t["inst"])
+    inst = "".join("<li>%s</li>" % s.replace("{img}", img) for s in t["inst"])
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % l for l in links)) for h, links in t["f_cols"])
     m = t["msg"]
     redirect = "" if k == "vi" else "try{if(!localStorage.getItem('tm-lang')&&/^vi\\b/i.test(navigator.language||'')&&!location.hash)location.replace('vi/')}catch(e){}\n"
