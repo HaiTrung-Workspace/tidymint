@@ -1,6 +1,11 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.3.3", date="", status="next",
+         en=["Only one copy of Tidymint runs at a time: launching a new build quits the old one",
+             "Install guide with a screenshot for every step"],
+         vi=["Chỉ một bản Tidymint chạy tại một lúc: mở bản mới sẽ tự tắt bản cũ",
+             "Hướng dẫn cài đặt có ảnh cho từng bước"]),
     dict(ver="0.3.2", date="2026-10-27", status="released",
          en=["New: Star White, a light theme",
              "New app icon and favicon",
