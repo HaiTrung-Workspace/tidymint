@@ -59,7 +59,7 @@ footer span a{color:var(--leaf);text-decoration:underline;text-decoration-color:
  .up:hover{border-color:#2fd39f;box-shadow:0 14px 36px #0f8f6866}
 }
 .btn:active,.topbar a:active{filter:brightness(.92)}
-.arr{display:inline-block;transition:transform .18s ease}a:hover .arr{transform:translateX(4px)}
+.arr{display:inline-block;transition:transform .18s ease}a:hover .arr{transform:translateY(3px)}
 .topbar{text-align:center;padding:8px 0 28px}
 .topbar a{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid #ffffff33;color:var(--text);font-size:14px;font-weight:600}
 .topbar a:hover{text-decoration:none}
