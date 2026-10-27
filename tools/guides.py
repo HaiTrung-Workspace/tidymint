@@ -69,8 +69,8 @@ def guide(g):
     toc = "".join('<li><a href="#%s">%s</a></li>' % (i, n) for i, n in g["toc"])
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), a) for q, a in g["faq"])
     srcs = "".join('<li><a href="%s" rel="nofollow">%s</a></li>' % (u, n) for n, u in g["sources"])
-    rel = "".join('<a href="%s">%s <span class="arr">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
-    cta = ('<div class="box"><h3>%s</h3><p>%s</p><a class="btn primary" href="%s">%s <span class="arr">→</span></a> '
+    rel = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
+    cta = ('<div class="box"><h3>%s</h3><p>%s</p><a class="btn primary" href="%s">%s <span class="arr">↓</span></a> '
            '<a class="btn ghost" href="%s%s">%s</a></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
     body = g["body"].replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
