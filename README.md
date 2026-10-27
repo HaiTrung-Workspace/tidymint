@@ -6,7 +6,7 @@
 
 AI work leaves a lot behind: model files, drafts, exported images, duplicate assets, caches from browsers and editors. Tidymint finds that clutter, shows exactly what it is, and moves only what you select to the Trash.
 
-> **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm.
+> **Safety first.** Nothing is deleted permanently. Every action moves files to the Trash, and the Trash is only emptied when you click **Empty Trash** and confirm. Before removing duplicates, Tidymint checks your project folders and flags any file a script or skill still references, so a cleanup never breaks a project.
 
 ![Clean Now results](docs/smart.jpg)
 
@@ -28,7 +28,7 @@ Zalo, Chrome, Edge, Cốc Cốc and CapCut each get their own page: caches are p
 ![Clean by App](docs/byapp.jpg)
 
 ### 3. Duplicates without the risk
-Identical files are grouped (SHA-256, any file name). The best copy is marked **Keep**, and one click selects every extra copy. Before deleting, the app checks your project folders: a file still used by a script or skill is flagged in red and unticked for you.
+Identical files are grouped (SHA-256, any file name). The best copy is marked **Keep**, and one click selects every extra copy. Before deleting, the app checks your project folders: a file still used by a script or skill is flagged in red and unticked for you. Add your project folders once in **Settings**; without them the app reminds you before deleting.
 
 ![Duplicates](docs/dupes.jpg)
 
