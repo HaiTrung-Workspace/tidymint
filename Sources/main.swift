@@ -3575,6 +3575,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             im.draw(in: NSRect(origin: .zero, size: im.size)); NSGraphicsContext.restoreGraphicsState()
             try? px.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: a[i + 2])); exit(0)
         }
+        // Single instance: a second copy (typically an older build still running after an update) is asked to quit,
+        // so the menu bar never shows two Tidymint icons. Screenshot/demo runs are exempt so tooling can run beside a live app.
+        if !a.contains("--demo"), let bid = Bundle.main.bundleIdentifier {
+            let me = ProcessInfo.processInfo.processIdentifier
+            for other in NSRunningApplication.runningApplications(withBundleIdentifier: bid) where other.processIdentifier != me {
+                other.terminate()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { if !other.isTerminated { other.forceTerminate() } }
+            }
+        }
         NSApp.applicationIconImage = makeAppIcon(Theme.p)
         // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
         // `--page <name> --window <W>x<H>` opens a page at a fixed size.

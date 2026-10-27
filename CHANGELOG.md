@@ -2,6 +2,11 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## Unreleased (next: 0.3.3)
+
+- Only one copy of Tidymint runs at a time: launching a new build quits the old one
+- Install guide with a screenshot for every step
+
 ## 0.3.2 (2026-10-27)
 
 - New: Star White, a light theme
