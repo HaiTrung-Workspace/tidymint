@@ -105,7 +105,7 @@ def guide(g):
       {"@context":"https://schema.org","@type":"Article","headline":g["h1"],"description":g["desc"],"inLanguage":k,
        "datePublished":g["date"],"dateModified":g["date"],"mainEntityOfPage":url,"image":"https://tidymint.app/smart.jpg",
        "author":{"@type":"Organization","name":"Tidymint","url":"https://tidymint.app/"},
-       "publisher":{"@type":"Organization","name":"Tidymint","logo":{"@type":"ImageObject","url":"https://tidymint.app/icon.png"}}},
+       "publisher":{"@type":"Organization","name":"Tidymint","logo":{"@type":"ImageObject","url":"https://tidymint.app/icon-512.png"},"sameAs":[u for _, u, _ in S.SOCIAL]}},
       {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":strip(a)}} for q, a in g["faq"]]},
       {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
         {"@type":"ListItem","position":1,"name":l["homename"],"item":"https://tidymint.app/" + pre},
@@ -133,12 +133,13 @@ def guide(g):
 <meta name="description" content="{g["desc"]}">
 <link rel="canonical" href="{url}">
 {hreflang}
-<link rel="icon" href="{root}favicon.png">
-<link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
+{S.head_icons(root)}
 <meta property="og:type" content="{"website" if hub else "article"}">
 <meta property="og:title" content="{g["title"]}">
 <meta property="og:description" content="{g["desc"]}">
-<meta property="og:image" content="https://tidymint.app/smart.jpg">
+<meta property="og:image" content="https://tidymint.app/{"vi/" if k == "vi" else ""}og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="{url}">
 <meta name="twitter:card" content="summary_large_image">
 <script>
@@ -153,7 +154,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 </head>
 <body id="top">
 <div class="topnav"><div class="wrap"><nav>
-  <a class="brand" href="{home}"><img src="{root}icon.png" alt=""><span>Tidy<span class="mint">mint</span></span></a>
+  <a class="brand" href="{home}"><img src="{root}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a>
   <div class="navr"><div class="links">{nav}</div><a class="btn primary navcta" href="{S.DL}">{t["navcta"]}</a><div class="lang" role="group" aria-label="{t["aria_lang"]}"><a {vi_on}href="{vi_href}" data-l="vi">VI</a><a {en_on}href="{en_href}" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
 </nav></div></div>
 <div class="wrap">
@@ -167,7 +168,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
 <div class="fcols">
-  <div><a class="brand" href="{home}"><img src="{root}icon.png" alt=""><span>Tidy<span class="mint">mint</span></span></a><p>{t["f_blurb"]}</p></div>
+  <div><a class="brand" href="{home}"><img src="{root}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a><p>{t["f_blurb"]}</p>{S.social(t["follow"])}</div>
   {fcols}
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
