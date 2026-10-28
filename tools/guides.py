@@ -11,6 +11,8 @@ _spec2 = importlib.util.spec_from_file_location("tmcontent", os.path.join(ROOT, 
 C = importlib.util.module_from_spec(_spec2); _spec2.loader.exec_module(C)
 
 ART_CSS = """
+.relv summary{display:flex;align-items:center;gap:12px}.relv summary:after{margin-left:auto}.relv .ver{font-size:18px}.relv .small{color:var(--sub);font-weight:400}.relv ul{margin:0 0 16px}
+
 .crumb{font-size:14px;color:var(--sub);margin:28px 0 0}.crumb a{color:var(--sub)}
 .art{max-width:760px;margin:0 auto;padding:12px 0 40px}
 .art h1{font-size:clamp(30px,4.4vw,46px);line-height:1.15;letter-spacing:-.02em;margin:14px 0 14px}
@@ -264,9 +266,14 @@ CL = {
 def changelogpage(k):
     import changelog as CLG
     h = dict(CL[k]); parts = []
-    for r in CLG.RELEASES:
-        head = "%s %s" % (h["next"], r["ver"]) if r["status"] == "next" else "%s <span class=\"small\">(%s)</span>" % (r["ver"], r["date"])
-        parts.append("<h2>%s</h2><ul>%s</ul>" % (head, "".join("<li>%s</li>" % x for x in r[k])))
+    # One collapsible block per release; only the newest starts open.
+    for i, r in enumerate(CLG.RELEASES):
+        d = datetime.date.fromisoformat(r["date"]) if r["date"] else None
+        ds = (d.strftime("%d/%m/%Y") if k == "vi" else d.strftime("%B %-d, %Y")) if d else ""
+        n = len(r[k]); cnt = ("%d thay đổi" % n) if k == "vi" else ("%d change%s" % (n, "" if n == 1 else "s"))
+        head = "%s %s" % (h["next"], r["ver"]) if r["status"] == "next" else r["ver"]
+        parts.append('<details class="relv" id="v%s"%s><summary><span class="ver">%s</span><span class="small">%s · %s</span></summary><ul>%s</ul></details>'
+                     % (r["ver"].replace(".", ""), " open" if i == 0 else "", head, ds, cnt, "".join("<li>%s</li>" % x for x in r[k])))
     body = "".join(parts) + '<p><a class="btn" href="%s">%s</a></p>' % (S.DL, h["dl"])
     dates = [r["date"] for r in CLG.RELEASES if r["date"]]
     h.update(lang=k, date=max(dates), hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body, lead="")
