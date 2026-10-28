@@ -204,7 +204,9 @@ def sitemap(guides):
     rows += ['  <url><loc>https://tidymint.app/guides/</loc><lastmod>%s</lastmod></url>' % today,
              '  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>%s</lastmod></url>' % today,
              '  <url><loc>https://tidymint.app/changelog/</loc><lastmod>%s</lastmod></url>' % today,
-             '  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>%s</lastmod></url>' % today]
+             '  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>%s</lastmod></url>' % today,
+             '  <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-28</lastmod></url>',
+             '  <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-28</lastmod></url>']
     for g in guides:
         pre = "vi/" if g["lang"] == "vi" else ""
         rows.append('  <url><loc>https://tidymint.app/%s%s/</loc><lastmod>%s</lastmod></url>' % (pre, g["slug"], g["date"]))
@@ -270,7 +272,58 @@ def changelogpage(k):
     h.update(lang=k, date=max(dates), hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body, lead="")
     return h
 
+SP = {
+ "vi": dict(slug="ung-ho", title="Ủng hộ Tidymint", crumb="Ủng hộ dự án", h1="Ủng hộ Tidymint", alt="sponsor",
+   desc="Tidymint miễn phí và sẽ luôn miễn phí. Ủng hộ là tự nguyện, không mở khoá thêm tính năng nào.",
+   status=("Chưa mở nhận ủng hộ", "Tài khoản nhận ủng hộ trên GitHub đang chờ duyệt. Khi duyệt xong, nút ủng hộ sẽ hiện ngay tại đây. Trong lúc chờ, bạn vẫn giúp được theo các cách bên dưới."),
+   h_use="Tiền ủng hộ dùng vào đâu",
+   use=["<b>Tài khoản Apple Developer, 99 USD mỗi năm.</b> Có nó, app được Apple xác nhận: người mới tải về mở là chạy, không phải vào Cài đặt > Bảo mật để cho phép.",
+        "<b>Cập nhật tới nhanh hơn.</b> App đã xác nhận có thể tự cập nhật, bạn không phải tải lại bản mới bằng tay.",
+        "<b>Phần còn lại</b> (nếu có) trả tên miền tidymint.app và thời gian làm bản mới."],
+   h_free="Không cần tiền vẫn giúp được",
+   free=["<b>Gắn sao trên GitHub.</b> Nhiều sao thì người lạ tin app hơn khi lần đầu thấy nó.",
+         "<b>Báo lỗi hoặc gợi ý.</b> Mở mục Issues trên GitHub, hoặc dùng mục Liên hệ ngay trong app.",
+         "<b>Gửi cho người cần.</b> Một người bạn đang kêu máy đầy là đủ.",
+         "<b>Góp luật dọn cho app bạn hay dùng.</b> Mỗi luật là một file nhỏ, ai cũng xem được trước khi gộp vào."],
+   h_promise="Tidymint cam kết",
+   promise=["Không quảng cáo, không bản trả phí khoá tính năng.",
+            "Người ủng hộ và người không ủng hộ dùng cùng một app.",
+            "Mỗi năm công khai số tiền nhận được và đã chi vào đâu."],
+   star="Gắn sao trên GitHub", issue="Báo lỗi trên GitHub"),
+ "en": dict(slug="sponsor", title="Sponsor Tidymint", crumb="Sponsor", h1="Sponsor Tidymint", alt="ung-ho",
+   desc="Tidymint is free and will stay free. Sponsoring is optional and unlocks nothing extra.",
+   status=("Not open for sponsorship yet", "Our GitHub Sponsors account is waiting for approval. Once it is approved, the sponsor button will appear right here. Until then, you can still help in the ways below."),
+   h_use="Where the money goes",
+   use=["<b>The Apple Developer account, $99 a year.</b> With it, Apple verifies the app: new users download it and it just opens, no trip to Settings > Security.",
+        "<b>Faster updates.</b> A verified app can update itself, so you no longer download each new version by hand.",
+        "<b>Anything left over</b> pays for the tidymint.app domain and time spent on new versions."],
+   h_free="Ways to help that cost nothing",
+   free=["<b>Star it on GitHub.</b> Stars help strangers trust the app the first time they see it.",
+         "<b>Report a bug or suggest something.</b> Open an issue on GitHub, or use Contact inside the app.",
+         "<b>Send it to someone who needs it.</b> One friend complaining about a full Mac is enough.",
+         "<b>Add a cleanup rule for an app you use.</b> Each rule is a small file anyone can read before it is merged."],
+   h_promise="What Tidymint promises",
+   promise=["No ads, no paid tier that locks features.",
+            "Sponsors and non-sponsors use the same app.",
+            "Each year we publish what came in and where it went."],
+   star="Star on GitHub", issue="Report a bug on GitHub"),
+}
+def sponsorpage(k):
+    h = dict(SP[k]); ul = lambda xs: "<ul>%s</ul>" % "".join("<li>%s</li>" % x for x in xs)
+    s1, s2 = h["status"]
+    body = ('<div class="body"><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
+            '<h2>%s</h2>%s<h2>%s</h2>%s<p class="cta"><a class="btn primary" href="%s">%s</a><a class="btn ghost" href="%s/issues">%s</a></p>'
+            '<h2>%s</h2>%s</div>') % (s1, s2, h["h_use"], ul(h["use"]), h["h_free"], ul(h["free"]), S.GH, h["star"], S.GH, h["issue"], h["h_promise"], ul(h["promise"]))
+    h.update(lang=k, date="2026-10-28", hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body,
+             lead='<p class="lead">%s</p>' % h["desc"])
+    return h
+
 if __name__ == "__main__":
+    for k in ("vi", "en"):
+        h = sponsorpage(k)
+        out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        open(out, "w").write(stamp(guide(h), out, ROOT)); print("wrote", os.path.relpath(out, ROOT))
     for k in ("vi", "en"):
         h = changelogpage(k)
         out = os.path.join(ROOT, "docs", "vi" if k == "vi" else "", h["slug"], "index.html")
