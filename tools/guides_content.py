@@ -252,14 +252,14 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="cai-dat", topic="start", date="2026-10-27", read="4 phút đọc",
+  lang="vi", slug="cai-dat", topic="start", date="2026-10-28", read="4 phút đọc",
   title="Cài Tidymint trên Mac: từng bước có ảnh | Tidymint",
   desc="Tải Tidymint, mở lần đầu khi macOS báo bị chặn, bấm Vẫn mở trong Quyền riêng tư và Bảo mật, cấp quyền Truy cập toàn bộ ổ đĩa. Mỗi bước một ảnh chụp màn hình.",
   crumb="Cài đặt từng bước",
   h1="Cài Tidymint trên Mac, từng bước có ảnh",
   tldr="Tidymint chưa được Apple công chứng, nên lần đầu mở macOS sẽ chặn và bạn phải bấm <b>Vẫn mở</b> (Open Anyway) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, mục <b>Bảo mật</b> ở giữa trang. Cả quy trình mất khoảng 2 phút và chỉ làm một lần. Ảnh chụp trên macOS tiếng Anh; máy tiếng Việt có cùng vị trí, tên mục dịch trong ngoặc.",
   toc=[("b1","Bước 1: Tải và giải nén"),("b2","Bước 2: Kéo vào Ứng dụng"),("b3","Bước 3: Mở lần đầu, bấm Xong"),("b4","Bước 4: Bấm Vẫn mở"),
-       ("b5","Bước 5: Xác nhận và nhập mật khẩu"),("b6","Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa"),("khong-thay","Không thấy nút Vẫn mở?"),("faq","Câu hỏi thường gặp")],
+       ("b5","Bước 5: Xác nhận và nhập mật khẩu"),("b6","Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa"),("cap-nhat","Cập nhật bản mới"),("khong-thay","Không thấy nút Vẫn mở?"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="b1">Bước 1: Tải và giải nén</h2>
 <p>Bấm <a href="{DL}">Tải Tidymint</a>. File <b>Tidymint.zip</b> (khoảng 3 MB) nằm trong thư mục <b>Downloads</b>. Nhấp đúp file zip, macOS tự giải nén ra app <b>Tidymint</b> ngay cạnh.</p>
@@ -269,7 +269,7 @@ dict(
 <img src="../../install-2-applications.jpg" alt="Tidymint nằm trong thư mục Ứng dụng" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
 <h2 id="b3">Bước 3: Mở lần đầu, bấm Xong</h2>
 <p>Nhấp đúp Tidymint trong Ứng dụng. macOS hiện hộp <i>"Tidymint" Not Opened</i> (không mở được) vì app chưa được Apple công chứng. Bấm <b>Done</b> (Xong). <b>Đừng</b> bấm Move to Trash.</p>
-<img src="../../install-3-blocked.jpg" alt="Hộp thoại Tidymint Not Opened, bấm Done" width="760" height="630" loading="lazy" style="display:block;max-width:380px;height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid #1c1c1c">
+<img src="../../install-3-blocked.jpg" alt="Hộp thoại Tidymint Not Opened, bấm Done" width="760" height="630" loading="lazy" style="display:block;max-width:min(380px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid #1c1c1c">
 <h2 id="b4">Bước 4: Bấm Vẫn mở</h2>
 <p>Mở <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b> (System Settings › Privacy &amp; Security). Kéo tới tiêu đề <b>Bảo mật</b> (Security), nằm ở khoảng giữa trang, ngay dưới dòng <i>Allow applications from</i>. Dòng <i>"Tidymint" was blocked to protect your Mac</i> có nút <b>Open Anyway</b> (Vẫn mở). Bấm vào.</p>
 <img src="../../open-anyway.jpg" alt="Mục Bảo mật trong Quyền riêng tư và Bảo mật với nút Open Anyway" width="1200" height="449" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
@@ -279,9 +279,16 @@ dict(
 <h2 id="b6">Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa</h2>
 <p>Bước này không bắt buộc, nhưng thiếu thì Mail, Tin nhắn và một phần thư mục Library sẽ hiện trống khi quét. Trong <b>Quyền riêng tư &amp; Bảo mật</b>, kéo <b>lên</b> danh sách quyền riêng tư (nửa trên của trang), bấm <b>Full Disk Access</b> (Truy cập toàn bộ ổ đĩa). Nhanh hơn: gõ "Full Disk" vào ô tìm kiếm góc trên trái cửa sổ Cài đặt.</p>
 <p>Tìm dòng <b>Tidymint</b>, gạt công tắc sang bật. Chưa có dòng này thì bấm <b>+</b> ở cuối danh sách, chọn Tidymint trong Ứng dụng, bấm Mở. Nếu Tidymint đang mở, macOS sẽ yêu cầu thoát và mở lại app, bấm đồng ý.</p>
-<img src="../../install-7-fulldisk.jpg" alt="Danh sách Full Disk Access với công tắc Tidymint bật" width="1000" height="1060" loading="lazy" style="display:block;max-width:720px;height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
+<img src="../../install-7-fulldisk.jpg" alt="Danh sách Full Disk Access với công tắc Tidymint bật" width="1000" height="1060" loading="lazy" style="display:block;max-width:min(720px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
 <p>Tidymint chỉ dùng quyền này để đo dung lượng và chuyển file vào Thùng rác. App chạy không cần mạng và không gửi gì ra ngoài máy, xem <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">chính sách riêng tư</a>.</p>
 {CTA}
+<h2 id="cap-nhat">Cập nhật bản mới</h2>
+<p>Có bản mới, Tidymint hiện một dòng báo kèm nút <b>Tải về</b> trong Cài đặt (app kiểm tra mỗi ngày một lần, hoặc bấm <b>Kiểm tra ngay</b>). Cập nhật chỉ mất khoảng một phút:</p>
+<ol>
+<li>Thoát Tidymint. Tải <b>Tidymint.zip</b>, mở ra, kéo <b>Tidymint</b> vào <b>Ứng dụng</b> và bấm <b>Thay thế</b>.</li>
+<li>Mở app. macOS chặn một lần như bước 3, làm lại bước 3 đến 5: bấm Xong, vào Quyền riêng tư &amp; Bảo mật bấm <b>Vẫn mở</b>, nhập mật khẩu.</li>
+</ol>
+<p>Không cần cấp lại quyền Truy cập toàn bộ ổ đĩa. Cài đặt, giao diện, thư mục dự án và danh sách bỏ qua vẫn giữ nguyên.</p>
 <h2 id="khong-thay">Không thấy nút Vẫn mở?</h2>
 <ul>
 <li>Nút chỉ hiện một lúc sau khi macOS vừa chặn. Nhấp đúp Tidymint lần nữa, bấm Done, rồi quay lại Quyền riêng tư &amp; Bảo mật.</li>
@@ -293,7 +300,7 @@ dict(
     ("Sao macOS lại chặn Tidymint?", "Tidymint chưa mua tài khoản nhà phát triển Apple (99 USD/năm) để công chứng. Mọi app chưa công chứng đều bị chặn kiểu này. Mã nguồn công khai trên GitHub để ai cũng kiểm tra được."),
     ("Bấm Vẫn mở có nguy hiểm không?", "Bạn đang cho phép một app cụ thể, không tắt bảo vệ của máy. Chỉ bấm với app tải từ trang chính thức tidymint.app hoặc GitHub của dự án."),
     ("Máy tiếng Việt thì các nút tên gì?", "Quyền riêng tư và Bảo mật, mục Bảo mật, nút Vẫn mở, hộp thoại Mở, Truy cập toàn bộ ổ đĩa. Vị trí giống hệt ảnh."),
-    ("Cập nhật bản mới có phải làm lại không?", "Có, mỗi bản tải mới đều bị chặn một lần cho tới khi app được công chứng. Làm lại bước 3 đến 5, mất khoảng một phút."),
+    ("Cập nhật bản mới có phải làm lại không?", "Có, mỗi bản tải mới đều bị chặn một lần cho tới khi app được công chứng. Làm lại bước 3 đến 5, mất khoảng một phút. Quyền Truy cập toàn bộ ổ đĩa và cài đặt vẫn giữ nguyên."),
     ("Không cấp Truy cập toàn bộ ổ đĩa thì sao?", "App vẫn chạy và dọn được bộ nhớ đệm, file lớn, file trùng trong thư mục người dùng. Chỉ các thư mục được macOS bảo vệ như Mail, Tin nhắn hiện trống. Lần quét đầu, macOS sẽ hỏi riêng quyền vào Desktop, Documents, Downloads, bấm Cho phép là được; app cũng hiện một dải nhắc trên trang chủ kèm nút mở thẳng mục cài đặt này."),
   ],
   sources=[
@@ -305,14 +312,14 @@ dict(
 ),
 
 dict(
-  lang="en", slug="install", topic="start", date="2026-10-27", read="4 min read",
+  lang="en", slug="install", topic="start", date="2026-10-28", read="4 min read",
   title="Install Tidymint on Mac: Step by Step With Screenshots | Tidymint",
   desc="Download Tidymint, get past the first-launch block, click Open Anyway in Privacy & Security and grant Full Disk Access. One screenshot per step.",
   crumb="Install step by step",
   h1="Install Tidymint on your Mac, step by step",
   tldr="Tidymint is not notarized by Apple yet, so the first launch is blocked and you need to click <b>Open Anyway</b> in <b>System Settings › Privacy &amp; Security</b>, under the <b>Security</b> heading halfway down the page. The whole thing takes about two minutes and only happens once.",
   toc=[("s1","Step 1: Download and unzip"),("s2","Step 2: Move to Applications"),("s3","Step 3: First launch, click Done"),("s4","Step 4: Click Open Anyway"),
-       ("s5","Step 5: Confirm and enter your password"),("s6","Step 6: Grant Full Disk Access"),("missing","No Open Anyway button?"),("faq","FAQ")],
+       ("s5","Step 5: Confirm and enter your password"),("s6","Step 6: Grant Full Disk Access"),("update","Updating to a new version"),("missing","No Open Anyway button?"),("faq","FAQ")],
   body="""
 <h2 id="s1">Step 1: Download and unzip</h2>
 <p>Click <a href="{DL}">Download Tidymint</a>. <b>Tidymint.zip</b> (about 3 MB) lands in <b>Downloads</b>. Double-click it and macOS unzips the <b>Tidymint</b> app next to it.</p>
@@ -322,7 +329,7 @@ dict(
 <img src="../install-2-applications.jpg" alt="Tidymint inside the Applications folder" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
 <h2 id="s3">Step 3: First launch, click Done</h2>
 <p>Double-click Tidymint in Applications. macOS shows <i>"Tidymint" Not Opened</i> because the app is not notarized. Click <b>Done</b>. Do <b>not</b> click Move to Trash.</p>
-<img src="../install-3-blocked.jpg" alt="The Tidymint Not Opened dialog, click Done" width="760" height="630" loading="lazy" style="display:block;max-width:380px;height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid #1c1c1c">
+<img src="../install-3-blocked.jpg" alt="The Tidymint Not Opened dialog, click Done" width="760" height="630" loading="lazy" style="display:block;max-width:min(380px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid #1c1c1c">
 <h2 id="s4">Step 4: Click Open Anyway</h2>
 <p>Open <b>System Settings › Privacy &amp; Security</b>. Scroll to the <b>Security</b> heading, about halfway down, right under <i>Allow applications from</i>. The line <i>"Tidymint" was blocked to protect your Mac</i> has an <b>Open Anyway</b> button. Click it.</p>
 <img src="../open-anyway.jpg" alt="Security section of Privacy and Security with the Open Anyway button" width="1200" height="449" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
@@ -332,9 +339,16 @@ dict(
 <h2 id="s6">Step 6: Grant Full Disk Access</h2>
 <p>Optional, but without it Mail, Messages and parts of Library show as empty in scans. In <b>Privacy &amp; Security</b>, scroll <b>up</b> to the privacy list (top half of the page) and click <b>Full Disk Access</b>. Faster: type "Full Disk" in the search box at the top left of System Settings.</p>
 <p>Find <b>Tidymint</b> and turn its switch on. If it is not listed, click <b>+</b> below the list, pick Tidymint in Applications and click Open. If Tidymint is running, macOS asks you to quit and reopen it; agree.</p>
-<img src="../install-7-fulldisk.jpg" alt="Full Disk Access list with the Tidymint switch on" width="1000" height="1060" loading="lazy" style="display:block;max-width:720px;height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
+<img src="../install-7-fulldisk.jpg" alt="Full Disk Access list with the Tidymint switch on" width="1000" height="1060" loading="lazy" style="display:block;max-width:min(720px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
 <p>Tidymint uses this permission only to measure sizes and move files to the Trash. It works offline and sends nothing anywhere, see the <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">privacy policy</a>.</p>
 {CTA}
+<h2 id="update">Updating to a new version</h2>
+<p>When a new version is out, Tidymint shows a line with a <b>Download</b> button in Settings (it checks once a day, or click <b>Check now</b>). Updating takes about a minute:</p>
+<ol>
+<li>Quit Tidymint. Download <b>Tidymint.zip</b>, open it, drag <b>Tidymint</b> to <b>Applications</b> and click <b>Replace</b>.</li>
+<li>Open the app. macOS blocks it once, as in step 3: repeat steps 3 to 5 (click Done, click <b>Open Anyway</b> in Privacy &amp; Security, enter your password).</li>
+</ol>
+<p>You do not need to grant Full Disk Access again. Your settings, theme, project folders and ignore list stay as they were.</p>
 <h2 id="missing">No Open Anyway button?</h2>
 <ul>
 <li>The button only appears for a while after a blocked launch. Double-click Tidymint again, click Done, then return to Privacy &amp; Security.</li>
@@ -345,7 +359,7 @@ dict(
   faq=[
     ("Why does macOS block Tidymint?", "Tidymint has no Apple Developer account yet (99 USD a year) and so is not notarized. Every unnotarized app is blocked the same way. The source code is public on GitHub."),
     ("Is clicking Open Anyway safe?", "You are allowing one specific app, not switching off protection. Only do it for apps downloaded from the official site tidymint.app or the project's GitHub."),
-    ("Do I have to repeat this for updates?", "Yes, each new download is blocked once until the app is notarized. Repeat steps 3 to 5, about a minute."),
+    ("Do I have to repeat this for updates?", "Yes, each new download is blocked once until the app is notarized. Repeat steps 3 to 5, about a minute. Full Disk Access and your settings are kept."),
     ("What if I skip Full Disk Access?", "The app still runs and cleans caches, large and duplicate files in your home folder. Only macOS-protected folders such as Mail and Messages show as empty. On the first scan macOS asks separately for Desktop, Documents and Downloads: click Allow. The home page also shows a reminder with a button that opens this setting."),
   ],
   sources=[
