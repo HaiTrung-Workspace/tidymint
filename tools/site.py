@@ -150,7 +150,7 @@ HOME_CSS = """
 T = {
 "en": dict(
   lang="en", path="", other="vi/", title="Free App to Free Up Storage on Mac (Open Source) | Tidymint",
-  desc="Free, open-source Mac cleaner with no tracking. See what fills your disk, clear caches and app leftovers, find duplicates, uninstall apps fully. Trash first, with Undo.",
+  desc="Free, open-source Mac cleaner with no tracking. See what fills your disk, clear caches, find duplicates, uninstall apps fully. Trash first, with Undo.",
   nav=[("#features","Features"),("#how","How it works"),("guides/","Guides"),("#faq","FAQ"),(GH,"GitHub")], navcta="Download",
   eyebrow=("changelog/", 'New: version <span class="ver">{v}</span> is out'),
   h1='Your Mac is full.<br><span>Let’s find out why.</span>',
@@ -217,7 +217,7 @@ T = {
   ck_text="This website uses Google Analytics cookies to count visits. The Tidymint app itself tracks nothing.", ck_yes="Accept", ck_no="Decline", ck_link="Cookie settings", ck_more="Privacy"),
 "vi": dict(
   lang="vi", path="vi/", other="../", title="Dọn dẹp MacBook miễn phí, thay CleanMyMac | Tidymint",
-  desc="Dọn dẹp MacBook miễn phí: xoá bộ nhớ đệm, gọn Dữ liệu hệ thống, gỡ ứng dụng sạch, tìm file trùng. Mã nguồn mở, tiếng Việt, mọi thứ vào Thùng rác trước.",
+  desc="Dọn dẹp MacBook miễn phí: xoá bộ nhớ đệm Zalo, Chrome, CapCut, gỡ ứng dụng sạch, tìm file trùng. Mã nguồn mở, tiếng Việt, mọi thứ vào Thùng rác trước.",
   nav=[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("huong-dan/","Hướng dẫn"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")], navcta="Tải về",
   eyebrow=("lich-su-cap-nhat/", 'Mới: đã có bản <span class="ver">{v}</span>'),
   h1='MacBook đầy ổ?<br><span>Xem ngay cái gì chiếm chỗ.</span>',
@@ -379,7 +379,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 </section>
 
 <section style="padding-top:24px">
-  <div class="band"><img src="{img}icon.png" alt=""><h2>{t["band_h"]}</h2><p>{t["band_p"]}</p><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a></div>
+  <div class="band"><img src="{img}icon.png" alt="" width="72" height="72"><h2>{t["band_h"]}</h2><p>{t["band_p"]}</p><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a></div>
 </section>
 
 <section id="{i["h"]}">
@@ -409,7 +409,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <section style="padding-top:24px">
   <div class="def">
     <div><span class="tag">{t["def_tag"]}</span><h2>{t["def_h"]}</h2><p>{t["def_p"]}</p><ul>{"".join("<li>%s</li>" % x for x in t["def_li"])}</ul><p>{t["def_p2"]}</p></div>
-    <img src="{shot}lens.jpg" alt="{t["lens_alt"]}" loading="lazy" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
+    <img src="{shot}lens.jpg" alt="{t["lens_alt"]}" loading="lazy" width="1600" height="1013" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
   </div>
 </section>
 
@@ -435,7 +435,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 </section>
 
 <section style="padding-top:24px">
-  <div class="band"><img src="{img}icon.png" alt=""><h2>{t["end_h"]}</h2><p>{t["end_p"]}</p><div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["i"]}">{t["cta2"]}</a></div></div>
+  <div class="band"><img src="{img}icon.png" alt="" width="72" height="72"><h2>{t["end_h"]}</h2><p>{t["end_p"]}</p><div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["i"]}">{t["cta2"]}</a></div></div>
   <div class="signup" id="{i["s"]}" style="margin-top:36px">
     <h2 style="margin-bottom:6px">{t["sign_h"]}</h2>
     <p class="small" style="margin:0">{t["sign_p"]}</p>
