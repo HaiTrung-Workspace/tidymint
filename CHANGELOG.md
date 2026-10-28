@@ -2,6 +2,20 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.3.5 (2026-10-28)
+
+- Clean Now shows results as cards, and the scan shows which step it is on
+- Done screen after a clean: space recovered, with Undo and Open Trash
+- Every page shows how many items are selected and their total size
+- Photo and video thumbnails in Large Files, Duplicates and Space Lens
+- Space Lens: select items and move them to the Trash, with back and forward
+- Uninstaller: filter and sort the app list
+- Clean by App now covers Telegram, WhatsApp, Slack, VS Code and Outlook
+- Settings shows whether Full Disk Access is on, with a button to turn it on
+- Sidebar: clearer icons, a number only on Settings, labels never cut off at any text size
+- Support the project in the menu bar menu
+- Sizes use one decimal, with a decimal comma in Vietnamese
+
 ## 0.3.4 (2026-10-27)
 
 - New: text size (Small, Default, Large) in Settings
