@@ -120,7 +120,7 @@ HOME_CSS = """
 .band h2{font-size:clamp(28px,3.8vw,44px)}.band p{color:var(--sub);max-width:560px;margin:0 auto 26px}
 .open{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .open a.card{color:var(--text);display:block}.open a.card:hover{text-decoration:none;border-color:#2fd39f88}
-.open .card span{display:block;margin-top:4px}
+.open .card>span{display:block;margin-top:4px}
 .specs{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .specs div{padding:18px 16px;border-left:1px solid var(--line)}.specs div:first-child{border-left:0}
 .specs small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:4px}
