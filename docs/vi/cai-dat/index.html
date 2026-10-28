@@ -164,6 +164,29 @@ summary{user-select:none}
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
 @media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+/* Images: one standard for every guide (style guide §5). Nothing wider than the text column. */
+.art img{display:block;max-width:100%;height:auto;margin:18px auto 6px;border-radius:12px;border:1px solid var(--line)}
+.art figure{margin:28px 0}.art figure img{margin:0 auto}
+.art figcaption{font-size:14px;line-height:1.5;color:var(--sub);text-align:center;margin-top:10px}
+.fig-app{position:relative}.fig-app img{box-shadow:0 24px 60px #000a}
+.fig-app:before{content:"";position:absolute;inset:12% 12% 20%;background:radial-gradient(closest-side,#2fd39f33,transparent);filter:blur(36px);z-index:-1}
+.fig-dlg img{max-width:380px}
+/* Section labels like the homepage: a small numbered tag above each H2 of the article body. */
+.art .body{counter-reset:sec}
+.art .body h2{counter-increment:sec}
+.art .body h2:before{content:counter(sec,decimal-leading-zero);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--leaf);margin-bottom:6px}
+/* Bullets as check marks, like the homepage feature lists. */
+.art .body ul:not(.src){list-style:none;padding-left:0}
+.art .body ul:not(.src)>li{position:relative;padding-left:28px}
+.art .body ul:not(.src)>li:before{content:"";position:absolute;left:2px;top:.55em;width:15px;height:15px;background:var(--leaf);
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* Download box styled as the homepage band. */
+.box{text-align:center;padding:38px 26px;border-radius:22px;background:radial-gradient(600px 240px at 50% 0%,#2fd39f33,transparent),linear-gradient(160deg,#0f3d30,#08201a);border:1px solid #2fd39f40}
+.box .bico{width:56px;height:56px;margin:0 auto 10px;border:0;border-radius:0}
+.box h3{font-size:clamp(22px,2.6vw,28px)}.box p{max-width:520px;margin:0 auto 18px}
+.box-cta{justify-content:center}
+@media (max-width:600px){.art p,.art li{font-size:16px}.fig-dlg img{max-width:100%}}
 </style>
 </head>
 <body id="top">
@@ -176,7 +199,7 @@ summary{user-select:none}
   <p class="crumb"><a href="../">Trang chủ</a> › Cài đặt từng bước</p>
   <h1>Cài Tidymint trên Mac, từng bước có ảnh</h1>
   <p class="meta">Cập nhật: 27/10/2026 · 4 phút đọc</p><div class="tldr"><span class="k">Tóm tắt nhanh</span><p>Tidymint chưa được Apple công chứng, nên lần đầu mở macOS sẽ chặn và bạn phải bấm <b>Vẫn mở</b> (Open Anyway) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, mục <b>Bảo mật</b> ở giữa trang. Cả quy trình mất khoảng 2 phút và chỉ làm một lần. Ảnh chụp trên macOS tiếng Anh; máy tiếng Việt có cùng vị trí, tên mục dịch trong ngoặc.</p></div><div class="toc" role="navigation" aria-label="Trong bài"><b>Trong bài</b><ol><li><a href="#b1">Bước 1: Tải và giải nén</a></li><li><a href="#b2">Bước 2: Kéo vào Ứng dụng</a></li><li><a href="#b3">Bước 3: Mở lần đầu, bấm Xong</a></li><li><a href="#b4">Bước 4: Bấm Vẫn mở</a></li><li><a href="#b5">Bước 5: Xác nhận và nhập mật khẩu</a></li><li><a href="#b6">Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa</a></li><li><a href="#khong-thay">Không thấy nút Vẫn mở?</a></li><li><a href="#faq">Câu hỏi thường gặp</a></li></ol></div>
-  
+  <div class="body">
 <h2 id="b1">Bước 1: Tải và giải nén</h2>
 <p>Bấm <a href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải Tidymint</a>. File <b>Tidymint.zip</b> (khoảng 3 MB) nằm trong thư mục <b>Downloads</b>. Nhấp đúp file zip, macOS tự giải nén ra app <b>Tidymint</b> ngay cạnh.</p>
 <img src="../../install-1-download.jpg?v=7bec020b" alt="Thư mục Downloads với Tidymint.zip và app Tidymint vừa giải nén" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
@@ -197,15 +220,15 @@ summary{user-select:none}
 <p>Tìm dòng <b>Tidymint</b>, gạt công tắc sang bật. Chưa có dòng này thì bấm <b>+</b> ở cuối danh sách, chọn Tidymint trong Ứng dụng, bấm Mở. Nếu Tidymint đang mở, macOS sẽ yêu cầu thoát và mở lại app, bấm đồng ý.</p>
 <img src="../../install-7-fulldisk.jpg?v=1b098162" alt="Danh sách Full Disk Access với công tắc Tidymint bật" width="1000" height="1060" loading="lazy" style="display:block;max-width:720px;height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
 <p>Tidymint chỉ dùng quyền này để đo dung lượng và chuyển file vào Thùng rác. App chạy không cần mạng và không gửi gì ra ngoài máy, xem <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">chính sách riêng tư</a>.</p>
-<div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div>
+<div class="box"><img class="bico" src="../../icon.png?v=9dcde6d4" alt=""><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div>
 <h2 id="khong-thay">Không thấy nút Vẫn mở?</h2>
 <ul>
 <li>Nút chỉ hiện một lúc sau khi macOS vừa chặn. Nhấp đúp Tidymint lần nữa, bấm Done, rồi quay lại Quyền riêng tư &amp; Bảo mật.</li>
 <li>Nút nằm ở mục <b>Bảo mật</b> giữa trang, không phải cuối trang.</li>
 <li>Máy công ty có thể bị quản trị viên khoá mục này; khi đó hỏi IT.</li>
 </ul>
-
-  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Sao macOS lại chặn Tidymint?</summary><p>Tidymint chưa mua tài khoản nhà phát triển Apple (99 USD/năm) để công chứng. Mọi app chưa công chứng đều bị chặn kiểu này. Mã nguồn công khai trên GitHub để ai cũng kiểm tra được.</p></details><details><summary>Bấm Vẫn mở có nguy hiểm không?</summary><p>Bạn đang cho phép một app cụ thể, không tắt bảo vệ của máy. Chỉ bấm với app tải từ trang chính thức tidymint.app hoặc GitHub của dự án.</p></details><details><summary>Máy tiếng Việt thì các nút tên gì?</summary><p>Quyền riêng tư và Bảo mật, mục Bảo mật, nút Vẫn mở, hộp thoại Mở, Truy cập toàn bộ ổ đĩa. Vị trí giống hệt ảnh.</p></details><details><summary>Cập nhật bản mới có phải làm lại không?</summary><p>Có, mỗi bản tải mới đều bị chặn một lần cho tới khi app được công chứng. Làm lại bước 3 đến 5, mất khoảng một phút.</p></details><details><summary>Không cấp Truy cập toàn bộ ổ đĩa thì sao?</summary><p>App vẫn chạy và dọn được bộ nhớ đệm, file lớn, file trùng trong thư mục người dùng. Chỉ các thư mục được macOS bảo vệ như Mail, Tin nhắn hiện trống. Lần quét đầu, macOS sẽ hỏi riêng quyền vào Desktop, Documents, Downloads, bấm Cho phép là được; app cũng hiện một dải nhắc trên trang chủ kèm nút mở thẳng mục cài đặt này.</p></details><div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/102445" rel="nofollow">Apple: Mở app an toàn trên máy Mac</a></li><li><a href="https://support.apple.com/guide/mac-help/mchld5a35146/mac" rel="nofollow">Apple: Kiểm soát quyền truy cập file và thư mục trên máy Mac</a></li></ul>
+</div>
+  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Sao macOS lại chặn Tidymint?</summary><p>Tidymint chưa mua tài khoản nhà phát triển Apple (99 USD/năm) để công chứng. Mọi app chưa công chứng đều bị chặn kiểu này. Mã nguồn công khai trên GitHub để ai cũng kiểm tra được.</p></details><details><summary>Bấm Vẫn mở có nguy hiểm không?</summary><p>Bạn đang cho phép một app cụ thể, không tắt bảo vệ của máy. Chỉ bấm với app tải từ trang chính thức tidymint.app hoặc GitHub của dự án.</p></details><details><summary>Máy tiếng Việt thì các nút tên gì?</summary><p>Quyền riêng tư và Bảo mật, mục Bảo mật, nút Vẫn mở, hộp thoại Mở, Truy cập toàn bộ ổ đĩa. Vị trí giống hệt ảnh.</p></details><details><summary>Cập nhật bản mới có phải làm lại không?</summary><p>Có, mỗi bản tải mới đều bị chặn một lần cho tới khi app được công chứng. Làm lại bước 3 đến 5, mất khoảng một phút.</p></details><details><summary>Không cấp Truy cập toàn bộ ổ đĩa thì sao?</summary><p>App vẫn chạy và dọn được bộ nhớ đệm, file lớn, file trùng trong thư mục người dùng. Chỉ các thư mục được macOS bảo vệ như Mail, Tin nhắn hiện trống. Lần quét đầu, macOS sẽ hỏi riêng quyền vào Desktop, Documents, Downloads, bấm Cho phép là được; app cũng hiện một dải nhắc trên trang chủ kèm nút mở thẳng mục cài đặt này.</p></details><div class="box"><img class="bico" src="../../icon.png?v=9dcde6d4" alt=""><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/102445" rel="nofollow">Apple: Mở app an toàn trên máy Mac</a></li><li><a href="https://support.apple.com/guide/mac-help/mchld5a35146/mac" rel="nofollow">Apple: Kiểm soát quyền truy cập file và thư mục trên máy Mac</a></li></ul>
   <h2>Đọc thêm</h2><div class="rel"><a href="../cleanmymac-mien-phi/">CleanMyMac miễn phí? Lựa chọn hợp pháp <span class="arr r">→</span></a><a href="../zalo-chiem-dung-luong-macbook/">Zalo chiếm bao nhiêu GB trên MacBook <span class="arr r">→</span></a><a href="../">Trang chủ Tidymint <span class="arr r">→</span></a></div>
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ Lên đầu trang</a></div>

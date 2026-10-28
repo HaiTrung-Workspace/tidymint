@@ -164,6 +164,29 @@ summary{user-select:none}
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
 @media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+/* Images: one standard for every guide (style guide §5). Nothing wider than the text column. */
+.art img{display:block;max-width:100%;height:auto;margin:18px auto 6px;border-radius:12px;border:1px solid var(--line)}
+.art figure{margin:28px 0}.art figure img{margin:0 auto}
+.art figcaption{font-size:14px;line-height:1.5;color:var(--sub);text-align:center;margin-top:10px}
+.fig-app{position:relative}.fig-app img{box-shadow:0 24px 60px #000a}
+.fig-app:before{content:"";position:absolute;inset:12% 12% 20%;background:radial-gradient(closest-side,#2fd39f33,transparent);filter:blur(36px);z-index:-1}
+.fig-dlg img{max-width:380px}
+/* Section labels like the homepage: a small numbered tag above each H2 of the article body. */
+.art .body{counter-reset:sec}
+.art .body h2{counter-increment:sec}
+.art .body h2:before{content:counter(sec,decimal-leading-zero);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--leaf);margin-bottom:6px}
+/* Bullets as check marks, like the homepage feature lists. */
+.art .body ul:not(.src){list-style:none;padding-left:0}
+.art .body ul:not(.src)>li{position:relative;padding-left:28px}
+.art .body ul:not(.src)>li:before{content:"";position:absolute;left:2px;top:.55em;width:15px;height:15px;background:var(--leaf);
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* Download box styled as the homepage band. */
+.box{text-align:center;padding:38px 26px;border-radius:22px;background:radial-gradient(600px 240px at 50% 0%,#2fd39f33,transparent),linear-gradient(160deg,#0f3d30,#08201a);border:1px solid #2fd39f40}
+.box .bico{width:56px;height:56px;margin:0 auto 10px;border:0;border-radius:0}
+.box h3{font-size:clamp(22px,2.6vw,28px)}.box p{max-width:520px;margin:0 auto 18px}
+.box-cta{justify-content:center}
+@media (max-width:600px){.art p,.art li{font-size:16px}.fig-dlg img{max-width:100%}}
 </style>
 </head>
 <body id="top">
@@ -176,7 +199,7 @@ summary{user-select:none}
   <p class="crumb"><a href="../">Trang chủ</a> › Mac tự đầy ổ</p>
   <h1>Vì sao Mac tự đầy ổ dù bạn không tải gì, và cách chặn</h1>
   <p class="meta">Cập nhật: 27/10/2026 · 7 phút đọc</p><div class="tldr"><span class="k">Tóm tắt nhanh</span><p>Mac tự tăng vài GB trong khi bạn không làm gì thường là do một trong sáu chỗ: <b>snapshot Time Machine</b>, <b>bộ nhớ đệm app và trình duyệt</b>, <b>bản sao lưu iPhone/iPad</b>, <b>file đính kèm Mail và Tin nhắn</b>, <b>đồ lập trình</b> (Xcode, Docker, node_modules) hoặc <b>model AI tải về</b>. Bài này chỉ cách tìm xem máy bạn đang phình ở đâu và chặn nó quay lại, không xoá nhầm thứ cần giữ.</p></div><div class="toc" role="navigation" aria-label="Trong bài"><b>Trong bài</b><ol><li><a href="#vi-sao">Vì sao ổ tăng khi bạn không làm gì</a></li><li><a href="#tim">Truy tìm thủ phạm</a></li><li><a href="#snapshot">Snapshot Time Machine</a></li><li><a href="#cache">Bộ nhớ đệm tự tạo lại</a></li><li><a href="#sao-luu">Sao lưu iPhone, iPad</a></li><li><a href="#mail">Đính kèm Mail và Tin nhắn</a></li><li><a href="#dev">Đồ lập trình</a></li><li><a href="#ai">Model AI và app tạo ảnh</a></li><li><a href="#chan">Dọn dẹp đơn giản với Tidymint</a></li><li><a href="#faq">Câu hỏi thường gặp</a></li></ol></div>
-  
+  <div class="body">
 <h2 id="vi-sao">Vì sao ổ tăng khi bạn không làm gì</h2>
 <p>macOS và các app ghi file liên tục mà không hỏi: mỗi giờ một snapshot trước khi sao lưu, mỗi trang web một bộ nhớ đệm, mỗi ảnh bạn mở trong Tin nhắn một bản sao. Phần lớn rơi vào <b>Dữ liệu hệ thống</b> (máy cũ gọi là <b>Khác</b>), cái túi mà mục Dung lượng trong Cài đặt không giải thích được. Vì thế con số cứ leo lên trong khi thư mục Tài liệu vẫn y nguyên.</p>
 <p><b>Tin tốt:</b> gần như toàn bộ đều tự tạo lại được, hoặc là bản sao của thứ bạn vẫn còn ở chỗ khác, nên bỏ đi không mất gì.</p>
@@ -189,6 +212,7 @@ summary{user-select:none}
 <li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
 </ol>
 <p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp; app miễn phí, mã nguồn mở.</p>
+<figure class="fig-app"><img src="../lens.jpg?v=21769b35" alt="Bản đồ ổ đĩa của Tidymint: mỗi thư mục là một bong bóng, to nhỏ theo dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Bản đồ ổ đĩa trong Tidymint: bong bóng càng to, thư mục càng nặng.</figcaption></figure>
 
 <h2 id="snapshot">Snapshot Time Machine</h2>
 <ul>
@@ -228,7 +252,7 @@ summary{user-select:none}
 <li><b>Là gì:</b> Ollama cất mọi model bạn từng tải trong <code>~/.ollama</code> (4–40 GB mỗi cái); Hugging Face đệm file tải về ở <code>~/.cache/huggingface</code>; các app Stable Diffusion giữ checkpoint và mọi ảnh đã tạo. Ít thứ nào trong số này hiện tên dễ hiểu ở mục Dung lượng.</li>
 <li><b>Sửa:</b> <code>ollama list</code> rồi <code>ollama rm &lt;model&gt;</code> với model không dùng nữa; xoá mục cũ trong cache Hugging Face; chuyển ảnh đã tạo ra ổ ngoài. Đây là nhóm thư mục làm nhiều người bất ngờ nhất, nên Bản đồ ổ đĩa của Tidymint gọi tên chúng rõ ràng.</li>
 </ul>
-<div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div>
+<div class="box"><img class="bico" src="../../icon.png?v=9dcde6d4" alt=""><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div>
 <h2 id="chan">Dọn dẹp đơn giản với Tidymint</h2>
 <p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
 <h3>Để ổ không đầy lại</h3>
@@ -239,8 +263,8 @@ summary{user-select:none}
 <li><b>Mỗi tháng xem một lần.</b> Năm phút nhìn bản đồ ổ đĩa đỡ hơn một lần hoảng khi hiện "ổ đĩa sắp đầy".</li>
 </ul>
 <p>Lỡ "dọn dẹp" quá tay? Đừng lo, Tidymint chỉ chuyển dữ liệu thừa vào Thùng rác, mọi thứ vẫn hoàn tác được nếu bạn đổi ý.</p>
-
-  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Ổ Mac cứ tăng dần có phải virus không?</summary><p>Gần như không bao giờ. Phần tăng đến từ snapshot, bộ nhớ đệm, sao lưu và nhật ký mà macOS cùng app bình thường tự ghi. Quét bảo mật không hại gì, nhưng cách sửa là quản lý các thư mục đó, không phải cài diệt virus.</p></details><details><summary>Sao Dữ liệu hệ thống tự lên xuống?</summary><p>macOS tạo snapshot Time Machine mỗi giờ và xoá khi cần chỗ, đồng thời dọn cache khi ổ chật. Con số bạn thấy là mục tiêu di động, nên so hai ngày cách nhau hữu ích hơn nhìn một lần.</p></details><details><summary>Xoá cả thư mục Caches được không?</summary><p>Chuyển ~/Library/Caches vào Thùng rác nhìn chung an toàn, app tự tạo lại. Lần mở đầu sẽ chậm hơn và một số app mất nội dung ngoại tuyến. Tuyệt đối không xoá tay /System hay /private/var.</p></details><details><summary>Dọn các thư mục này có mất ảnh hay tài liệu không?</summary><p>Không. Tài liệu, Màn hình chính, Ảnh và thư viện Ảnh nằm riêng. Các thư mục trong bài chứa bản sao, bộ nhớ đệm và sao lưu. Tránh xa cơ sở dữ liệu của Mail, Tin nhắn, thư viện Ảnh trừ khi dùng đúng cài đặt của app.</p></details><details><summary>Tidymint có tự sửa chuyện này không?</summary><p>App tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá.</p></details><div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/vi-vn/102624" rel="nofollow">Apple: Giải phóng dung lượng lưu trữ trên máy Mac</a></li><li><a href="https://support.apple.com/vi-vn/102154" rel="nofollow">Apple: Giới thiệu về snapshot cục bộ của Time Machine</a></li><li><a href="https://support.apple.com/vi-vn/108809" rel="nofollow">Apple: Định vị và quản lý bản sao lưu iPhone, iPad</a></li></ul>
+</div>
+  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Ổ Mac cứ tăng dần có phải virus không?</summary><p>Gần như không bao giờ. Phần tăng đến từ snapshot, bộ nhớ đệm, sao lưu và nhật ký mà macOS cùng app bình thường tự ghi. Quét bảo mật không hại gì, nhưng cách sửa là quản lý các thư mục đó, không phải cài diệt virus.</p></details><details><summary>Sao Dữ liệu hệ thống tự lên xuống?</summary><p>macOS tạo snapshot Time Machine mỗi giờ và xoá khi cần chỗ, đồng thời dọn cache khi ổ chật. Con số bạn thấy là mục tiêu di động, nên so hai ngày cách nhau hữu ích hơn nhìn một lần.</p></details><details><summary>Xoá cả thư mục Caches được không?</summary><p>Chuyển ~/Library/Caches vào Thùng rác nhìn chung an toàn, app tự tạo lại. Lần mở đầu sẽ chậm hơn và một số app mất nội dung ngoại tuyến. Tuyệt đối không xoá tay /System hay /private/var.</p></details><details><summary>Dọn các thư mục này có mất ảnh hay tài liệu không?</summary><p>Không. Tài liệu, Màn hình chính, Ảnh và thư viện Ảnh nằm riêng. Các thư mục trong bài chứa bản sao, bộ nhớ đệm và sao lưu. Tránh xa cơ sở dữ liệu của Mail, Tin nhắn, thư viện Ảnh trừ khi dùng đúng cài đặt của app.</p></details><details><summary>Tidymint có tự sửa chuyện này không?</summary><p>App tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá.</p></details><div class="box"><img class="bico" src="../../icon.png?v=9dcde6d4" alt=""><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/vi-vn/102624" rel="nofollow">Apple: Giải phóng dung lượng lưu trữ trên máy Mac</a></li><li><a href="https://support.apple.com/vi-vn/102154" rel="nofollow">Apple: Giới thiệu về snapshot cục bộ của Time Machine</a></li><li><a href="https://support.apple.com/vi-vn/108809" rel="nofollow">Apple: Định vị và quản lý bản sao lưu iPhone, iPad</a></li></ul>
   <h2>Đọc thêm</h2><div class="rel"><a href="../zalo-chiem-dung-luong-macbook/">Zalo chiếm bao nhiêu GB trên MacBook <span class="arr r">→</span></a><a href="../xoa-ung-dung-macbook/">Xóa ứng dụng trên MacBook sạch hoàn toàn <span class="arr r">→</span></a><a href="../">Trang chủ Tidymint <span class="arr r">→</span></a></div>
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ Lên đầu trang</a></div>
