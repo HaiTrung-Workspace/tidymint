@@ -164,6 +164,29 @@ summary{user-select:none}
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
 @media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+/* Images: one standard for every guide (style guide §5). Nothing wider than the text column. */
+.art img{display:block;max-width:100%;height:auto;margin:18px auto 6px;border-radius:12px;border:1px solid var(--line)}
+.art figure{margin:28px 0}.art figure img{margin:0 auto}
+.art figcaption{font-size:14px;line-height:1.5;color:var(--sub);text-align:center;margin-top:10px}
+.fig-app{position:relative}.fig-app img{box-shadow:0 24px 60px #000a}
+.fig-app:before{content:"";position:absolute;inset:12% 12% 20%;background:radial-gradient(closest-side,#2fd39f33,transparent);filter:blur(36px);z-index:-1}
+.fig-dlg img{max-width:380px}
+/* Section labels like the homepage: a small numbered tag above each H2 of the article body. */
+.art .body{counter-reset:sec}
+.art .body h2{counter-increment:sec}
+.art .body h2:before{content:counter(sec,decimal-leading-zero);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--leaf);margin-bottom:6px}
+/* Bullets as check marks, like the homepage feature lists. */
+.art .body ul:not(.src){list-style:none;padding-left:0}
+.art .body ul:not(.src)>li{position:relative;padding-left:28px}
+.art .body ul:not(.src)>li:before{content:"";position:absolute;left:2px;top:.55em;width:15px;height:15px;background:var(--leaf);
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* Download box styled as the homepage band. */
+.box{text-align:center;padding:38px 26px;border-radius:22px;background:radial-gradient(600px 240px at 50% 0%,#2fd39f33,transparent),linear-gradient(160deg,#0f3d30,#08201a);border:1px solid #2fd39f40}
+.box .bico{width:56px;height:56px;margin:0 auto 10px;border:0;border-radius:0}
+.box h3{font-size:clamp(22px,2.6vw,28px)}.box p{max-width:520px;margin:0 auto 18px}
+.box-cta{justify-content:center}
+@media (max-width:600px){.art p,.art li{font-size:16px}.fig-dlg img{max-width:100%}}
 </style>
 </head>
 <body id="top">
@@ -176,7 +199,7 @@ summary{user-select:none}
   <p class="crumb"><a href="../">Home</a> › Free CleanMyMac alternative</p>
   <h1>The best free CleanMyMac alternatives</h1>
   <p class="meta">Updated: October 26, 2026 · 6 min read</p><div class="tldr"><span class="k">Quick answer</span><p>CleanMyMac has no free tier, only a <b>7-day trial</b>, then about <b>$40 a year</b> for one Mac. If you mainly need to <b>clear caches, uninstall apps cleanly and get disk space back</b>, free options cover it: <b>Tidymint</b> (free, open source, all-in-one cleaner), <b>AppCleaner</b> and <b>Pearcleaner</b> (uninstallers), <b>OnyX</b> (maintenance for power users) and macOS's own Storage settings. None of them replace CleanMyMac's malware scanner.</p></div><div class="toc" role="navigation" aria-label="On this page"><b>On this page</b><ol><li><a href="#price">What CleanMyMac costs</a></li><li><a href="#need">What do you actually need?</a></li><li><a href="#options">5 free alternatives</a></li><li><a href="#compare">Tidymint vs CleanMyMac</a></li><li><a href="#faq">FAQ</a></li></ol></div>
-  
+  <div class="body">
 <h2 id="price">What CleanMyMac costs</h2>
 <p>CleanMyMac by MacPaw offers a <b>7-day free trial</b> with full features. After that, pricing seen in August 2026 was:</p>
 <div class="tbl"><table>
@@ -211,7 +234,7 @@ summary{user-select:none}
 <p>Free and long-running. Many cleaning and system options, but the interface assumes you know macOS well.</p>
 <h3>5. macOS Storage settings</h3>
 <p><b>System Settings › General › Storage</b> offers Optimize Storage, Empty Trash Automatically and lists of large documents. Completely safe, but it doesn't touch caches or explain System Data.</p>
-<div class="box"><h3>Clean your Mac for free</h3><p>Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download <span class="hs">Tidymint</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#install">How to install</a></div></div>
+<div class="box"><img class="bico" src="../icon.png?v=9dcde6d4" alt=""><h3>Clean your Mac for free</h3><p>Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download <span class="hs">Tidymint</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#install">How to install</a></div></div>
 
 <h2 id="compare">Tidymint vs CleanMyMac</h2>
 <p>To be clear: Tidymint does not replace all of CleanMyMac. It focuses on cleaning and disk space.</p>
@@ -228,8 +251,8 @@ summary{user-select:none}
 <tr><td>Support</td><td>Email and GitHub</td><td class="y">Dedicated support team</td></tr>
 </table></div>
 <p><b>Pick CleanMyMac</b> if you want an all-in-one suite with malware protection and are happy to pay. <b>Pick Tidymint</b> if you want a clean Mac, free disk space and to see exactly what gets removed.</p>
-
-  <h2 id="faq">FAQ</h2><details><summary>Is there a free version of CleanMyMac?</summary><p>No. There is a 7-day free trial with full features, available from the MacPaw Store, the App Store and Setapp. After that you need a subscription or a one-time purchase.</p></details><details><summary>Is CleanMyMac worth it?</summary><p>It is a polished suite with a malware scanner and support. If you only need cleanup and uninstalling, free tools do those jobs.</p></details><details><summary>Is Tidymint safe?</summary><p>Tidymint only moves items to the Trash, so anything can be put back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and its source code is public.</p></details><details><summary>Why does macOS block Tidymint the first time?</summary><p>It is not notarized by Apple yet, which requires a paid developer account. Open it once via System Settings › Privacy & Security › Open Anyway, as Apple describes.</p></details><details><summary>Does Tidymint work on Intel Macs?</summary><p>Yes. It runs on macOS 14 or later on both Apple silicon and Intel.</p></details><div class="box"><h3>Clean your Mac for free</h3><p>Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download <span class="hs">Tidymint</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#install">How to install</a></div></div><h2>Sources</h2><ul class="src"><li><a href="https://macpaw.com/support/cleanmymac/knowledgebase/editions" rel="nofollow">MacPaw: CleanMyMac editions and trial</a></li><li><a href="https://macpaw.com/support/cleanmymac/knowledgebase/languages" rel="nofollow">MacPaw: languages CleanMyMac supports</a></li><li><a href="https://macpaw.com/legal/cleanmymac-privacy-policy" rel="nofollow">MacPaw: CleanMyMac privacy policy</a></li><li><a href="https://pricingsaas.com/companies/cleanmymac" rel="nofollow">PricingSaaS: CleanMyMac pricing (seen Aug 2026)</a></li><li><a href="https://www.jamf.com/blog/jtl-malware-pirated-applications/" rel="nofollow">Jamf Threat Labs: malware in pirated macOS apps</a></li><li><a href="https://support.apple.com/102445" rel="nofollow">Apple: Safely open apps on your Mac</a></li></ul>
+</div>
+  <h2 id="faq">FAQ</h2><details><summary>Is there a free version of CleanMyMac?</summary><p>No. There is a 7-day free trial with full features, available from the MacPaw Store, the App Store and Setapp. After that you need a subscription or a one-time purchase.</p></details><details><summary>Is CleanMyMac worth it?</summary><p>It is a polished suite with a malware scanner and support. If you only need cleanup and uninstalling, free tools do those jobs.</p></details><details><summary>Is Tidymint safe?</summary><p>Tidymint only moves items to the Trash, so anything can be put back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and its source code is public.</p></details><details><summary>Why does macOS block Tidymint the first time?</summary><p>It is not notarized by Apple yet, which requires a paid developer account. Open it once via System Settings › Privacy & Security › Open Anyway, as Apple describes.</p></details><details><summary>Does Tidymint work on Intel Macs?</summary><p>Yes. It runs on macOS 14 or later on both Apple silicon and Intel.</p></details><div class="box"><img class="bico" src="../icon.png?v=9dcde6d4" alt=""><h3>Clean your Mac for free</h3><p>Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download <span class="hs">Tidymint</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#install">How to install</a></div></div><h2>Sources</h2><ul class="src"><li><a href="https://macpaw.com/support/cleanmymac/knowledgebase/editions" rel="nofollow">MacPaw: CleanMyMac editions and trial</a></li><li><a href="https://macpaw.com/support/cleanmymac/knowledgebase/languages" rel="nofollow">MacPaw: languages CleanMyMac supports</a></li><li><a href="https://macpaw.com/legal/cleanmymac-privacy-policy" rel="nofollow">MacPaw: CleanMyMac privacy policy</a></li><li><a href="https://pricingsaas.com/companies/cleanmymac" rel="nofollow">PricingSaaS: CleanMyMac pricing (seen Aug 2026)</a></li><li><a href="https://www.jamf.com/blog/jtl-malware-pirated-applications/" rel="nofollow">Jamf Threat Labs: malware in pirated macOS apps</a></li><li><a href="https://support.apple.com/102445" rel="nofollow">Apple: Safely open apps on your Mac</a></li></ul>
   <h2>Read next</h2><div class="rel"><a href="../clear-system-data-mac/">How to clear System Data on Mac <span class="arr r">→</span></a><a href="../free-up-space-mac/">How to free up space on Mac <span class="arr r">→</span></a></div>
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ Back to top</a></div>

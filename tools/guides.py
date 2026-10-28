@@ -38,6 +38,29 @@ ART_CSS = """
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
 @media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+/* Images: one standard for every guide (style guide §5). Nothing wider than the text column. */
+.art img{display:block;max-width:100%;height:auto;margin:18px auto 6px;border-radius:12px;border:1px solid var(--line)}
+.art figure{margin:28px 0}.art figure img{margin:0 auto}
+.art figcaption{font-size:14px;line-height:1.5;color:var(--sub);text-align:center;margin-top:10px}
+.fig-app{position:relative}.fig-app img{box-shadow:0 24px 60px #000a}
+.fig-app:before{content:"";position:absolute;inset:12% 12% 20%;background:radial-gradient(closest-side,#2fd39f33,transparent);filter:blur(36px);z-index:-1}
+.fig-dlg img{max-width:380px}
+/* Section labels like the homepage: a small numbered tag above each H2 of the article body. */
+.art .body{counter-reset:sec}
+.art .body h2{counter-increment:sec}
+.art .body h2:before{content:counter(sec,decimal-leading-zero);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--leaf);margin-bottom:6px}
+/* Bullets as check marks, like the homepage feature lists. */
+.art .body ul:not(.src){list-style:none;padding-left:0}
+.art .body ul:not(.src)>li{position:relative;padding-left:28px}
+.art .body ul:not(.src)>li:before{content:"";position:absolute;left:2px;top:.55em;width:15px;height:15px;background:var(--leaf);
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* Download box styled as the homepage band. */
+.box{text-align:center;padding:38px 26px;border-radius:22px;background:radial-gradient(600px 240px at 50% 0%,#2fd39f33,transparent),linear-gradient(160deg,#0f3d30,#08201a);border:1px solid #2fd39f40}
+.box .bico{width:56px;height:56px;margin:0 auto 10px;border:0;border-radius:0}
+.box h3{font-size:clamp(22px,2.6vw,28px)}.box p{max-width:520px;margin:0 auto 18px}
+.box-cta{justify-content:center}
+@media (max-width:600px){.art p,.art li{font-size:16px}.fig-dlg img{max-width:100%}}
 """
 
 L = {
@@ -71,7 +94,7 @@ def guide(g):
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), a) for q, a in g["faq"])
     srcs = "".join('<li><a href="%s" rel="nofollow">%s</a></li>' % (u, n) for n, u in g["sources"])
     rel = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
-    cta = ('<div class="box"><h3>%s</h3><p>%s</p><div class="cta box-cta"><a class="btn primary" href="%s">%s <span class="arr">↓</span></a>'
+    cta = ('<div class="box"><img class="bico" src="' + root + 'icon.png" alt=""><h3>%s</h3><p>%s</p><div class="cta box-cta"><a class="btn primary" href="%s">%s <span class="arr">↓</span></a>'
            '<a class="btn ghost" href="%s%s">%s</a></div></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
     body = g["body"].replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
@@ -136,7 +159,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
   <p class="crumb"><a href="{home}">{l["homename"]}</a> › {g["crumb"]}</p>
   <h1>{g["h1"]}</h1>
   {head_extra}
-  {body}
+  <div class="{"hubbody" if hub else "body"}">{body}</div>
   {tail}
   {"<h2>%s</h2><div class=\"rel\">%s</div>" % (l["rel"], rel) if rel else ""}
 </article>

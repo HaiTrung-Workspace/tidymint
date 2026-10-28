@@ -164,6 +164,29 @@ summary{user-select:none}
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
 @media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+/* Images: one standard for every guide (style guide §5). Nothing wider than the text column. */
+.art img{display:block;max-width:100%;height:auto;margin:18px auto 6px;border-radius:12px;border:1px solid var(--line)}
+.art figure{margin:28px 0}.art figure img{margin:0 auto}
+.art figcaption{font-size:14px;line-height:1.5;color:var(--sub);text-align:center;margin-top:10px}
+.fig-app{position:relative}.fig-app img{box-shadow:0 24px 60px #000a}
+.fig-app:before{content:"";position:absolute;inset:12% 12% 20%;background:radial-gradient(closest-side,#2fd39f33,transparent);filter:blur(36px);z-index:-1}
+.fig-dlg img{max-width:380px}
+/* Section labels like the homepage: a small numbered tag above each H2 of the article body. */
+.art .body{counter-reset:sec}
+.art .body h2{counter-increment:sec}
+.art .body h2:before{content:counter(sec,decimal-leading-zero);display:block;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--leaf);margin-bottom:6px}
+/* Bullets as check marks, like the homepage feature lists. */
+.art .body ul:not(.src){list-style:none;padding-left:0}
+.art .body ul:not(.src)>li{position:relative;padding-left:28px}
+.art .body ul:not(.src)>li:before{content:"";position:absolute;left:2px;top:.55em;width:15px;height:15px;background:var(--leaf);
+ -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* Download box styled as the homepage band. */
+.box{text-align:center;padding:38px 26px;border-radius:22px;background:radial-gradient(600px 240px at 50% 0%,#2fd39f33,transparent),linear-gradient(160deg,#0f3d30,#08201a);border:1px solid #2fd39f40}
+.box .bico{width:56px;height:56px;margin:0 auto 10px;border:0;border-radius:0}
+.box h3{font-size:clamp(22px,2.6vw,28px)}.box p{max-width:520px;margin:0 auto 18px}
+.box-cta{justify-content:center}
+@media (max-width:600px){.art p,.art li{font-size:16px}.fig-dlg img{max-width:100%}}
 </style>
 </head>
 <body id="top">
@@ -176,7 +199,7 @@ summary{user-select:none}
   <p class="crumb"><a href="../">Trang chủ</a> › Zalo chiếm dung lượng MacBook</p>
   <h1>Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào</h1>
   <p class="meta">Cập nhật: 27/10/2026 · 6 phút đọc</p><div class="tldr"><span class="k">Tóm tắt nhanh</span><p>Zalo cất mọi thứ trong thư mục ẩn <code>~/Library/Application Support/ZaloData</code>. Phần nặng nhất là <b>ảnh và file trong tin nhắn</b> (thư mục <code>media</code>), rồi đến tin nhắn (<code>Database</code>, không được xoá) và bộ nhớ đệm (xoá thoải mái). Thoát Zalo trước, chuyển các thư mục cache vào Thùng rác, ảnh cũ thì tự chọn. Trên máy của tác giả, ZaloData chiếm 3,6 GB, trong đó 2,5 GB là ảnh và file.</p></div><div class="toc" role="navigation" aria-label="Trong bài"><b>Trong bài</b><ol><li><a href="#o-dau">Zalo trên Mac lưu dữ liệu ở đâu?</a></li><li><a href="#ben-trong">Bên trong ZaloData có gì, phần nào nặng?</a></li><li><a href="#don-tay">Xoá bộ nhớ đệm Zalo bằng tay</a></li><li><a href="#anh-cu">Bỏ ảnh cũ, giữ ảnh mới</a></li><li><a href="#zalo-tu-don">Zalo có tự dọn không?</a></li><li><a href="#faq">Câu hỏi thường gặp</a></li></ol></div>
-  
+  <div class="body">
 <h2 id="o-dau">Zalo trên Mac lưu dữ liệu ở đâu?</h2>
 <p>Zalo cất toàn bộ dữ liệu của bạn trong một thư mục ẩn: <code>~/Library/Application Support/ZaloData</code>. Finder không hiện thư mục Library theo mặc định, nên nhiều người không biết nó tồn tại và chỉ thấy mục <b>Dữ liệu hệ thống</b> trong Cài đặt phình lên.</p>
 <ol class="steps">
@@ -212,20 +235,20 @@ summary{user-select:none}
 <h2 id="anh-cu">Bỏ ảnh cũ, giữ ảnh mới</h2>
 <p>Trong <code>ZaloDownloads/picture</code> và <code>resource</code>, file xếp được theo ngày. Trong Finder chọn xem dạng <b>Danh sách</b>, sắp theo <b>Ngày sửa đổi</b>, chọn các file cũ hơn 6 tháng rồi kéo vào Thùng rác. Ảnh nào cần giữ thì lưu ra thư mục Ảnh trước.</p>
 <p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint miễn phí, mã nguồn mở, do một người Việt làm.</p>
-<img src="../byapp.jpg?v=039962f8" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1013" loading="lazy">
-<div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div>
+<figure class="fig-app"><img src="../byapp.jpg?v=33ee156d" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
+<div class="box"><img class="bico" src="../../icon.png?v=9dcde6d4" alt=""><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div>
 
 <h2 id="zalo-tu-don">Zalo có tự dọn không?</h2>
 <p>Có, và nên thử trước khi dọn tay. Trong Zalo trên Mac, vào <b>Cài đặt › Quản lý dữ liệu</b>. Màn hình <b>Dữ liệu Zalo</b> chia dữ liệu làm ba phần:</p>
-<img src="../zalo-quan-ly-du-lieu.jpg?v=29cfcc2f" alt="Màn hình Quản lý dữ liệu của Zalo trên Mac: Tin nhắn media 2,2 GB, Bộ nhớ đệm 103 MB, Dữ liệu hệ thống 590 MB" width="1200" height="968" loading="lazy">
+<figure class="fig-win"><img src="../zalo-quan-ly-du-lieu.jpg?v=29cfcc2f" alt="Màn hình Quản lý dữ liệu của Zalo trên Mac: Tin nhắn media 2,2 GB, Bộ nhớ đệm 103 MB, Dữ liệu hệ thống 590 MB" width="1200" height="968" loading="lazy"><figcaption>Màn hình Quản lý dữ liệu ngay trong Zalo (máy của tác giả, 27/10/2026).</figcaption></figure>
 <ul>
 <li><b>Tin nhắn media</b> (ảnh, video, file, ghi âm lưu trên máy): bấm mũi tên để xoá theo từng cuộc trò chuyện. Đây là phần nặng nhất, trùng với thư mục <code>media</code> ở trên.</li>
 <li><b>Bộ nhớ đệm</b>: bấm biểu tượng thùng rác là xoá ngay, không mất gì.</li>
 <li><b>Dữ liệu hệ thống</b> (tin nhắn văn bản và dữ liệu để app chạy): không xoá được ở đây, và cũng không nên.</li>
 </ul>
 <p>Hai điểm Zalo chưa làm: không cho xem ảnh nào cũ, ảnh nào nặng để chọn, và xoá là xoá hẳn, không qua Thùng rác. Muốn chọn theo tháng và có đường lùi thì dọn tay theo bảng ở trên, hoặc dùng Tidymint.</p>
-
-  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Xoá cả thư mục ZaloData có sao không?</summary><p>Mất toàn bộ tin nhắn, ảnh và file đã lưu trên máy này, và phải đăng nhập lại. Chỉ nên xoá các thư mục bộ nhớ đệm như hướng dẫn.</p></details><details><summary>Xoá bộ nhớ đệm Zalo có phải đăng nhập lại không?</summary><p>Không. Thông tin đăng nhập nằm ngoài các thư mục cache. Chỉ xoá cả ZaloData mới phải đăng nhập lại.</p></details><details><summary>Dữ liệu hệ thống giảm bao nhiêu sau khi dọn Zalo?</summary><p>Đúng bằng phần bạn đã xoá, sau khi Đổ Thùng rác và khởi động lại máy để macOS tính lại.</p></details><details><summary>Zalo Web có chiếm nhiều như vậy không?</summary><p>Không. Bản web lưu trong bộ nhớ đệm trình duyệt, xoá cache trình duyệt là hết.</p></details><details><summary>Xoá trong Cài đặt › Quản lý dữ liệu của Zalo có lấy lại được không?</summary><p>Không. Zalo xoá thẳng, không qua Thùng rác. Ảnh cần giữ thì lưu ra ngoài trước.</p></details><details><summary>Dọn Zalo bằng Tidymint có mất tin nhắn không?</summary><p>Không. Tidymint khoá mục tin nhắn và đăng nhập, không bao giờ chọn. Ảnh trong tin nhắn thì để bạn tự chọn theo tháng, và mọi thứ chỉ chuyển vào Thùng rác.</p></details><div class="box"><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/vi-vn/102624" rel="nofollow">Apple: Tìm hiểu dung lượng lưu trữ trên máy Mac (Dữ liệu hệ thống)</a></li><li><a href="https://voz.vn/t/zalo-ngon-nhieu-dung-luong-cua-may-qua.930107/" rel="nofollow">VOZ: Zalo ngốn nhiều dung lượng của máy quá (3/2024)</a></li></ul>
+</div>
+  <h2 id="faq">Câu hỏi thường gặp</h2><details><summary>Xoá cả thư mục ZaloData có sao không?</summary><p>Mất toàn bộ tin nhắn, ảnh và file đã lưu trên máy này, và phải đăng nhập lại. Chỉ nên xoá các thư mục bộ nhớ đệm như hướng dẫn.</p></details><details><summary>Xoá bộ nhớ đệm Zalo có phải đăng nhập lại không?</summary><p>Không. Thông tin đăng nhập nằm ngoài các thư mục cache. Chỉ xoá cả ZaloData mới phải đăng nhập lại.</p></details><details><summary>Dữ liệu hệ thống giảm bao nhiêu sau khi dọn Zalo?</summary><p>Đúng bằng phần bạn đã xoá, sau khi Đổ Thùng rác và khởi động lại máy để macOS tính lại.</p></details><details><summary>Zalo Web có chiếm nhiều như vậy không?</summary><p>Không. Bản web lưu trong bộ nhớ đệm trình duyệt, xoá cache trình duyệt là hết.</p></details><details><summary>Xoá trong Cài đặt › Quản lý dữ liệu của Zalo có lấy lại được không?</summary><p>Không. Zalo xoá thẳng, không qua Thùng rác. Ảnh cần giữ thì lưu ra ngoài trước.</p></details><details><summary>Dọn Zalo bằng Tidymint có mất tin nhắn không?</summary><p>Không. Tidymint khoá mục tin nhắn và đăng nhập, không bao giờ chọn. Ảnh trong tin nhắn thì để bạn tự chọn theo tháng, và mọi thứ chỉ chuyển vào Thùng rác.</p></details><div class="box"><img class="bico" src="../../icon.png?v=9dcde6d4" alt=""><h3>Dọn Mac miễn phí, hợp pháp</h3><p>Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.</p><div class="cta box-cta"><a class="btn primary" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Tải <span class="hs">Tidymint</span><span class="hm">về</span> <span class="arr">↓</span></a><a class="btn ghost" href="../#cai-dat">Xem cách cài</a></div></div><h2>Nguồn tham khảo</h2><ul class="src"><li><a href="https://support.apple.com/vi-vn/102624" rel="nofollow">Apple: Tìm hiểu dung lượng lưu trữ trên máy Mac (Dữ liệu hệ thống)</a></li><li><a href="https://voz.vn/t/zalo-ngon-nhieu-dung-luong-cua-may-qua.930107/" rel="nofollow">VOZ: Zalo ngốn nhiều dung lượng của máy quá (3/2024)</a></li></ul>
   <h2>Đọc thêm</h2><div class="rel"><a href="../xoa-ung-dung-macbook/">Xóa ứng dụng trên MacBook sạch hoàn toàn <span class="arr r">→</span></a><a href="../cleanmymac-mien-phi/">CleanMyMac miễn phí? Lựa chọn hợp pháp <span class="arr r">→</span></a><a href="../">Trang chủ Tidymint <span class="arr r">→</span></a></div>
 </article>
 <div class="topbar"><a href="#top" id="toTop">↑ Lên đầu trang</a></div>
