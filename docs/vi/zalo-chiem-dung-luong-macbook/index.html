@@ -290,7 +290,8 @@ function set(v){try{localStorage.setItem('tm-consent',v)}catch(e){};gtag('consen
 document.getElementById('ckY').onclick=function(){set('yes')};document.getElementById('ckN').onclick=function(){set('no')};
 document.getElementById('ckOpen').onclick=function(){show(true)};
 if(!tmC)show(true);
-document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','download_click',{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide'})})});})();
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','download_click',{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide'})})});
+document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','sponsor_click',{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide',link_location:a.closest('footer')?'footer':'page'})})});})();
 </script>
 </body>
 </html>
