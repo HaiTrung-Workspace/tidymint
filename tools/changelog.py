@@ -84,7 +84,7 @@ RELEASES = [
              "Ảnh chụp mới và website tidymint.app"]),
     dict(ver="0.1.0", date="2026-10-25", status="released",
          en=["First public build: Smart Scan, Cleanup, Uninstaller, Large and old files, Duplicates, Space Lens, Cloud Cleanup, Startup Items, Statistics",
-             "Everything goes to the Trash, nothing is deleted outright",
+             "Everything always goes to the Trash, nothing is deleted outright",
              "English and Vietnamese"],
          vi=["Bản đầu tiên: Quét thông minh, Dọn rác, Gỡ app, File lớn và cũ, File trùng, Bản đồ ổ đĩa, Dữ liệu đám mây, Tự chạy khi bật máy, Thống kê",
              "Mọi thứ luôn vào Thùng rác, không xoá thẳng",

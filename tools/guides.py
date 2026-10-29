@@ -73,7 +73,7 @@ L = {
             nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../huong-dan/","Hướng dẫn"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
  "en": dict(home="../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
             toc="On this page", faq="FAQ", src="Sources", rel="Read next",
-            cta_h="Clean your Mac for free", cta_p="Tidymint is free and open source. Everything goes to the Trash first, so you stay in control.",
+            cta_h="Clean your Mac for free", cta_p="Tidymint is free and open source. Everything always goes to the Trash first, so you stay in control.",
             cta_btn="Download <span class=\"hs\">Tidymint</span>", cta_more="How to install", inst="#install",
             nav=[("../#features","Features"),("../#how","How it works"),("../guides/","Guides"),("../#faq","FAQ"),(S.GH,"GitHub")]),
 }
