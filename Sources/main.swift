@@ -160,13 +160,13 @@ struct HoverLift: ViewModifier {
 /// Soft tile behind a small control on hover, hand cursor: shows it is clickable without a permanent border.
 struct HoverTile: ViewModifier {
     var enabled = true
-    @State private var hover = false
+    @StateObject private var h = Flag()
     func body(content: Content) -> some View {
         content
-            .background(RoundedRectangle(cornerRadius: 6).fill(Theme.text.opacity(hover && enabled ? 0.12 : 0)))
+            .background(RoundedRectangle(cornerRadius: 6).fill(Theme.text.opacity(h.v && enabled ? 0.12 : 0)))
             .contentShape(Rectangle())
             .onHover { v in
-                withAnimation(.easeOut(duration: 0.12)) { hover = v }
+                withAnimation(.easeOut(duration: 0.12)) { h.v = v }
                 if enabled { (v ? NSCursor.pointingHand : NSCursor.arrow).set() }
             }
     }
@@ -174,8 +174,8 @@ struct HoverTile: ViewModifier {
 extension View { func hoverTile(_ enabled: Bool = true) -> some View { modifier(HoverTile(enabled: enabled)) } }
 /// Icon-only buttons: the whole square takes the click (not only the icon's strokes), tile on hover, slight press.
 struct IconButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View { Body(configuration: configuration) }
-    struct Body: View {
+    func makeBody(configuration: Configuration) -> some View { IconBody(configuration: configuration) }
+    struct IconBody: View {
         let configuration: Configuration
         @Environment(\.isEnabled) private var enabled
         var body: some View {
