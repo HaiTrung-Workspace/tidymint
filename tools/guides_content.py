@@ -1228,4 +1228,383 @@ dict(
   ],
   related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Why your Mac storage keeps filling up", "{HOME}mac-storage-keeps-filling-up/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/")],
 ),
+
+dict(
+  lang="en", slug="clean-developer-files-mac", topic="disk", date="2026-10-29", read="8 min read",
+  title="Xcode, Docker, node_modules: Free Up Space on Mac | Tidymint",
+  desc="Developer files can quietly take 50 GB or more. What Xcode, Docker, npm, Homebrew, pip and local AI models keep on your Mac, and what is safe to remove.",
+  crumb="Clean developer files on Mac",
+  h1="Xcode, Docker, node_modules: cleaning developer files on Mac",
+  tldr="On a developer Mac, the biggest space users are usually <b>Xcode build data and simulators</b>, <b>Docker images and build cache</b>, <b>node_modules</b> in old projects, package caches (<b>npm, Homebrew, pip</b>) and <b>local AI models</b>. Most of it can be rebuilt or downloaded again. Measure first, clear what you can rebuild, and keep anything that is the only copy of your work, such as Xcode archives you shipped.",
+  toc=[("measure","Measure before you delete"),("xcode","Xcode"),("docker","Docker"),("node","node_modules and npm"),
+       ("brew","Homebrew and pip"),("ai","Local AI models"),("keep","What to keep"),("tidymint","Where Tidymint helps"),("faq","FAQ")],
+  body="""
+<h2 id="measure">Measure before you delete</h2>
+<p>Open Terminal and check the usual suspects. Each line prints a size, or nothing if the folder doesn't exist:</p>
+<pre>du -sh ~/Library/Developer/Xcode/DerivedData
+du -sh ~/Library/Developer/CoreSimulator
+du -sh ~/.npm ~/Library/Caches/Homebrew ~/.ollama
+docker system df</pre>
+<p>Write the numbers down. It keeps the clean-up focused on what is actually big on your Mac.</p>
+
+<h2 id="xcode">Xcode</h2>
+<ul>
+<li><b>DerivedData</b> (<code>~/Library/Developer/Xcode/DerivedData</code>): build products and indexes. Everything in it is safe to delete; the next build takes longer because Xcode starts from scratch. You can remove one project's folder instead of all of it.</li>
+<li><b>Unavailable simulators</b>: run <code>xcrun simctl delete unavailable</code> to remove simulators for runtimes you no longer have.</li>
+<li><b>iOS DeviceSupport</b> (<code>~/Library/Developer/Xcode/iOS DeviceSupport</code>): debug symbols for each iPhone or iOS version you have connected. Old versions can go; Xcode prepares them again when you connect that device.</li>
+<li><b>Archives</b> (<code>~/Library/Developer/Xcode/Archives</code>): see <a href="#keep">What to keep</a>.</li>
+</ul>
+
+<h2 id="docker">Docker</h2>
+<p><code>docker system df</code> shows how much space images, containers, volumes and build cache use. Then:</p>
+<ul>
+<li><code>docker system prune</code> removes stopped containers, networks not used by any container, dangling images and unused build cache.</li>
+<li>Add <code>-a</code> to also remove every image not used by a container. You will download them again next time.</li>
+<li><b>Volumes are kept</b> unless you add <code>--volumes</code>. Volumes often hold database data, so check before you add it.</li>
+</ul>
+
+<h2 id="node">node_modules and npm</h2>
+<ul>
+<li><b>node_modules</b> in projects you no longer work on can be deleted. <code>npm install</code> brings them back from <code>package.json</code> and the lock file.</li>
+<li>The <b>npm cache</b> lives in <code>~/.npm</code>. npm's own docs say clearing it is usually unnecessary because the cache is self-healing, which is why <code>npm cache clean --force</code> needs the force flag. Clear it only to get the space back.</li>
+</ul>
+
+<h2 id="brew">Homebrew and pip</h2>
+<ul>
+<li><b>Homebrew</b> removes old versions when you upgrade and runs extra cleanup every 30 days. Its download cache is usually <code>~/Library/Caches/Homebrew</code>; <code>brew cleanup</code> clears what it no longer needs.</li>
+<li><b>pip</b>: <code>pip cache dir</code> shows where the cache is and <code>pip cache purge</code> removes everything in it.</li>
+</ul>
+
+<h2 id="ai">Local AI models</h2>
+<ul>
+<li><b>Ollama</b> keeps models in <code>~/.ollama/models</code>. Run <code>ollama list</code>, then <code>ollama rm model-name</code> for the ones you don't use.</li>
+<li><b>Hugging Face</b> downloads go to <code>~/.cache/huggingface</code>.</li>
+</ul>
+<p>A single model can be several gigabytes, so on an AI workstation this is often the biggest single win.</p>
+
+<h2 id="keep">What to keep</h2>
+<ul>
+<li><b>Xcode archives of builds you shipped.</b> They are what you need to read crash reports from that version. Delete only archives of builds you never released.</li>
+<li><b>Docker volumes</b> with data you care about.</li>
+<li><b>Anything you can't rebuild</b>: local databases, generated datasets, model fine-tunes.</li>
+</ul>
+
+<h2 id="tidymint">Where Tidymint helps</h2>
+<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner. For developers it:</p>
+<ul>
+<li>lists the <b>npm cache</b> and your user caches (including Homebrew and pip) in <b>Clean Now</b>, grouped and explained before you press Clean;</li>
+<li>clears <code>_to_delete</code> and <code>_tmp</code> folders inside the <b>project folders</b> you add in Settings;</li>
+<li>shows plain notes in <b>Space Lens</b> for folders like DerivedData, CoreSimulator, node_modules, iOS DeviceSupport, <code>.ollama</code> and Hugging Face, so you know what a big bubble is before you act;</li>
+<li>checks your project folders before removing <a href="{HOME}remove-duplicate-files-mac/">duplicate files</a> a script still uses.</li>
+</ul>
+<p>It does not run <code>docker</code> or <code>xcrun</code> commands for you. Everything you select always goes to the Trash first.</p>
+{CTA}
+""",
+  faq=[
+    ("Is it safe to delete DerivedData?", "Yes. Xcode rebuilds it. Your next build takes longer, and deleting it is also a common fix for odd build errors."),
+    ("Does docker system prune delete my volumes?", "No. Volumes are kept unless you add --volumes. By default it removes stopped containers, unused networks, dangling images and unused build cache."),
+    ("Can I delete node_modules?", "Yes, in projects you are not working on. Running npm install in the project brings the folder back."),
+    ("Should I clear the npm cache?", "Only to reclaim space. npm's documentation says the cache is self-healing, so clearing it rarely fixes anything."),
+    ("Does Tidymint delete Xcode or Docker data?", "Tidymint explains those folders in Space Lens and clears the npm cache and user caches you select. It does not run Docker or Xcode commands, and everything goes to the Trash first."),
+  ],
+  sources=[
+    ("Docker docs: docker system prune", "https://docs.docker.com/reference/cli/docker/system/prune/"),
+    ("Docker docs: Prune unused objects", "https://docs.docker.com/engine/manage-resources/pruning/"),
+    ("npm docs: npm cache", "https://docs.npmjs.com/cli/v10/commands/npm-cache"),
+    ("Homebrew FAQ", "https://docs.brew.sh/FAQ"),
+    ("pip docs: pip cache", "https://pip.pypa.io/en/stable/cli/pip_cache/"),
+    ("Ollama FAQ: where models are stored", "https://docs.ollama.com/faq"),
+    ("Kodeco: Understanding and managing Xcode space", "https://www.kodeco.com/19998365-understanding-and-managing-xcode-space"),
+  ],
+  related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Remove duplicate files safely", "{HOME}remove-duplicate-files-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/")],
+  alt="don-du-lieu-lap-trinh-mac",
+),
+dict(
+  lang="vi", slug="don-du-lieu-lap-trinh-mac", topic="disk", date="2026-10-29", read="8 phút đọc",
+  title="Xcode, Docker, node_modules ngốn ổ Mac: dọn sao | Tidymint",
+  desc="Dữ liệu lập trình có thể âm thầm chiếm 50 GB hay hơn. Xcode, Docker, npm, Homebrew, pip và mô hình AI giữ gì trên Mac, phần nào xoá được an toàn.",
+  crumb="Dọn dữ liệu lập trình trên Mac",
+  h1="Xcode, Docker, node_modules ngốn ổ Mac: dọn sao cho an toàn",
+  tldr="Trên máy lập trình, thứ chiếm chỗ nhiều nhất thường là <b>dữ liệu build và máy giả lập của Xcode</b>, <b>image và bộ nhớ build của Docker</b>, <b>node_modules</b> trong dự án cũ, bộ nhớ đệm gói (<b>npm, Homebrew, pip</b>) và <b>mô hình AI chạy trên máy</b>. Phần lớn tạo lại hoặc tải lại được. Đo trước, xoá thứ tạo lại được, giữ thứ là bản duy nhất của công việc, như bản archive Xcode đã phát hành.",
+  toc=[("do","Đo trước khi xoá"),("xcode","Xcode"),("docker","Docker"),("node","node_modules và npm"),
+       ("brew","Homebrew và pip"),("ai","Mô hình AI chạy trên máy"),("giu","Những thứ nên giữ"),("tidymint","Tidymint giúp được gì"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="do">Đo trước khi xoá</h2>
+<p>Mở Terminal và kiểm các chỗ hay phình. Mỗi dòng in ra dung lượng, thư mục không có thì không in gì:</p>
+<pre>du -sh ~/Library/Developer/Xcode/DerivedData
+du -sh ~/Library/Developer/CoreSimulator
+du -sh ~/.npm ~/Library/Caches/Homebrew ~/.ollama
+docker system df</pre>
+<p>Ghi lại các con số, để dọn đúng chỗ đang thật sự lớn trên máy bạn.</p>
+
+<h2 id="xcode">Xcode</h2>
+<ul>
+<li><b>DerivedData</b> (<code>~/Library/Developer/Xcode/DerivedData</code>): sản phẩm build và chỉ mục. Xoá hết được an toàn; lần build sau lâu hơn vì Xcode build lại từ đầu. Có thể chỉ xoá thư mục của một dự án.</li>
+<li><b>Máy giả lập không dùng được nữa</b>: chạy <code>xcrun simctl delete unavailable</code> để xoá máy giả lập của các bản runtime đã gỡ.</li>
+<li><b>iOS DeviceSupport</b> (<code>~/Library/Developer/Xcode/iOS DeviceSupport</code>): file gỡ lỗi cho từng iPhone, từng bản iOS bạn từng cắm vào. Bản cũ xoá được; cắm lại máy đó thì Xcode chuẩn bị lại.</li>
+<li><b>Archives</b> (<code>~/Library/Developer/Xcode/Archives</code>): xem mục <a href="#giu">Những thứ nên giữ</a>.</li>
+</ul>
+
+<h2 id="docker">Docker</h2>
+<p><code>docker system df</code> cho thấy image, container, volume và bộ nhớ build đang chiếm bao nhiêu. Sau đó:</p>
+<ul>
+<li><code>docker system prune</code> xoá container đã dừng, network không container nào dùng, image lơ lửng (dangling) và bộ nhớ build không dùng.</li>
+<li>Thêm <code>-a</code> để xoá luôn mọi image không container nào dùng. Lần sau cần thì tải lại.</li>
+<li><b>Volume được giữ nguyên</b> trừ khi thêm <code>--volumes</code>. Volume hay chứa dữ liệu cơ sở dữ liệu, kiểm kỹ trước khi thêm.</li>
+</ul>
+
+<h2 id="node">node_modules và npm</h2>
+<ul>
+<li><b>node_modules</b> trong dự án đã thôi làm xoá được. Chạy <code>npm install</code> là có lại, theo <code>package.json</code> và file lock.</li>
+<li><b>Bộ nhớ đệm npm</b> nằm ở <code>~/.npm</code>. Tài liệu của npm nói thường không cần xoá vì bộ nhớ đệm tự sửa lỗi, nên lệnh <code>npm cache clean --force</code> mới bắt thêm cờ force. Chỉ xoá khi cần lấy lại chỗ.</li>
+</ul>
+
+<h2 id="brew">Homebrew và pip</h2>
+<ul>
+<li><b>Homebrew</b> tự xoá bản cũ khi nâng cấp và dọn thêm mỗi 30 ngày. Bộ nhớ tải về thường ở <code>~/Library/Caches/Homebrew</code>; <code>brew cleanup</code> xoá phần không cần nữa.</li>
+<li><b>pip</b>: <code>pip cache dir</code> cho biết bộ nhớ đệm ở đâu, <code>pip cache purge</code> xoá toàn bộ.</li>
+</ul>
+
+<h2 id="ai">Mô hình AI chạy trên máy</h2>
+<ul>
+<li><b>Ollama</b> lưu mô hình ở <code>~/.ollama/models</code>. Chạy <code>ollama list</code>, rồi <code>ollama rm tên-mô-hình</code> với mô hình không dùng.</li>
+<li><b>Hugging Face</b> tải về <code>~/.cache/huggingface</code>.</li>
+</ul>
+<p>Một mô hình có thể nặng vài GB, nên trên máy làm AI đây thường là chỗ giải phóng được nhiều nhất.</p>
+
+<h2 id="giu">Những thứ nên giữ</h2>
+<ul>
+<li><b>Archive Xcode của các bản đã phát hành.</b> Cần chúng để đọc báo cáo lỗi (crash) của bản đó. Chỉ xoá archive của bản chưa từng phát hành.</li>
+<li><b>Volume Docker</b> có dữ liệu bạn cần.</li>
+<li><b>Thứ không tạo lại được</b>: cơ sở dữ liệu trên máy, bộ dữ liệu tự tạo, mô hình đã tinh chỉnh.</li>
+</ul>
+
+<h2 id="tidymint">Tidymint giúp được gì</h2>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Với dân lập trình, Tidymint:</p>
+<ul>
+<li>liệt kê <b>bộ nhớ đệm npm</b> và bộ nhớ đệm của bạn (gồm cả Homebrew, pip) trong <b>Dọn ngay</b>, chia nhóm, giải thích trước khi bạn bấm Dọn;</li>
+<li>dọn thư mục <code>_to_delete</code>, <code>_tmp</code> trong các <b>thư mục dự án</b> bạn khai ở Cài đặt;</li>
+<li>ghi chú dễ hiểu trong <b>Bản đồ ổ đĩa</b> cho DerivedData, CoreSimulator, node_modules, iOS DeviceSupport, <code>.ollama</code>, Hugging Face, để biết bong bóng to là gì trước khi xử lý;</li>
+<li>kiểm thư mục dự án trước khi xoá <a href="{HOME}xoa-file-trung-mac/">file trùng</a> mà script vẫn đang dùng.</li>
+</ul>
+<p>Tidymint không chạy lệnh <code>docker</code> hay <code>xcrun</code> thay bạn. Mọi thứ bạn chọn luôn vào Thùng rác trước.</p>
+{CTA}
+""",
+  faq=[
+    ("Xoá DerivedData có an toàn không?", "Có. Xcode tự tạo lại. Lần build sau lâu hơn, và xoá DerivedData cũng là cách hay dùng để chữa lỗi build lạ."),
+    ("docker system prune có xoá volume không?", "Không. Volume được giữ trừ khi thêm --volumes. Mặc định lệnh xoá container đã dừng, network không dùng, image lơ lửng và bộ nhớ build không dùng."),
+    ("Xoá node_modules được không?", "Được, với dự án bạn không làm nữa. Chạy npm install trong dự án là có lại."),
+    ("Có nên xoá bộ nhớ đệm npm không?", "Chỉ khi cần lấy lại chỗ. Tài liệu npm nói bộ nhớ đệm tự sửa lỗi, xoá đi hiếm khi chữa được gì."),
+    ("Tidymint có xoá dữ liệu Xcode, Docker không?", "Tidymint giải thích các thư mục đó trong Bản đồ ổ đĩa, và dọn bộ nhớ đệm npm cùng bộ nhớ đệm bạn chọn. Tidymint không chạy lệnh Docker hay Xcode, mọi thứ vào Thùng rác trước."),
+  ],
+  sources=[
+    ("Docker: docker system prune", "https://docs.docker.com/reference/cli/docker/system/prune/"),
+    ("Docker: dọn đối tượng không dùng", "https://docs.docker.com/engine/manage-resources/pruning/"),
+    ("npm: npm cache", "https://docs.npmjs.com/cli/v10/commands/npm-cache"),
+    ("Homebrew FAQ", "https://docs.brew.sh/FAQ"),
+    ("pip: pip cache", "https://pip.pypa.io/en/stable/cli/pip_cache/"),
+    ("Ollama FAQ: nơi lưu mô hình", "https://docs.ollama.com/faq"),
+    ("Kodeco: hiểu và quản lý dung lượng Xcode", "https://www.kodeco.com/19998365-understanding-and-managing-xcode-space"),
+  ],
+  related=[("Dữ liệu hệ thống trên Mac là gì", "{HOME}du-lieu-he-thong-mac/"), ("Xoá file trùng an toàn", "{HOME}xoa-file-trung-mac/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/")],
+  alt="clean-developer-files-mac",
+),
+dict(
+  lang="en", slug="remove-duplicate-files-mac", topic="disk", date="2026-10-29", read="7 min read",
+  title="How to Remove Duplicate Files on Mac Safely | Tidymint",
+  desc="Duplicate downloads, photos and exports waste gigabytes. How to find and remove them on Mac without breaking a project that still uses one copy.",
+  crumb="Remove duplicate files on Mac",
+  h1="How to remove duplicate files on Mac, safely",
+  tldr="Duplicates pile up from downloading the same file twice, exporting again, and copying folders between projects. For photos, use <b>Photos › Utilities › Duplicates</b> and merge. For other files, compare by <b>content</b>, not by name, always <b>keep one copy</b>, and before deleting a copy inside a project, check that <b>no script points to that exact path</b>. Move duplicates to the Trash rather than deleting them outright.",
+  toc=[("why","Why duplicates pile up"),("photos","Photos: use the built-in Duplicates"),("finder","Other files: find them by hand"),
+       ("risk","The real risk: breaking a project"),("rules","Four rules for a safe clean-up"),("tidymint","Do it with Tidymint"),("faq","FAQ")],
+  body="""
+<h2 id="why">Why duplicates pile up</h2>
+<ul>
+<li>The same file downloaded twice: <code>report.pdf</code>, <code>report (1).pdf</code>, <code>report (2).pdf</code>.</li>
+<li>Video and design exports saved again after a small change.</li>
+<li>Folders copied between projects "just to be safe".</li>
+<li>Photos imported from a phone and also saved from a chat app.</li>
+</ul>
+
+<h2 id="photos">Photos: use the built-in Duplicates</h2>
+<p>If your pictures live in the Photos app, use Apple's own tool:</p>
+<ol class="steps">
+<li>Open <b>Photos</b> and click <b>Duplicates</b> under <b>Utilities</b> in the sidebar.</li>
+<li>Select the duplicates to merge (Command-A selects all).</li>
+<li>Click <b>Merge</b> and confirm. One original stays in your library; the rest go to <b>Recently Deleted</b>, where you can recover them for 30 days.</li>
+</ol>
+<p>Never delete files inside the Photos library package in Finder. Always work from the Photos app.</p>
+
+<h2 id="finder">Other files: find them by hand</h2>
+<ul>
+<li>In Finder, search your Downloads for <code>(1)</code> and <code>copy</code> to catch the obvious ones.</li>
+<li>Sort folders by <b>Size</b>: identical files often sit next to each other with the same size.</li>
+<li>Before deleting, open both copies. Same name and size is a strong hint, not proof that two files are identical.</li>
+</ul>
+<p>This works for a few files. For a whole drive, a tool that compares file contents is faster and more reliable.</p>
+
+<h2 id="risk">The real risk: breaking a project</h2>
+<p>Most duplicate finders only ask "are these two files the same?". For people who write scripts, automations or AI skills, a second question matters: <b>does something point to this exact copy?</b></p>
+<p>A Python script that reads <code>data/prices.csv</code>, a shell script that copies <code>assets/logo.png</code>, a skill file that names a template: delete that copy and the script breaks, even though an identical file exists somewhere else. The file wasn't junk. Its location was the point.</p>
+
+<h2 id="rules">Four rules for a safe clean-up</h2>
+<ol class="steps">
+<li><b>Match by content.</b> Same name does not mean same file, and the same file can have different names.</li>
+<li><b>Always keep one copy</b>, preferably the one outside Downloads, Desktop and temp folders.</li>
+<li><b>Check your projects</b> before removing a copy that lives inside one.</li>
+<li><b>Use the Trash, not permanent delete</b>, so a mistake costs you a drag back, not a lost file.</li>
+</ol>
+
+<h2 id="tidymint">Do it with Tidymint</h2>
+<figure class="fig-app"><img src="../dupes.jpg" alt="Tidymint's Duplicates page: groups of identical files with one copy kept" width="1600" height="1013" loading="lazy"><figcaption>Duplicates in Tidymint: identical files grouped, one copy always kept.</figcaption></figure>
+<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner built around those four rules:</p>
+<ul>
+<li>It scans Documents, Downloads, Desktop, Pictures, Movies and Music for files of 1 MB or more and <b>matches them by content</b>, not by name.</li>
+<li>It skips folders like <code>.git</code>, <code>node_modules</code>, virtual environments, <code>build</code> and DerivedData.</li>
+<li><b>One copy is always kept</b>: preferably one outside Downloads, Desktop and temp folders, then the one with the shorter path.</li>
+<li>Before anything moves, it offers to <b>check your project folders</b> (set in Settings). It searches scripts and notes there for each file name, shows which script uses which copy, and offers to untick those and remove the rest.</li>
+<li>Everything always goes to the Trash first, with Undo.</li>
+</ul>
+{CTA}
+""",
+  faq=[
+    ("Is it safe to delete duplicate files on Mac?", "Yes, if you keep one copy, match files by content rather than name, and move them to the Trash so you can undo. Check first that no script or project points to the copy you remove."),
+    ("Does macOS have a duplicate file finder?", "For photos and videos, yes: Photos › Utilities › Duplicates lets you merge them. For other files, macOS has no built-in duplicate finder."),
+    ("Can two files with the same name be different?", "Yes. Name and size are only hints. Comparing the content (a checksum) is the reliable way to know two files are identical."),
+    ("Which copy should I keep?", "Usually the one inside an organised folder rather than Downloads or Desktop. If a script or project uses one copy, keep that one."),
+    ("How does Tidymint protect projects?", "Before removing duplicates, Tidymint can search the project folders you add in Settings for scripts and notes that mention each file, show you which ones are used, and leave them in place."),
+  ],
+  sources=[
+    ("Apple: Remove duplicate photos and videos on Mac", "https://support.apple.com/guide/photos/remove-duplicates-pht5a3157c1d/mac"),
+  ],
+  related=[("Xcode, Docker, node_modules: cleaning developer files", "{HOME}clean-developer-files-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
+  alt="xoa-file-trung-mac",
+),
+dict(
+  lang="vi", slug="xoa-file-trung-mac", topic="disk", date="2026-10-29", read="7 phút đọc",
+  title="Cách xoá file trùng trên Mac an toàn | Tidymint",
+  desc="File tải về hai lần, ảnh lưu nhiều bản, file xuất lặp lại chiếm hàng GB. Cách tìm và xoá file trùng trên Mac mà không làm hỏng dự án vẫn đang dùng một bản.",
+  crumb="Xoá file trùng trên Mac",
+  h1="Cách xoá file trùng trên Mac an toàn",
+  tldr="File trùng sinh ra khi tải một file hai lần, xuất lại sau khi sửa nhỏ, hay chép thư mục giữa các dự án. Với ảnh, dùng <b>Ảnh › Tiện ích › Bản trùng lặp</b> rồi gộp. Với file khác, so theo <b>nội dung</b> chứ không theo tên, luôn <b>giữ lại một bản</b>, và trước khi xoá bản nằm trong dự án, kiểm xem <b>có script nào trỏ tới đúng đường dẫn đó</b> không. Chuyển vào Thùng rác thay vì xoá thẳng.",
+  toc=[("vi-sao","Vì sao file trùng nhiều"),("anh","Ảnh: dùng tính năng Bản trùng lặp sẵn có"),("tim-tay","File khác: tìm bằng tay"),
+       ("rui-ro","Rủi ro thật: làm hỏng dự án"),("luat","Bốn luật dọn file trùng an toàn"),("tidymint","Làm bằng Tidymint"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="vi-sao">Vì sao file trùng nhiều</h2>
+<ul>
+<li>Một file tải hai lần: <code>bao-cao.pdf</code>, <code>bao-cao (1).pdf</code>, <code>bao-cao (2).pdf</code>.</li>
+<li>Video, file thiết kế xuất lại sau một chỉnh sửa nhỏ.</li>
+<li>Thư mục chép sang dự án khác "cho chắc".</li>
+<li>Ảnh vừa nhập từ điện thoại, vừa lưu từ Zalo.</li>
+</ul>
+
+<h2 id="anh">Ảnh: dùng tính năng Bản trùng lặp sẵn có</h2>
+<p>Nếu ảnh nằm trong app Ảnh (Photos), dùng luôn công cụ của Apple:</p>
+<ol class="steps">
+<li>Mở <b>Ảnh</b>, bấm <b>Bản trùng lặp</b> (Duplicates) trong mục <b>Tiện ích</b> (Utilities) ở thanh bên.</li>
+<li>Chọn các bản trùng muốn gộp (Command-A để chọn hết).</li>
+<li>Bấm <b>Gộp</b> (Merge) rồi xác nhận. Một bản gốc ở lại thư viện, các bản còn lại vào <b>Đã xoá gần đây</b>, lấy lại được trong 30 ngày.</li>
+</ol>
+<p>Đừng bao giờ xoá file bên trong gói thư viện Ảnh bằng Finder. Luôn làm trong app Ảnh.</p>
+
+<h2 id="tim-tay">File khác: tìm bằng tay</h2>
+<ul>
+<li>Trong Finder, tìm <code>(1)</code> và <code>copy</code> trong thư mục Tải về để bắt các bản trùng dễ thấy.</li>
+<li>Sắp xếp thư mục theo <b>Kích thước</b>: file giống nhau hay nằm cạnh nhau với cùng dung lượng.</li>
+<li>Trước khi xoá, mở cả hai bản. Cùng tên, cùng dung lượng chỉ là dấu hiệu, chưa chắc hai file giống hệt.</li>
+</ul>
+<p>Cách này ổn với vài file. Với cả ổ, công cụ so nội dung file nhanh và chắc hơn.</p>
+
+<h2 id="rui-ro">Rủi ro thật: làm hỏng dự án</h2>
+<p>Phần lớn app tìm file trùng chỉ hỏi "hai file này có giống nhau không?". Với người viết script, tự động hoá hay skill cho AI, còn một câu nữa: <b>có thứ gì đang trỏ tới đúng bản này không?</b></p>
+<p>Một script Python đọc <code>data/gia.csv</code>, một script shell chép <code>assets/logo.png</code>, một file skill gọi tên một mẫu: xoá bản đó là script hỏng, dù ở chỗ khác vẫn còn một bản y hệt. File đó không phải rác. Vị trí của nó mới là điều quan trọng.</p>
+
+<h2 id="luat">Bốn luật dọn file trùng an toàn</h2>
+<ol class="steps">
+<li><b>So theo nội dung.</b> Cùng tên chưa chắc cùng file, và cùng một file có thể mang tên khác nhau.</li>
+<li><b>Luôn giữ một bản</b>, ưu tiên bản nằm ngoài Tải về, Màn hình nền và thư mục tạm.</li>
+<li><b>Kiểm dự án</b> trước khi xoá bản nằm trong dự án.</li>
+<li><b>Chuyển vào Thùng rác, không xoá thẳng</b>, để lỡ nhầm chỉ mất một thao tác kéo lại.</li>
+</ol>
+
+<h2 id="tidymint">Làm bằng Tidymint</h2>
+<figure class="fig-app"><img src="../dupes.jpg" alt="Trang File trùng của Tidymint: các nhóm file giống hệt nhau, luôn giữ một bản" width="1600" height="1013" loading="lazy"><figcaption>File trùng trong Tidymint: gom nhóm file giống hệt nhau, luôn giữ lại một bản.</figcaption></figure>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm theo đúng bốn luật trên:</p>
+<ul>
+<li>Quét Tài liệu, Tải về, Màn hình nền, Ảnh, Phim, Nhạc, tìm file từ 1 MB trở lên và <b>so theo nội dung</b>, không theo tên.</li>
+<li>Bỏ qua các thư mục như <code>.git</code>, <code>node_modules</code>, môi trường ảo Python, <code>build</code>, DerivedData.</li>
+<li><b>Luôn giữ một bản</b>: ưu tiên bản nằm ngoài Tải về, Màn hình nền và thư mục tạm, rồi tới bản có đường dẫn ngắn hơn.</li>
+<li>Trước khi chuyển, Tidymint đề nghị <b>kiểm thư mục dự án</b> (khai ở Cài đặt): tìm tên từng file trong script và ghi chú ở đó, cho thấy script nào đang dùng bản nào, rồi đề nghị bỏ tick các bản đó và xoá phần còn lại.</li>
+<li>Mọi thứ luôn vào Thùng rác trước, có thể hoàn tác.</li>
+</ul>
+{CTA}
+""",
+  faq=[
+    ("Xoá file trùng trên Mac có an toàn không?", "An toàn nếu bạn giữ lại một bản, so file theo nội dung chứ không theo tên, và chuyển vào Thùng rác để còn hoàn tác. Kiểm trước xem có script hay dự án nào trỏ tới bản định xoá không."),
+    ("macOS có sẵn công cụ tìm file trùng không?", "Với ảnh và video thì có: Ảnh › Tiện ích › Bản trùng lặp cho phép gộp. Với file khác, macOS không có công cụ tìm file trùng sẵn."),
+    ("Hai file cùng tên có thể khác nhau không?", "Có. Tên và dung lượng chỉ là dấu hiệu. So nội dung (mã kiểm tra) mới chắc hai file giống hệt."),
+    ("Nên giữ bản nào?", "Thường là bản trong thư mục đã sắp xếp, không phải trong Tải về hay Màn hình nền. Nếu một script hay dự án đang dùng một bản, giữ bản đó."),
+    ("Tidymint bảo vệ dự án thế nào?", "Trước khi xoá file trùng, Tidymint có thể tìm trong các thư mục dự án bạn khai ở Cài đặt những script, ghi chú nhắc tới từng file, cho bạn thấy file nào đang được dùng và để nguyên các file đó."),
+  ],
+  sources=[
+    ("Apple: Xoá ảnh và video trùng lặp trên Mac", "https://support.apple.com/guide/photos/remove-duplicates-pht5a3157c1d/mac"),
+  ],
+  related=[("Dọn dữ liệu lập trình trên Mac", "{HOME}don-du-lieu-lap-trinh-mac/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="remove-duplicate-files-mac",
+),
+dict(
+  lang="en", slug="free-up-ram-mac", topic="compare", date="2026-10-29", read="6 min read",
+  title="Do Mac RAM Cleaners Help? What Actually Works | Tidymint",
+  desc="Free RAM does not make a Mac faster. What memory pressure in Activity Monitor tells you, why RAM cleaners can backfire, and what actually helps.",
+  crumb="Do RAM cleaners help?",
+  h1="Do RAM cleaners help a Mac? What actually works",
+  tldr="Usually not. macOS is designed to <b>use</b> your memory, keeping recently used files cached so apps open faster. Apple says unused memory doesn't make a Mac faster. Check <b>memory pressure</b> in Activity Monitor instead: green is fine, yellow means you may eventually need more RAM, red means you need more. If it is red, quit the apps using the most memory or restart. A cleaner that empties memory throws away that cache.",
+  toc=[("myth","The myth: free RAM is fast RAM"),("check","What to check instead"),("cleaners","Why RAM cleaners can backfire"),
+       ("works","What actually helps"),("tidymint","What Tidymint does with memory"),("faq","FAQ")],
+  body="""
+<h2 id="myth">The myth: free RAM is fast RAM</h2>
+<p>Open Activity Monitor on almost any Mac and "Memory Used" looks high. That looks like a problem, and memory cleaners promise to fix it by freeing memory with one click.</p>
+<p>Apple's own guide says the opposite: macOS gets the best performance by using and managing all of your memory, and <b>having unused memory doesn't make your Mac faster</b>.</p>
+
+<h2 id="check">What to check instead</h2>
+<p>Open <b>Activity Monitor</b> (Applications › Utilities) and click <b>Memory</b>. Look at the <b>Memory Pressure</b> graph at the bottom, not at "Memory Used":</p>
+<div class="tbl"><table>
+<tr><th>Color</th><th>What Apple says it means</th></tr>
+<tr><td>Green</td><td>Your Mac is using its RAM efficiently</td></tr>
+<tr><td>Yellow</td><td>Your Mac might eventually need more RAM</td></tr>
+<tr><td>Red</td><td>Your Mac needs more RAM</td></tr>
+</table></div>
+<p>Two other numbers help: <b>Cached Files</b> is memory holding recently used files so they open faster, and <b>Swap Used</b> is disk space macOS uses when RAM is full. A little swap is normal. Swap that keeps growing while pressure is red is the real sign of a memory shortage.</p>
+
+<h2 id="cleaners">Why RAM cleaners can backfire</h2>
+<p>Much of the memory a cleaner "frees" is that cache of recently used files. Apple describes it as memory that stays cached until it is overwritten, so reopening an app is quicker. Empty it, and the next app or file you open has to be read from disk again. The number in the menu bar looks better; the Mac feels the same or slower.</p>
+<p>The other part, memory that apps are actively using, comes back as soon as you use those apps again.</p>
+
+<h2 id="works">What actually helps</h2>
+<ol class="steps">
+<li><b>Find the heavy app.</b> In Activity Monitor › Memory, sort by the Memory column. Browsers with many tabs, video editors and local AI models are common at the top.</li>
+<li><b>Quit what you don't need</b>, or close tabs. That frees memory that was really in use.</li>
+<li><b>Restart</b> if the Mac has been on for weeks or an app seems to leak memory.</li>
+<li><b>Keep free disk space.</b> When RAM is short, macOS swaps to disk, which needs room on the drive.</li>
+<li><b>If pressure is red every day</b>, your workload needs more memory. On Apple silicon Macs, memory can't be upgraded later, so this matters most when choosing your next Mac.</li>
+</ol>
+
+<h2 id="tidymint">What Tidymint does with memory</h2>
+<p>We chose not to build a "free RAM" button, for the reasons above. <a href="{HOME}">Tidymint</a>'s menu bar monitor shows free memory next to free disk space and can alert you when memory use goes above 90 percent, so you know when to look at Activity Monitor. The rest of the app is about disk space: caches, logs, old downloads, app leftovers, large files and duplicates, and everything always goes to the Trash first.</p>
+{CTA}
+""",
+  faq=[
+    ("Does freeing RAM make a Mac faster?", "Usually not. Apple says unused memory doesn't make a Mac faster. macOS keeps recently used files in memory so apps open faster."),
+    ("How do I know if my Mac needs more RAM?", "Open Activity Monitor › Memory and look at Memory Pressure. If it is red most of the time during your normal work, your Mac needs more RAM."),
+    ("Is high Memory Used a problem?", "Not by itself. Part of it is cached files that macOS gives up as soon as another app needs the space. Memory pressure is the number to watch."),
+    ("Should I use a RAM cleaner app?", "There is little reason to. Emptying the file cache makes the next app launch read from disk again. Quitting heavy apps or restarting frees memory that was really in use."),
+    ("Does Tidymint free RAM?", "No. Tidymint shows free memory in the menu bar and can alert you when memory use goes above 90 percent, but it has no button that empties memory."),
+  ],
+  sources=[
+    ("Apple: Check if your Mac needs more RAM in Activity Monitor", "https://support.apple.com/guide/activity-monitor/check-if-your-mac-needs-more-ram-actmntr34865/mac"),
+    ("Apple: View memory usage in Activity Monitor on Mac", "https://support.apple.com/guide/activity-monitor/view-memory-usage-actmntr1004/mac"),
+  ],
+  related=[("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
+),
 ]
