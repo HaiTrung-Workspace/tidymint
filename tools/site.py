@@ -27,7 +27,7 @@ def head_icons(root):
     return ('<link rel="icon" href="%sfavicon.ico" sizes="32x32">\n<link rel="icon" href="%sfavicon.svg" type="image/svg+xml">\n'
             '<link rel="apple-touch-icon" href="%sapple-touch-icon.png">\n<link rel="manifest" href="%ssite.webmanifest">\n<meta name="theme-color" content="#030c09">') % (root, root, root, root)
 # Lists that include Tidymint, shown in the 'Listed in' trust card. Add a name only once its listing is live.
-LISTED = '<span class="lst"><a href="https://github.com/jaywcjlove/awesome-mac" target="_blank" rel="noopener">awesome-mac</a> · <a href="https://alternativeto.net/software/tidymint/about/" target="_blank" rel="noopener">AlternativeTo</a> · <a href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener">awesome-swift-<wbr>macos-apps</a></span>'
+LISTED = '<span class="lst"><a href="https://github.com/jaywcjlove/awesome-mac" target="_blank" rel="noopener">awesome-mac</a> · <a href="https://alternativeto.net/software/tidymint/about/" target="_blank" rel="noopener">AlternativeTo</a> · <a href="https://macnative.io/apps/tidymint" target="_blank" rel="noopener">MacNative</a> · <a href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener">awesome-swift-<wbr>macos-apps</a></span>'
 ORG = {"@context":"https://schema.org","@type":"Organization","name":"Tidymint","url":"https://tidymint.app/","logo":"https://tidymint.app/icon-512.png","sameAs":[u for _, u, _ in SOCIAL]}
 BASE_CSS = open(os.path.join(ROOT, "tools", "site.css")).read()
 EXTRA_CSS = """
