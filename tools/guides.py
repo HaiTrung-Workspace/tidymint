@@ -40,7 +40,7 @@ ART_CSS = """
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
 @media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}
-.rel.gcards{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.gcards a{display:flex;flex-direction:column;gap:8px;padding:18px}
+.rel.gcards{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.mvt{margin:28px 0 8px}.mvt h3{margin:0 0 4px}.mvt th:last-child{color:var(--leaf)}@media (max-width:600px){.mvt tr:first-child{display:none}.mvt table,.mvt tbody,.mvt tr,.mvt td{display:block;width:auto}.mvt tr{border:1px solid var(--line);border-radius:12px;margin:0 0 10px;padding:12px 14px}.mvt td{border:0!important;padding:3px 0!important;white-space:normal!important;min-width:0!important}.mvt table{min-width:0!important;width:100%!important}.mvt td[data-l]:before{content:attr(data-l) ": ";font-weight:600;color:var(--sub)}}.gcards a{display:flex;flex-direction:column;gap:8px;padding:18px}
 .gcards .gt{font-size:17px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.05em}
 .gcards .gd{color:var(--sub);font-size:14.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.5em}
 .gcards .gm{margin-top:auto;padding-top:4px;color:var(--leaf);font-weight:600;font-size:14.5px}
@@ -103,6 +103,10 @@ def guide(g):
     rel = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
     cta = ('<div class="box"><img class="bico" src="' + root + 'icon.png" alt="" width="56" height="56"><h3>%s</h3><p>%s</p><div class="cta box-cta"><a class="btn primary" href="%s">%s <span class="arr">↓</span></a>'
            '<a class="btn ghost" href="%s%s">%s</a></div></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
+    if g.get("topic", "disk") in ("disk", "apps"):
+        vh, vrows = VS[k]
+        cta = ('<div class="mvt"><h3>%s</h3><div class="tbl"><table><tr><th></th><th>%s</th><th>Tidymint</th></tr>%s</table></div></div>'
+               % (vh, vrows[0], "".join('<tr><td><b>%s</b></td><td data-l="%s">%s</td><td class="y" data-l="Tidymint">%s</td></tr>' % (r[0], vrows[0], r[1], r[2]) for r in vrows[1:]))) + cta
     body = g["body"].replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
     fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
     strip = lambda s: html.unescape(__import__("re").sub("<[^>]+>", "", s))
@@ -229,6 +233,22 @@ HUB = {
             h1="Guides to a tidy Mac", desc="Plain-language guides to clearing System Data, freeing up space and uninstalling apps on macOS, with official sources.",
             lead='<p class="lead" style="margin-top:6px">Plain-language guides with official sources. Manual steps first, tools second.</p>'),
 }
+# "Manual vs Tidymint" box, shown before the download box on disk and app guides.
+VS = {
+ "vi": ("Làm tay hay dùng Tidymint?", ["Làm tay",
+   ("Tốc độ", "Mở từng thư mục ẩn, gõ lệnh trong Terminal", "Một lần quét, kết quả chia nhóm theo dung lượng"),
+   ("Nhìn tổng quát", "Mỗi lần chỉ thấy một thư mục", "Bản đồ ổ đĩa cho thấy cả ổ, thư mục nào nặng nhất"),
+   ("Hiểu cấu trúc máy", "Tên thư mục khó hiểu như Caches, DerivedData", "Ghi chú dễ hiểu cho các thư mục hay gặp"),
+   ("Không lo xoá nhầm", "Xoá nhầm là mất, không có đường lùi", "Chọn sẵn phần an toàn, phần còn lại bạn tự quyết, luôn vào Thùng rác, có thể hoàn tác"),
+   ("Chi phí", "Miễn phí, tốn thời gian", "Miễn phí, mã nguồn mở")]),
+ "en": ("Doing it by hand vs. Tidymint", ["By hand",
+   ("Speed", "Open hidden folders one by one, type Terminal commands", "One scan, results grouped by size"),
+   ("The big picture", "You see one folder at a time", "Space Lens shows the whole drive and the heaviest folders"),
+   ("Understanding your Mac", "Cryptic folder names like Caches and DerivedData", "Plain-language notes for common folders"),
+   ("No accidental deletes", "A wrong delete is gone for good", "Safe items pre-selected, the rest left to you, always to the Trash first, with Undo"),
+   ("Cost", "Free, but it takes time", "Free and open source")]),
+}
+
 # Guide topics, in display order. A guide without "topic" lands in "disk".
 TOPICS = [
     ("start", "Bắt đầu", "Getting started"),

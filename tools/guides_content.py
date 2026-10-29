@@ -112,9 +112,9 @@ dict(
   desc="Kéo app vào Thùng rác chưa xóa hết: cài đặt, bộ nhớ đệm vẫn còn. Hướng dẫn gỡ app trên MacBook đúng cách, kể cả macOS 26 Tahoe, và cách dọn phần sót lại.",
   crumb="Xóa ứng dụng trên MacBook",
   h1="Cách xóa ứng dụng trên MacBook sạch hoàn toàn",
-  tldr="Cách chuẩn của Apple: thoát app, tìm app trong <b>Finder › Ứng dụng</b>, dùng trình gỡ cài đặt riêng nếu app có, nếu không thì kéo app vào <b>Thùng rác</b> rồi đổ Thùng rác. Nhưng cách này thường <b>để lại cài đặt, bộ nhớ đệm và dữ liệu</b> trong thư mục Thư viện. Muốn gỡ sạch, hãy dọn thêm các thư mục đó, hoặc dùng app gỡ cài đặt miễn phí như Tidymint hay AppCleaner.",
+  tldr="Cách chuẩn của Apple: thoát app, tìm app trong <b>Finder › Ứng dụng</b>, dùng trình gỡ cài đặt riêng nếu app có, nếu không thì kéo app vào <b>Thùng rác</b> rồi đổ Thùng rác. Nhưng cách này thường <b>để lại cài đặt, bộ nhớ đệm và dữ liệu</b> trong thư mục Thư viện. Muốn gỡ sạch, hãy dọn thêm các thư mục đó, hoặc dùng Tidymint (miễn phí, tiếng Việt) để tìm giúp.",
   toc=[("cach-1-finder","Cách 1: Xóa bằng Finder (cách của Apple)"),("cach-2-trinh-go","Cách 2: Dùng trình gỡ cài đặt của app"),
-       ("macos-26","Lưu ý trên macOS 26 Tahoe"),("phan-sot-lai","Dọn phần sót lại cho sạch"),("cach-3-app","Cách 3: Gỡ sạch bằng app miễn phí"),
+       ("macos-26","Lưu ý trên macOS 26 Tahoe"),("phan-sot-lai","Dọn phần sót lại cho sạch"),("cach-3-app","Cách 3: Gỡ sạch bằng Tidymint (miễn phí)"),
        ("khong-xoa-duoc","App không xóa được thì làm sao"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="cach-1-finder">Cách 1: Xóa bằng Finder (cách của Apple)</h2>
@@ -147,8 +147,8 @@ dict(
 </table></div>
 <div class="warn"><p>Chỉ chuyển vào Thùng rác những thư mục <b>mang đúng tên app hoặc tên hãng</b> (ví dụ <code>com.spotify.client</code>). Không chắc thì để lại. Đừng xóa cả thư mục Library.</p></div>
 
-<h2 id="cach-3-app">Cách 3: Gỡ sạch bằng app miễn phí</h2>
-<p>Dò tay từng thư mục khá mất công và dễ nhầm. Các app gỡ cài đặt sẽ tự tìm phần sót lại giúp bạn:</p>
+<h2 id="cach-3-app">Cách 3: Gỡ sạch bằng Tidymint (miễn phí)</h2>
+<p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zoom cùng các file sót lại trong Library" width="1600" height="1013" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
 <li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xóa nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xóa từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, có nút Hoàn tác.</li>
@@ -450,7 +450,7 @@ dict(
     ("Sao Dữ liệu hệ thống tự lên xuống?", "macOS tạo snapshot Time Machine mỗi giờ và xoá khi cần chỗ, đồng thời dọn cache khi ổ chật. Con số bạn thấy là mục tiêu di động, nên so hai ngày cách nhau hữu ích hơn nhìn một lần."),
     ("Xoá cả thư mục Caches được không?", "Chuyển ~/Library/Caches vào Thùng rác nhìn chung an toàn, app tự tạo lại. Lần mở đầu sẽ chậm hơn và một số app mất nội dung ngoại tuyến. Tuyệt đối không xoá tay /System hay /private/var."),
     ("Dọn các thư mục này có mất ảnh hay tài liệu không?", "Không. Tài liệu, Màn hình chính, Ảnh và thư viện Ảnh nằm riêng. Các thư mục trong bài chứa bản sao, bộ nhớ đệm và sao lưu. Tránh xa cơ sở dữ liệu của Mail, Tin nhắn, thư viện Ảnh trừ khi dùng đúng cài đặt của app."),
-    ("Tidymint có tự sửa chuyện này không?", "App tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá."),
+    ("Tidymint có tự sửa chuyện này không?", "Tidymint tìm các thư mục, gắn nhãn từng nhóm an toàn, cần xem hay khoá, và chuyển phần bạn tick vào Thùng rác, có Hoàn tác. Không chạy ngầm, không tự xoá."),
   ],
   sources=[
     ("Apple: Giải phóng dung lượng lưu trữ trên máy Mac", "https://support.apple.com/vi-vn/102624"),
@@ -742,7 +742,7 @@ dict(
   h1="How to clear System Data on Mac, safely",
   tldr="System Data is macOS's catch-all bucket for files that don't fit another category: caches, logs, local Time Machine snapshots, old iPhone backups, developer tools and more. You can shrink it safely by <b>restarting</b>, <b>emptying the Trash</b>, <b>deleting local snapshots</b>, <b>clearing user caches</b>, <b>removing old device backups</b> and cleaning <b>Xcode, Docker or AI model caches</b>. Never delete anything inside <code>/System</code> or <code>/private/var</code>.",
   toc=[("what","What is System Data?"),("check","Check how big it is"),("steps","7 safe ways to shrink System Data"),
-       ("dont","What you should never delete"),("faster","The faster way: let an app find it"),("faq","FAQ")],
+       ("dont","What you should never delete"),("faster","The faster way: let Tidymint find it"),("faq","FAQ")],
   body="""
 <h2 id="what">What is System Data?</h2>
 <p>Apple describes System Data (called "Other" on older macOS) as a general category that measures storage used by Apple and third-party files that don't fit a more specific category. In practice, it usually includes:</p>
@@ -796,7 +796,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 </ul>
 <p>Also be careful with "one click" cleaners that delete permanently. If something goes wrong, there is no undo.</p>
 
-<h2 id="faster">The faster way: let an app find it</h2>
+<h2 id="faster">The faster way: let Tidymint find it</h2>
 <p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you: Clean Now finds user and app caches, logs, npm cache, old downloads and project drafts and shows them by group before you press Clean; Clean by App lists what Chrome, Edge, Zalo and CapCut keep; Space Lens draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>. Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
 {CTA}
 """,
@@ -821,8 +821,8 @@ dict(
   desc="Mac storage almost full? 10 safe ways to free up space on macOS: clear cache, find large and duplicate files, remove unused apps and leftovers.",
   crumb="Free up space on Mac",
   h1="How to free up space on Mac: 10 safe ways",
-  tldr="Start with <b>System Settings › General › Storage</b> to see what is using space. Then work down this list: empty the Trash, clear Downloads, turn on <b>Optimize Storage</b>, <b>clear browser and app caches</b>, remove <b>large and duplicate files</b>, <b>uninstall apps</b> together with their leftovers, and delete old device backups. A free app like Tidymint can do most of this in one scan.",
-  toc=[("look","First, see what is using space"),("ways","10 safe ways"),("cache","How to clear cache on Mac"),("faster","Do it in one scan"),("faq","FAQ")],
+  tldr="Start with <b>System Settings › General › Storage</b> to see what is using space. Then work down this list: empty the Trash, clear Downloads, turn on <b>Optimize Storage</b>, <b>clear browser and app caches</b>, remove <b>large and duplicate files</b>, <b>uninstall apps</b> together with their leftovers, and delete old device backups. Tidymint, a free open-source cleaner, can do most of this in one scan.",
+  toc=[("look","First, see what is using space"),("ways","10 safe ways"),("cache","How to clear cache on Mac"),("faster","Do it in one scan with Tidymint"),("faq","FAQ")],
   body="""
 <h2 id="look">First, see what is using space</h2>
 <p>Open <b>Apple menu › System Settings › General › Storage</b>. The colored bar shows your biggest categories, and the list below lets you open Applications, Documents, Messages and more. If <b>System Data</b> is the largest, read our guide to <a href="{HOME}clear-system-data-mac/">clearing System Data</a>.</p>
@@ -850,7 +850,7 @@ dict(
 <p>Quit your apps, press <b>Shift+Cmd+G</b> in Finder and go to <code>~/Library/Caches</code>. Move folders of apps you recognize to the Trash. Chat and design apps like Slack, Notion and VS Code often keep gigabytes here.</p>
 <div class="warn"><p>Clearing caches frees space for a while, but apps rebuild them as you use them. It is maintenance, not a permanent fix. Large files, duplicates and unused apps give longer-lasting results.</p></div>
 
-<h2 id="faster">Do it in one scan</h2>
+<h2 id="faster">Do it in one scan with Tidymint</h2>
 <p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that covers most of this list: Clean Now for caches, logs and old downloads (shown by group before you press Clean); Clean by App for Chrome, Edge, Zalo and CapCut; Large Files (never pre-selected); Duplicates that keeps the best copy; an Uninstaller that finds leftovers, even from apps you removed long ago; and Space Lens to see where the space went. Everything goes to the Trash first.</p>
 {CTA}
 """,
@@ -957,7 +957,7 @@ dict(
   h1="Dữ liệu hệ thống trên Mac là gì, dọn sao cho an toàn",
   tldr="Dữ liệu hệ thống (System Data, macOS cũ gọi là \"Khác\") là nhóm gom mọi file không thuộc nhóm nào rõ ràng: <b>bộ nhớ đệm</b>, nhật ký, file tạm, <b>bản sao lưu iPhone cũ</b>, dữ liệu lập trình. Dọn an toàn bằng cách: <b>khởi động lại</b>, <b>đổ Thùng rác</b>, <b>xoá bộ nhớ đệm của bạn</b>, <b>xoá bản sao lưu iPhone cũ</b>, dọn <b>dữ liệu Xcode, Docker</b> nếu có. Tuyệt đối không xoá gì trong <code>/System</code> hay <code>/private/var</code>.",
   toc=[("la-gi","Dữ liệu hệ thống là gì?"),("xem","Xem nó đang chiếm bao nhiêu"),("cach-don","7 cách dọn an toàn"),
-       ("khong-xoa","Những thứ không bao giờ được xoá"),("nhanh-hon","Cách nhanh hơn: để app tìm giúp"),("faq","Câu hỏi thường gặp")],
+       ("khong-xoa","Những thứ không bao giờ được xoá"),("nhanh-hon","Cách nhanh hơn: để Tidymint tìm giúp"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="la-gi">Dữ liệu hệ thống là gì?</h2>
 <p>Theo Apple, đây là nhóm chung, đo dung lượng của mọi file của Apple và của app khác <b>không xếp được vào nhóm cụ thể nào</b>. Trên máy thật, trong đó thường có:</p>
@@ -1006,7 +1006,7 @@ dict(
 </ul>
 <p>Cẩn thận với các app dọn "một cú click" mà xoá thẳng. Lỡ xoá nhầm thì không có đường lùi.</p>
 
-<h2 id="nhanh-hon">Cách nhanh hơn: để app tìm giúp</h2>
+<h2 id="nhanh-hon">Cách nhanh hơn: để Tidymint tìm giúp</h2>
 <p>Bước 2, 4, 6, 7 đều phải lục thư mục ẩn. <a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, tìm giúp bạn:</p>
 <figure class="fig-app"><img src="../smart.jpg" alt="Trang Dọn ngay của Tidymint sau khi quét: bộ nhớ đệm, nhật ký, file tải về cũ chia nhóm kèm dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Dọn ngay: mọi thứ chia nhóm, ghi rõ dung lượng, bạn xem trước rồi mới chọn dọn.</figcaption></figure>
 <ul>
@@ -1037,8 +1037,8 @@ dict(
   desc="MacBook báo sắp đầy ổ? 10 cách giải phóng dung lượng an toàn: xoá bộ nhớ đệm, tìm file lớn và file trùng, gỡ app không dùng kèm phần sót lại, dọn Zalo.",
   crumb="Giải phóng dung lượng MacBook",
   h1="10 cách giải phóng dung lượng MacBook an toàn",
-  tldr="Bắt đầu từ <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b> để xem thứ gì đang chiếm chỗ. Rồi làm lần lượt: đổ Thùng rác, dọn thư mục Tải về, bật <b>Tối ưu hoá dung lượng</b>, <b>xoá bộ nhớ đệm</b> trình duyệt và app, tìm <b>file lớn và file trùng</b>, <b>gỡ app</b> kèm phần sót lại, dọn <b>dữ liệu Zalo</b>, xoá bản sao lưu iPhone cũ. App miễn phí như Tidymint làm được phần lớn danh sách này trong một lần quét.",
-  toc=[("xem","Trước hết, xem thứ gì đang chiếm chỗ"),("cach","10 cách an toàn"),("bo-nho-dem","Cách xoá bộ nhớ đệm trên Mac"),("nhanh-hon","Làm trong một lần quét"),("faq","Câu hỏi thường gặp")],
+  tldr="Bắt đầu từ <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b> để xem thứ gì đang chiếm chỗ. Rồi làm lần lượt: đổ Thùng rác, dọn thư mục Tải về, bật <b>Tối ưu hoá dung lượng</b>, <b>xoá bộ nhớ đệm</b> trình duyệt và app, tìm <b>file lớn và file trùng</b>, <b>gỡ app</b> kèm phần sót lại, dọn <b>dữ liệu Zalo</b>, xoá bản sao lưu iPhone cũ. Tidymint (miễn phí) làm được phần lớn danh sách này trong một lần quét.",
+  toc=[("xem","Trước hết, xem thứ gì đang chiếm chỗ"),("cach","10 cách an toàn"),("bo-nho-dem","Cách xoá bộ nhớ đệm trên Mac"),("nhanh-hon","Làm trong một lần quét với Tidymint"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="xem">Trước hết, xem thứ gì đang chiếm chỗ</h2>
 <p>Vào <b>menu Apple › Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>. Thanh màu cho thấy nhóm nào lớn nhất, danh sách bên dưới mở được Ứng dụng, Tài liệu, Tin nhắn và các nhóm khác. Nếu <b>Dữ liệu hệ thống</b> lớn nhất, đọc bài <a href="{HOME}du-lieu-he-thong-mac/">Dữ liệu hệ thống trên Mac là gì</a>.</p>
@@ -1066,7 +1066,7 @@ dict(
 <p>Thoát các app, trong Finder nhấn <b>Shift+Cmd+G</b> rồi gõ <code>~/Library/Caches</code>. Chuyển thư mục của app bạn nhận ra vào Thùng rác. App chat, app thiết kế như Slack, Notion, VS Code thường giữ vài GB ở đây.</p>
 <div class="warn"><p>Xoá bộ nhớ đệm giải phóng được một thời gian, rồi app tạo lại khi bạn dùng. Đây là việc bảo dưỡng, không phải cách chữa tận gốc. File lớn, file trùng và app không dùng mới cho kết quả lâu dài.</p></div>
 
-<h2 id="nhanh-hon">Làm trong một lần quét</h2>
+<h2 id="nhanh-hon">Làm trong một lần quét với Tidymint</h2>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm được phần lớn danh sách trên:</p>
 <ul>
 <li><b>Dọn ngay</b>: bộ nhớ đệm, nhật ký, file tải về cũ, chia nhóm trước khi bạn bấm Dọn.</li>
@@ -1098,9 +1098,9 @@ dict(
   desc="Dragging an app to the Trash leaves settings and caches behind. How to uninstall apps on Mac the right way, including macOS 26 Tahoe, and clean up leftovers.",
   crumb="Uninstall apps on Mac",
   h1="How to uninstall apps on Mac completely",
-  tldr="Apple's way: quit the app, find it in <b>Finder › Applications</b>, run its own uninstaller if it has one, otherwise drag it to the <b>Trash</b> and empty the Trash. That usually <b>leaves settings, caches and data</b> behind in your Library folder. To remove an app completely, clean those folders too, or use a free uninstaller such as Tidymint or AppCleaner.",
+  tldr="Apple's way: quit the app, find it in <b>Finder › Applications</b>, run its own uninstaller if it has one, otherwise drag it to the <b>Trash</b> and empty the Trash. That usually <b>leaves settings, caches and data</b> behind in your Library folder. To remove an app completely, clean those folders too, or let Tidymint (free, open source) find them for you.",
   toc=[("finder","Way 1: Delete it in Finder (Apple's way)"),("uninstaller","Way 2: Use the app's own uninstaller"),
-       ("tahoe","A note on macOS 26 Tahoe"),("leftovers","Clean up the leftovers"),("app","Way 3: Uninstall with a free app"),
+       ("tahoe","A note on macOS 26 Tahoe"),("leftovers","Clean up the leftovers"),("app","Way 3: Uninstall with Tidymint (free)"),
        ("stuck","When an app won't delete"),("faq","FAQ")],
   body="""
 <h2 id="finder">Way 1: Delete it in Finder (Apple's way)</h2>
@@ -1133,8 +1133,8 @@ dict(
 </table></div>
 <div class="warn"><p>Only move folders that carry <b>the app's name or the developer's name</b> (for example <code>com.spotify.client</code>). If you're not sure, leave it. Never delete the whole Library folder.</p></div>
 
-<h2 id="app">Way 3: Uninstall with a free app</h2>
-<p>Checking every folder by hand takes time and it's easy to pick the wrong one. Uninstaller apps find the leftovers for you:</p>
+<h2 id="app">Way 3: Uninstall with Tidymint (free)</h2>
+<p>Checking every folder by hand takes time and it's easy to pick the wrong one. Tidymint finds the leftovers for you:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Zoom together with its leftover files in Library" width="1600" height="1013" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
 <ul>
 <li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Everything always goes to the Trash first, with Undo.</li>
@@ -1442,7 +1442,7 @@ dict(
 <li>Sort folders by <b>Size</b>: identical files often sit next to each other with the same size.</li>
 <li>Before deleting, open both copies. Same name and size is a strong hint, not proof that two files are identical.</li>
 </ul>
-<p>This works for a few files. For a whole drive, a tool that compares file contents is faster and more reliable.</p>
+<p>This works for a few files. For a whole drive, Tidymint compares file contents for you, which is faster and more reliable.</p>
 
 <h2 id="risk">The real risk: breaking a project</h2>
 <p>Most duplicate finders only ask "are these two files the same?". For people who write scripts, automations or AI skills, a second question matters: <b>does something point to this exact copy?</b></p>
@@ -1514,7 +1514,7 @@ dict(
 <li>Sắp xếp thư mục theo <b>Kích thước</b>: file giống nhau hay nằm cạnh nhau với cùng dung lượng.</li>
 <li>Trước khi xoá, mở cả hai bản. Cùng tên, cùng dung lượng chỉ là dấu hiệu, chưa chắc hai file giống hệt.</li>
 </ul>
-<p>Cách này ổn với vài file. Với cả ổ, công cụ so nội dung file nhanh và chắc hơn.</p>
+<p>Cách này ổn với vài file. Với cả ổ, Tidymint so nội dung file giúp bạn, nhanh và chắc hơn.</p>
 
 <h2 id="rui-ro">Rủi ro thật: làm hỏng dự án</h2>
 <p>Phần lớn app tìm file trùng chỉ hỏi "hai file này có giống nhau không?". Với người viết script, tự động hoá hay skill cho AI, còn một câu nữa: <b>có thứ gì đang trỏ tới đúng bản này không?</b></p>
