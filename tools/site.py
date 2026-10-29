@@ -469,7 +469,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 
 <div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
 <div class="fcols">
-  <div><a class="brand" href="./"><img src="{img}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a><p>{t["f_blurb"]}</p>{social(t["follow"])}</div>
+  <div><a class="brand" href="./"><img src="{img}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a><p>{t["f_blurb"]}</p>{social(t["follow"])}<a class="osa" href="https://www.opensourcealternatives.to" target="_blank" rel="noopener"><img src="{img}badge-osa.svg" alt="As seen on Open Source Alternatives" width="270" height="20" loading="lazy"></a></div>
   {fcols}
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
