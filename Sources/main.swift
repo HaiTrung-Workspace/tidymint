@@ -2536,6 +2536,9 @@ struct CheckBox: View {
         Image(systemName: state == 2 ? "checkmark.square.fill" : (state == 1 ? "minus.square.fill" : "square"))
             .font(.system(size: fs(17), weight: .medium))
             .foregroundStyle(state == 0 ? AnyShapeStyle(Theme.ink.opacity(0.5)) : AnyShapeStyle(Theme.accent))
+            // The whole square takes the click, not only the outline; hand cursor, no hover colour (lists stay calm).
+            .contentShape(Rectangle())
+            .onHover { ($0 ? NSCursor.pointingHand : NSCursor.arrow).set() }
     }
 }
 
@@ -3231,7 +3234,7 @@ struct ReviewView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
@@ -3239,7 +3242,7 @@ struct ReviewView: View {
                     Button(t("Select All", "Chọn tất cả")) { vm.setAll(true) }
                     Button(t("Deselect All", "Bỏ chọn tất cả")) { vm.setAll(false) }
                     Button(t("Smart Selection", "Chọn thông minh")) { vm.scanJunk(thenReview: true) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
 
             ScrollView {
@@ -3371,7 +3374,7 @@ struct AppDetail: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
                     Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
@@ -3476,7 +3479,7 @@ struct LargeView: View {
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
                 if vm.large.isEmpty {
@@ -3531,11 +3534,12 @@ struct LensView: View {
                         Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.icon)
                             .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).help(t("Forward", "Tiến"))
                             .padding(.trailing, 8)
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).foregroundColor(Theme.text)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).help(t("Go to your home folder", "Về thư mục người dùng")).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: fs(10))).foregroundColor(Theme.sub)
-                            Button(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent) { vm.lensUp(to: i) }
-                                .buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
+                            Button { vm.lensUp(to: i) } label: {
+                                Text(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent).padding(.horizontal, 4).padding(.vertical, 2).hoverTile()
+                            }.buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
                         }
                     }
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -3823,7 +3827,7 @@ struct LangSwitch: View {
                         .foregroundColor(Theme.ink.opacity(vm.lang == l ? 1 : 0.55))
                         .frame(width: 22, height: 16)
                         .background(RoundedRectangle(cornerRadius: 4).fill(vm.lang == l ? Theme.ink.opacity(0.22) : .clear))
-                        .contentShape(Rectangle())
+                        .hoverTile(vm.lang != l)
                 }.buttonStyle(.plain)
             }
         }
@@ -3870,7 +3874,7 @@ struct Sidebar: View {
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: fs(9), weight: .bold)).foregroundColor(Theme.sub)
                         .rotationEffect(.degrees(vm.advancedOpen ? 90 : 0)).padding(.trailing, 10)
-                }.contentShape(Rectangle())
+                }.padding(.vertical, 2).hoverTile()
             }.buttonStyle(.plain)
             if vm.advancedOpen {
                 NavItem(p: .lens, vm: vm)
@@ -4046,7 +4050,7 @@ struct AppsView: View {
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
@@ -4073,7 +4077,7 @@ struct AppsView: View {
                     }
                 } label: {
                     Text(filterName(vm.appsFilter) + " (\(vm.appsMatching(vm.appsFilter).count))").font(.system(size: fs(12), weight: .semibold))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
                 Spacer()
                 Menu {
                     Button(t("Size", "Dung lượng")) { vm.appsSort = 0 }
@@ -4199,8 +4203,8 @@ struct DupesView: View {
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 6)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .dupes)
             if !vm.dupMsg.isEmpty {
@@ -4290,7 +4294,7 @@ struct CloudView: View {
                 }
                 Spacer()
                 if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text)
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -5044,8 +5048,9 @@ struct ConCaoHint: View {
                 Text("Dọn xong rồi, thưởng mình một ly?").foregroundColor(Theme.sub)
                 TextLink("Gợi ý ở Cồn Cào →", url: ConCao.url("done"), size: 13)
                 Spacer()
-                Button("Đừng hiện nữa") { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub)
+                Button { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true } label: {
+                    Text("Đừng hiện nữa").padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain).foregroundColor(Theme.sub)
             }
             .font(.system(size: fs(12)))
             .padding(.horizontal, 14).padding(.vertical, 10)
@@ -6663,15 +6668,9 @@ struct OrgPlan: View {
                 Text(t("Plan for \(org.folder.lastPathComponent) (\(org.files.count) files)", "Kế hoạch cho \(org.folder.lastPathComponent) (\(org.files.count) file)"))
                     .font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
-                HStack(spacing: 2) {
-                    ForEach([(false, t("Rename only", "Chỉ đổi tên")), (true, t("Sort into folders", "Sắp xếp vào thư mục"))], id: \.0) { v, label in
-                        Button { org.moveIntoFolders = v } label: {
-                            Text(label).font(.system(size: fs(12), weight: .medium)).foregroundColor(org.moveIntoFolders == v ? .white : Theme.sub)
-                                .padding(.horizontal, 14).padding(.vertical, 5)
-                                .background(Capsule().fill(org.moveIntoFolders == v ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Color.clear)))
-                        }.buttonStyle(.plain)
-                    }
-                }.padding(3).background(Capsule().fill(Theme.card))
+                PillSwitch(options: [(false, t("Rename only", "Chỉ đổi tên"), t("Keep files where they are, only rename them", "Giữ file ở chỗ cũ, chỉ đổi tên"), nil),
+                                     (true, t("Sort into folders", "Sắp xếp vào thư mục"), t("Make a folder per type and move files into it", "Tạo thư mục theo loại và chuyển file vào"), nil)],
+                           value: $org.moveIntoFolders)
                 Button { org.plan() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).help(t("Plan again", "Lập lại kế hoạch"))
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 8)
             if org.moveIntoFolders && !org.files.isEmpty {
@@ -6764,6 +6763,7 @@ struct OrgGroupBlock: View {
                             Text(fresh ? t("NEW", "MỚI") : t("EXISTING", "CÓ SẴN")).font(.system(size: fs(9), weight: .semibold))
                                 .foregroundColor(fresh ? Theme.accentSolid : Theme.text).padding(.horizontal, 6).padding(.vertical, 1)
                                 .background(Capsule().fill(fresh ? Theme.accentSolid.opacity(0.18) : Theme.sub.opacity(0.18)))
+                                .help(fresh ? t("This folder is created when you Apply", "Thư mục sẽ được tạo khi áp dụng") : t("This folder already exists, files are added to it", "Thư mục đã có, file được thêm vào"))
                         }
                     }.foregroundColor(Theme.sub).font(.system(size: fs(11)))
                 }
@@ -6783,6 +6783,7 @@ struct OrgGroupBlock: View {
                 Button { if org.collapsed.contains(g) { org.collapsed.remove(g) } else { org.collapsed.insert(g) } } label: {
                     Image(systemName: "chevron.down").rotationEffect(.degrees(org.collapsed.contains(g) ? -90 : 0))
                 }.buttonStyle(.icon).foregroundColor(Theme.sub)
+                    .help(org.collapsed.contains(g) ? t("Expand group", "Mở nhóm") : t("Collapse group", "Thu gọn nhóm"))
             }.padding(.horizontal, 14).padding(.vertical, 12)
             if !org.collapsed.contains(g) {
                 ForEach(ids, id: \.self) { i in OrgRow(org: org, i: i) }
@@ -6825,11 +6826,11 @@ struct OrgRow: View {
                     if f.pairOf == nil {
                         Menu {
                             ForEach(OrgGroup.allCases, id: \.self) { g in Button(g.label) { org.setGroup(f.id, g) } }
-                        } label: { Image(systemName: "folder") }.menuStyle(.borderlessButton).fixedSize().help(t("Move to another group", "Chuyển sang nhóm khác"))
+                        } label: { Image(systemName: "folder") }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 5).padding(.vertical, 3).hoverTile().help(t("Move to another group", "Chuyển sang nhóm khác"))
                     }
                     Button { org.editing = org.editing == f.id ? nil : f.id } label: {
                         Image(systemName: f.note.isEmpty ? "square.and.pencil" : "note.text").foregroundColor(f.note.isEmpty ? Theme.sub : Theme.accentSolid)
-                    }.buttonStyle(.plain).help(t("Note", "Ghi chú"))
+                    }.buttonStyle(.icon).help(t("Add a note (kept in Tidymint only, not written into the file)", "Thêm ghi chú (chỉ lưu trong Tidymint, không ghi vào file)"))
                 }
                 if f.pairOf != nil, let n = f.newName {
                     // Its name comes from the file it goes with.
@@ -6843,6 +6844,7 @@ struct OrgRow: View {
                         Button { org.edit(f.id) { $0.renameOn.toggle() } } label: {
                             Image(systemName: f.renameOn ? "checkmark.square.fill" : "square").font(.system(size: fs(13)))
                                 .foregroundStyle(f.renameOn ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.ink.opacity(0.5)))
+                                .contentShape(Rectangle()).onHover { ($0 ? NSCursor.pointingHand : NSCursor.arrow).set() }
                         }.buttonStyle(.plain)
                         Text(t("Rename to", "Đổi tên thành")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
                         TextField("", text: Binding(get: { org.file(f.id)?.newName ?? "" }, set: { v in org.edit(f.id) { $0.newName = v; $0.renameOn = true; $0.nameEdited = true } }))
@@ -7004,15 +7006,10 @@ struct OrgShowBar: View {
                 Text(t("To check (\(inc.filter { $0.warn != nil }.count))", "Cần xem (\(inc.filter { $0.warn != nil }.count))")).tag(OrgVM.Show.check)
             }.pickerStyle(.segmented).labelsHidden().fixedSize()
             Spacer()
-            Picker("", selection: $org.treeView) {
-                // Named by what each side is for: the list is where files are changed, the tree only shows the result.
-                Label(t("Edit", "Chỉnh sửa"), systemImage: "list.bullet").tag(false)
-                    .help(t("Rename, tag and regroup each file", "Đổi tên, tag, nhóm cho từng file"))
-                Label(t("Preview", "Xem trước"), systemImage: "list.bullet.indent").tag(true)
-                    .help(t("See the folders before and after Apply", "Xem thư mục trước và sau khi áp dụng"))
-            }.pickerStyle(.segmented).labelsHidden().fixedSize()
-            .help(t("Edit: rename, tag and regroup each file. Preview: the folders before and after Apply.",
-                    "Chỉnh sửa: đổi tên, tag, nhóm cho từng file. Xem trước: thư mục trước và sau khi áp dụng."))
+            // Named by what each side is for: the list is where files are changed, the tree only shows the result.
+            PillSwitch(options: [(false, t("Edit", "Chỉnh sửa"), t("Rename, tag and regroup each file", "Đổi tên, tag, nhóm cho từng file"), "list.bullet"),
+                                 (true, t("Preview", "Xem trước"), t("See the folders before and after Apply", "Xem thư mục trước và sau khi áp dụng"), "list.bullet.indent")],
+                       value: $org.treeView)
         }
     }
 }
@@ -7070,6 +7067,7 @@ struct OrgNameBar: View {
             Menu {
                 ForEach(NamePreset.allCases, id: \.self) { p in Button(p.label) { org.preset = p } }
             } label: { Text(org.preset.label).font(.system(size: fs(12), weight: .semibold)) }.menuStyle(.borderlessButton).fixedSize()
+                .padding(.horizontal, 6).padding(.vertical, 3).hoverTile().help(t("Pick a ready-made naming style", "Chọn kiểu đặt tên có sẵn"))
             // The whole pill takes the click (a bare icon only reacts on its thin strokes), and a click always opens the editor.
             Button { org.showRule = true } label: {
                 Label(t("Customize", "Tuỳ chỉnh"), systemImage: "slider.horizontal.3").font(.system(size: fs(12)))
@@ -7082,7 +7080,8 @@ struct OrgNameBar: View {
                 Button { org.show = .check } label: {
                     Label(t("\(org.warnCount) to check", "\(org.warnCount) file cần xem"), systemImage: "exclamationmark.triangle.fill")
                         .foregroundColor(Theme.warn).font(.system(size: fs(12), weight: .semibold))
-                }.buttonStyle(.plain).onHover { $0 ? NSCursor.pointingHand.push() : NSCursor.pop() }
+                        .padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain)
                     .help(t("Show only these files", "Chỉ hiện các file này"))
             }
             if org.renameCount == 0 && !org.renameAll && named.isEmpty && !org.files.isEmpty {
@@ -7134,7 +7133,7 @@ struct OrgRuleEditor: View {
                         Button { move(i, -1) } label: { Image(systemName: "chevron.up") }.buttonStyle(.icon).disabled(i == 0)
                         Button { move(i, 1) } label: { Image(systemName: "chevron.down") }.buttonStyle(.icon).disabled(i == r.parts.count - 1)
                         Button { set { r in r.parts.removeAll { $0.id == p.id } } } label: { Image(systemName: "xmark.circle.fill").foregroundColor(.secondary) }
-                            .buttonStyle(.plain).help(t("Remove", "Bỏ phần này"))
+                            .buttonStyle(.icon).help(t("Remove", "Bỏ phần này"))
                     }.padding(.vertical, 2)
                 }
                 .onMove { from, to in set { r in r.parts.move(fromOffsets: from, toOffset: to) } }
@@ -7147,7 +7146,7 @@ struct OrgRuleEditor: View {
                     Button { set { r in r.parts.append(NamePart(kind: k)) } } label: {
                         Label(k.label, systemImage: k == .text ? "character.cursor.ibeam" : "plus").font(.system(size: fs(11)))
                             .padding(.horizontal, 8).padding(.vertical, 4).frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Capsule().stroke(Color.secondary.opacity(0.4)))
+                            .background(Capsule().stroke(Color.secondary.opacity(0.4))).hoverTile()
                     }.buttonStyle(.plain)
                 }
             }
@@ -7213,6 +7212,27 @@ struct OrgHistory: View {
                 }
             }.padding(.horizontal, 14).padding(.vertical, 6).frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+}
+
+/// Two-option switch made of buttons, so each option has its own tooltip and hover tile (a segmented picker has neither).
+struct PillSwitch: View {
+    let options: [(Bool, String, String, String?)]   // value, label, tooltip, SF symbol
+    @Binding var value: Bool
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(options, id: \.0) { v, label, tip, icon in
+                Button { value = v } label: {
+                    HStack(spacing: 5) {
+                        if let icon { Image(systemName: icon) }
+                        Text(label)
+                    }.font(.system(size: fs(12), weight: .medium)).foregroundColor(value == v ? .white : Theme.sub)
+                        .padding(.horizontal, 12).padding(.vertical, 5)
+                        .background(Capsule().fill(value == v ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Color.clear)))
+                        .hoverTile(value != v)
+                }.buttonStyle(.plain).help(tip)
+            }
+        }.padding(3).background(Capsule().fill(Theme.card))
     }
 }
 
