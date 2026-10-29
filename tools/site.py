@@ -268,7 +268,7 @@ T = {
   inst_h="Cài đặt", inst_lead="Cần macOS 14 trở lên, chạy được cả máy chip Apple và máy Intel.",
   inst_note="Tidymint chưa được Apple công chứng nên lần mở đầu macOS sẽ chặn, như mọi app chưa công chứng. <a href=\"ung-ho/\">Ủng hộ dự án</a> giúp mua tài khoản Apple Developer: khi đó app mở là chạy, cập nhật tới nhanh hơn.",
   inst=[("Tải về",'Bấm <a href="%s">Tải Tidymint</a>, mở <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).' % DL),
-        ("Mở lần đầu",'Nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done). Đừng chọn Chuyển vào Thùng rác.'),
+        ("Mở lần đầu",'Nhấp đúp Tidymint. macOS báo không mở được, bấm <b>Xong</b> (Done).'),
         ("Cho phép mở",'Vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b>, bấm <b>Vẫn mở</b> (Open Anyway) rồi xác nhận bằng mật khẩu máy. <a href="cai-dat/">Hướng dẫn từng bước có ảnh</a>.'),
         ("Truy cập toàn bộ ổ đĩa <span class=\"opt\">không bắt buộc</span>",'Trong Quyền riêng tư &amp; Bảo mật, mở <b>Truy cập toàn bộ ổ đĩa</b> và bật Tidymint để quét được cả Mail, Tin nhắn, Library. <a href="cai-dat/#s6">Xem cách làm</a>.')],
   inst_small='Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Mã nguồn công khai trên <a href="%s">GitHub</a>.' % GH,

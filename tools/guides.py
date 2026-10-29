@@ -68,7 +68,7 @@ ART_CSS = """
 L = {
  "vi": dict(home="../", homename="Trang chủ", guides="Hướng dẫn", updated="Cập nhật", tldr="Tóm tắt nhanh",
             toc="Trong bài", faq="Câu hỏi thường gặp", src="Nguồn tham khảo", rel="Đọc thêm",
-            cta_h="Dọn Mac miễn phí, hợp pháp", cta_p="Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ chuyển vào Thùng rác trước, bạn tự quyết.",
+            cta_h="Dọn Mac miễn phí, hợp pháp", cta_p="Tidymint miễn phí, mã nguồn mở, có tiếng Việt. Mọi thứ luôn vào Thùng rác trước, bạn tự quyết.",
             cta_btn="Tải <span class=\"hs\">Tidymint</span><span class=\"hm\">về</span>", cta_more="Xem cách cài", inst="#cai-dat",
             nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../huong-dan/","Hướng dẫn"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
  "en": dict(home="../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
