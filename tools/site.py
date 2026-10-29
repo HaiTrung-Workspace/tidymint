@@ -220,7 +220,7 @@ T = {
   desc="Dọn dẹp MacBook miễn phí: xoá bộ nhớ đệm Zalo, Chrome, CapCut, gỡ ứng dụng sạch, tìm file trùng. Mã nguồn mở, tiếng Việt, mọi thứ vào Thùng rác trước.",
   nav=[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("huong-dan/","Hướng dẫn"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")], navcta="Tải về",
   eyebrow=("lich-su-cap-nhat/", 'Mới: đã có bản <span class="ver">{v}</span>'),
-  h1='MacBook đầy ổ?<br><span>Xem ngay cái gì chiếm chỗ.</span>',
+  h1='MacBook đầy ổ?<br><span>Xem ngay thứ gì chiếm chỗ.</span>',
   sub="Zalo, Cốc Cốc, CapCut ngốn hàng GB? Tidymint dọn đúng phần rác, giữ nguyên tin nhắn và file công việc: miễn phí, mã nguồn mở, mọi thứ vào Thùng rác trước.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài", cta_how="Xem cách dùng",
   micro='macOS 14 trở lên · Chip Apple và Intel · Bản <span class="ver">{v}</span>',
