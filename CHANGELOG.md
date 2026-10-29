@@ -63,5 +63,5 @@ All notable changes to Tidymint. Dates are release dates.
 ## 0.1.0 (2026-10-25)
 
 - First public build: Smart Scan, Cleanup, Uninstaller, Large and old files, Duplicates, Space Lens, Cloud Cleanup, Startup Items, Statistics
-- Everything goes to the Trash, nothing is deleted outright
+- Everything always goes to the Trash, nothing is deleted outright
 - English and Vietnamese
