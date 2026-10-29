@@ -2,6 +2,15 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.3.6 (2026-11-01)
+
+- New: "What is in System Data" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, and where to handle the rest
+- New: Statistics shows a chart of free space per day (7, 30 or 90 days)
+- Clean Now lists Xcode build data per project, never pre-selected
+- Clean by App: CapCut rendering cache and proxies, now checked on a real Mac
+- Space Lens explains more folders: CapCut, Docker, Homebrew, Xcode archives
+- New app icon; Advanced in the sidebar starts folded
+
 ## 0.3.5 (2026-10-28)
 
 - Clean Now shows results as cards, and the scan shows which step it is on
