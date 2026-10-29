@@ -5335,6 +5335,9 @@ struct InviteCard: View {
 // reviews the plan and clicks Apply; every apply can be undone. Only files directly inside the chosen folder are
 // touched, never subfolders, and nothing is ever deleted or overwritten.
 
+/// Where one group goes when sorting: a new folder name inside the chosen folder, or a folder picked elsewhere.
+struct OrgDest: Codable, Equatable { var name: String? = nil; var path: String? = nil }
+
 enum OrgGroup: String, CaseIterable, Codable {
     case screens, receipts, cv, images, video, audio, docs, sheets, slides, archives, installers, code, other
     var label: String {
@@ -5816,13 +5819,20 @@ enum OrgNotes {
 }
 
 @MainActor final class OrgVM: ObservableObject {
-    @Published var folder: URL = Scanner.home.appendingPathComponent("Downloads")
+    @Published var folder: URL = Scanner.home.appendingPathComponent("Downloads") { didSet { dests = Self.loadDests(for: folder) } }
     @Published var readContent = true
-    @Published var moveIntoFolders = !UserDefaults.standard.bool(forKey: "org-sub") { didSet { recomputeNames() } }
-    /// Include files in sub-folders. They are renamed and tagged where they are; nothing is moved out of its folder.
-    @Published var includeSub = UserDefaults.standard.bool(forKey: "org-sub") {
-        didSet { UserDefaults.standard.set(includeSub, forKey: "org-sub"); moveIntoFolders = !includeSub }
+    /// Sort into folders (one per group, inside the chosen folder unless the person picked another) or rename only.
+    @Published var moveIntoFolders = UserDefaults.standard.object(forKey: "org-move") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(moveIntoFolders, forKey: "org-move"); recomputeNames() }
     }
+    /// Include files in sub-folders. Those are renamed and tagged where they are; only loose files are sorted into folders.
+    @Published var includeSub = UserDefaults.standard.bool(forKey: "org-sub") {
+        didSet { UserDefaults.standard.set(includeSub, forKey: "org-sub") }
+    }
+    /// Where each group goes when sorting, remembered per chosen folder (key: group raw value).
+    @Published var dests: [String: OrgDest] = OrgVM.loadDests(for: Scanner.home.appendingPathComponent("Downloads"))
+    @Published var editingGroup: OrgGroup? = nil
+    @Published var groupDraft = ""
     @Published var phase: Phase = .idle
     @Published var files: [OrgFile] = []
     @Published var progress = 0
@@ -5875,7 +5885,9 @@ enum OrgNotes {
         let c = ctx, base = folder.standardizedFileURL.path
         func rel(_ u: URL) -> [String] {
             let p = u.standardizedFileURL.path
-            return (p.hasPrefix(base + "/") ? String(p.dropFirst(base.count + 1)) : u.lastPathComponent).split(separator: "/").map(String.init)
+            if p.hasPrefix(base + "/") { return String(p.dropFirst(base.count + 1)).split(separator: "/").map(String.init) }
+            // A folder outside the chosen one shows as one "~/..." line.
+            return [u.deletingLastPathComponent().path.replacingOccurrences(of: NSHomeDirectory(), with: "~"), u.lastPathComponent]
         }
         var now: [(path: [String], f: OrgFile, state: Int)] = [], after: [(path: [String], f: OrgFile, state: Int)] = []
         for f in inc {
@@ -5961,8 +5973,9 @@ enum OrgNotes {
             guard renameAll || files[i].needsName else { files[i].newName = nil; files[i].renameOn = false; continue }
             // Numbers restart per destination folder: the type folder when moving, otherwise the folder the file sits in.
             let own = files[i].url.deletingLastPathComponent()
-            let key = moveIntoFolders ? files[i].group.rawValue : own.path
-            let parent = moveIntoFolders ? folder.lastPathComponent : own.lastPathComponent
+            let mv = moves(files[i])
+            let key = mv ? destURL(files[i].group).standardizedFileURL.path : own.standardizedFileURL.path
+            let parent = mv ? folder.lastPathComponent : own.lastPathComponent
             counters[key, default: 0] += 1
             let n = OrgEngine.makeName(files[i], r, seq: counters[key]!, parent: parent)
             let had = files[i].newName != nil
@@ -5979,13 +5992,65 @@ enum OrgNotes {
     var example: String {
         let f = files.first { $0.pairOf == nil && (renameAll || $0.needsName) } ?? files.first
         guard let f else { return "" }
-        return OrgEngine.makeName(f, rule, seq: 1, parent: moveIntoFolders ? folder.lastPathComponent : f.url.deletingLastPathComponent().lastPathComponent)
+        return OrgEngine.makeName(f, rule, seq: 1, parent: moves(f) ? folder.lastPathComponent : f.url.deletingLastPathComponent().lastPathComponent)
+    }
+
+    // MARK: destination folders
+
+    nonisolated static let destKey = "org-dest"
+    nonisolated static func allDests() -> [String: [String: OrgDest]] {
+        UserDefaults.standard.data(forKey: destKey).flatMap { try? JSONDecoder().decode([String: [String: OrgDest]].self, from: $0) } ?? [:]
+    }
+    nonisolated static func loadDests(for f: URL) -> [String: OrgDest] { allDests()[f.standardizedFileURL.path] ?? [:] }
+    func saveDests() {
+        var all = Self.allDests(); all[folder.standardizedFileURL.path] = dests.isEmpty ? nil : dests
+        if let d = try? JSONEncoder().encode(all) { UserDefaults.standard.set(d, forKey: Self.destKey) }
+    }
+    /// A folder the person picked, or a folder named after the group (or their name for it) inside the chosen folder.
+    static func destURL(_ g: OrgGroup, _ folder: URL, _ d: [String: OrgDest]) -> URL {
+        if let p = d[g.rawValue]?.path { return URL(fileURLWithPath: p, isDirectory: true) }
+        return folder.appendingPathComponent(d[g.rawValue]?.name ?? g.label, isDirectory: true)
+    }
+    func destURL(_ g: OrgGroup) -> URL { Self.destURL(g, folder, dests) }
+    func isInside(_ u: URL) -> Bool { u.standardizedFileURL.path.hasPrefix(folder.standardizedFileURL.path + "/") }
+    /// Short path for the screen: "Downloads/Images" inside the chosen folder, "~/Documents/Work" elsewhere.
+    func destLabel(_ g: OrgGroup) -> String {
+        let u = destURL(g).standardizedFileURL, base = folder.standardizedFileURL.path
+        if isInside(u) { return folder.lastPathComponent + String(u.path.dropFirst(base.count)) }
+        return u.path.replacingOccurrences(of: NSHomeDirectory(), with: "~")
+    }
+    func destExists(_ g: OrgGroup) -> Bool { var d: ObjCBool = false; return FileManager.default.fileExists(atPath: destURL(g).path, isDirectory: &d) && d.boolValue }
+    /// A file sorts into its group folder only when it sits loose in the chosen folder.
+    func moves(_ f: OrgFile) -> Bool { moveIntoFolders && f.url.deletingLastPathComponent().standardizedFileURL.path == folder.standardizedFileURL.path }
+    func groupMoves(_ g: OrgGroup) -> Bool { files.contains { $0.group == g && $0.include && $0.pairOf == nil && moves($0) } }
+    var movingGroups: [OrgGroup] { OrgGroup.allCases.filter { groupMoves($0) } }
+    var newDirCount: Int { Set(movingGroups.filter { !destExists($0) }.map { destURL($0).standardizedFileURL.path }).count }
+    var outsideGroups: [OrgGroup] { movingGroups.filter { !isInside(destURL($0)) && destURL($0).standardizedFileURL.path != folder.standardizedFileURL.path } }
+    func setDest(_ g: OrgGroup, _ d: OrgDest?) { dests[g.rawValue] = d; saveDests(); recomputeNames() }
+    func renameDest(_ g: OrgGroup, _ typed: String) {
+        let n = typed.replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: "-").trimmingCharacters(in: .whitespacesAndNewlines)
+        let clean = n.hasPrefix(".") ? String(n.drop { $0 == "." }) : n
+        setDest(g, clean.isEmpty || clean == g.label ? nil : OrgDest(name: clean))
+        editingGroup = nil
+    }
+    func chooseDest(_ g: OrgGroup) {
+        let p = NSOpenPanel(); p.canChooseDirectories = true; p.canChooseFiles = false; p.allowsMultipleSelection = false; p.canCreateDirectories = true
+        p.directoryURL = destExists(g) ? destURL(g) : folder; p.prompt = t("Use this folder", "Dùng thư mục này")
+        p.message = t("Files in \(g.label) will go into the folder you pick. You can make a new folder here.",
+                      "File nhóm \(g.label) sẽ vào thư mục bạn chọn. Có thể tạo thư mục mới ngay tại đây.")
+        guard p.runModal() == .OK, let u = p.url else { return }
+        guard OrgEngine.allowed(u) else {
+            let a = NSAlert(); a.messageText = t("Pick a folder inside your home folder", "Chọn một thư mục bên trong thư mục người dùng")
+            a.informativeText = t("Tidymint does not move files into Library or system folders.", "Tidymint không chuyển file vào Library hay thư mục hệ thống.")
+            a.runModal(); return
+        }
+        setDest(g, OrgDest(path: u.standardizedFileURL.path))
     }
 
     // MARK: where each file ends up
 
-    struct Ctx { let folder: URL; let moving: Bool }
-    var ctx: Ctx { Ctx(folder: folder, moving: moveIntoFolders && !includeSub) }
+    struct Ctx { let folder: URL; let moving: Bool; var dests: [String: OrgDest] = [:] }
+    var ctx: Ctx { Ctx(folder: folder, moving: moveIntoFolders, dests: dests) }
 
     /// The name a file will have after Apply. A typed name is cleaned the same way Apply cleans it;
     /// a file that goes with another one takes that file's new name with its own extension.
@@ -6010,7 +6075,11 @@ enum OrgNotes {
     static func target(_ f: OrgFile, _ by: [UUID: OrgFile], _ c: Ctx) -> URL {
         let dir: URL
         if let l = f.pairOf.flatMap({ by[$0] }) { dir = target(l, by, c).deletingLastPathComponent() }
-        else { dir = c.moving ? c.folder.appendingPathComponent(f.group.label, isDirectory: true) : f.url.deletingLastPathComponent() }
+        else {
+            let own = f.url.deletingLastPathComponent()
+            // Only loose files are sorted; files already in a sub-folder stay there.
+            dir = c.moving && own.standardizedFileURL.path == c.folder.standardizedFileURL.path ? Self.destURL(f.group, c.folder, c.dests) : own
+        }
         return dir.appendingPathComponent(finalName(f, by))
     }
 
@@ -6213,6 +6282,7 @@ enum OrgNotes {
     /// Apply the reviewed plan: optional move into a subfolder per group, optional rename, tags and notes.
     func apply() {
         validate()
+        let away = outsideGroups.map { "\(destURL($0).lastPathComponent) → \(destLabel($0))" }
         let o = Self.execute(included, ctx, dedupe: dedupe)
         report = o.notes
         let s = OrgSession(folder: folder.path, date: Date(), moves: o.moves, madeDirs: o.made)
@@ -6220,6 +6290,7 @@ enum OrgNotes {
         canUndo = true
         let dup = o.trashed > 0 ? t(" \(o.trashed) identical copies went to the Trash.", " \(o.trashed) bản trùng y hệt đã vào Thùng rác.") : ""
         result = t("Organized \(o.moved) files, tagged \(o.tagged).", "Đã sắp xếp \(o.moved) file, gắn tag \(o.tagged) file.") + dup + (o.fail > 0 ? t(" \(o.fail) skipped.", " Bỏ qua \(o.fail) file.") : "")
+            + (away.isEmpty ? "" : t(" Moved out of \(folder.lastPathComponent): ", " Chuyển ra ngoài \(folder.lastPathComponent): ") + away.joined(separator: ", ") + ".")
         vm?.log(t("Organized \(folder.lastPathComponent): moved or renamed \(o.moved) files, tagged \(o.tagged)", "Sắp xếp \(folder.lastPathComponent): chuyển hoặc đổi tên \(o.moved) file, gắn tag \(o.tagged) file")
                 + (o.trashed > 0 ? t(", \(o.trashed) identical copies to the Trash", ", \(o.trashed) bản trùng vào Thùng rác") : "")
                 + (o.fail > 0 ? t(", skipped \(o.fail)", ", bỏ qua \(o.fail)") : ""))
@@ -6314,19 +6385,19 @@ enum OrgNotes {
     func autoApply(_ input: [OrgFile], rule r: NameRule, renameAll all: Bool, dedupe dd: Bool) {
         defer { watchBusy = false }
         var list = input
-        let dir = Self.watchDir
+        let dir = Self.watchDir, dd2 = Self.loadDests(for: dir)
         let lead = Dictionary(uniqueKeysWithValues: list.filter { $0.pairOf == nil }.map { ($0.id, $0) })
         for i in list.indices { if let l = list[i].pairOf.flatMap({ lead[$0] }) { list[i].group = l.group } }
         // Names follow the current rule: only names that say nothing, unless "rename all" is on. Numbers continue the folder's count.
         var counters: [String: Int] = [:]
         for i in list.indices where list[i].pairOf == nil && (all || list[i].needsName) {
             let g = list[i].group.label
-            if counters[g] == nil { counters[g] = OrgEngine.files(in: dir.appendingPathComponent(g)).count }
+            if counters[g] == nil { counters[g] = OrgEngine.files(in: Self.destURL(list[i].group, dir, dd2)).count }
             counters[g]! += 1
             let n = OrgEngine.makeName(list[i], r, seq: counters[g]!, parent: dir.lastPathComponent)
             if n != list[i].name { list[i].newName = n; list[i].renameOn = true }
         }
-        let o = Self.execute(list, Ctx(folder: dir, moving: true), dedupe: dd)
+        let o = Self.execute(list, Ctx(folder: dir, moving: true, dests: dd2), dedupe: dd)
         guard !o.moves.isEmpty else { return }
         // One session per day: a single Undo puts back everything moved automatically today.
         var s = OrgVM.load(Self.autoPath)
@@ -6389,8 +6460,8 @@ struct OrgStart: View {
                              sub: t("Finds receipts and CVs, suggests tags like Food or Beach. Uses macOS's built-in recognition, slower.",
                                     "Nhận ra hoá đơn, CV, gợi ý tag như Đồ ăn, Biển. Dùng nhận diện có sẵn của macOS, chậm hơn."), on: $org.readContent)
                 OrgSwitchRow(title: t("Include sub-folders", "Gồm cả thư mục con"),
-                             sub: t("Files are renamed and tagged where they are, never moved out of their folder. App bundles and code projects are skipped.",
-                                    "File được đổi tên và gắn tag ngay tại chỗ, không bị chuyển ra khỏi thư mục của nó. Bỏ qua gói app và thư mục dự án code."), on: $org.includeSub)
+                             sub: t("Files in sub-folders are renamed and tagged where they are. Only loose files are sorted into folders. App bundles and code projects are skipped.",
+                                    "File trong thư mục con được đổi tên và gắn tag tại chỗ. Chỉ file nằm rời mới được xếp vào thư mục. Bỏ qua gói app và thư mục dự án code."), on: $org.includeSub)
                 OrgSwitchRow(title: t("Put identical copies in the Trash", "Bỏ bản trùng y hệt vào Thùng rác"),
                              sub: t("When a new name is taken by a file with exactly the same content, the extra copy goes to the Trash instead of getting \" 2\". Undo brings it back.",
                                     "Khi tên mới trùng một file có nội dung giống hệt, bản thừa vào Thùng rác thay vì thêm \" 2\". Hoàn tác sẽ lấy lại."), on: $org.dedupe)
@@ -6412,14 +6483,26 @@ struct OrgPlan: View {
                 Text(t("Plan for \(org.folder.lastPathComponent) (\(org.files.count) files)", "Kế hoạch cho \(org.folder.lastPathComponent) (\(org.files.count) file)"))
                     .font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
-                if org.includeSub {
-                    Text(t("Sub-folders included: files stay in place", "Gồm thư mục con: file giữ nguyên chỗ")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
-                } else {
-                Toggle(t("Move into subfolders", "Chuyển vào thư mục con"), isOn: $org.moveIntoFolders).toggleStyle(.switch).tint(Theme.accentSolid)
-                    .foregroundColor(Theme.text).font(.system(size: fs(12)))
-                }
+                HStack(spacing: 2) {
+                    ForEach([(false, t("Rename only", "Chỉ đổi tên")), (true, t("Sort into folders", "Sắp xếp vào thư mục"))], id: \.0) { v, label in
+                        Button { org.moveIntoFolders = v } label: {
+                            Text(label).font(.system(size: fs(12), weight: .medium)).foregroundColor(org.moveIntoFolders == v ? .white : Theme.sub)
+                                .padding(.horizontal, 14).padding(.vertical, 5)
+                                .background(Capsule().fill(org.moveIntoFolders == v ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Color.clear)))
+                        }.buttonStyle(.plain)
+                    }
+                }.padding(3).background(Capsule().fill(Theme.card))
                 Button { org.plan() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).help(t("Plan again", "Lập lại kế hoạch"))
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 8)
+            if org.moveIntoFolders && !org.files.isEmpty {
+                let n = org.newDirCount
+                let made = n > 0 ? t("Creates \(n) new folders in \(org.folder.lastPathComponent).", "Tạo \(n) thư mục mới trong \(org.folder.lastPathComponent).") : ""
+                let stay = org.includeSub ? t(" Files already in sub-folders stay where they are, only renamed.", " File đã nằm trong thư mục con cũ giữ nguyên chỗ, chỉ đổi tên.") : ""
+                if !(made + stay).isEmpty {
+                    Text((made + stay).trimmingCharacters(in: .whitespaces)).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
+                }
+            }
             OrgNameBar(org: org).padding(.horizontal, 24).padding(.bottom, 10)
             OrgShowBar(org: org).padding(.horizontal, 24).padding(.bottom, 10)
             if org.files.isEmpty {
@@ -6453,6 +6536,12 @@ struct OrgPlan: View {
                 Text(selLabel(inc.count, inc.reduce(0) { $0 + $1.size })).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
                 Text(t("· \(inc.reduce(0) { $0 + $1.tagOn.count }) tags", "· \(inc.reduce(0) { $0 + $1.tagOn.count }) tag")).foregroundColor(Theme.sub).font(.system(size: fs(13)))
                 Spacer()
+                if org.moveIntoFolders && !org.outsideGroups.isEmpty {
+                    let n = org.outsideGroups.count
+                    Text(t("\(n) group(s) go outside \(org.folder.lastPathComponent). Undo puts everything back.",
+                           "Có \(n) nhóm chuyển ra ngoài \(org.folder.lastPathComponent). Hoàn tác trả lại tất cả."))
+                        .foregroundColor(Theme.sub).font(.system(size: fs(12))).lineLimit(2).padding(.trailing, 6)
+                }
                 GhostButton(title: t("Cancel", "Huỷ")) { org.phase = .idle; org.files = [] }
                 PrimaryButton(title: t("Apply", "Áp dụng"), action: { org.apply() }, disabled: inc.isEmpty)
             }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
@@ -6474,12 +6563,42 @@ struct OrgGroupBlock: View {
                     org.validate()
                 } label: { CheckBox(state: on == 0 ? 0 : (on == ids.count ? 2 : 1)) }.buttonStyle(.plain)
                 Image(systemName: g.icon).font(.system(size: fs(18))).foregroundColor(Theme.accentSolid).frame(width: 24)
+                let mv = org.groupMoves(g)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(org.moveIntoFolders ? "\(g.label)/" : g.label).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
-                    Text(t("\(ids.count) files · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))", "\(ids.count) file · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))"))
-                        .foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                    if org.editingGroup == g {
+                        TextField(g.label, text: $org.groupDraft).textFieldStyle(.plain).foregroundColor(Theme.text)
+                            .font(.system(size: fs(15), weight: .semibold)).frame(width: 220 * uiScale)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Theme.accentSolid, lineWidth: 1))
+                            .onSubmit { org.renameDest(g, org.groupDraft) }
+                            .onExitCommand { org.editingGroup = nil }
+                    } else {
+                        Text(mv ? org.destURL(g).lastPathComponent + "/" : g.label).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
+                    }
+                    HStack(spacing: 6) {
+                        Text(t("\(ids.count) files · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))", "\(ids.count) file · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))"))
+                        if mv {
+                            Text("→ " + org.destLabel(g)).lineLimit(1).truncationMode(.middle)
+                            let fresh = !org.destExists(g)
+                            Text(fresh ? t("NEW", "MỚI") : t("EXISTING", "CÓ SẴN")).font(.system(size: fs(9), weight: .semibold))
+                                .foregroundColor(fresh ? Theme.accentSolid : Theme.text).padding(.horizontal, 6).padding(.vertical, 1)
+                                .background(Capsule().fill(fresh ? Theme.accentSolid.opacity(0.18) : Theme.sub.opacity(0.18)))
+                        }
+                    }.foregroundColor(Theme.sub).font(.system(size: fs(11)))
                 }
                 Spacer()
+                if mv {
+                    Menu {
+                        Button(t("Rename folder…", "Đổi tên thư mục…")) { org.groupDraft = org.destURL(g).lastPathComponent; org.editingGroup = g }
+                        Button(t("Choose an existing folder…", "Chọn thư mục có sẵn…")) { org.chooseDest(g) }
+                        Divider()
+                        Button(t("Back to default (in \(org.folder.lastPathComponent))", "Về mặc định (trong \(org.folder.lastPathComponent))")) { org.setDest(g, nil) }
+                            .disabled(org.dests[g.rawValue] == nil)
+                    } label: { Text(t("Change", "Đổi")).font(.system(size: fs(12))) }
+                        .menuStyle(.borderlessButton).fixedSize().foregroundColor(Theme.text)
+                        .padding(.horizontal, 10).padding(.vertical, 4).overlay(Capsule().stroke(Theme.sub.opacity(0.5), lineWidth: 1))
+                        .help(t("Rename this folder or pick another one", "Đổi tên thư mục này hoặc chọn thư mục khác"))
+                }
                 Button { if org.collapsed.contains(g) { org.collapsed.remove(g) } else { org.collapsed.insert(g) } } label: {
                     Image(systemName: "chevron.down").rotationEffect(.degrees(org.collapsed.contains(g) ? -90 : 0))
                 }.buttonStyle(.plain).foregroundColor(Theme.sub)
@@ -6620,7 +6739,7 @@ struct OrgTreeRow: Identifiable {
         var out = [OrgTreeRow(depth: 0, name: root.lastPathComponent, isDir: true, count: items.count)]
         func walk(_ n: Node, _ depth: Int, _ at: URL) {
             for d in n.dirs.keys.sorted(by: { $0.localizedStandardCompare($1) == .orderedAscending }) {
-                let u = at.appendingPathComponent(d), k = n.dirs[d]!
+                let u = d.hasPrefix("~/") ? URL(fileURLWithPath: NSHomeDirectory() + d.dropFirst()) : at.appendingPathComponent(d), k = n.dirs[d]!
                 var r = OrgTreeRow(depth: depth, name: d, isDir: true, count: k.files.count)
                 r.isNew = markNew && !FileManager.default.fileExists(atPath: u.path)
                 r.existing = markNew && !r.isNew
