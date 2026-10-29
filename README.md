@@ -115,7 +115,7 @@ Self-hosting the collector: `backend/Code.gs` is a Google Apps Script that appen
 
 ## Support the project
 
-Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://tidymint.app/sponsor/). Sponsorships go toward the Apple Developer account (so the app can be notarized and open without warnings) and time for new features.
+Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://github.com/sponsors/HaiTrung-Workspace). Sponsorships go toward the Apple Developer account (so the app can be notarized and open without warnings) and time for new features.
 
 ## License
 
