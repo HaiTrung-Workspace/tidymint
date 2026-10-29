@@ -157,6 +157,38 @@ struct HoverLift: ViewModifier {
             .onHover { v in withAnimation(.easeOut(duration: 0.12)) { h.v = v } }
     }
 }
+/// Soft tile behind a small control on hover, hand cursor: shows it is clickable without a permanent border.
+struct HoverTile: ViewModifier {
+    var enabled = true
+    @State private var hover = false
+    func body(content: Content) -> some View {
+        content
+            .background(RoundedRectangle(cornerRadius: 6).fill(Theme.text.opacity(hover && enabled ? 0.12 : 0)))
+            .contentShape(Rectangle())
+            .onHover { v in
+                withAnimation(.easeOut(duration: 0.12)) { hover = v }
+                if enabled { (v ? NSCursor.pointingHand : NSCursor.arrow).set() }
+            }
+    }
+}
+extension View { func hoverTile(_ enabled: Bool = true) -> some View { modifier(HoverTile(enabled: enabled)) } }
+/// Icon-only buttons: the whole square takes the click (not only the icon's strokes), tile on hover, slight press.
+struct IconButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View { Body(configuration: configuration) }
+    struct Body: View {
+        let configuration: Configuration
+        @Environment(\.isEnabled) private var enabled
+        var body: some View {
+            configuration.label
+                .padding(.horizontal, 5).frame(minWidth: 26 * uiScale, minHeight: 24 * uiScale)
+                .hoverTile(enabled)
+                .scaleEffect(configuration.isPressed ? 0.92 : 1)
+                .opacity(enabled ? 1 : 0.35)
+        }
+    }
+}
+extension ButtonStyle where Self == IconButtonStyle { static var icon: IconButtonStyle { IconButtonStyle() } }
+
 /// Clickable text: link colour, underline + brighter + hand cursor on hover, so it reads as a link.
 struct TextLink: View {
     let title: String
@@ -2682,7 +2714,7 @@ struct DoneBanner: View {
                 if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
                 GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.doneInfo = nil; vm.page = .trash }
                 Button { vm.doneInfo = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub).help(t("Close", "Đóng"))
+                    .buttonStyle(.icon).foregroundColor(Theme.sub).help(t("Close", "Đóng"))
             }
             .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.green.opacity(0.12)))
             .padding(.horizontal, 24).padding(.bottom, 10)
@@ -2973,7 +3005,7 @@ struct SysDataView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
-                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text).help(t("Back", "Lùi"))
+                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon).foregroundColor(Theme.text).help(t("Back", "Lùi"))
                 Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
                 Spacer()
                 if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
@@ -3444,7 +3476,7 @@ struct LargeView: View {
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
                 if vm.large.isEmpty {
@@ -3494,12 +3526,12 @@ struct LensView: View {
                 // breadcrumb
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.plain)
+                        Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon)
                             .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).help(t("Back", "Lùi"))
-                        Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.plain)
+                        Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.icon)
                             .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).help(t("Forward", "Tiến"))
                             .padding(.trailing, 8)
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: fs(10))).foregroundColor(Theme.sub)
                             Button(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent) { vm.lensUp(to: i) }
@@ -4014,7 +4046,7 @@ struct AppsView: View {
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
@@ -4168,7 +4200,7 @@ struct DupesView: View {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
                 }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .dupes)
             if !vm.dupMsg.isEmpty {
@@ -4258,7 +4290,7 @@ struct CloudView: View {
                 }
                 Spacer()
                 if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -6640,7 +6672,7 @@ struct OrgPlan: View {
                         }.buttonStyle(.plain)
                     }
                 }.padding(3).background(Capsule().fill(Theme.card))
-                Button { org.plan() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).help(t("Plan again", "Lập lại kế hoạch"))
+                Button { org.plan() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).help(t("Plan again", "Lập lại kế hoạch"))
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 8)
             if org.moveIntoFolders && !org.files.isEmpty {
                 let n = org.newDirCount
@@ -6745,12 +6777,12 @@ struct OrgGroupBlock: View {
                             .disabled(org.dests[g.rawValue] == nil)
                     } label: { Text(t("Change", "Đổi")).font(.system(size: fs(12))) }
                         .menuStyle(.borderlessButton).fixedSize().foregroundColor(Theme.text)
-                        .padding(.horizontal, 10).padding(.vertical, 4).overlay(Capsule().stroke(Theme.sub.opacity(0.5), lineWidth: 1))
+                        .padding(.horizontal, 8).padding(.vertical, 3).hoverTile()
                         .help(t("Rename this folder or pick another one", "Đổi tên thư mục này hoặc chọn thư mục khác"))
                 }
                 Button { if org.collapsed.contains(g) { org.collapsed.remove(g) } else { org.collapsed.insert(g) } } label: {
                     Image(systemName: "chevron.down").rotationEffect(.degrees(org.collapsed.contains(g) ? -90 : 0))
-                }.buttonStyle(.plain).foregroundColor(Theme.sub)
+                }.buttonStyle(.icon).foregroundColor(Theme.sub)
             }.padding(.horizontal, 14).padding(.vertical, 12)
             if !org.collapsed.contains(g) {
                 ForEach(ids, id: \.self) { i in OrgRow(org: org, i: i) }
@@ -7041,9 +7073,7 @@ struct OrgNameBar: View {
             // The whole pill takes the click (a bare icon only reacts on its thin strokes), and a click always opens the editor.
             Button { org.showRule = true } label: {
                 Label(t("Customize", "Tuỳ chỉnh"), systemImage: "slider.horizontal.3").font(.system(size: fs(12)))
-                    .padding(.horizontal, 10).padding(.vertical, 4)
-                    .overlay(Capsule().stroke(Theme.sub.opacity(0.5), lineWidth: 1)).contentShape(Capsule())
-            }.buttonStyle(.plain).foregroundColor(Theme.text).onHover { $0 ? NSCursor.pointingHand.push() : NSCursor.pop() }
+            }.buttonStyle(.icon).foregroundColor(Theme.text)
                 .help(t("Edit the rule", "Sửa quy tắc"))
                 .popover(isPresented: $org.showRule, arrowEdge: .bottom) { OrgRuleEditor(org: org).frame(width: 380).padding(16) }
             Text(t("e.g. ", "ví dụ: ") + org.example).foregroundColor(Theme.sub).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
@@ -7101,8 +7131,8 @@ struct OrgRuleEditor: View {
                             Text(p.kind.label).font(.system(size: fs(12)))
                             Spacer()
                         }
-                        Button { move(i, -1) } label: { Image(systemName: "chevron.up") }.buttonStyle(.plain).disabled(i == 0)
-                        Button { move(i, 1) } label: { Image(systemName: "chevron.down") }.buttonStyle(.plain).disabled(i == r.parts.count - 1)
+                        Button { move(i, -1) } label: { Image(systemName: "chevron.up") }.buttonStyle(.icon).disabled(i == 0)
+                        Button { move(i, 1) } label: { Image(systemName: "chevron.down") }.buttonStyle(.icon).disabled(i == r.parts.count - 1)
                         Button { set { r in r.parts.removeAll { $0.id == p.id } } } label: { Image(systemName: "xmark.circle.fill").foregroundColor(.secondary) }
                             .buttonStyle(.plain).help(t("Remove", "Bỏ phần này"))
                     }.padding(.vertical, 2)
