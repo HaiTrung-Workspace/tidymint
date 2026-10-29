@@ -434,7 +434,7 @@ dict(
 </ul>
 {CTA}
 <h2 id="chan">Dọn dẹp đơn giản với Tidymint</h2>
-<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
+<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ chỉ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
 <h3>Để ổ không đầy lại</h3>
 <ul>
 <li><b>Khởi động lại mỗi tuần.</b> macOS dọn file tạm và phần "có thể xoá" khi khởi động lại.</li>
