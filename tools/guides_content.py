@@ -1615,13 +1615,24 @@ dict(
   crumb="CapCut chiếm dung lượng Mac",
   h1="CapCut chiếm dung lượng Mac: dọn sao cho không mất dự án",
   tldr="CapCut trên Mac cất mọi thứ trong <code>~/Movies/CapCut/User Data</code>. Phần phình nhanh nhất là <b>Cache</b>: ảnh thu nhỏ khung hình, sóng âm, dữ liệu nhận diện, file tạm. Phần này <b>xoá được</b>, CapCut tự tạo lại khi mở dự án. Thư mục <b>Projects</b> là các bản dựng của bạn, <b>không được xoá</b>. Cách an toàn nhất: dọn bằng Tidymint, hoặc thoát CapCut rồi chỉ chuyển đúng các thư mục tạm vào Thùng rác.",
-  toc=[("o-dau","CapCut trên Mac lưu dữ liệu ở đâu?"),("ben-trong","Bên trong có gì, phần nào xoá được?"),
+  toc=[("o-dau","CapCut trên Mac lưu dữ liệu ở đâu?"),("cong-dong","Người dùng CapCut đang gặp gì?"),("ben-trong","Bên trong có gì, phần nào xoá được?"),
        ("don-tay","Dọn bộ nhớ đệm CapCut bằng tay"),("khong-xoa","Những thứ không được xoá"),("tidymint","Dọn CapCut bằng Tidymint"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="o-dau">CapCut trên Mac lưu dữ liệu ở đâu?</h2>
 <p>Khác với nhiều app, CapCut không cất dữ liệu trong thư mục Thư viện mà trong thư mục <b>Phim</b> (Movies) của bạn:</p>
 <pre>~/Movies/CapCut/User Data</pre>
-<p>Để mở: trong Finder bấm <b>Shift+Cmd+G</b>, dán đường dẫn trên rồi nhấn Return. Chúng tôi đã kiểm trên máy Mac thật với bản CapCut tải từ App Store (tháng 10/2026): chỉ sau vài phút dựng thử một video ngắn, thư mục <code>Cache</code> đã lên khoảng 500 MB. Người dựng video thường xuyên có thể thấy con số lớn hơn nhiều.</p>
+<p>Để mở: trong Finder bấm <b>Shift+Cmd+G</b>, dán đường dẫn trên rồi nhấn Return. Đường dẫn này chúng tôi đã kiểm trên máy Mac thật với bản CapCut tải từ App Store (tháng 10/2026). CapCut không có trang hướng dẫn chính thức về chỗ lưu dữ liệu trên Mac.</p>
+
+<h2 id="cong-dong">Người dùng CapCut đang gặp gì?</h2>
+<p>Gom từ các diễn đàn, blog hướng dẫn và nhóm dựng video (số do người dùng tự báo, không phải số chính thức của CapCut):</p>
+<ul>
+<li><b>Bộ nhớ đệm lên hàng chục GB.</b> Một hướng dẫn chuyên về CapCut ghi người dựng thường xuyên hay thấy bộ nhớ đệm khoảng <b>15–30 GB</b>. Trong một diễn đàn CapCut, người trả lời cảnh báo nếu không dọn, bộ nhớ đệm có thể lên tới <b>hàng trăm GB</b>.</li>
+<li><b>Không chuyển được sang ổ ngoài.</b> Một người dùng Mac báo CapCut từ chối lưu vào ổ cứng ngoài với lỗi <i>"External device is not supported. Select a local path."</i>, nên mọi thứ dồn vào ổ trong của máy.</li>
+<li><b>File proxy.</b> CapCut tạo bản sao độ phân giải thấp (thường 720p hoặc 540p) của video gốc để dựng mượt hơn. Mỗi video lớn kéo theo một bản proxy.</li>
+<li><b>Sợ xoá nhầm dự án.</b> Câu hỏi hay gặp nhất là "xoá bộ nhớ đệm có mất dự án không". Câu trả lời: không, nếu chỉ xoá bộ nhớ đệm. Dự án nằm ở chỗ khác (xem bảng dưới).</li>
+<li><b>Tự xoá theo lịch có rủi ro.</b> Một blog Việt khuyên không bật tự xoá theo thời gian cho bản nháp, vì có thể mất dự án chưa làm xong.</li>
+</ul>
+<p>Trên máy chúng tôi kiểm (Mac mini, CapCut bản App Store, tháng 10/2026), chỉ vài phút dựng thử một video ngắn, bộ nhớ đệm đã khoảng <b>500 MB</b>.</p>
 
 <h2 id="ben-trong">Bên trong có gì, phần nào xoá được?</h2>
 <div class="tbl"><table>
@@ -1671,6 +1682,9 @@ dict(
   ],
   sources=[
     ("Ultimate Systems Blog: thư mục và bộ nhớ đệm của CapCut trên Mac, PC", "https://blog.usro.net/2025/08/capcut-folders-cache-mac-and-pc-paths/"),
+    ("CapEditCut Community: CapCut is eating all my hard drive (Mac)", "https://www.capeditcut.com/community/capcut/capcut-is-eating-all-my-hard-drive-how-do-i-get-files-to-store-on-an-external-hard-drive/"),
+    ("EditLogic: Clear CapCut cache without deleting projects", "https://editlogic.io/how-to-clear-capcut-cache-safely-without-deleting-projects-the-ultimate-performance-guide/"),
+    ("Đỗ Văn Phương: CapCut đã làm đầy ổ đĩa máy tính của bạn như thế nào?", "https://dovanphuong.com/capcut-lam-full-o-cung.html"),
   ],
   related=[("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Adobe chiếm bao nhiêu GB trên Mac", "{HOME}adobe-chiem-dung-luong-mac/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/")],
 ),
