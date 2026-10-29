@@ -5212,10 +5212,31 @@ struct InviteCard: View {
         let c = "Movies/CapCut/User Data/"
         let capcutReport = AppReport(rule: capcut, groups: [
                 AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/recognize", 410, true), row(c + "Cache/audioWave", 95, true)]),
-                AppGroup(id: "projects", section: capcut.sections[1], rows: [row(c + "Projects", 6200, false)]),
+                AppGroup(id: "render", section: capcut.sections.first { $0.id == "render" }!, rows: [row(c + "Cache/prerender", 1200, false), row(c + "Cache/agencycache", 600, false)]),
+                AppGroup(id: "projects", section: capcut.sections.first { $0.id == "projects" }!, rows: [row(c + "Projects", 6200, false)]),
             ], running: false)
+        // More apps so the list looks like a real, lived-in Mac. Sizes are sample values (MB per section, 0 = empty).
+        func extra(_ id: String, _ sizes: [Double], running: Bool = false) -> AppReport? {
+            guard let r = AppRules.all.first(where: { $0.id == id }) else { return nil }
+            var gs: [AppGroup] = []
+            for (i, sec) in r.sections.enumerated() where i < sizes.count && sizes[i] > 0 {
+                let mbv = sizes[i]
+                let rows: [AppRow] = sec.byAge
+                    ? ageRows(id + sec.id, [(0, mbv * 0.2, 120), (2, mbv * 0.3, 260), (6, mbv * 0.5, 410)])
+                    : [row((sec.paths.first ?? "Library").replacingOccurrences(of: "*", with: "Default"), mbv, sec.safety == .safe)]
+                gs.append(AppGroup(id: sec.id, section: sec, rows: rows))
+            }
+            return AppReport(rule: r, groups: gs, running: running)
+        }
+        let more: [String: AppReport] = [
+            "telegram": extra("telegram", [380, 2400, 640]), "whatsapp": extra("whatsapp", [150, 1800, 420]),
+            "slack": extra("slack", [920, 210], running: true), "vscode": extra("vscode", [1100, 2300, 640, 380]),
+            "edge": extra("edge", [900, 0, 60]),
+        ].compactMapValues { $0 }
+        func pick(_ ids: [String]) -> [AppReport] { ids.compactMap { more[$0] } }
         // English screenshots lead with apps a US reader knows; Vietnamese ones lead with Zalo.
-        vm.appReports = en ? [chromeReport, capcutReport, zaloReport] : [zaloReport, chromeReport, capcutReport]
+        vm.appReports = en ? [chromeReport, capcutReport] + pick(["vscode", "slack", "telegram", "whatsapp", "edge"]) + [zaloReport]
+                           : [zaloReport, chromeReport, capcutReport] + pick(["telegram", "vscode", "slack", "edge", "whatsapp"])
         vm.appScanned = true
         if detail {
             if en { vm.appSel = "chrome" } else { vm.appSel = "zalo"; vm.selectOlder("zalo", months: 6) }
