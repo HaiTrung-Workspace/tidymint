@@ -64,7 +64,10 @@ var systemTextScale: CGFloat { min(1.4, max(0.9, NSFont.preferredFont(forTextSty
 var uiScale: CGFloat { systemTextScale * (appTextSize == "small" ? 0.8 : (appTextSize == "large" ? 1.2 : 1.0)) }
 func fs(_ v: CGFloat) -> CGFloat { v * uiScale }
 /// Sponsor page on the website (not GitHub directly), so the destination can change without a new app release.
-var sponsorURL: URL { URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/"))! }
+/// Sponsor page with UTM so GA4 can tell clicks from the app (place: "button" or "menubar").
+func sponsorURL(_ place: String) -> URL {
+    URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/") + "?utm_source=tidymint&utm_medium=app&utm_campaign=sponsor&utm_content=\(place)")!
+}
 
 var appTheme: String = UserDefaults.standard.string(forKey: "theme").flatMap { id in palettes.contains { $0.id == id } ? id : nil } ?? "mint"
 
@@ -4379,7 +4382,7 @@ struct SettingsView: View {
                         if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }, width: Pill.rowWidth) }
                         else { GhostButton(title: t("Check now", "Kiểm tra ngay"), action: { vm.checkUpdates(force: true) }, width: Pill.rowWidth) }
                     }
-                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL) }, width: Pill.rowWidth)
+                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, width: Pill.rowWidth)
                 }
             }
             settingRow(t("Open at login", "Mở cùng máy"),
@@ -4485,7 +4488,7 @@ struct MenuView: View {
             }.padding(.horizontal, -8)
             Divider()
             VStack(spacing: 1) {
-                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL) }
+                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL("menubar")) }
                 MenuRow(title: t("Quit", "Thoát")) { NSApp.terminate(nil) }
             }.padding(.horizontal, -8)
         }
