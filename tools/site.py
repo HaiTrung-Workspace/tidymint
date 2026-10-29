@@ -27,6 +27,8 @@ def social(follow):
 def head_icons(root):
     return ('<link rel="icon" href="%sfavicon.ico" sizes="32x32">\n<link rel="icon" href="%sfavicon.svg" type="image/svg+xml">\n'
             '<link rel="apple-touch-icon" href="%sapple-touch-icon.png">\n<link rel="manifest" href="%ssite.webmanifest">\n<meta name="theme-color" content="#030c09">') % (root, root, root, root)
+# Lists that include Tidymint, shown in the 'Listed in' trust card. Add a name only once its listing is live.
+LISTED = '<span class="lst"><a href="https://github.com/jaywcjlove/awesome-mac" target="_blank" rel="noopener">awesome-mac</a> · <a href="https://alternativeto.net/software/tidymint/about/" target="_blank" rel="noopener">AlternativeTo</a> · <a href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener">awesome-swift-<wbr>macos-apps</a></span>'
 ORG = {"@context":"https://schema.org","@type":"Organization","name":"Tidymint","url":"https://tidymint.app/","logo":"https://tidymint.app/icon-512.png","sameAs":[u for _, u, _ in SOCIAL]}
 BASE_CSS = open(os.path.join(ROOT, "tools", "site.css")).read()
 EXTRA_CSS = """
@@ -111,6 +113,8 @@ HOME_CSS = """
 .trust div{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:16px 10px;border-radius:14px;background:#ffffff06;border:1px solid var(--line);font-size:14px;color:var(--sub)}
 .trust b{color:var(--text);font-size:15px}
 .trust .ico{width:38px;height:38px}
+.trust.n6{grid-template-columns:repeat(3,1fr);max-width:860px}
+.trust .lst a{white-space:nowrap;color:var(--leaf);text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px}.trust .lst a:hover{text-decoration-color:var(--leaf)}
 .shot{position:relative}
 .shot:before{content:"";position:absolute;inset:8% 10% -4%;background:radial-gradient(closest-side,#2fd39f55,transparent);filter:blur(40px);z-index:-1}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -158,7 +162,7 @@ HOME_CSS = """
 .specs b{font-size:15px}
 @media (max-width:980px){.trust{grid-template-columns:repeat(3,1fr)}.open{grid-template-columns:1fr 1fr}.specs{grid-template-columns:repeat(3,1fr)}.specs div:nth-child(4){border-left:0}.specs div:nth-child(n+4){border-top:1px solid var(--line)}}
 @media (max-width:820px){.fx{grid-template-columns:1fr;gap:24px;padding:32px 0}.fx.flip .fx-t{order:0}.stats{grid-template-columns:1fr}.strip div{padding:14px}}
-@media (max-width:600px){.trust{grid-template-columns:1fr 1fr}.trust div:last-child{grid-column:1/-1}.open,.specs{grid-template-columns:1fr 1fr}.specs div{border-left:0;border-top:1px solid var(--line)}.specs div:nth-child(-n+2){border-top:0}.specs div:nth-child(even){border-left:1px solid var(--line)}.band{padding:40px 18px}
+@media (max-width:600px){.trust,.trust.n6{grid-template-columns:repeat(2,minmax(0,1fr))}.trust div:last-child{grid-column:1/-1}.trust.n6 div:last-child{grid-column:auto}.open,.specs{grid-template-columns:1fr 1fr}.specs div{border-left:0;border-top:1px solid var(--line)}.specs div:nth-child(-n+2){border-top:0}.specs div:nth-child(even){border-left:1px solid var(--line)}.band{padding:40px 18px}
  .strip{grid-template-columns:1fr}.strip div{border-left:0;border-top:1px solid var(--line);padding:12px 14px}.strip div:first-child{border-top:0}}
 """
 
@@ -172,7 +176,7 @@ T = {
   sub="A free, open-source Mac cleaner that tracks nothing. See exactly what fills your disk, free up gigabytes, and undo any clean: everything goes to the Trash first.",
   cta1="Download free", cta2="How to install", cta_how="See how it works",
   micro='macOS 14 or later · Apple silicon and Intel · Version <span class="ver">{v}</span>',
-  trust=[("privacy","No tracking","No account, works offline"),("free","Free forever","No subscription, no paid tier"),("undo","Trash first","Undo the last clean in one click"),("source","Open source","MIT licence, every line public"),("listed","Listed in awesome-mac","Also on AlternativeTo")],
+  trust=[("privacy","No tracking","No account, works offline"),("free","Free forever","No subscription, no paid tier"),("undo","Trash first","Undo the last clean in one click"),("source","Open source","MIT licence, every line public"),("listed","Listed in",LISTED)],
   pain_tag="Sound familiar?", pain_h="Three common worries, and how we solve them",
   pains=[("“Cleaners want a subscription, and cracked copies carry malware.”","Free for good","No account, no trial, no paid tier. Download it from GitHub, no crack needed."),("“What if it deletes something I need?”","Trash first, with Undo","Nothing is erased. One click puts the whole last clean back where it was."),("“I need four apps just to see what fills my disk.”","One app, nine tools","Disk map, uninstaller, large files and duplicates in one place, plus free space in the menu bar.")],
   fx=[("smart","Clean Now","Free up space in one click","One scan finds caches, logs and old installers, sorted by size. Nothing moves until you press Clean.",["Grouped and explained in plain words","Safe items pre-selected, the rest left to you","Apple system caches are never touched"],None,"cleanup.jpg","Clean Now scan results grouped by type and size"),
@@ -239,7 +243,7 @@ T = {
   sub="Zalo, Cốc Cốc, CapCut ngốn hàng GB? Tidymint dọn đúng phần rác, giữ nguyên tin nhắn và file công việc: miễn phí, mã nguồn mở, mọi thứ chỉ vào Thùng rác, có thể hoàn tác.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài", cta_how="Xem cách dùng",
   micro='macOS 14 trở lên · Chip Apple và Intel · Bản <span class="ver">{v}</span>',
-  trust=[("languages","Tiếng Việt đầy đủ","App, web và hướng dẫn"),("free","Miễn phí mãi","Không thuê bao, không bản trả phí"),("privacy","Không theo dõi","Không tài khoản, chạy không cần mạng"),("undo","Vào Thùng rác trước","Hoàn tác lần dọn bằng một cú bấm"),("source","Mã nguồn mở","Giấy phép MIT, ai cũng đọc được")],
+  trust=[("languages","Tiếng Việt đầy đủ","App, web và hướng dẫn"),("free","Miễn phí mãi","Không thuê bao, không bản trả phí"),("privacy","Không theo dõi","Không tài khoản, chạy không cần mạng"),("undo","Vào Thùng rác trước","Hoàn tác lần dọn bằng một cú bấm"),("source","Mã nguồn mở","Giấy phép MIT, ai cũng đọc được"),("listed","Có mặt trong",LISTED)],
   pain_tag="Nghe quen không?", pain_h="Ba nỗi lo hay gặp và cách giải quyết",
   pains=[("“Zalo ăn hết ổ, mà xoá thì sợ mất tin nhắn, mất ảnh chứng từ.”","Dọn mà không mất tin nhắn","Chỉ bộ nhớ đệm được chọn sẵn. Tin nhắn, đăng nhập khoá lại; ảnh, file xếp theo tháng để bạn tự chọn."),("“App dọn máy toàn thu phí năm, mà tải bản crack thì sợ dính mã độc.”","Miễn phí mãi, khỏi crack","Không tài khoản, không bản trả phí. Tải thẳng từ GitHub, mã nguồn ai cũng xem được."),("“Lỡ xoá nhầm file quan trọng thì sao?”","Vào Thùng rác trước, có Hoàn tác","Không xoá vĩnh viễn thứ gì. Một cú bấm trả cả lần dọn vừa rồi về chỗ cũ.")],
   fx=[("byapp","Dọn theo ứng dụng","Dọn Zalo, Cốc Cốc, CapCut mà không mất tin nhắn","App chat, trình duyệt, app dựng video tích tụ hàng GB. Tidymint biết từng app cất gì ở đâu, dọn riêng từng app một.",["Zalo, Cốc Cốc, CapCut, Chrome, Edge, Telegram, Slack, Outlook…","Bộ nhớ đệm chọn sẵn, tin nhắn và đăng nhập app không bao giờ bị đụng tới","Ảnh, file tin nhắn xếp theo tháng, bạn tự chọn bỏ hoặc giữ tháng nào"],("zalo-chiem-dung-luong-macbook/","Zalo chiếm dung lượng MacBook"),"byapp.jpg","Dọn theo ứng dụng: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng"),
@@ -378,7 +382,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
   <p>{t["sub"]}</p>
   <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["h"]}">{t["cta_how"]}</a></div>
   <div class="micro">{V(t["micro"])}</div>
-  <div class="trust">{trust}</div>
+  <div class="trust n{len(t["trust"])}">{trust}</div>
   <div class="shot"><img src="{shot}smart.jpg" alt="{t["shot_alt"]}" width="1600" height="1013"></div>
 </header>
 
