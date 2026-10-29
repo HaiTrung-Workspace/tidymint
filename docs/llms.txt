@@ -32,6 +32,11 @@
 - How to free up space on Mac (incl. clearing cache): https://tidymint.app/free-up-space-mac/
 - (Vietnamese) 10 cách giải phóng dung lượng MacBook an toàn: https://tidymint.app/vi/giai-phong-dung-luong-macbook/
 - How to uninstall apps on Mac completely: https://tidymint.app/uninstall-apps-mac/
+- Xcode, Docker, node_modules: cleaning developer files on Mac: https://tidymint.app/clean-developer-files-mac/
+- (Vietnamese) Dọn dữ liệu lập trình trên Mac: https://tidymint.app/vi/don-du-lieu-lap-trinh-mac/
+- Remove duplicate files on Mac without breaking projects: https://tidymint.app/remove-duplicate-files-mac/
+- (Vietnamese) Xoá file trùng trên Mac an toàn: https://tidymint.app/vi/xoa-file-trung-mac/
+- Do RAM cleaners help a Mac?: https://tidymint.app/free-up-ram-mac/
 - Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
 - (Vietnamese) CleanMyMac miễn phí, lựa chọn hợp pháp: https://tidymint.app/vi/cleanmymac-mien-phi/
 - (Vietnamese) Cách xóa ứng dụng trên MacBook sạch hoàn toàn: https://tidymint.app/vi/xoa-ung-dung-macbook/
