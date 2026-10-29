@@ -5034,6 +5034,9 @@ struct FieldBox<C: View>: View {
 }
 
 struct ContactView: View {
+    static let social: [(String, String)] = [("Facebook", "https://www.facebook.com/tidymintapp"), ("Instagram", "https://www.instagram.com/tidymint.app/"),
+                                             ("X", "https://x.com/tidymintapp"), ("LinkedIn", "https://www.linkedin.com/company/tidymint/"),
+                                             ("GitHub", "https://github.com/HaiTrung-Workspace/tidymint")]
     @ObservedObject var vm: VM
     @StateObject private var f = FormState()
     var body: some View {
@@ -5048,6 +5051,15 @@ struct ContactView: View {
                         Text(t("Or email", "Hoặc gửi email tới")).foregroundColor(Theme.sub)
                         TextLink("hello@tidymint.app", url: URL(string: "mailto:hello@tidymint.app")!)
                     }.font(.system(size: fs(12)))
+                    // Brand accounts and public bug reports. Plain links: nothing is loaded until the person clicks.
+                    HStack(spacing: 4) {
+                        Text(t("Follow Tidymint:", "Theo dõi Tidymint:")).foregroundColor(Theme.sub)
+                        ForEach(Array(ContactView.social.enumerated()), id: \.offset) { i, s in
+                            if i > 0 { Text("·").foregroundColor(Theme.sub.opacity(0.6)) }
+                            TextLink(s.0, url: URL(string: s.1)!)
+                        }
+                    }.font(.system(size: fs(12)))
+                    TextLink(t("Report a bug on GitHub", "Báo lỗi trên GitHub"), url: URL(string: "https://github.com/HaiTrung-Workspace/tidymint/issues")!)
                 }.padding(.top, 34)
                 HStack(spacing: 8) {
                     ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in
@@ -5729,10 +5741,23 @@ enum OrgEngine {
         return (req.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     }
 
+    /// Words that make a screenshot a real document (bill, contract, ticket, statement, ID), not just a screen full of text.
+    static let docWords = ["hợp đồng", "contract", "agreement", "vé", "ticket", "boarding pass", "booking", "đặt chỗ", "sao kê", "statement",
+                           "số tài khoản", "account number", "căn cước", "passport", "hộ chiếu", "giấy phép", "license", "certificate", "chứng nhận"]
+    /// Labels for an image. Measured on real files (29/10/2026): Apple returns "document" with exactly the same confidence as
+    /// "screenshot" for every screen capture (it is the parent label), and guesses on tiny images sit around 0.5. So: skip tiny
+    /// images, keep labels from 0.6 up, and drop "document" when it only comes along with "screenshot".
     static func labels(_ u: URL) -> [String] {
+        let bytes = (try? u.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        var side = 0
+        if let src = CGImageSourceCreateWithURL(u as CFURL, nil), let p = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any] {
+            side = max(p[kCGImagePropertyPixelWidth] as? Int ?? 0, p[kCGImagePropertyPixelHeight] as? Int ?? 0)
+        }
+        if bytes < 20_000 || (side > 0 && side < 300) { return [] }
         let req = VNClassifyImageRequest()
         try? VNImageRequestHandler(url: u).perform([req])
-        let obs = (req.results ?? []).filter { $0.confidence >= 0.3 && !generic.contains($0.identifier) }
+        var obs = (req.results ?? []).filter { $0.confidence >= 0.6 && !generic.contains($0.identifier) }
+        if obs.contains(where: { $0.identifier == "screenshot" }) { obs.removeAll { $0.identifier == "document" } }
         var out: [String] = []
         for o in obs.sorted(by: { $0.confidence > $1.confidence }) {
             let name = vi[o.identifier].map { appLang == "vi" ? $0 : o.identifier.replacingOccurrences(of: "_", with: " ").capitalized }
@@ -5760,6 +5785,12 @@ enum OrgEngine {
         else if c >= 2 { f.group = .cv; f.why = t("Text in the file looks like a CV", "Chữ trong file giống CV") }
         if image {
             f.tags = labels(f.url)
+            // A screenshot of a bill, contract or ticket is still a document: add it back when the text says so.
+            let doc = t("Document", "Giấy tờ")
+            if f.tags.contains(t("Screenshot", "Ảnh màn hình")), !f.tags.contains(doc),
+               r >= 2 || c >= 2 || docWords.map(fold).contains(where: { text.contains($0) }) {
+                f.tags.insert(doc, at: min(1, f.tags.count))
+            }
             if raw.count > 40, !f.tags.contains(t("Has text", "Có chữ")) { f.tags.append(t("Has text", "Có chữ")) }
         }
         f.tagOn = Set(f.tags)
@@ -6743,7 +6774,15 @@ struct OrgNameBar: View {
                 }.buttonStyle(.plain).onHover { $0 ? NSCursor.pointingHand.push() : NSCursor.pop() }
                     .help(t("Show only these files", "Chỉ hiện các file này"))
             }
-            Text(t("\(org.renameCount) to rename", "\(org.renameCount) file sẽ đổi tên")).foregroundColor(Theme.text).font(.system(size: fs(12), weight: .semibold))
+            if org.renameCount == 0 && !org.renameAll && named.isEmpty && !org.files.isEmpty {
+                // Say why nothing is renamed: every name is already readable, so the rule leaves them alone.
+                Text(t("Names already clear, kept", "Tên đã rõ ràng, giữ nguyên")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                    .help(t("Only names that say nothing (IMG_, Screenshot, scan, random strings) are renamed by default.",
+                            "Mặc định chỉ đổi tên file có tên vô nghĩa (IMG_, Screenshot, scan, chuỗi ngẫu nhiên)."))
+                TextLink(t("Rename these too", "Đổi cả các file này"), size: fs(12)) { org.renameAll = true }
+            } else {
+                Text(t("\(org.renameCount) to rename", "\(org.renameCount) file sẽ đổi tên")).foregroundColor(Theme.text).font(.system(size: fs(12), weight: .semibold))
+            }
             if !named.isEmpty {
                 let allOn = named.allSatisfy { org.files[$0].renameOn }
                 TextLink(allOn ? t("Keep all old names", "Giữ tên cũ tất cả") : t("Rename all", "Đổi tên tất cả"), size: fs(12)) {
