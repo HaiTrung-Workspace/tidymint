@@ -217,8 +217,8 @@ def sitemap(guides):
              '  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>%s</lastmod></url>' % today,
              '  <url><loc>https://tidymint.app/changelog/</loc><lastmod>%s</lastmod></url>' % today,
              '  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>%s</lastmod></url>' % today,
-             '  <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-28</lastmod></url>',
-             '  <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-28</lastmod></url>']
+             '  <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-30</lastmod></url>',
+             '  <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-30</lastmod></url>']
     for g in guides:
         pre = "vi/" if g["lang"] == "vi" else ""
         rows.append('  <url><loc>https://tidymint.app/%s%s/</loc><lastmod>%s</lastmod></url>' % (pre, g["slug"], g["date"]))
@@ -309,7 +309,8 @@ def changelogpage(k):
 SP = {
  "vi": dict(slug="ung-ho", title="Ủng hộ Tidymint", crumb="Ủng hộ dự án", h1="Ủng hộ Tidymint", alt="sponsor",
    desc="Tidymint miễn phí và sẽ luôn miễn phí. Ủng hộ là tự nguyện, không mở khoá thêm tính năng nào.",
-   status=("Chưa mở nhận ủng hộ", "Tài khoản nhận ủng hộ trên GitHub đang chờ duyệt. Khi duyệt xong, nút ủng hộ sẽ hiện ngay tại đây. Trong lúc chờ, bạn vẫn giúp được theo các cách bên dưới."),
+   status=("Đã mở nhận ủng hộ", "Ủng hộ qua GitHub Sponsors, hằng tháng hoặc một lần, số tiền tuỳ bạn (từ 1 USD). Mục tiêu: 12 USD mỗi tháng, đủ trả tài khoản Apple Developer và tên miền mỗi năm."),
+   sponsor="Ủng hộ trên GitHub",
    h_use="Tiền ủng hộ dùng vào đâu",
    use=["<b>Tài khoản Apple Developer, 99 USD mỗi năm.</b> Có nó, app được Apple xác nhận: người mới tải về mở là chạy, không phải vào Cài đặt > Bảo mật để cho phép.",
         "<b>Cập nhật tới nhanh hơn.</b> App đã xác nhận có thể tự cập nhật, bạn không phải tải lại bản mới bằng tay.",
@@ -326,7 +327,8 @@ SP = {
    star="Gắn sao trên GitHub", issue="Báo lỗi trên GitHub"),
  "en": dict(slug="sponsor", title="Sponsor Tidymint", crumb="Sponsor", h1="Sponsor Tidymint", alt="ung-ho",
    desc="Tidymint is free and will stay free. Sponsoring is optional and unlocks nothing extra.",
-   status=("Not open for sponsorship yet", "Our GitHub Sponsors account is waiting for approval. Once it is approved, the sponsor button will appear right here. Until then, you can still help in the ways below."),
+   status=("Open for sponsorship", "Sponsor through GitHub Sponsors, monthly or once, any amount from $1. The goal is $12 a month, enough to cover the Apple Developer account and the domain each year."),
+   sponsor="Sponsor on GitHub",
    h_use="Where the money goes",
    use=["<b>The Apple Developer account, $99 a year.</b> With it, Apple verifies the app: new users download it and it just opens, no trip to Settings > Security.",
         "<b>Faster updates.</b> A verified app can update itself, so you no longer download each new version by hand.",
@@ -342,13 +344,15 @@ SP = {
             "Each year we publish what came in and where it went."],
    star="Star on GitHub", issue="Report a bug on GitHub"),
 }
+SPONSOR = "https://github.com/sponsors/HaiTrung-Workspace"
 def sponsorpage(k):
     h = dict(SP[k]); ul = lambda xs: "<ul>%s</ul>" % "".join("<li>%s</li>" % x for x in xs)
     s1, s2 = h["status"]
     body = ('<div class="body"><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
-            '<h2>%s</h2>%s<h2>%s</h2>%s<p class="cta"><a class="btn primary" href="%s">%s</a><a class="btn ghost" href="%s/issues">%s</a></p>'
-            '<h2>%s</h2>%s</div>') % (s1, s2, h["h_use"], ul(h["use"]), h["h_free"], ul(h["free"]), S.GH, h["star"], S.GH, h["issue"], h["h_promise"], ul(h["promise"]))
-    h.update(lang=k, date="2026-10-28", hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body,
+            '<p class="cta"><a class="btn primary" href="%s">%s <span class="arr">→</span></a></p>'
+            '<h2>%s</h2>%s<h2>%s</h2>%s<p class="cta"><a class="btn ghost" href="%s">%s</a><a class="btn ghost" href="%s/issues">%s</a></p>'
+            '<h2>%s</h2>%s</div>') % (s1, s2, SPONSOR, h["sponsor"], h["h_use"], ul(h["use"]), h["h_free"], ul(h["free"]), S.GH, h["star"], S.GH, h["issue"], h["h_promise"], ul(h["promise"]))
+    h.update(lang=k, date="2026-10-30", hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body,
              lead='<p class="lead">%s</p>' % h["desc"])
     return h
 
