@@ -137,7 +137,7 @@ HOME_CSS = """
 .endcard{display:grid;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);grid-template-rows:repeat(4,auto);column-gap:56px;text-align:left;padding:48px 56px}
 .endcard .col{display:grid;grid-row:1/5;grid-template-rows:subgrid;align-items:start}
 .endcard .sep{grid-row:1/5;background:#2fd39f33}
-.endcard .ttl{display:flex;align-items:center;align-self:center;gap:14px;margin:0 0 12px;min-height:48px}
+.endcard .ttl{display:flex;align-items:center;align-self:center;gap:14px;margin:0 0 12px}
 .endcard .ttl img{width:48px;height:48px;margin:0}
 .endcard h2{font-size:clamp(26px,3vw,34px);line-height:1.15;margin:0}
 .endcard p{margin:0 0 24px;max-width:none}
@@ -451,7 +451,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 <section style="padding-top:24px">
   <div class="band endcard">
     <div class="col">
-      <div class="ttl"><img src="{img}icon.png" alt="" width="48" height="48"><h2>{t["end_h"]}</h2></div>
+      <div class="ttl"><h2>{t["end_h"]}</h2></div>
       <p>{t["end_p"]}</p>
       <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["i"]}">{t["end_btn2"]}</a></div>
       <div></div>
