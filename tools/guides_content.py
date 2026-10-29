@@ -175,6 +175,7 @@ dict(
     ("Switching to Mac: gỡ app trên macOS 26 Tahoe", "https://www.switchingtomac.com/how-to-uninstall-apps-on-mac/"),
   ],
   related=[("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="uninstall-apps-mac",
 ),
 
 dict(
@@ -764,7 +765,7 @@ dict(
 <h3>2. Empty the Trash and your Downloads folder</h3>
 <p>Files in the Trash still take space until you empty it. Old installers (<code>.dmg</code>, <code>.pkg</code>, <code>.zip</code>) in Downloads are a common hidden cost.</p>
 <h3>3. Delete local Time Machine snapshots</h3>
-<p>If you use Time Machine, macOS keeps snapshots on your internal drive. macOS removes them when it needs space, but the Storage screen often counts them as System Data. To list and remove them, open Terminal:</p>
+<p>If you use Time Machine, macOS keeps snapshots on your internal drive for up to 24 hours and removes them when it needs space. Apple counts that space as available, so you can usually leave them. If space does not come back after a big clean-up, list and remove them in Terminal (more in <a href="{HOME}time-machine-local-snapshots-mac/">our guide to local snapshots</a>):</p>
 <pre>tmutil listlocalsnapshots /
 sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 <p>Replace the date with one from the list. Your backups on the external Time Machine drive are not affected.</p>
@@ -811,6 +812,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
     ("Macworld: How to delete Time Machine snapshots", "https://www.macworld.com/article/231067/how-to-delete-time-machine-snapshots-on-your-mac.html"),
   ],
   related=[("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/")],
+  alt="du-lieu-he-thong-mac",
 ),
 
 dict(
@@ -864,6 +866,7 @@ dict(
     ("Apple: Uninstall apps on your Mac", "https://support.apple.com/en-lamr/102610"),
   ],
   related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/")],
+  alt="giai-phong-dung-luong-macbook",
 ),
 
 dict(
@@ -944,5 +947,285 @@ dict(
   ],
   related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/")],
   alt="cleanmymac-mien-phi",
+),
+
+dict(
+  lang="vi", slug="du-lieu-he-thong-mac", topic="disk", date="2026-10-29", read="7 phút đọc",
+  title="Dữ liệu hệ thống trên Mac là gì, dọn sao an toàn | Tidymint",
+  desc="Dữ liệu hệ thống chiếm vài chục GB mà không rõ là gì? Giải thích trong đó có gì, phần nào xoá được, phần nào không, và 7 cách dọn an toàn trên macOS.",
+  crumb="Dữ liệu hệ thống trên Mac",
+  h1="Dữ liệu hệ thống trên Mac là gì, dọn sao cho an toàn",
+  tldr="Dữ liệu hệ thống (System Data, macOS cũ gọi là \"Khác\") là nhóm gom mọi file không thuộc nhóm nào rõ ràng: <b>bộ nhớ đệm</b>, nhật ký, file tạm, <b>bản sao lưu iPhone cũ</b>, dữ liệu lập trình. Dọn an toàn bằng cách: <b>khởi động lại</b>, <b>đổ Thùng rác</b>, <b>xoá bộ nhớ đệm của bạn</b>, <b>xoá bản sao lưu iPhone cũ</b>, dọn <b>dữ liệu Xcode, Docker</b> nếu có. Tuyệt đối không xoá gì trong <code>/System</code> hay <code>/private/var</code>.",
+  toc=[("la-gi","Dữ liệu hệ thống là gì?"),("xem","Xem nó đang chiếm bao nhiêu"),("cach-don","7 cách dọn an toàn"),
+       ("khong-xoa","Những thứ không bao giờ được xoá"),("nhanh-hon","Cách nhanh hơn: để app tìm giúp"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="la-gi">Dữ liệu hệ thống là gì?</h2>
+<p>Theo Apple, đây là nhóm chung, đo dung lượng của mọi file của Apple và của app khác <b>không xếp được vào nhóm cụ thể nào</b>. Trên máy thật, trong đó thường có:</p>
+<ul>
+<li><b>Bộ nhớ đệm</b> của app và trình duyệt, nhật ký, file tạm</li>
+<li><b>Bản sao lưu iPhone, iPad</b> cũ</li>
+<li><b>Dữ liệu lập trình</b>: dữ liệu build của Xcode, máy ảo giả lập, ổ đĩa Docker</li>
+<li>File macOS cần để chạy, như bộ nhớ ảo (để yên những file này)</li>
+</ul>
+<p>Máy dùng một hai năm, Dữ liệu hệ thống lên 50 GB hay hơn là chuyện thường. macOS không có nút nào để dọn nhóm này.</p>
+
+<h2 id="xem">Xem nó đang chiếm bao nhiêu</h2>
+<p>Vào <b>menu Apple › Cài đặt hệ thống › Cài đặt chung › Dung lượng</b> (macOS 13 Ventura trở lên). Chờ thanh màu tính xong, rê chuột vào phần màu xám để xem con số. Ghi lại số này để biết mỗi bước dưới đây giải phóng được bao nhiêu.</p>
+
+<h2 id="cach-don">7 cách dọn an toàn</h2>
+<h3>1. Khởi động lại máy</h3>
+<p>Khởi động lại sẽ xoá file tạm và bộ nhớ hoán đổi (swap). Không tốn gì, không rủi ro, có khi tự trả lại vài GB.</p>
+<h3>2. Đổ Thùng rác và dọn thư mục Tải về</h3>
+<p>File trong Thùng rác vẫn chiếm chỗ cho tới khi bạn đổ. Trong thư mục Tải về, các file cài đặt cũ (<code>.dmg</code>, <code>.pkg</code>, <code>.zip</code>) hay nằm lại rất lâu.</p>
+<h3>3. Hiểu đúng về bản chụp Time Machine</h3>
+<p>Nếu bật sao lưu tự động, Time Machine lưu bản chụp ngay trên ổ máy, mỗi bản giữ <b>tối đa 24 giờ</b>, và macOS <b>tự xoá khi cần chỗ</b>. Apple tính phần này là dung lượng còn trống, nên thường bạn không cần làm gì. Muốn xoá ngay, cách Apple hướng dẫn là: tắt <b>Sao lưu tự động</b>, chờ vài phút, rồi bật lại. Bản sao lưu trên ổ Time Machine bên ngoài không bị ảnh hưởng.</p>
+<h3>4. Xoá bộ nhớ đệm của bạn</h3>
+<p>Thoát các app, trong Finder nhấn <b>Shift+Cmd+G</b> rồi gõ <code>~/Library/Caches</code>. Chuyển thư mục của các app bạn nhận ra vào Thùng rác. App sẽ tự tạo lại thứ nó cần, lần mở đầu có thể chậm hơn một chút.</p>
+<div class="warn"><p>Dùng đúng <code>~/Library/Caches</code> (có dấu ngã, là thư mục của bạn), không phải <code>/Library/Caches</code> hay <code>/System/Library/Caches</code>.</p></div>
+<h3>5. Xoá bản sao lưu iPhone, iPad cũ</h3>
+<p>Nếu từng sao lưu iPhone vào máy, các bản cũ có thể chiếm vài chục GB. Apple cho phép xoá bản sao lưu cũ không cần nữa. Vào <b>Cài đặt chung › Dung lượng</b>, mở mục <b>Tệp iOS</b> (iOS Files) để xem và xoá.</p>
+<h3>6. Dọn dữ liệu lập trình (nếu bạn là dev)</h3>
+<ul>
+<li><b>Dữ liệu build Xcode</b>: chuyển <code>~/Library/Developer/Xcode/DerivedData</code> vào Thùng rác. Xcode tự tạo lại.</li>
+<li><b>Máy giả lập cũ</b>: chạy <code>xcrun simctl delete unavailable</code>.</li>
+<li><b>Docker</b>: chạy <code>docker system prune</code> để xoá image và container không dùng.</li>
+<li><b>node_modules</b> trong các dự án cũ đã thôi làm.</li>
+</ul>
+<h3>7. Dọn mô hình AI tải về</h3>
+<ul>
+<li><b>Ollama</b>: chạy <code>ollama list</code>, rồi <code>ollama rm tên-mô-hình</code> với mô hình không dùng.</li>
+<li><b>Hugging Face</b>: mô hình tải về nằm ở <code>~/.cache/huggingface</code>.</li>
+</ul>
+<p>Một mô hình chạy trên máy có thể nặng vài GB, nên trên máy làm AI đây thường là phần giải phóng được nhiều nhất.</p>
+
+<h2 id="khong-xoa">Những thứ không bao giờ được xoá</h2>
+<ul>
+<li>Mọi thứ trong <code>/System</code>, <code>/private/var/vm</code> (bộ nhớ ảo) hay <code>/private/var/db</code></li>
+<li>Cả thư mục <code>~/Library</code>, thư viện Ảnh hay Mail</li>
+<li>File bạn không nhận ra. Không chắc thì để yên.</li>
+</ul>
+<p>Cẩn thận với các app dọn "một cú click" mà xoá thẳng. Lỡ xoá nhầm thì không có đường lùi.</p>
+
+<h2 id="nhanh-hon">Cách nhanh hơn: để app tìm giúp</h2>
+<p>Bước 2, 4, 6, 7 đều phải lục thư mục ẩn. <a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, tìm giúp bạn:</p>
+<figure class="fig-app"><img src="../smart.jpg" alt="Trang Dọn ngay của Tidymint sau khi quét: bộ nhớ đệm, nhật ký, file tải về cũ chia nhóm kèm dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Dọn ngay: mọi thứ chia nhóm, ghi rõ dung lượng, bạn xem trước rồi mới chọn dọn.</figcaption></figure>
+<ul>
+<li><b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, bộ nhớ npm, file tải về cũ, nháp trong thư mục dự án, chia nhóm trước khi bạn bấm Dọn.</li>
+<li><b>Dọn theo ứng dụng</b> cho thấy Chrome, Cốc Cốc, Zalo, CapCut đang giữ bao nhiêu.</li>
+<li><b>Bản đồ ổ đĩa</b> vẽ bong bóng cho cả ổ, kèm ghi chú dễ hiểu cho các thư mục như <code>.ollama</code>.</li>
+</ul>
+<p>Bản chụp Time Machine thì Tidymint để macOS tự lo. Mọi thứ bạn chọn <b>luôn vào Thùng rác trước</b>, có thể hoàn tác.</p>
+{CTA}
+""",
+  faq=[
+    ("Xoá Dữ liệu hệ thống trên Mac có an toàn không?", "Một phần thì có: bộ nhớ đệm của bạn, file tải về cũ, bản sao lưu iPhone cũ, dữ liệu build lập trình đều xoá được. File macOS cần để chạy như bộ nhớ ảo thì không. Không bao giờ xoá gì trong /System hay /private/var."),
+    ("Vì sao Dữ liệu hệ thống to vậy?", "Thường do bộ nhớ đệm của app và trình duyệt, bản sao lưu iPhone cũ, dữ liệu Xcode, Docker và mô hình AI tải về. Trên máy lập trình hay làm AI, con số có thể vượt 100 GB."),
+    ("Dữ liệu hệ thống có tự giảm không?", "Một phần. macOS tự xoá bản chụp Time Machine và một số bộ nhớ đệm khi thiếu chỗ, khởi động lại thì xoá file tạm. Dữ liệu lập trình, mô hình AI và bản sao lưu iPhone cũ thì máy không tự xoá."),
+    ("Có nên xoá bản chụp Time Machine không?", "Thường là không cần. Mỗi bản chỉ giữ tối đa 24 giờ, macOS tự xoá khi cần chỗ và Apple tính phần này là dung lượng còn trống."),
+    ("Tidymint có xoá Dữ liệu hệ thống không?", "Tidymint tìm phần an toàn như bộ nhớ đệm, nhật ký, file tải về cũ, giải thích từng thư mục, và chỉ chuyển những gì bạn chọn vào Thùng rác. Tidymint không bao giờ đụng tới thư mục hệ thống của Apple."),
+  ],
+  sources=[
+    ("Apple: Giải phóng dung lượng lưu trữ trên Mac", "https://support.apple.com/ht206996"),
+    ("Apple: Về bản chụp cục bộ của Time Machine", "https://support.apple.com/en-us/102154"),
+  ],
+  related=[("Vì sao MacBook tự đầy ổ", "{HOME}mac-tu-day-o/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/")],
+  alt="clear-system-data-mac",
+),
+dict(
+  lang="vi", slug="giai-phong-dung-luong-macbook", topic="disk", date="2026-10-29", read="7 phút đọc",
+  title="10 cách giải phóng dung lượng MacBook an toàn | Tidymint",
+  desc="MacBook báo sắp đầy ổ? 10 cách giải phóng dung lượng an toàn: xoá bộ nhớ đệm, tìm file lớn và file trùng, gỡ app không dùng kèm phần sót lại, dọn Zalo.",
+  crumb="Giải phóng dung lượng MacBook",
+  h1="10 cách giải phóng dung lượng MacBook an toàn",
+  tldr="Bắt đầu từ <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b> để xem thứ gì đang chiếm chỗ. Rồi làm lần lượt: đổ Thùng rác, dọn thư mục Tải về, bật <b>Tối ưu hoá dung lượng</b>, <b>xoá bộ nhớ đệm</b> trình duyệt và app, tìm <b>file lớn và file trùng</b>, <b>gỡ app</b> kèm phần sót lại, dọn <b>dữ liệu Zalo</b>, xoá bản sao lưu iPhone cũ. App miễn phí như Tidymint làm được phần lớn danh sách này trong một lần quét.",
+  toc=[("xem","Trước hết, xem thứ gì đang chiếm chỗ"),("cach","10 cách an toàn"),("bo-nho-dem","Cách xoá bộ nhớ đệm trên Mac"),("nhanh-hon","Làm trong một lần quét"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="xem">Trước hết, xem thứ gì đang chiếm chỗ</h2>
+<p>Vào <b>menu Apple › Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>. Thanh màu cho thấy nhóm nào lớn nhất, danh sách bên dưới mở được Ứng dụng, Tài liệu, Tin nhắn và các nhóm khác. Nếu <b>Dữ liệu hệ thống</b> lớn nhất, đọc bài <a href="{HOME}du-lieu-he-thong-mac/">Dữ liệu hệ thống trên Mac là gì</a>.</p>
+
+<h2 id="cach">10 cách an toàn</h2>
+<ol class="steps">
+<li><b>Đổ Thùng rác.</b> File đã xoá vẫn chiếm chỗ cho tới khi bạn đổ. Trong mục Dung lượng có thể bật tự động đổ Thùng rác sau 30 ngày.</li>
+<li><b>Dọn thư mục Tải về.</b> Sắp xếp theo kích thước, bỏ các file cài đặt cũ (<code>.dmg</code>, <code>.pkg</code>) và file nén đã giải nén xong.</li>
+<li><b>Bật Tối ưu hoá dung lượng</b> (Optimize Storage). Nếu bạn có gói iCloud, macOS chỉ giữ file mới trên máy, file cũ tải về khi bạn mở.</li>
+<li><b>Xoá bộ nhớ đệm trình duyệt và app.</b> Xem cách làm ở dưới.</li>
+<li><b>Tìm file lớn.</b> Trong mục Dung lượng, mở <b>Tài liệu</b> rồi sắp xếp theo kích thước. Video và file xuất dự án cũ thường đứng đầu.</li>
+<li><b>Xoá file trùng.</b> Ảnh và file tải về hay có hai ba bản dưới tên khác nhau.</li>
+<li><b>Gỡ app không dùng</b>, kèm bộ nhớ đệm và cài đặt của nó. Kéo app vào Thùng rác sẽ để sót lại những thứ này, xem bài <a href="{HOME}xoa-ung-dung-macbook/">xoá ứng dụng trên MacBook sạch hoàn toàn</a>.</li>
+<li><b>Dọn dữ liệu Zalo, CapCut.</b> Ảnh, video, file trong Zalo có thể lên vài chục GB. Xem bài <a href="{HOME}zalo-chiem-dung-luong-macbook/">Zalo chiếm bao nhiêu GB trên MacBook</a> để dọn mà không mất tin nhắn.</li>
+<li><b>Xoá bản sao lưu iPhone, iPad cũ</b> trong mục Dung lượng › <b>Tệp iOS</b> (iOS Files).</li>
+<li><b>Chuyển thư viện lớn ra ổ ngoài.</b> Apple hỗ trợ chuyển thư viện Ảnh và dự án iMovie sang ổ khác.</li>
+</ol>
+
+<h2 id="bo-nho-dem">Cách xoá bộ nhớ đệm trên Mac</h2>
+<h3>Safari</h3>
+<p>Mở <b>Safari › Cài đặt › Nâng cao</b>, bật dòng hiện tính năng cho nhà phát triển web (Show features for web developers). Sau đó chọn menu <b>Phát triển › Dọn bộ nhớ đệm</b> (Develop › Empty Caches).</p>
+<h3>Chrome, Cốc Cốc</h3>
+<p>Mở <b>Cài đặt › Quyền riêng tư và bảo mật › Xoá dữ liệu duyệt web</b>, chỉ tick <b>Hình ảnh và tệp được lưu trong bộ nhớ đệm</b> (giữ nguyên mật khẩu và cookie), rồi bấm Xoá dữ liệu.</p>
+<h3>Bộ nhớ đệm của app</h3>
+<p>Thoát các app, trong Finder nhấn <b>Shift+Cmd+G</b> rồi gõ <code>~/Library/Caches</code>. Chuyển thư mục của app bạn nhận ra vào Thùng rác. App chat, app thiết kế như Slack, Notion, VS Code thường giữ vài GB ở đây.</p>
+<div class="warn"><p>Xoá bộ nhớ đệm giải phóng được một thời gian, rồi app tạo lại khi bạn dùng. Đây là việc bảo dưỡng, không phải cách chữa tận gốc. File lớn, file trùng và app không dùng mới cho kết quả lâu dài.</p></div>
+
+<h2 id="nhanh-hon">Làm trong một lần quét</h2>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm được phần lớn danh sách trên:</p>
+<ul>
+<li><b>Dọn ngay</b>: bộ nhớ đệm, nhật ký, file tải về cũ, chia nhóm trước khi bạn bấm Dọn.</li>
+<li><b>Dọn theo ứng dụng</b>: Chrome, Cốc Cốc, Zalo, CapCut, tin nhắn và đăng nhập app không bao giờ bị đụng tới.</li>
+<li><b>File lớn</b> (không bao giờ chọn sẵn) và <b>File trùng</b> (luôn giữ một bản).</li>
+<li><b>Gỡ app</b> tìm cả phần sót lại, kể cả của app đã xoá từ lâu.</li>
+<li><b>Bản đồ ổ đĩa</b> cho thấy dung lượng đi đâu.</li>
+</ul>
+<p>Mọi thứ <b>luôn vào Thùng rác trước</b>, có thể hoàn tác.</p>
+{CTA}
+""",
+  faq=[
+    ("Thứ gì chiếm nhiều chỗ nhất trên Mac?", "Thường là video và ảnh, app và dữ liệu của app, bản sao lưu iPhone, và Dữ liệu hệ thống như bộ nhớ đệm. Với người dùng Việt Nam, Zalo hay nằm trong nhóm lớn nhất. Mục Cài đặt chung › Dung lượng cho thấy con số trên máy bạn."),
+    ("Xoá bộ nhớ đệm trên Mac có an toàn không?", "Có, với bộ nhớ đệm của bạn trong ~/Library/Caches và bộ nhớ đệm trình duyệt. App tự tạo lại khi cần. Tránh các thư mục bộ nhớ đệm hệ thống trong /System hay /Library."),
+    ("Mac nên chừa trống bao nhiêu?", "Apple không đưa con số chính thức. Kinh nghiệm thường gặp là chừa khoảng 10–15% dung lượng ổ để macOS có chỗ cập nhật và chạy bộ nhớ hoán đổi."),
+    ("Tối ưu hoá dung lượng có xoá file của tôi không?", "Không. File nằm trên iCloud và tải lại khi bạn mở. Bạn cần đủ dung lượng iCloud để dùng tính năng này."),
+    ("Tidymint có miễn phí không?", "Có. Tidymint mã nguồn mở theo giấy phép MIT, không tài khoản, không thuê bao, không bản trả phí."),
+  ],
+  sources=[
+    ("Apple: Giải phóng dung lượng lưu trữ trên Mac", "https://support.apple.com/ht206996"),
+    ("Apple: Gỡ cài đặt app trên máy Mac", "https://support.apple.com/en-us/102610"),
+  ],
+  related=[("Dữ liệu hệ thống trên Mac là gì", "{HOME}du-lieu-he-thong-mac/"), ("Xoá ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/")],
+  alt="free-up-space-mac",
+),
+dict(
+  lang="en", slug="uninstall-apps-mac", topic="disk", date="2026-10-29", read="6 min read",
+  title="How to Uninstall Apps on Mac Completely | Tidymint",
+  desc="Dragging an app to the Trash leaves settings and caches behind. How to uninstall apps on Mac the right way, including macOS 26 Tahoe, and clean up leftovers.",
+  crumb="Uninstall apps on Mac",
+  h1="How to uninstall apps on Mac completely",
+  tldr="Apple's way: quit the app, find it in <b>Finder › Applications</b>, run its own uninstaller if it has one, otherwise drag it to the <b>Trash</b> and empty the Trash. That usually <b>leaves settings, caches and data</b> behind in your Library folder. To remove an app completely, clean those folders too, or use a free uninstaller such as Tidymint or AppCleaner.",
+  toc=[("finder","Way 1: Delete it in Finder (Apple's way)"),("uninstaller","Way 2: Use the app's own uninstaller"),
+       ("tahoe","A note on macOS 26 Tahoe"),("leftovers","Clean up the leftovers"),("app","Way 3: Uninstall with a free app"),
+       ("stuck","When an app won't delete"),("faq","FAQ")],
+  body="""
+<h2 id="finder">Way 1: Delete it in Finder (Apple's way)</h2>
+<ol class="steps">
+<li><b>Quit the app</b> (Cmd+Q). If it has a menu bar icon, quit it there too.</li>
+<li>Open <b>Finder</b> and click <b>Applications</b> in the sidebar.</li>
+<li>Drag the app to the <b>Trash</b>, or select it and choose <b>File › Move to Trash</b>. Enter your Mac password if asked.</li>
+<li><b>Empty the Trash</b> (Finder › Empty Trash) to actually get the space back.</li>
+</ol>
+<p>Apple notes that deleting an app <b>doesn't remove documents you created</b> with it, and <b>doesn't cancel subscriptions</b> you bought through it. Cancel those in the App Store or on the developer's website.</p>
+
+<h2 id="uninstaller">Way 2: Use the app's own uninstaller</h2>
+<p>Some big apps ship with their own uninstaller: Adobe apps, Microsoft Office, antivirus tools, printer drivers. Look for an app named <b>Uninstall</b> or <b>Uninstaller</b> in the app's folder, or a remove or reset option in the app's settings.</p>
+<p>Apple calls this the best way when it exists, because the uninstaller also removes login items, extensions and data stored elsewhere.</p>
+
+<h2 id="tahoe">A note on macOS 26 Tahoe</h2>
+<p>On older macOS versions you could open Launchpad, hold an icon until it jiggles and click the X. In <b>macOS 26 Tahoe</b>, Launchpad is folded into Spotlight and that delete button is gone. On macOS 26, use Finder (way 1) or the app's uninstaller (way 2). To check your version, open <b>Apple menu › About This Mac</b>.</p>
+
+<h2 id="leftovers">Clean up the leftovers</h2>
+<p>Dragging an app to the Trash removes only the app itself. The files it created while you used it stay in your <b>Library</b> folder, and some apps leave several gigabytes behind.</p>
+<p>To open it: in Finder choose <b>Go › Go to Folder</b> (Shift+Cmd+G) and type <code>~/Library</code>. Leftovers usually live in:</p>
+<div class="tbl"><table>
+<tr><th>Folder</th><th>What's inside</th></tr>
+<tr><td><code>~/Library/Application Support</code></td><td>App data (often the largest)</td></tr>
+<tr><td><code>~/Library/Caches</code></td><td>Caches</td></tr>
+<tr><td><code>~/Library/Preferences</code></td><td>Settings files (.plist)</td></tr>
+<tr><td><code>~/Library/Containers</code></td><td>Data for App Store apps</td></tr>
+<tr><td><code>~/Library/Saved Application State</code></td><td>Saved window state</td></tr>
+<tr><td><code>~/Library/LaunchAgents</code></td><td>Items that start with your Mac</td></tr>
+</table></div>
+<div class="warn"><p>Only move folders that carry <b>the app's name or the developer's name</b> (for example <code>com.spotify.client</code>). If you're not sure, leave it. Never delete the whole Library folder.</p></div>
+
+<h2 id="app">Way 3: Uninstall with a free app</h2>
+<p>Checking every folder by hand takes time and it's easy to pick the wrong one. Uninstaller apps find the leftovers for you:</p>
+<figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Zoom together with its leftover files in Library" width="1600" height="1013" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
+<ul>
+<li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Everything always goes to the Trash first, with Undo.</li>
+<li><b>AppCleaner</b> (free) and <b>Pearcleaner</b> (free, source available): drop an app on the window and they list its related files for you to remove.</li>
+</ul>
+{CTA}
+
+<h2 id="stuck">When an app won't delete</h2>
+<ul>
+<li><b>"The item is in use"</b>: quit the app completely, including its menu bar icon. If that fails, restart your Mac and try again.</li>
+<li><b>Apple apps</b> such as Mail, Music, Books, Notes and Maps are part of macOS. You can't delete them, and you shouldn't.</li>
+<li><b>The app still runs after you deleted it</b>: a startup item is left in <code>~/Library/LaunchAgents</code> or in <b>System Settings › General › Login Items</b>. Turn it off or remove it. Tidymint's Startup Items list shows every background item and flags odd names or locations.</li>
+</ul>
+""",
+  faq=[
+    ("Does dragging an app to the Trash delete everything?", "No. It removes only the app itself. Its settings, caches and data stay in your Library folder (~/Library) until you clean them up yourself or use an uninstaller."),
+    ("Can I delete apps from Launchpad?", "On macOS 15 and earlier, yes, for apps from the App Store. In macOS 26 Tahoe, Launchpad is part of Spotlight and has no delete button, so use Finder instead."),
+    ("Will I lose my documents if I delete an app?", "No. Documents you made with the app stay where they are. Only the app's own data in your Library folder goes away, and only if you clean up the leftovers."),
+    ("Does deleting an app cancel my subscription?", "No. Cancel App Store subscriptions in App Store › your account › Subscriptions, and web subscriptions on the developer's website."),
+    ("Is uninstalling with Tidymint safe?", "Tidymint moves the app and its leftovers to the Trash, so a mistake can be undone. Apps that are running are flagged and never pre-selected."),
+  ],
+  sources=[
+    ("Apple: Uninstall apps on your Mac", "https://support.apple.com/en-us/102610"),
+    ("Switching to Mac: uninstalling apps on macOS 26 Tahoe", "https://www.switchingtomac.com/how-to-uninstall-apps-on-mac/"),
+  ],
+  related=[("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
+  alt="xoa-ung-dung-macbook",
+),
+dict(
+  lang="en", slug="time-machine-local-snapshots-mac", topic="disk", date="2026-10-29", read="6 min read",
+  title="Time Machine Snapshots Filling Your Mac? | Tidymint",
+  desc="What Time Machine local snapshots are, how long macOS keeps them, why your free space can look wrong, and how to remove them safely if you really need to.",
+  crumb="Time Machine local snapshots",
+  h1="Time Machine local snapshots: are they eating your storage?",
+  tldr="When automatic backups are on, Time Machine saves a <b>local snapshot about every hour</b> on your Mac's own disk. Each one is kept for <b>up to 24 hours</b>, and macOS <b>removes them on its own when space is needed</b>. Apple counts that space as available. Most of the time you don't need to do anything. If an install or a big copy still fails for lack of space, turn <b>Back Up Automatically</b> off for a few minutes, or delete snapshots with <code>tmutil</code>.",
+  toc=[("what","What local snapshots are"),("space","Do they really take up space?"),("see","How to see your snapshots"),
+       ("remove","How to remove them"),("dont","What not to do"),("tidymint","Where Tidymint fits"),("faq","FAQ")],
+  body="""
+<h2 id="what">What local snapshots are</h2>
+<p>Time Machine normally backs up to an external drive or a network disk. So that you can still restore files when that disk isn't connected, it also keeps <b>local snapshots</b> on your Mac. According to Apple:</p>
+<ul>
+<li>Time Machine saves one snapshot of your startup disk <b>about every hour</b>.</li>
+<li>Each snapshot is kept for <b>up to 24 hours</b>. One extra snapshot of your last successful backup is kept until space is needed.</li>
+<li>Another snapshot is saved <b>before a macOS update</b> is installed.</li>
+<li>Snapshots are only made on disks formatted as <b>APFS</b>, and only when <b>Back Up Automatically</b> is on.</li>
+</ul>
+<p>Local snapshots are a convenience, not a backup. They live on the same disk as your files, so they don't help if that disk fails.</p>
+
+<h2 id="space">Do they really take up space?</h2>
+<p>They do use space on the disk, but Apple says <b>your Mac counts the space used by snapshots as available storage</b>, and Time Machine deletes them as they age or when other tasks need the room. That is why the free space in System Settings can look larger than what some other tools report.</p>
+<p>In practice this rarely causes trouble. When it does, it's usually right after a large clean-up: you deleted gigabytes of files, but they are still held by a recent snapshot, so the space comes back only when that snapshot expires.</p>
+
+<h2 id="see">How to see your snapshots</h2>
+<p>Open <b>Terminal</b> (in Applications › Utilities) and run:</p>
+<pre>tmutil listlocalsnapshots /</pre>
+<p>Each line ends with a date, such as <code>2026-10-29-101500</code>. No output means there are no local snapshots on your startup disk.</p>
+
+<h2 id="remove">How to remove them</h2>
+<h3>The Apple way: pause automatic backups</h3>
+<ol class="steps">
+<li>Open <b>Apple menu › System Settings › General › Time Machine</b>.</li>
+<li>Turn off automatic backups and wait a few minutes. macOS removes the local snapshots.</li>
+<li>Turn automatic backups back on. Time Machine remembers your backup disks.</li>
+</ol>
+<h3>The Terminal way: delete one snapshot</h3>
+<pre>sudo tmutil deletelocalsnapshots 2026-10-29-101500</pre>
+<p>Replace the date with one from your list. Terminal asks for your Mac password and shows nothing while you type it. Backups on your external Time Machine disk are not affected.</p>
+
+<h2 id="dont">What not to do</h2>
+<ul>
+<li><b>Don't turn Time Machine off for good</b> just to save space. You lose your backups, and snapshots go away on their own anyway.</li>
+<li><b>Don't delete files inside</b> <code>/System</code> or <code>/private/var</code>. Use the steps above instead.</li>
+<li><b>Don't rely on snapshots as your backup.</b> Keep regular backups on another disk.</li>
+</ul>
+
+<h2 id="tidymint">Where Tidymint fits</h2>
+<p>We leave Time Machine snapshots to macOS on purpose: they expire on their own, and removing them is a backup decision, not a clean-up one. <a href="{HOME}">Tidymint</a> focuses on what macOS won't clear for you: app and browser caches, logs, old downloads, leftovers from deleted apps, large and duplicate files. Space Lens shows where the rest of your disk went. Everything always goes to the Trash first.</p>
+{CTA}
+""",
+  faq=[
+    ("Is it safe to delete Time Machine local snapshots?", "Yes. They are short-term copies on your Mac's own disk. Deleting them does not touch the backups on your Time Machine drive. You only lose the option to restore from that hour while the drive is disconnected."),
+    ("How long does macOS keep local snapshots?", "Up to 24 hours each, plus one snapshot of your last successful backup until space is needed. macOS also deletes them early when the disk needs room."),
+    ("Why didn't I get space back after deleting files?", "A recent local snapshot may still hold those files. The space returns when the snapshot expires, or right away if you remove local snapshots."),
+    ("Do local snapshots show up as System Data?", "Apple says the space used by snapshots is counted as available storage. If System Data is large, the usual causes are caches, old iPhone backups and developer files."),
+    ("Does Tidymint delete Time Machine snapshots?", "No. Tidymint leaves them to macOS and focuses on caches, logs, old downloads, app leftovers, large files and duplicates."),
+  ],
+  sources=[
+    ("Apple: About Time Machine local snapshots", "https://support.apple.com/en-us/102154"),
+    ("Apple Mac User Guide: About Time Machine local snapshots on Mac", "https://support.apple.com/guide/mac-help/about-time-machine-local-snapshots-mh35933/mac"),
+    ("Apple Community: How to delete Time Machine local snapshots", "https://discussions.apple.com/docs/DOC-12803"),
+  ],
+  related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Why your Mac storage keeps filling up", "{HOME}mac-storage-keeps-filling-up/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/")],
 ),
 ]

@@ -6,7 +6,7 @@
 <title>How to Clear System Data on Mac (Safely) | Tidymint</title>
 <meta name="description" content="System Data taking 50 GB or more? What it actually contains and 7 safe ways to shrink it: caches, Time Machine snapshots, Xcode, Docker.">
 <link rel="canonical" href="https://tidymint.app/clear-system-data-mac/">
-<link rel="alternate" hreflang="en" href="https://tidymint.app/clear-system-data-mac/">
+<link rel="alternate" hreflang="en" href="https://tidymint.app/clear-system-data-mac/"><link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/du-lieu-he-thong-mac/">
 <link rel="icon" href="../favicon.ico?v=e432162e" sizes="32x32">
 <link rel="icon" href="../favicon.svg?v=54bc3a99" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png?v=09bf11fa">
@@ -201,7 +201,7 @@ summary{user-select:none}
 <body id="top">
 <div class="topnav"><div class="wrap"><nav>
   <a class="brand" href="../"><img src="../logo.svg?v=a82b62e0" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a>
-  <div class="navr"><div class="links"><a href="../#features">Features</a><a href="../#how">How it works</a><a href="../guides/">Guides</a><a href="../#faq">FAQ</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><a class="btn primary navcta" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download</a><div class="lang" role="group" aria-label="Language"><a href="../vi/huong-dan/" data-l="vi">VI</a><a class="on" href="./" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
+  <div class="navr"><div class="links"><a href="../#features">Features</a><a href="../#how">How it works</a><a href="../guides/">Guides</a><a href="../#faq">FAQ</a><a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a></div><a class="btn primary navcta" href="https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip">Download</a><div class="lang" role="group" aria-label="Language"><a href="../vi/du-lieu-he-thong-mac/" data-l="vi">VI</a><a class="on" href="./" data-l="en">EN</a></div><button class="mbtn" id="mbtn" type="button" aria-label="Menu" aria-expanded="false">☰</button></div>
 </nav></div></div>
 <div class="wrap">
 <article class="art">
@@ -230,7 +230,7 @@ summary{user-select:none}
 <h3>2. Empty the Trash and your Downloads folder</h3>
 <p>Files in the Trash still take space until you empty it. Old installers (<code>.dmg</code>, <code>.pkg</code>, <code>.zip</code>) in Downloads are a common hidden cost.</p>
 <h3>3. Delete local Time Machine snapshots</h3>
-<p>If you use Time Machine, macOS keeps snapshots on your internal drive. macOS removes them when it needs space, but the Storage screen often counts them as System Data. To list and remove them, open Terminal:</p>
+<p>If you use Time Machine, macOS keeps snapshots on your internal drive for up to 24 hours and removes them when it needs space. Apple counts that space as available, so you can usually leave them. If space does not come back after a big clean-up, list and remove them in Terminal (more in <a href="../time-machine-local-snapshots-mac/">our guide to local snapshots</a>):</p>
 <pre>tmutil listlocalsnapshots /
 sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 <p>Replace the date with one from the list. Your backups on the external Time Machine drive are not affected.</p>
