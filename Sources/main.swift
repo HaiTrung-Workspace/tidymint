@@ -4972,6 +4972,9 @@ struct FieldBox<C: View>: View {
 }
 
 struct ContactView: View {
+    static let social: [(String, String)] = [("Facebook", "https://www.facebook.com/tidymintapp"), ("Instagram", "https://www.instagram.com/tidymint.app/"),
+                                             ("X", "https://x.com/tidymintapp"), ("LinkedIn", "https://www.linkedin.com/company/tidymint/"),
+                                             ("GitHub", "https://github.com/HaiTrung-Workspace/tidymint")]
     @ObservedObject var vm: VM
     @StateObject private var f = FormState()
     var body: some View {
@@ -4986,6 +4989,15 @@ struct ContactView: View {
                         Text(t("Or email", "Hoặc gửi email tới")).foregroundColor(Theme.sub)
                         TextLink("hello@tidymint.app", url: URL(string: "mailto:hello@tidymint.app")!)
                     }.font(.system(size: fs(12)))
+                    // Brand accounts and public bug reports. Plain links: nothing is loaded until the person clicks.
+                    HStack(spacing: 4) {
+                        Text(t("Follow Tidymint:", "Theo dõi Tidymint:")).foregroundColor(Theme.sub)
+                        ForEach(Array(ContactView.social.enumerated()), id: \.offset) { i, s in
+                            if i > 0 { Text("·").foregroundColor(Theme.sub.opacity(0.6)) }
+                            TextLink(s.0, url: URL(string: s.1)!)
+                        }
+                    }.font(.system(size: fs(12)))
+                    TextLink(t("Report a bug on GitHub", "Báo lỗi trên GitHub"), url: URL(string: "https://github.com/HaiTrung-Workspace/tidymint/issues")!)
                 }.padding(.top, 34)
                 HStack(spacing: 8) {
                     ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in
