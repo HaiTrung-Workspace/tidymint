@@ -223,7 +223,7 @@ dict(
 <h2 id="anh-cu">Bỏ ảnh cũ, giữ ảnh mới</h2>
 <p>Trong <code>ZaloDownloads/picture</code> và <code>resource</code>, file xếp được theo ngày. Trong Finder chọn xem dạng <b>Danh sách</b>, sắp theo <b>Ngày sửa đổi</b>, chọn các file cũ hơn 6 tháng rồi kéo vào Thùng rác. Ảnh nào cần giữ thì lưu ra thư mục Ảnh trước.</p>
 <p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint miễn phí, mã nguồn mở, do một người Việt làm.</p>
-<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1085" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
 {CTA}
 
 <h2 id="zalo-tu-don">Zalo có tự dọn không?</h2>
@@ -1679,7 +1679,7 @@ dict(
 </ul>
 
 <h2 id="tidymint">Dọn CapCut bằng Tidymint</h2>
-<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1085" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
 <ul>
 <li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích) được chọn sẵn, ghi rõ dung lượng;</li>
@@ -1706,3 +1706,121 @@ dict(
   related=[("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Adobe chiếm bao nhiêu GB trên Mac", "{HOME}adobe-chiem-dung-luong-mac/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/")],
 ),
 ]
+
+GUIDES.append(dict(
+  lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-10-30", read="6 phút đọc",
+  title="Tidymint có gửi dữ liệu của bạn đi không? | Tidymint",
+  desc="App dọn máy được đọc cả ổ đĩa. Tidymint chạy hoàn toàn trên máy: không tài khoản, không thu thập dữ liệu, dọn không cần mạng. Giải thích dễ hiểu.",
+  crumb="Quyền riêng tư",
+  h1="Tidymint làm gì với dữ liệu của bạn? Câu trả lời ngắn: không gì cả",
+  tldr="Tidymint quét và dọn <b>ngay trên máy bạn</b>, giống người thợ dọn nhà làm việc trong nhà bạn rồi về tay không. App không có tài khoản, không quảng cáo, không gắn công cụ đo lường, và <b>tắt mạng vẫn quét, dọn bình thường</b>. App chỉ lên mạng trong hai trường hợp: <b>kiểm tra bản mới</b> (đọc một con số phiên bản, mỗi ngày tối đa một lần) và khi <b>bạn tự bấm gửi góp ý</b>. Mã nguồn công khai, ai cũng kiểm được.",
+  toc=[("vi-sao-can-quyen","Vì sao app dọn máy cần quyền đọc cả ổ"),("chay-tren-may","Tidymint làm việc thế nào"),
+       ("khi-nao-len-mang","Lúc nào Tidymint kết nối mạng"),("tu-kiem","Tự kiểm chứng trong 2 phút"),
+       ("web","Còn trang web tidymint.app?"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="vi-sao-can-quyen">Vì sao app dọn máy cần quyền đọc cả ổ</h2>
+<p>Để biết chỗ nào đang chiếm dung lượng, app dọn dẹp phải nhìn được các thư mục macOS giấu đi: bộ nhớ đệm, nhật ký, dữ liệu của Zalo, Chrome, Mail. macOS khoá các thư mục này, chỉ mở khi bạn cấp quyền <b>Truy cập toàn bộ ổ đĩa</b> (Full Disk Access) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>.</p>
+<p>Theo Apple, quyền này cho app <b>truy cập mọi tệp trên máy</b>, kể cả dữ liệu của Mail, Tin nhắn, Safari và bản sao lưu Time Machine. Nói cách khác: <b>chọn app dọn máy cũng là chọn ai được nhìn vào máy mình</b>. Vì vậy câu hỏi \"app này có gửi gì đi không\" rất đáng hỏi.</p>
+
+<h2 id="chay-tren-may">Tidymint làm việc thế nào: mọi thứ diễn ra trên máy bạn</h2>
+<p>Hình dung Tidymint như <b>người thợ dọn nhà làm việc ngay trong nhà bạn</b>: đi từng phòng, ghi lại thứ gì to, thứ gì cũ, đưa bạn tờ danh sách. Bạn đánh dấu thứ muốn bỏ, thợ mang ra Thùng rác. Thợ không chụp ảnh đồ đạc gửi về công ty, và về tay không.</p>
+<ol class="steps">
+<li><b>Quét:</b> Tidymint đọc <b>tên, kích thước, ngày</b> của các tệp trong những thư mục nó biết là hay đầy. Việc tính toán dùng chính bộ xử lý của máy bạn, không cần internet.</li>
+<li><b>Tìm file trùng:</b> app so nội dung từng file bằng một phép tính ra \"dấu vân tay\" của file, cũng ngay trên máy. Ảnh thu nhỏ do macOS tạo sẵn.</li>
+<li><b>Dọn:</b> thứ bạn chọn được chuyển vào <b>Thùng rác</b> của macOS. Không có gì bị gửi lên mạng, cũng không có gì bị xoá thẳng. Đổi ý thì bấm Hoàn tác.</li>
+</ol>
+<p>Tidymint <b>không có tài khoản</b>, <b>không quảng cáo</b>, <b>không gắn công cụ đo lường</b> (kiểu đếm bạn bấm nút nào, mở app bao lâu). Trừ lúc bạn tự gửi góp ý, không có máy chủ nào biết bạn là ai hay máy bạn có gì.</p>
+
+<h2 id="khi-nao-len-mang">Lúc nào Tidymint kết nối mạng</h2>
+<p>Chỉ có các trường hợp dưới đây, và bạn biết rõ từng cái:</p>
+<div class="tbl"><table>
+<tr><th>Khi nào</th><th>Tidymint làm gì</th><th>Gửi đi thông tin gì</th></tr>
+<tr><td>Kiểm tra bản mới</td><td>Tải một tệp chữ chỉ chứa số phiên bản mới nhất (ví dụ 0.3.6), mỗi ngày tối đa một lần</td><td>Không gửi thông tin máy hay tệp nào</td></tr>
+<tr><td>Bạn bấm Gửi trong mục Liên hệ</td><td>Gửi góp ý cho người làm app</td><td>Email và nội dung bạn tự gõ. Nếu bạn tick ô kèm thông tin máy: phiên bản app, phiên bản macOS, đời máy</td></tr>
+<tr><td>Bạn bấm một đường link</td><td>Mở trình duyệt tới trang web, GitHub, mạng xã hội</td><td>Như mọi lần bạn tự mở web</td></tr>
+</table></div>
+<p>Ngoài ba trường hợp trên, Tidymint không kết nối đi đâu. <b>Rút mạng, tắt Wi-Fi, quét và dọn vẫn chạy bình thường.</b></p>
+
+<h2 id="tu-kiem">Tự kiểm chứng trong 2 phút</h2>
+<p>Không cần tin lời, bạn tự kiểm được:</p>
+<ol class="steps">
+<li><b>Tắt Wi-Fi</b> rồi mở Tidymint, bấm Quét và dọn thử. Mọi thứ chạy như lúc có mạng.</li>
+<li>Mở <b>Giám sát hoạt động</b> (Activity Monitor), chọn thẻ <b>Mạng</b> (Network). Danh sách hiện từng app kèm lượng dữ liệu đã gửi đi (Sent Bytes). Dùng Tidymint một lúc rồi nhìn dòng Tidymint: con số gần như không đổi.</li>
+<li><b>Đọc mã nguồn</b>: toàn bộ mã của Tidymint công khai trên <a href=\"https://github.com/HaiTrung-Workspace/tidymint\">GitHub</a>, giấy phép MIT. Bạn không đọc code cũng không sao: ai rành đọc được, và có chuyện gì thì cộng đồng sẽ thấy.</li>
+<li><b>Thu hồi quyền bất cứ lúc nào</b>: vào Quyền riêng tư &amp; Bảo mật › Truy cập toàn bộ ổ đĩa, tắt Tidymint. App vẫn chạy, chỉ thấy ít thư mục hơn.</li>
+</ol>
+<p>Một lưu ý thật: Tidymint <b>chưa được Apple công chứng</b> (notarize), nên lần đầu mở phải bấm \"Vẫn mở\". Công chứng là Apple quét app tìm mã độc trước khi cho phép. Trong lúc chưa có, mã nguồn công khai là cách để bạn kiểm. Các bước mở app có ảnh ở <a href=\"{HOME}cai-dat/\">hướng dẫn cài đặt</a>.</p>
+
+<h2 id="web">Còn trang web tidymint.app thì sao?</h2>
+<p>Nói rõ cho minh bạch: <b>trang web</b> dùng Google Analytics để đếm lượt xem, và <b>chỉ khi bạn bấm Đồng ý</b> ở ô cookie. Bấm Từ chối thì không lưu cookie đo lường. Còn <b>app Tidymint</b> trên máy bạn thì không có công cụ đo lường nào.</p>
+<p>Bản crack của các app dọn máy trả phí là đường lây mã độc đánh cắp mật khẩu khá phổ biến. Đọc thêm ở bài <a href=\"{HOME}cleanmymac-mien-phi/\">CleanMyMac miễn phí: cách thay bản crack hợp pháp</a>.</p>
+""",
+  faq=[("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Hai chỗ đọc nội dung: tìm file trùng (so nội dung để biết hai file giống hệt nhau) và kiểm script trong thư mục dự án bạn tự khai (tìm xem script còn gọi tên file nào). Cả hai đều chạy trên máy, không gửi đi đâu."),
+       ("Có bắt buộc cấp quyền Truy cập toàn bộ ổ đĩa không?", "Không. Không cấp thì Tidymint vẫn chạy, chỉ thấy ít thư mục hơn nên tìm được ít dung lượng hơn. Bạn bật, tắt quyền này lúc nào cũng được trong Cài đặt hệ thống."),
+       ("Gỡ Tidymint thì còn lại gì?", "Chỉ có cài đặt và lịch sử dọn lưu trên chính máy bạn (trong thư mục Library của bạn). Không có dữ liệu nào nằm trên máy chủ, vì Tidymint không có máy chủ lưu dữ liệu người dùng."),
+       ("Vì sao miễn phí mà không bán dữ liệu?", "Tidymint là dự án mã nguồn mở, sống nhờ người dùng tự nguyện ủng hộ, không sống nhờ quảng cáo hay dữ liệu. Mã công khai nên nếu app gửi gì đi thì ai cũng thấy được.")],
+  sources=[("Apple: Thay đổi cài đặt Quyền riêng tư & Bảo mật trên máy Mac (Truy cập toàn bộ ổ đĩa)", "https://support.apple.com/vi-vn/guide/mac-help/mchl211c911f/mac"),
+           ("Apple: Xem hoạt động mạng trong Giám sát hoạt động", "https://support.apple.com/vi-vn/guide/activity-monitor/actmntr1006/mac"),
+           ("Mã nguồn Tidymint trên GitHub (giấy phép MIT)", "https://github.com/HaiTrung-Workspace/tidymint")],
+  related=[("Cài Tidymint trên Mac: từng bước có ảnh", "{HOME}cai-dat/"), ("CleanMyMac miễn phí? Cách thay bản crack hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="tidymint-privacy",
+))
+
+GUIDES.append(dict(
+  lang="en", slug="tidymint-privacy", topic="start", date="2026-10-30", read="6 min read",
+  title="Does Tidymint Send Your Data Anywhere? | Tidymint",
+  desc="A Mac cleaner can read your whole disk. Tidymint runs entirely on your Mac: no account, no data collected, and cleaning works offline. Here's how.",
+  crumb="Privacy",
+  h1="What Does Tidymint Do With Your Data? Short Answer: Nothing",
+  tldr="Tidymint scans and cleans <b>right on your Mac</b>, like a cleaner who works inside your home and leaves empty-handed. There is no account, no ads and no analytics, and <b>scanning and cleaning work with Wi-Fi off</b>. The app goes online in only two cases: <b>checking for a new version</b> (it reads a version number, at most once a day) and when <b>you choose to send feedback</b>. The code is public, so anyone can check.",
+  toc=[("why-access","Why a cleaner needs to read your whole disk"),("on-your-mac","How Tidymint works"),
+       ("when-online","When Tidymint goes online"),("check-yourself","Check it yourself in 2 minutes"),
+       ("website","What about the tidymint.app website?"),("faq","FAQ")],
+  body="""
+<h2 id="why-access">Why a cleaner needs to read your whole disk</h2>
+<p>To find what is taking up space, a cleaner has to look inside folders macOS keeps hidden: caches, logs, and data from Chrome, Slack or Mail. macOS locks these folders until you grant <b>Full Disk Access</b> in <b>System Settings › Privacy &amp; Security</b>.</p>
+<p>Apple describes this permission as letting an app <b>access all files on your computer</b>, including data from Mail, Messages and Safari, and Time Machine backups. In other words, <b>choosing a cleaner means choosing who gets to look inside your Mac</b>. So \"does this app send anything out?\" is exactly the right question to ask.</p>
+
+<h2 id="on-your-mac">How Tidymint works: everything happens on your Mac</h2>
+<p>Think of Tidymint as <b>a cleaner working inside your home</b>: it walks through each room, notes what is big or old, and hands you a list. You mark what to throw out, and it carries those things to the Trash. It doesn't photograph your belongings for head office, and it leaves empty-handed.</p>
+<ol class="steps">
+<li><b>Scan:</b> Tidymint reads the <b>name, size and date</b> of files in the folders that usually fill up. The work runs on your Mac's own processor, with no internet needed.</li>
+<li><b>Find duplicates:</b> the app compares file contents by computing a \"fingerprint\" for each file, also on your Mac. Thumbnails come from macOS itself.</li>
+<li><b>Clean:</b> whatever you select moves to the macOS <b>Trash</b>. Nothing is uploaded, and nothing is deleted outright. Changed your mind? Click Undo.</li>
+</ol>
+<p>Tidymint has <b>no account</b>, <b>no ads</b> and <b>no analytics</b> (nothing counts which buttons you click or how long the app is open). Unless you choose to send feedback, no server knows who you are or what is on your Mac.</p>
+
+<h2 id="when-online">When Tidymint goes online</h2>
+<p>Only in these cases, and you know about each one:</p>
+<div class="tbl"><table>
+<tr><th>When</th><th>What Tidymint does</th><th>What it sends</th></tr>
+<tr><td>Checking for updates</td><td>Downloads a text file that contains only the latest version number (for example 0.3.6), at most once a day</td><td>No information about your Mac or your files</td></tr>
+<tr><td>You click Send in Contact</td><td>Sends your feedback to the developer</td><td>The email and message you typed. If you tick the box: app version, macOS version and Mac model</td></tr>
+<tr><td>You click a link</td><td>Opens the website, GitHub or social pages in your browser</td><td>The same as opening any website yourself</td></tr>
+</table></div>
+<p>Beyond these, Tidymint doesn't connect anywhere. <b>Unplug, turn off Wi-Fi, and scanning and cleaning still work.</b></p>
+
+<h2 id="check-yourself">Check it yourself in 2 minutes</h2>
+<p>You don't have to take our word for it:</p>
+<ol class="steps">
+<li><b>Turn off Wi-Fi</b>, open Tidymint, then scan and clean something. It all works the same.</li>
+<li>Open <b>Activity Monitor</b> and choose the <b>Network</b> tab. It lists each app with the data it has sent (Sent Bytes). Use Tidymint for a while and look at its row: the number barely moves.</li>
+<li><b>Read the code</b>: all of Tidymint's source is public on <a href=\"https://github.com/HaiTrung-Workspace/tidymint\">GitHub</a> under the MIT license. You don't need to read code yourself: people who can, do, and anything odd would be visible.</li>
+<li><b>Revoke access any time</b>: go to Privacy &amp; Security › Full Disk Access and turn Tidymint off. The app still runs; it just sees fewer folders.</li>
+</ol>
+<p>One honest limit: Tidymint <b>is not notarized by Apple yet</b>, so the first launch needs \"Open Anyway\". Notarization means Apple scans an app for malware before it runs freely. Until then, the public source code is how you can check it. The steps, with screenshots, are in the <a href=\"{HOME}install/\">install guide</a>.</p>
+
+<h2 id="website">What about the tidymint.app website?</h2>
+<p>To be fully transparent: <b>the website</b> uses Google Analytics to count visits, <b>only if you click Accept</b> on the cookie banner. Click Decline and no analytics cookies are stored. <b>The Tidymint app</b> on your Mac has no analytics at all.</p>
+<p>Cracked copies of paid cleaners are a known way password-stealing malware spreads. More on that in <a href=\"{HOME}cleanmymac-alternative/\">Free CleanMyMac alternatives</a>.</p>
+""",
+  faq=[("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. It reads contents in two places: finding duplicates (to confirm two files are identical) and checking scripts in project folders you add yourself (to see which file names they still use). Both run on your Mac and nothing is sent anywhere."),
+       ("Do I have to grant Full Disk Access?", "No. Without it Tidymint still runs, it just sees fewer folders, so it finds less space. You can turn the permission on or off at any time in System Settings."),
+       ("What's left after I uninstall Tidymint?", "Only its settings and cleaning history, stored on your own Mac in your Library folder. Nothing sits on a server, because Tidymint has no server that stores user data."),
+       ("It's free. Is my data the product?", "No. Tidymint is open source and relies on voluntary sponsors, not ads or data. The code is public, so if the app sent anything out, anyone could see it.")],
+  sources=[("Apple: Change Privacy & Security settings on Mac (Full Disk Access)", "https://support.apple.com/guide/mac-help/mchl211c911f/mac"),
+           ("Apple: View network activity in Activity Monitor", "https://support.apple.com/guide/activity-monitor/actmntr1006/mac"),
+           ("Tidymint source code on GitHub (MIT license)", "https://github.com/HaiTrung-Workspace/tidymint")],
+  related=[("Install Tidymint on Mac, step by step", "{HOME}install/"), ("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/"), ("Tidymint home", "{HOME}")],
+  alt="quyen-rieng-tu-tidymint",
+))
