@@ -223,7 +223,7 @@ dict(
 <h2 id="anh-cu">Bỏ ảnh cũ, giữ ảnh mới</h2>
 <p>Trong <code>ZaloDownloads/picture</code> và <code>resource</code>, file xếp được theo ngày. Trong Finder chọn xem dạng <b>Danh sách</b>, sắp theo <b>Ngày sửa đổi</b>, chọn các file cũ hơn 6 tháng rồi kéo vào Thùng rác. Ảnh nào cần giữ thì lưu ra thư mục Ảnh trước.</p>
 <p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint miễn phí, mã nguồn mở, do một người Việt làm.</p>
-<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1085" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
 {CTA}
 
 <h2 id="zalo-tu-don">Zalo có tự dọn không?</h2>
@@ -1679,7 +1679,7 @@ dict(
 </ul>
 
 <h2 id="tidymint">Dọn CapCut bằng Tidymint</h2>
-<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1085" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
 <ul>
 <li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích) được chọn sẵn, ghi rõ dung lượng;</li>
