@@ -1052,7 +1052,7 @@ dict(
 <li><b>Tìm file lớn.</b> Trong mục Dung lượng, mở <b>Tài liệu</b> rồi sắp xếp theo kích thước. Video và file xuất dự án cũ thường đứng đầu.</li>
 <li><b>Xoá file trùng.</b> Ảnh và file tải về hay có hai ba bản dưới tên khác nhau.</li>
 <li><b>Gỡ app không dùng</b>, kèm bộ nhớ đệm và cài đặt của nó. Kéo app vào Thùng rác sẽ để sót lại những thứ này, xem bài <a href="{HOME}xoa-ung-dung-macbook/">xoá ứng dụng trên MacBook sạch hoàn toàn</a>.</li>
-<li><b>Dọn dữ liệu Zalo, CapCut.</b> Ảnh, video, file trong Zalo có thể lên vài chục GB. Xem bài <a href="{HOME}zalo-chiem-dung-luong-macbook/">Zalo chiếm bao nhiêu GB trên MacBook</a> để dọn mà không mất tin nhắn.</li>
+<li><b>Dọn dữ liệu Zalo, CapCut.</b> Ảnh, video, file trong Zalo có thể lên vài chục GB. Xem bài <a href="{HOME}zalo-chiem-dung-luong-macbook/">Zalo chiếm bao nhiêu GB</a> và <a href="{HOME}capcut-chiem-dung-luong-mac/">CapCut chiếm dung lượng Mac</a> để dọn mà không mất tin nhắn hay dự án.</li>
 <li><b>Xoá bản sao lưu iPhone, iPad cũ</b> trong mục Dung lượng › <b>Tệp iOS</b> (iOS Files).</li>
 <li><b>Chuyển thư viện lớn ra ổ ngoài.</b> Apple hỗ trợ chuyển thư viện Ảnh và dự án iMovie sang ổ khác.</li>
 </ol>
@@ -1606,5 +1606,72 @@ dict(
     ("Apple: View memory usage in Activity Monitor on Mac", "https://support.apple.com/guide/activity-monitor/view-memory-usage-actmntr1004/mac"),
   ],
   related=[("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
+),
+
+dict(
+  lang="vi", slug="capcut-chiem-dung-luong-mac", topic="apps", date="2026-10-29", read="6 phút đọc",
+  title="CapCut chiếm dung lượng Mac: dọn sao an toàn | Tidymint",
+  desc="CapCut trên Mac cất bộ nhớ đệm và dự án trong Movies/CapCut. Thư mục nào phình to, phần nào xoá được an toàn, phần nào là bản dựng của bạn không được đụng.",
+  crumb="CapCut chiếm dung lượng Mac",
+  h1="CapCut chiếm dung lượng Mac: dọn sao cho không mất dự án",
+  tldr="CapCut trên Mac cất mọi thứ trong <code>~/Movies/CapCut/User Data</code>. Phần phình nhanh nhất là <b>Cache</b>: ảnh thu nhỏ khung hình, sóng âm, dữ liệu nhận diện, file tạm. Phần này <b>xoá được</b>, CapCut tự tạo lại khi mở dự án. Thư mục <b>Projects</b> là các bản dựng của bạn, <b>không được xoá</b>. Cách an toàn nhất: dọn bằng Tidymint, hoặc thoát CapCut rồi chỉ chuyển đúng các thư mục tạm vào Thùng rác.",
+  toc=[("o-dau","CapCut trên Mac lưu dữ liệu ở đâu?"),("ben-trong","Bên trong có gì, phần nào xoá được?"),
+       ("don-tay","Dọn bộ nhớ đệm CapCut bằng tay"),("khong-xoa","Những thứ không được xoá"),("tidymint","Dọn CapCut bằng Tidymint"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="o-dau">CapCut trên Mac lưu dữ liệu ở đâu?</h2>
+<p>Khác với nhiều app, CapCut không cất dữ liệu trong thư mục Thư viện mà trong thư mục <b>Phim</b> (Movies) của bạn:</p>
+<pre>~/Movies/CapCut/User Data</pre>
+<p>Để mở: trong Finder bấm <b>Shift+Cmd+G</b>, dán đường dẫn trên rồi nhấn Return. Chúng tôi đã kiểm trên máy Mac thật với bản CapCut tải từ App Store (tháng 10/2026): chỉ sau vài phút dựng thử một video ngắn, thư mục <code>Cache</code> đã lên khoảng 500 MB. Người dựng video thường xuyên có thể thấy con số lớn hơn nhiều.</p>
+
+<h2 id="ben-trong">Bên trong có gì, phần nào xoá được?</h2>
+<div class="tbl"><table>
+<tr><th>Thư mục</th><th>Chứa gì</th><th>Xoá được không?</th></tr>
+<tr><td><code>Cache/frameThumbnail</code></td><td>Ảnh thu nhỏ khung hình trên dòng thời gian</td><td class="y">Được, CapCut tạo lại</td></tr>
+<tr><td><code>Cache/audioWave</code></td><td>Hình sóng âm của các đoạn nhạc, giọng nói</td><td class="y">Được, CapCut tạo lại</td></tr>
+<tr><td><code>Cache/recognize</code>, <code>AlgorithmCache</code></td><td>Dữ liệu nhận diện, phân tích video</td><td class="y">Được, CapCut tạo lại</td></tr>
+<tr><td><code>Cache/ttsTemp</code></td><td>File tạm của giọng đọc chữ thành tiếng</td><td class="y">Được</td></tr>
+<tr><td>Các thư mục khác trong <code>Cache</code></td><td>Hiệu ứng, mẫu, nhạc tải về, bản dựng sẵn để xem trước</td><td>Để yên nếu không chắc</td></tr>
+<tr><td><code>Projects</code></td><td><b>Các dự án bạn đang dựng</b></td><td class="n">Không</td></tr>
+</table></div>
+<p>Trong <code>Cache</code> có vài chục thư mục con. Một số chứa bản sao của đoạn video bạn kéo vào hoặc bản dựng sẵn để xem trước. Vì vậy chúng tôi chỉ khuyên xoá đúng các thư mục tạm đã nêu tên ở trên, không xoá cả <code>Cache</code>.</p>
+
+<h2 id="don-tay">Dọn bộ nhớ đệm CapCut bằng tay</h2>
+<ol class="steps">
+<li><b>Thoát hẳn CapCut</b> (Cmd+Q).</li>
+<li>Trong Finder bấm <b>Shift+Cmd+G</b>, mở <code>~/Movies/CapCut/User Data/Cache</code>.</li>
+<li>Chuyển các thư mục <code>frameThumbnail</code>, <code>audioWave</code>, <code>recognize</code>, <code>AlgorithmCache</code>, <code>ttsTemp</code> vào Thùng rác.</li>
+<li>Mở lại CapCut và một dự án để kiểm tra mọi thứ bình thường, rồi mới đổ Thùng rác.</li>
+</ol>
+<p>Lần mở dự án đầu tiên sau khi dọn có thể chậm hơn một chút, vì CapCut tạo lại ảnh thu nhỏ và sóng âm.</p>
+
+<h2 id="khong-xoa">Những thứ không được xoá</h2>
+<ul>
+<li><b>Thư mục <code>Projects</code></b>: chứa dòng thời gian, hiệu ứng, chỉnh sửa của từng dự án. Xoá là mất bản dựng.</li>
+<li><b>Video đã xuất</b>: CapCut lưu ở chỗ bạn chọn khi xuất (xem trong phần cài đặt xuất của CapCut). Đó là thành phẩm của bạn, không phải rác.</li>
+<li><b>Cả thư mục <code>User Data</code></b>: đừng xoá cả cụm. Chỉ chọn đúng phần tạm.</li>
+</ul>
+
+<h2 id="tidymint">Dọn CapCut bằng Tidymint</h2>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
+<ul>
+<li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích) được chọn sẵn, ghi rõ dung lượng;</li>
+<li>nhóm <b>Dự án</b> hiện ra để bạn thấy nó nặng bao nhiêu, nhưng <b>bị khoá</b>, Tidymint không bao giờ đụng vào;</li>
+<li>Tidymint không đụng tới các thư mục khác trong <code>Cache</code>, để tránh xoá nhầm bản sao video của bạn.</li>
+</ul>
+<p>Mọi thứ luôn vào Thùng rác trước, có thể hoàn tác.</p>
+{CTA}
+""",
+  faq=[
+    ("CapCut lưu file ở đâu trên Mac?", "Trong ~/Movies/CapCut/User Data. Thư mục Cache chứa bộ nhớ đệm, thư mục Projects chứa các dự án bạn đang dựng."),
+    ("Xoá Cache của CapCut có mất dự án không?", "Không, nếu bạn chỉ xoá các thư mục tạm như frameThumbnail, audioWave, recognize, AlgorithmCache, ttsTemp. Dự án nằm ở thư mục Projects, riêng biệt với Cache."),
+    ("Vì sao CapCut chiếm nhiều dung lượng vậy?", "Mỗi lần dựng, CapCut tạo ảnh thu nhỏ khung hình, sóng âm, dữ liệu phân tích và tải hiệu ứng, mẫu, nhạc về máy. Dựng càng nhiều, Cache càng lớn."),
+    ("Dọn xong CapCut có chậm không?", "Lần mở dự án đầu tiên sau khi dọn có thể chậm hơn một chút vì CapCut tạo lại ảnh thu nhỏ và sóng âm. Sau đó trở lại bình thường."),
+    ("Tidymint dọn CapCut có an toàn không?", "Tidymint chỉ chọn sẵn các thư mục tạm, khoá thư mục Dự án và chuyển mọi thứ vào Thùng rác, nên lỡ tay vẫn lấy lại được."),
+  ],
+  sources=[
+    ("Ultimate Systems Blog: thư mục và bộ nhớ đệm của CapCut trên Mac, PC", "https://blog.usro.net/2025/08/capcut-folders-cache-mac-and-pc-paths/"),
+  ],
+  related=[("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Adobe chiếm bao nhiêu GB trên Mac", "{HOME}adobe-chiem-dung-luong-mac/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/")],
 ),
 ]
