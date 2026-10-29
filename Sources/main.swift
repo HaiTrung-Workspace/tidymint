@@ -4582,7 +4582,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if a.contains("--demo") { Demo.load(sharedVM) }
         // `--watch-folder <dir>` watches a test folder instead of Downloads.
         if let j = a.firstIndex(of: "--watch-folder"), j + 1 < a.count { OrgVM.watchDir = URL(fileURLWithPath: a[j + 1]) }
-        if featureOrganize && sharedOrg.watchDownloads { sharedOrg.vm = sharedVM; sharedOrg.startWatch() }
+        OrgNotifier.shared.install()
+        if featureOrganize && sharedOrg.watchDownloads { sharedOrg.vm = sharedVM; sharedOrg.startWatch(catchUp: true) }
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
             sharedVM.page = pg
@@ -5340,21 +5341,23 @@ struct OrgDest: Codable, Equatable { var name: String? = nil; var path: String? 
 
 enum OrgGroup: String, CaseIterable, Codable {
     case screens, receipts, cv, images, video, audio, docs, sheets, slides, archives, installers, code, other
-    var label: String {
+    var label: String { let n = names; return (n.0, n.1) }
+    /// English and Vietnamese names, to find a group folder made in the other language.
+    var names: (String, String) {
         switch self {
-        case .screens: return t("Screenshots", "Ảnh màn hình")
-        case .receipts: return t("Receipts and invoices", "Hoá đơn và biên lai")
-        case .cv: return t("CVs", "CV")
-        case .images: return t("Images", "Ảnh")
-        case .video: return t("Videos", "Video")
-        case .audio: return t("Audio", "Âm thanh")
-        case .docs: return t("Documents", "Tài liệu")
-        case .sheets: return t("Spreadsheets", "Bảng tính")
-        case .slides: return t("Presentations", "Trình chiếu")
-        case .archives: return t("Archives", "File nén")
-        case .installers: return t("Installers", "Bộ cài app")
-        case .code: return t("Code", "Code")
-        case .other: return t("Other", "Khác")
+        case .screens: return ("Screenshots", "Ảnh màn hình")
+        case .receipts: return ("Receipts and invoices", "Hoá đơn và biên lai")
+        case .cv: return ("CVs", "CV")
+        case .images: return ("Images", "Ảnh")
+        case .video: return ("Videos", "Video")
+        case .audio: return ("Audio", "Âm thanh")
+        case .docs: return ("Documents", "Tài liệu")
+        case .sheets: return ("Spreadsheets", "Bảng tính")
+        case .slides: return ("Presentations", "Trình chiếu")
+        case .archives: return ("Archives", "File nén")
+        case .installers: return ("Installers", "Bộ cài app")
+        case .code: return ("Code", "Code")
+        case .other: return ("Other", "Khác")
         }
     }
     var icon: String {
@@ -5453,7 +5456,7 @@ struct OrgFile: Identifiable {
 struct OrgNote: Identifiable { enum Kind { case skipped, kept, numbered, trashed }; let id = UUID(); let kind: Kind; let name: String; let detail: String }
 
 struct OrgMove: Codable { let from: String; let to: String; let addedTags: [String]; var trashed: Bool? = nil }
-struct OrgSession: Codable { let folder: String; var date: Date; var moves: [OrgMove]; var madeDirs: [String]; var auto: Bool? = nil }
+struct OrgSession: Codable { let folder: String; var date: Date; var moves: [OrgMove]; var madeDirs: [String]; var auto: Bool? = nil; var id: String? = nil }
 
 enum OrgEngine {
     static let fm = FileManager.default
@@ -5594,6 +5597,14 @@ enum OrgEngine {
         return x.isEqual(y)
     }
     /// Move or rename. A change of case only (IMG.JPG to IMG.jpg) goes through a temporary name, because the disk sees one file.
+    /// Another process has this file open (a torrent client still writing, an installer reading). Checked before moving a new download.
+    static func isOpen(_ u: URL) -> Bool {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof"); p.arguments = ["-t", "--", u.path]
+        p.standardOutput = FileHandle.nullDevice; p.standardError = FileHandle.nullDevice
+        do { try p.run() } catch { return false }
+        p.waitUntilExit()
+        return p.terminationStatus == 0
+    }
     static func move(_ from: URL, _ to: URL) throws {
         if from.path != to.path, from.path.lowercased() == to.path.lowercased() || sameFile(from, to) {
             let tmp = to.deletingLastPathComponent().appendingPathComponent(".tidymint-\(UUID().uuidString)")
@@ -6009,7 +6020,16 @@ enum OrgNotes {
     /// A folder the person picked, or a folder named after the group (or their name for it) inside the chosen folder.
     static func destURL(_ g: OrgGroup, _ folder: URL, _ d: [String: OrgDest]) -> URL {
         if let p = d[g.rawValue]?.path { return URL(fileURLWithPath: p, isDirectory: true) }
-        return folder.appendingPathComponent(d[g.rawValue]?.name ?? g.label, isDirectory: true)
+        if let n = d[g.rawValue]?.name { return folder.appendingPathComponent(n, isDirectory: true) }
+        // A folder made earlier keeps being used when the app language changes ("Images" stays, no second "Ảnh").
+        for n in [g.label, g.names.0, g.names.1] where isDir(folder.appendingPathComponent(n)) { return folder.appendingPathComponent(n, isDirectory: true) }
+        return folder.appendingPathComponent(g.label, isDirectory: true)
+    }
+    nonisolated static func isDir(_ u: URL) -> Bool { var d: ObjCBool = false; return FileManager.default.fileExists(atPath: u.path, isDirectory: &d) && d.boolValue }
+    /// Keep Downloads tidy only uses folders inside the watched folder: a group set to go elsewhere uses its default folder there.
+    nonisolated static func autoDests(for dir: URL) -> [String: OrgDest] {
+        let base = dir.standardizedFileURL.path + "/"
+        return loadDests(for: dir).filter { $0.value.path.map { URL(fileURLWithPath: $0).standardizedFileURL.path.hasPrefix(base) } ?? true }
     }
     func destURL(_ g: OrgGroup) -> URL { Self.destURL(g, folder, dests) }
     func isInside(_ u: URL) -> Bool { u.standardizedFileURL.path.hasPrefix(folder.standardizedFileURL.path + "/") }
@@ -6301,16 +6321,46 @@ enum OrgNotes {
         guard let d = FileManager.default.contents(atPath: p) else { return nil }
         return try? JSONDecoder().decode(OrgSession.self, from: d)
     }
-    /// The newer of the last manual organize and today's automatic Downloads session.
+    /// The newest thing to undo: the last manual organize or the newest automatic batch.
     static func latest() -> (String, OrgSession)? {
-        [sessionPath, autoPath].compactMap { p in load(p).map { (p, $0) } }.max { $0.1.date < $1.1.date }
+        let manual = load(sessionPath).map { (sessionPath, $0) }
+        let auto = history().first.map { ("auto:" + ($0.id ?? ""), $0) }
+        return [manual, auto].compactMap { $0 }.max { $0.1.date < $1.1.date }
     }
+    static let historyPath = Stats.dir + "/organize-auto-history.json"
+    /// Automatic batches from the last 7 days, newest first. Each one can be undone on its own.
+    static func history() -> [OrgSession] {
+        var h = FileManager.default.contents(atPath: historyPath).flatMap { try? JSONDecoder().decode([OrgSession].self, from: $0) } ?? []
+        // Older builds kept one automatic session per day in a single file.
+        if var old = load(autoPath) {
+            old.id = old.id ?? UUID().uuidString; h.append(old); h.sort { $0.date > $1.date }
+            try? FileManager.default.removeItem(atPath: autoPath); saveHistory(h)
+        }
+        let cut = Date().addingTimeInterval(-7 * 86400)
+        return h.filter { $0.date > cut }
+    }
+    static func saveHistory(_ h: [OrgSession]) {
+        let cut = Date().addingTimeInterval(-7 * 86400)
+        let keep = Array(h.filter { $0.date > cut }.sorted { $0.date > $1.date }.prefix(300))
+        try? FileManager.default.createDirectory(atPath: Stats.dir, withIntermediateDirectories: true)
+        if let d = try? JSONEncoder().encode(keep) { try? d.write(to: URL(fileURLWithPath: historyPath)) }
+    }
+    /// Undo one automatic batch (from the list or the notification).
+    func undoBatch(_ id: String) {
+        guard let s = Self.history().first(where: { $0.id == id }) else { return }
+        revert(s, key: "auto:" + id)
+    }
+    @Published var historyOpen = false
+    @Published var historyTick = 0
     static func lastSession() -> OrgSession? { latest()?.1 }
 
     /// Put every file back where it was (also copies sent to the Trash), remove the tags this session added,
     /// remove folders it created if now empty.
     func undo() {
         guard let (path, s) = OrgVM.latest() else { return }
+        revert(s, key: path)
+    }
+    func revert(_ s: OrgSession, key path: String) {
         let fm = FileManager.default
         var back = 0, fail = 0, notes = OrgNotes.load()
         for m in s.moves.reversed() {
@@ -6328,7 +6378,8 @@ enum OrgNotes {
             try? fm.removeItem(atPath: d + "/.DS_Store"); try? fm.removeItem(atPath: d)
         }
         OrgNotes.save(notes)
-        try? fm.removeItem(atPath: path)
+        if path.hasPrefix("auto:") { Self.saveHistory(Self.history().filter { $0.id != s.id }) } else { try? fm.removeItem(atPath: path) }
+        historyTick += 1
         report = []
         canUndo = OrgVM.lastSession() != nil
         result = t("Put back \(back) files.", "Đã đưa \(back) file về chỗ cũ.") + (fail > 0 ? t(" \(fail) could not be moved back.", " \(fail) file không đưa về được.") : "")
@@ -6346,36 +6397,76 @@ enum OrgNotes {
     private var watchSeen = Set<String>()
     private var watchSize: [String: Int64] = [:]
     private var watchBusy = false
+    static let lastRunKey = "org-watch-last"
 
-    /// Watch Downloads while Tidymint runs (window or menu bar). Files already there when watching starts are left alone;
-    /// a new file is moved into its type folder once it has stopped changing (about a minute after it lands).
-    func startWatch() {
+    /// Files Tidymint sorted, by file number (it survives renames and moves): one the person brings back to Downloads is left alone.
+    static let movedPath = Stats.dir + "/organize-auto-moved.json"
+    private var movedIDs: [String: Date] = OrgVM.loadMoved()
+    nonisolated static func loadMoved() -> [String: Date] {
+        let m = FileManager.default.contents(atPath: movedPath).flatMap { try? JSONDecoder().decode([String: Date].self, from: $0) } ?? [:]
+        let cut = Date().addingTimeInterval(-90 * 86400)
+        return m.filter { $0.value > cut }
+    }
+    func saveMoved() { if let d = try? JSONEncoder().encode(movedIDs) { try? d.write(to: URL(fileURLWithPath: Self.movedPath)) } }
+    nonisolated static func fileNumber(_ u: URL) -> String? {
+        ((try? FileManager.default.attributesOfItem(atPath: u.path))?[.systemFileNumber] as? NSNumber).map { $0.stringValue }
+    }
+
+    /// Never touched by Keep Downloads tidy: ".torrent" is an extension, anything else is part of the name. Comma separated.
+    @Published var exclude = UserDefaults.standard.string(forKey: "org-exclude") ?? "" {
+        didSet { UserDefaults.standard.set(exclude, forKey: "org-exclude") }
+    }
+    nonisolated static func excluded(_ u: URL, _ pats: String) -> Bool {
+        let n = u.lastPathComponent.lowercased(), e = u.pathExtension.lowercased()
+        for raw in pats.split(whereSeparator: { $0 == "," || $0 == ";" || $0 == "\n" }) {
+            let p = raw.trimmingCharacters(in: .whitespaces).lowercased()
+            if p.isEmpty { continue }
+            if p.hasPrefix("."), !p.dropFirst().contains(".") { if e == String(p.dropFirst()) { return true } }
+            else if n.contains(p) { return true }
+        }
+        return false
+    }
+
+    /// Watch Downloads while Tidymint runs (window or menu bar). Turning the switch on leaves files already there alone;
+    /// when the app starts (catchUp), files that landed while it was closed are sorted too.
+    /// A new file is moved once it has stopped changing for 2 minutes and no other app has it open.
+    func startWatch(catchUp: Bool = false) {
         stopWatch()
-        watchSeen = Set(OrgEngine.files(in: Self.watchDir).map(\.path))
+        let since = catchUp ? (UserDefaults.standard.object(forKey: Self.lastRunKey) as? Date)?.addingTimeInterval(-300) : nil
+        watchSeen = Set(OrgEngine.files(in: Self.watchDir).filter { u in
+            guard let s = since, let added = (try? u.resourceValues(forKeys: [.addedToDirectoryDateKey]))?.addedToDirectoryDate else { return true }
+            return added <= s
+        }.map(\.path))
+        UserDefaults.standard.set(Date(), forKey: Self.lastRunKey)
         watchTimer = Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { _ in Task { @MainActor in sharedOrg.watchTick() } }
     }
     func stopWatch() { watchTimer?.invalidate(); watchTimer = nil; watchSize = [:] }
 
     func watchTick() {
+        UserDefaults.standard.set(Date(), forKey: Self.lastRunKey)
         // Not while the person is planning that same folder by hand.
         let busyHere = (phase == .scanning || phase == .review) && folder.standardizedFileURL.path == Self.watchDir.standardizedFileURL.path
         guard !watchBusy, !busyHere else { return }
         var ready: [URL] = []
-        let now = Date()
+        let now = Date(), pats = exclude
         for u in OrgEngine.files(in: Self.watchDir) where !watchSeen.contains(u.path) {
             if Self.partialExt.contains(u.pathExtension.lowercased()) { continue }
+            // Brought back by the person after Tidymint sorted it, or on the do-not-touch list: leave it where it is.
+            if let id = Self.fileNumber(u), movedIDs[id] != nil { watchSeen.insert(u.path); continue }
+            if Self.excluded(u, pats) { watchSeen.insert(u.path); continue }
             let v = try? u.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
             let size = Int64(v?.fileSize ?? -1)
-            // Same size as last check and untouched for 30 seconds: the download has finished.
-            if watchSize[u.path] == size, let m = v?.contentModificationDate, now.timeIntervalSince(m) > 30 { ready.append(u) }
+            // Same size as last check and untouched for 2 minutes: the download has finished.
+            if watchSize[u.path] == size, let m = v?.contentModificationDate, now.timeIntervalSince(m) > 120 { ready.append(u) }
             else { watchSize[u.path] = size }
         }
         guard !ready.isEmpty else { return }
-        for u in ready { watchSeen.insert(u.path); watchSize.removeValue(forKey: u.path) }
         watchBusy = true
         let deep = readContent, r = rule, all = renameAll, dd = dedupe
         Task.detached {
-            var list: [OrgFile] = ready.map { var o = OrgEngine.quick($0); if deep { OrgEngine.deep(&o) }; return o }
+            // A file still open in another app waits for the next check.
+            let free = ready.filter { !OrgEngine.isOpen($0) }
+            var list: [OrgFile] = free.map { var o = OrgEngine.quick($0); if deep { OrgEngine.deep(&o) }; return o }
             OrgEngine.linkPairs(&list)
             let done = list
             await MainActor.run { sharedOrg.autoApply(done, rule: r, renameAll: all, dedupe: dd) }
@@ -6384,8 +6475,9 @@ enum OrgNotes {
 
     func autoApply(_ input: [OrgFile], rule r: NameRule, renameAll all: Bool, dedupe dd: Bool) {
         defer { watchBusy = false }
+        for f in input { watchSeen.insert(f.url.path); watchSize.removeValue(forKey: f.url.path) }
         var list = input
-        let dir = Self.watchDir, dd2 = Self.loadDests(for: dir)
+        let dir = Self.watchDir, dd2 = Self.autoDests(for: dir)
         let lead = Dictionary(uniqueKeysWithValues: list.filter { $0.pairOf == nil }.map { ($0.id, $0) })
         for i in list.indices { if let l = list[i].pairOf.flatMap({ lead[$0] }) { list[i].group = l.group } }
         // Names follow the current rule: only names that say nothing, unless "rename all" is on. Numbers continue the folder's count.
@@ -6399,14 +6491,58 @@ enum OrgNotes {
         }
         let o = Self.execute(list, Ctx(folder: dir, moving: true, dests: dd2), dedupe: dd)
         guard !o.moves.isEmpty else { return }
-        // One session per day: a single Undo puts back everything moved automatically today.
-        var s = OrgVM.load(Self.autoPath)
-        if var x = s, Calendar.current.isDateInToday(x.date) { x.moves += o.moves; x.madeDirs += o.made; x.date = Date(); s = x }
-        else { s = OrgSession(folder: dir.path, date: Date(), moves: o.moves, madeDirs: o.made, auto: true) }
-        if let d = try? JSONEncoder().encode(s) { try? d.write(to: URL(fileURLWithPath: Self.autoPath)) }
-        canUndo = true
+        // Each batch is kept for 7 days and can be undone on its own.
+        let s = OrgSession(folder: dir.path, date: Date(), moves: o.moves, madeDirs: o.made, auto: true, id: UUID().uuidString)
+        Self.saveHistory([s] + Self.history())
+        for m in o.moves where m.trashed != true { if let n = Self.fileNumber(URL(fileURLWithPath: m.to)) { movedIDs[n] = Date() } }
+        saveMoved()
+        canUndo = true; historyTick += 1
         vm?.log(t("Kept \(dir.lastPathComponent) tidy: moved \(o.moved) new files", "Tự xếp \(dir.lastPathComponent): chuyển \(o.moved) file mới")
                 + (o.trashed > 0 ? t(", \(o.trashed) identical copies to the Trash", ", \(o.trashed) bản trùng vào Thùng rác") : ""))
+        notifyAuto(s, moved: o.moved, trashed: o.trashed)
+    }
+
+    /// "Sorted 3 new downloads · Screenshots: 2 · Documents: 1", with Show in Finder and Undo.
+    func notifyAuto(_ s: OrgSession, moved: Int, trashed: Int) {
+        let kept = s.moves.filter { $0.trashed != true }
+        let by = Dictionary(grouping: kept) { URL(fileURLWithPath: $0.to).deletingLastPathComponent().lastPathComponent }
+        let c = UNMutableNotificationContent()
+        c.title = t("Sorted \(moved) new downloads", "Đã xếp \(moved) file vừa tải về")
+        c.body = by.keys.sorted().map { "\($0): \(by[$0]!.count)" }.joined(separator: " · ")
+            + (trashed > 0 ? t(" · \(trashed) identical copies to the Trash", " · \(trashed) bản trùng vào Thùng rác") : "")
+        c.categoryIdentifier = "org-auto"
+        let dirs = Set(kept.map { URL(fileURLWithPath: $0.to).deletingLastPathComponent().path })
+        let reveal = kept.count == 1 ? kept[0].to : (dirs.count == 1 ? dirs.first! : s.folder)
+        c.userInfo = ["batch": s.id ?? "", "reveal": reveal]
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: s.id ?? UUID().uuidString, content: c, trigger: nil))
+    }
+}
+
+/// Notifications: shown while Tidymint is in front too; Show in Finder and Undo on a Keep Downloads tidy batch.
+final class OrgNotifier: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = OrgNotifier()
+    func install() {
+        let open = UNNotificationAction(identifier: "open", title: t("Show in Finder", "Mở thư mục"), options: [.foreground])
+        let undo = UNNotificationAction(identifier: "undo", title: t("Undo", "Hoàn tác"), options: [])
+        let c = UNUserNotificationCenter.current()
+        c.setNotificationCategories([UNNotificationCategory(identifier: "org-auto", actions: [open, undo], intentIdentifiers: [], options: [])])
+        c.delegate = self
+    }
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                withCompletionHandler done: @escaping (UNNotificationPresentationOptions) -> Void) { done([.banner, .sound]) }
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                withCompletionHandler done: @escaping () -> Void) {
+        let info = response.notification.request.content.userInfo
+        let batch = info["batch"] as? String ?? "", reveal = info["reveal"] as? String ?? "", act = response.actionIdentifier
+        let isAuto = response.notification.request.content.categoryIdentifier == "org-auto"
+        Task { @MainActor in
+            if act == "undo" { sharedOrg.undoBatch(batch) }
+            else if isAuto && !reveal.isEmpty {
+                let u = URL(fileURLWithPath: reveal)
+                if OrgVM.isDir(u) { NSWorkspace.shared.open(u) } else if FileManager.default.fileExists(atPath: reveal) { NSWorkspace.shared.activateFileViewerSelecting([u]) }
+            }
+        }
+        done()
     }
 }
 
@@ -6466,8 +6602,17 @@ struct OrgStart: View {
                              sub: t("When a new name is taken by a file with exactly the same content, the extra copy goes to the Trash instead of getting \" 2\". Undo brings it back.",
                                     "Khi tên mới trùng một file có nội dung giống hệt, bản thừa vào Thùng rác thay vì thêm \" 2\". Hoàn tác sẽ lấy lại."), on: $org.dedupe)
                 OrgSwitchRow(title: t("Keep Downloads tidy", "Tự xếp thư mục Tải về"),
-                             sub: t("New downloads go into their type folder about a minute after they land, named by your rule. Works while Tidymint is open, even only in the menu bar. Files already there are left alone.",
-                                    "File mới tải về được chuyển vào thư mục theo loại sau khoảng 1 phút, đặt tên theo quy tắc của bạn. Chạy khi Tidymint đang mở, kể cả chỉ còn ở thanh menu. File có sẵn không bị động tới."), on: $org.watchDownloads)
+                             sub: t("New downloads go into their type folder inside Downloads about 2 minutes after they finish, named by your rule. A file still open in another app waits, and a file you drag back to Downloads stays there. Works while Tidymint is open, even only in the menu bar; downloads that came while it was closed are sorted when it opens. Files already there when you turn this on are left alone.",
+                                    "File mới tải về được chuyển vào thư mục theo loại ngay trong Tải về, khoảng 2 phút sau khi tải xong, đặt tên theo quy tắc của bạn. File đang mở trong app khác sẽ chờ; file bạn kéo ra lại Tải về được để yên. Chạy khi Tidymint đang mở, kể cả chỉ ở thanh menu; file tải lúc app tắt được xếp khi mở lại. File có sẵn lúc bật không bị động tới."), on: $org.watchDownloads)
+                if org.watchDownloads {
+                    HStack(spacing: 8) {
+                        Text(t("Never touch:", "Không động tới:")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                        TextField(t(".torrent, invoice", ".torrent, hoá đơn"), text: $org.exclude).textFieldStyle(.roundedBorder).font(.system(size: fs(12)))
+                            .help(t("Comma separated. \".mkv\" skips that extension, any other word skips files whose name contains it.",
+                                    "Cách nhau bằng dấu phẩy. \".mkv\" bỏ qua đuôi đó, chữ khác thì bỏ qua file có tên chứa chữ đó."))
+                    }.padding(.horizontal, 14).padding(.bottom, 4)
+                }
+                OrgHistory(org: org)
             }.frame(width: 520)
             BigScanButton(label: t("Plan", "Lập kế hoạch")) { org.plan() }
             if org.canUndo { TextLink(t("Undo the last organize", "Hoàn tác lần sắp xếp gần nhất"), size: fs(12)) { org.undo() } }
@@ -6538,8 +6683,9 @@ struct OrgPlan: View {
                 Spacer()
                 if org.moveIntoFolders && !org.outsideGroups.isEmpty {
                     let n = org.outsideGroups.count
-                    Text(t("\(n) group(s) go outside \(org.folder.lastPathComponent). Undo puts everything back.",
-                           "Có \(n) nhóm chuyển ra ngoài \(org.folder.lastPathComponent). Hoàn tác trả lại tất cả."))
+                    let auto = org.watchDownloads && org.folder.standardizedFileURL.path == OrgVM.watchDir.standardizedFileURL.path
+                    Text(t("\(n) group(s) go outside \(org.folder.lastPathComponent). Undo puts everything back.", "Có \(n) nhóm chuyển ra ngoài \(org.folder.lastPathComponent). Hoàn tác trả lại tất cả.")
+                         + (auto ? t(" New downloads still stay inside Downloads.", " File mới tải về vẫn xếp trong Tải về.") : ""))
                         .foregroundColor(Theme.sub).font(.system(size: fs(12))).lineLimit(2).padding(.trailing, 6)
                 }
                 GhostButton(title: t("Cancel", "Huỷ")) { org.phase = .idle; org.files = [] }
@@ -6997,6 +7143,36 @@ struct OrgRuleEditor: View {
 
 /// A settings-style row: title and explanation on the left, the switch pinned to the right edge,
 /// so every switch lines up with the others and with the button in the folder card above.
+/// Keep Downloads tidy batches from the last 7 days, each with its own Undo.
+struct OrgHistory: View {
+    @ObservedObject var org: OrgVM
+    var body: some View {
+        let _ = org.historyTick
+        let h = OrgVM.history()
+        if !h.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                TextLink(org.historyOpen ? t("Hide automatic batches", "Ẩn các đợt tự xếp") : t("Automatic batches, last 7 days (\(h.count))", "Các đợt tự xếp 7 ngày qua (\(h.count))"), size: fs(12)) {
+                    org.historyOpen.toggle()
+                }
+                if org.historyOpen {
+                    let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
+                    ForEach(h.prefix(30), id: \.date) { b in
+                        let kept = b.moves.filter { $0.trashed != true }
+                        let dirs = Array(Set(kept.map { URL(fileURLWithPath: $0.to).deletingLastPathComponent().lastPathComponent })).sorted()
+                        HStack(spacing: 8) {
+                            Text(df.string(from: b.date)).foregroundColor(Theme.sub).monospacedDigit()
+                            Text(t("\(kept.count) files", "\(kept.count) file") + (dirs.isEmpty ? "" : " · " + dirs.joined(separator: ", ")))
+                                .foregroundColor(Theme.text).lineLimit(1).truncationMode(.tail)
+                            Spacer(minLength: 8)
+                            TextLink(t("Undo", "Hoàn tác"), size: fs(12)) { if let id = b.id { org.undoBatch(id) } }
+                        }.font(.system(size: fs(12)))
+                    }
+                }
+            }.padding(.horizontal, 14).padding(.vertical, 6).frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
 struct OrgSwitchRow: View {
     let title: String; let sub: String
     @Binding var on: Bool
