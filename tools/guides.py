@@ -39,7 +39,12 @@ ART_CSS = """
 .src{font-size:14px}.src li{font-size:14px;color:var(--sub)}
 .rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
 .rel a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--text)}
-@media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}.toc a:hover{color:var(--text)}}
+@media (hover:hover){.rel a:hover{border-color:#2fd39f88;text-decoration:none}
+.rel.gcards{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.gcards a{display:flex;flex-direction:column;gap:8px;padding:18px}
+.gcards .gt{font-size:17px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.05em}
+.gcards .gd{color:var(--sub);font-size:14.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.5em}
+.gcards .gm{margin-top:auto;padding-top:4px;color:var(--leaf);font-weight:600;font-size:14.5px}
+.gcards a:hover .gm .arr{transform:translateX(3px)}.gcards .gm .arr{display:inline-block;transition:transform .15s}.toc a:hover{color:var(--text)}}
 /* Images: one standard for every guide (style guide §5). Nothing wider than the text column. */
 .art img{display:block;max-width:100%;height:auto;margin:18px auto 6px;border-radius:12px;border:1px solid var(--line)}
 .art figure{margin:28px 0}.art figure img{margin:0 auto}
@@ -248,9 +253,10 @@ def hubpage(k):
     for tid, tvi, ten in TOPICS:
         grp = sorted([g for g in items if g.get("topic", "disk") == tid], key=lambda g: g["date"], reverse=True)
         if not grp: continue
-        cards = "".join('<a href="../%s/" data-t="%s"><b>%s</b><br><span class="small">%s</span></a>'
-                        % (g["slug"], html.escape(g["h1"] + " " + g["desc"], quote=True), g["h1"], g["desc"]) for g in grp)
-        body += '<div class="gsec"><h2>%s</h2><div class="rel">%s</div></div>' % (tvi if k == "vi" else ten, cards)
+        more = "Xem thêm" if k == "vi" else "Read more"
+        cards = "".join('<a href="../%s/" data-t="%s"><b class="gt">%s</b><span class="gd">%s</span><span class="gm">%s <span class="arr">→</span></span></a>'
+                        % (g["slug"], html.escape(g["h1"] + " " + g["desc"], quote=True), g["h1"], g["desc"], more) for g in grp)
+        body += '<div class="gsec"><h2>%s</h2><div class="rel gcards">%s</div></div>' % (tvi if k == "vi" else ten, cards)
     body += SEARCH_JS
     h.update(lang=k, date=max(g["date"] for g in C.GUIDES), hub=True, read="", tldr="", toc=[], faq=[], sources=[],
              body=body, alt=("guides" if k == "vi" else "huong-dan"))
