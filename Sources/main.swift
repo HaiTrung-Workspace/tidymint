@@ -4085,7 +4085,7 @@ struct AppsView: View {
                     Button(t("Last opened", "Lâu không mở")) { vm.appsSort = 2 }
                 } label: {
                     Text(t("Sort: ", "Xếp: ") + [t("Size", "Dung lượng"), t("Name", "Tên"), t("Last opened", "Lâu không mở")][vm.appsSort]).font(.system(size: fs(12)))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 18).padding(.vertical, 10)
             ScrollView {
                 LazyVStack(spacing: 2) {
