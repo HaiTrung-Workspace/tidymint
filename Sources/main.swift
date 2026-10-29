@@ -6348,7 +6348,10 @@ enum OrgNotes {
     /// Undo one automatic batch (from the list or the notification).
     func undoBatch(_ id: String) {
         guard let s = Self.history().first(where: { $0.id == id }) else { return }
+        // From a notification while a plan is open: undo, but keep the plan on screen.
+        let keep = phase == .review || phase == .scanning ? phase : nil, msg = result
         revert(s, key: "auto:" + id)
+        if let keep { phase = keep; result = msg }
     }
     @Published var historyOpen = false
     @Published var historyTick = 0
