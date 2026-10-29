@@ -7033,7 +7033,12 @@ struct OrgNameBar: View {
             Menu {
                 ForEach(NamePreset.allCases, id: \.self) { p in Button(p.label) { org.preset = p } }
             } label: { Text(org.preset.label).font(.system(size: fs(12), weight: .semibold)) }.menuStyle(.borderlessButton).fixedSize()
-            Button { org.showRule.toggle() } label: { Image(systemName: "slider.horizontal.3") }.buttonStyle(.plain).foregroundColor(Theme.text)
+            // The whole pill takes the click (a bare icon only reacts on its thin strokes), and a click always opens the editor.
+            Button { org.showRule = true } label: {
+                Label(t("Customize", "Tuỳ chỉnh"), systemImage: "slider.horizontal.3").font(.system(size: fs(12)))
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .overlay(Capsule().stroke(Theme.sub.opacity(0.5), lineWidth: 1)).contentShape(Capsule())
+            }.buttonStyle(.plain).foregroundColor(Theme.text).onHover { $0 ? NSCursor.pointingHand.push() : NSCursor.pop() }
                 .help(t("Edit the rule", "Sửa quy tắc"))
                 .popover(isPresented: $org.showRule, arrowEdge: .bottom) { OrgRuleEditor(org: org).frame(width: 380).padding(16) }
             Text(t("e.g. ", "ví dụ: ") + org.example).foregroundColor(Theme.sub).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
