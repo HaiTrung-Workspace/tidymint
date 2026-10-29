@@ -5341,7 +5341,7 @@ struct OrgDest: Codable, Equatable { var name: String? = nil; var path: String? 
 
 enum OrgGroup: String, CaseIterable, Codable {
     case screens, receipts, cv, images, video, audio, docs, sheets, slides, archives, installers, code, other
-    var label: String { let n = names; return (n.0, n.1) }
+    var label: String { let n = names; return t(n.0, n.1) }
     /// English and Vietnamese names, to find a group folder made in the other language.
     var names: (String, String) {
         switch self {
@@ -6400,7 +6400,7 @@ enum OrgNotes {
     static let lastRunKey = "org-watch-last"
 
     /// Files Tidymint sorted, by file number (it survives renames and moves): one the person brings back to Downloads is left alone.
-    static let movedPath = Stats.dir + "/organize-auto-moved.json"
+    nonisolated static let movedPath = Stats.dir + "/organize-auto-moved.json"
     private var movedIDs: [String: Date] = OrgVM.loadMoved()
     nonisolated static func loadMoved() -> [String: Date] {
         let m = FileManager.default.contents(atPath: movedPath).flatMap { try? JSONDecoder().decode([String: Date].self, from: $0) } ?? [:]
