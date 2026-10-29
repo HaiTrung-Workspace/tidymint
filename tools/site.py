@@ -134,6 +134,20 @@ HOME_CSS = """
 .band{position:relative;overflow:hidden;text-align:center;padding:56px 28px;border-radius:24px;background:radial-gradient(700px 300px at 50% 0%,#2fd39f33,transparent),linear-gradient(160deg,#0f3d30,#08201a);border:1px solid #2fd39f40}
 .band img{width:72px;height:72px;margin-bottom:14px}
 .band h2{font-size:clamp(28px,3.8vw,44px)}.band p{color:var(--sub);max-width:560px;margin:0 auto 26px}
+.endcard{display:grid;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);grid-template-rows:repeat(4,auto);column-gap:56px;text-align:left;padding:48px 56px}
+.endcard .col{display:grid;grid-row:1/5;grid-template-rows:subgrid;align-items:start}
+.endcard .sep{grid-row:1/5;background:#2fd39f33}
+.endcard .ttl{display:flex;align-items:center;align-self:center;gap:14px;margin:0 0 12px;min-height:48px}
+.endcard .ttl img{width:48px;height:48px;margin:0}
+.endcard h2{font-size:clamp(26px,3vw,34px);line-height:1.15;margin:0}
+.endcard p{margin:0 0 24px;max-width:none}
+.endcard .cta,.endcard form{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin:0}
+.endcard .btn.lg,.endcard form .btn,.endcard input{height:56px;box-sizing:border-box}
+.endcard form{flex-wrap:nowrap}
+.endcard form .btn{padding:0 26px}
+.endcard input{flex:1;min-width:0;padding:0 18px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
+.endcard .endnote{margin-top:14px}.endcard .endnote .small{margin:0;font-size:14px}.endcard #msg{font-size:15px}.endcard #msg:not(:empty){margin:0 0 8px}
+@media (max-width:820px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px 22px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}.endcard .cta{display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.endcard .cta .ghost{order:-1}.endcard .cta .btn,.endcard form .btn{width:100%;padding:0 12px;font-size:16px;white-space:nowrap;justify-content:center}.endcard .btn.lg,.endcard form .btn,.endcard input{height:52px}.endcard input{width:100%;padding:0 14px;font-size:15px}}
 .open{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .open a.card{color:var(--text);display:block}.open a.card:hover{text-decoration:none;border-color:#2fd39f88}
 .open .card>span{display:block;margin-top:4px}
@@ -206,7 +220,7 @@ T = {
   inst_small='Steps from Apple: <a href="https://support.apple.com/102445">Safely open apps on your Mac</a>. Source code and build steps are on <a href="%s">GitHub</a>.' % GH,
   sign_h="Get updates", sign_p="Mac tips and new releases, at most one email a month.", sign_ph="name@example.com", sign_btn="Subscribe",
   consent="Get the latest updates. Unsubscribe any time.",
-  end_h="Ready to tidy up?", end_p="Free, open source, and everything always goes to the Trash first.",
+  end_h="Clean up your Mac now", end_btn2="Guide", end_p="Free, open source, and everything always goes to the Trash first.",
   f_blurb="Free, open-source Mac cleaner. Provided as is, without warranty. Official site: tidymint.app, downloads only from GitHub.",
   f_cols=[("Product",[("#features","Features"),("#how","How it works"),("#install","Install"),("changelog/","Changelog"),(GH+"/releases","Releases"),("sponsor/","Sponsor")]),
           ("Guides",[("install/","Install step by step"),("mac-storage-keeps-filling-up/","Mac keeps filling up"),("clear-system-data-mac/","Clear System Data"),("adobe-storage-mac/","Adobe taking up space"),("free-up-space-mac/","Free up space on Mac"),("cleanmymac-alternative/","CleanMyMac alternative"),(GH+"/issues","Report a bug")]),
@@ -274,7 +288,7 @@ T = {
   inst_small='Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Mã nguồn công khai trên <a href="%s">GitHub</a>.' % GH,
   sign_h="Nhận tin khi có bản mới", sign_p="Mẹo giữ máy gọn và thông báo phiên bản mới, mỗi tháng tối đa một thư.", sign_ph="ten@example.com", sign_btn="Đăng ký",
   consent="Nhận thông tin cập nhật mới nhất. Huỷ bất kỳ lúc nào.",
-  end_h="Dọn máy thôi?", end_p="Miễn phí, mã nguồn mở, mọi thứ luôn vào Thùng rác trước.",
+  end_h="Dọn máy ngay", end_btn2="Hướng dẫn", end_p="Miễn phí, mã nguồn mở, mọi thứ luôn vào Thùng rác trước.",
   f_blurb="Ứng dụng dọn dẹp MacBook miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành. Trang chính thức duy nhất: tidymint.app, tải chỉ từ GitHub.",
   f_cols=[("Sản phẩm",[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("#cai-dat","Cài đặt"),("lich-su-cap-nhat/","Lịch sử cập nhật"),(GH+"/releases","Các phiên bản"),("ung-ho/","Ủng hộ dự án")]),
           ("Hướng dẫn",[("cai-dat/","Cài đặt từng bước"),("mac-tu-day-o/","Mac tự đầy ổ"),("zalo-chiem-dung-luong-macbook/","Zalo chiếm dung lượng"),("adobe-chiem-dung-luong-mac/","Adobe chiếm dung lượng"),("cleanmymac-mien-phi/","CleanMyMac miễn phí?"),("xoa-ung-dung-macbook/","Xóa ứng dụng trên MacBook"),(GH,"Mã nguồn"),(GH+"/issues","Báo lỗi")]),
@@ -435,13 +449,20 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 </section>
 
 <section style="padding-top:24px">
-  <div class="band"><img src="{img}icon.png" alt="" width="72" height="72"><h2>{t["end_h"]}</h2><p>{t["end_p"]}</p><div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["i"]}">{t["cta2"]}</a></div></div>
-  <div class="signup" id="{i["s"]}" style="margin-top:36px">
-    <h2 style="margin-bottom:6px">{t["sign_h"]}</h2>
-    <p class="small" style="margin:0">{t["sign_p"]}</p>
-    <form id="f"><input type="email" id="email" required placeholder="{t["sign_ph"]}" autocomplete="email"><button class="btn primary" type="submit">{t["sign_btn"]}</button></form>
-    <div id="msg"></div>
-    <p class="small">{t["consent"]}</p>
+  <div class="band endcard">
+    <div class="col">
+      <div class="ttl"><img src="{img}icon.png" alt="" width="48" height="48"><h2>{t["end_h"]}</h2></div>
+      <p>{t["end_p"]}</p>
+      <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["i"]}">{t["end_btn2"]}</a></div>
+      <div></div>
+    </div>
+    <div class="sep"></div>
+    <div class="col" id="{i["s"]}">
+      <div class="ttl"><h2>{t["sign_h"]}</h2></div>
+      <p>{t["sign_p"]}</p>
+      <form id="f"><input type="email" id="email" required placeholder="{t["sign_ph"]}" autocomplete="email"><button class="btn primary" type="submit">{t["sign_btn"]}</button></form>
+      <div class="endnote"><div id="msg"></div><p class="small">{t["consent"]}</p></div>
+    </div>
   </div>
 </section>
 
