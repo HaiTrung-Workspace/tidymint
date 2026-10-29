@@ -1614,9 +1614,9 @@ dict(
   desc="CapCut trên Mac cất bộ nhớ đệm và dự án trong Movies/CapCut. Thư mục nào phình to, phần nào xoá được an toàn, phần nào là bản dựng của bạn không được đụng.",
   crumb="CapCut chiếm dung lượng Mac",
   h1="CapCut chiếm dung lượng Mac: dọn sao cho không mất dự án",
-  tldr="CapCut trên Mac cất mọi thứ trong <code>~/Movies/CapCut/User Data</code>. Phần phình nhanh nhất là <b>Cache</b>: ảnh thu nhỏ khung hình, sóng âm, dữ liệu nhận diện, file tạm. Phần này <b>xoá được</b>, CapCut tự tạo lại khi mở dự án. Thư mục <b>Projects</b> là các bản dựng của bạn, <b>không được xoá</b>. Cách an toàn nhất: dọn bằng Tidymint, hoặc thoát CapCut rồi chỉ chuyển đúng các thư mục tạm vào Thùng rác.",
+  tldr="CapCut trên Mac cất mọi thứ trong <code>~/Movies/CapCut/User Data</code>. Phần phình nhanh nhất là <b>Cache</b>: ảnh thu nhỏ, sóng âm, bản dựng sẵn, proxy. Phần này <b>xoá được</b>, CapCut tự tạo lại. Thư mục <b>Projects</b> là các bản dựng của bạn, <b>không được xoá</b>. Cách dọn: dùng nút thùng rác trong <b>Cài đặt › Draft</b> và <b>Performance</b> của CapCut, bật tự xoá, hoặc để Tidymint chọn sẵn đúng phần tạm.",
   toc=[("o-dau","CapCut trên Mac lưu dữ liệu ở đâu?"),("cong-dong","Người dùng CapCut đang gặp gì?"),("ben-trong","Bên trong có gì, phần nào xoá được?"),
-       ("don-tay","Dọn bộ nhớ đệm CapCut bằng tay"),("khong-xoa","Những thứ không được xoá"),("tidymint","Dọn CapCut bằng Tidymint"),("faq","Câu hỏi thường gặp")],
+       ("trong-capcut","Dọn bằng chính CapCut"),("don-tay","Dọn bộ nhớ đệm CapCut bằng tay"),("khong-xoa","Những thứ không được xoá"),("tidymint","Dọn CapCut bằng Tidymint"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="o-dau">CapCut trên Mac lưu dữ liệu ở đâu?</h2>
 <p>Khác với nhiều app, CapCut không cất dữ liệu trong thư mục Thư viện mà trong thư mục <b>Phim</b> (Movies) của bạn:</p>
@@ -1630,7 +1630,7 @@ dict(
 <li><b>Không chuyển được sang ổ ngoài.</b> Một người dùng Mac báo CapCut từ chối lưu vào ổ cứng ngoài với lỗi <i>"External device is not supported. Select a local path."</i>, nên mọi thứ dồn vào ổ trong của máy.</li>
 <li><b>File proxy.</b> CapCut tạo bản sao độ phân giải thấp (thường 720p hoặc 540p) của video gốc để dựng mượt hơn. Mỗi video lớn kéo theo một bản proxy.</li>
 <li><b>Sợ xoá nhầm dự án.</b> Câu hỏi hay gặp nhất là "xoá bộ nhớ đệm có mất dự án không". Câu trả lời: không, nếu chỉ xoá bộ nhớ đệm. Dự án nằm ở chỗ khác (xem bảng dưới).</li>
-<li><b>Tự xoá theo lịch có rủi ro.</b> Một blog Việt khuyên không bật tự xoá theo thời gian cho bản nháp, vì có thể mất dự án chưa làm xong.</li>
+<li><b>Ngại bật tự xoá.</b> Một blog Việt khuyên cân nhắc trước khi bật tự xoá theo thời gian, sợ ảnh hưởng dự án đang làm dở. Trên bản Mac chúng tôi kiểm, tuỳ chọn tự xoá nằm ở mục <b>Cache</b> và chỉ áp cho bộ nhớ đệm.</li>
 </ul>
 <p>Trên máy chúng tôi kiểm (Mac mini, CapCut bản App Store, tháng 10/2026), chỉ vài phút dựng thử một video ngắn, bộ nhớ đệm đã khoảng <b>500 MB</b>.</p>
 
@@ -1641,12 +1641,28 @@ dict(
 <tr><td><code>Cache/audioWave</code></td><td>Hình sóng âm của các đoạn nhạc, giọng nói</td><td class="y">Được, CapCut tạo lại</td></tr>
 <tr><td><code>Cache/recognize</code>, <code>AlgorithmCache</code></td><td>Dữ liệu nhận diện, phân tích video</td><td class="y">Được, CapCut tạo lại</td></tr>
 <tr><td><code>Cache/ttsTemp</code></td><td>File tạm của giọng đọc chữ thành tiếng</td><td class="y">Được</td></tr>
-<tr><td>Các thư mục khác trong <code>Cache</code></td><td>Hiệu ứng, mẫu, nhạc tải về, bản dựng sẵn để xem trước</td><td>Để yên nếu không chắc</td></tr>
-<tr><td><code>Projects</code></td><td><b>Các dự án bạn đang dựng</b></td><td class="n">Không</td></tr>
+<tr><td><code>Cache/prerender</code></td><td>Bản dựng sẵn để xem trước mượt hơn (Rendering cache)</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
+<tr><td><code>Cache/agencycache</code></td><td>File proxy, bản sao độ phân giải thấp của video gốc</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
+<tr><td><code>Cache/RemuxCache</code></td><td>File đổi sang MOV để phát mượt (Auto remux)</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
+<tr><td>Các thư mục khác trong <code>Cache</code></td><td>Hiệu ứng, mẫu, nhạc tải về, file đã nhập</td><td>Để yên nếu không chắc</td></tr>
+<tr><td><code>Projects/com.lveditor.draft</code></td><td><b>Các dự án (bản nháp) bạn đang dựng</b></td><td class="n">Không</td></tr>
 </table></div>
 <p>Trong <code>Cache</code> có vài chục thư mục con. Một số chứa bản sao của đoạn video bạn kéo vào hoặc bản dựng sẵn để xem trước. Vì vậy chúng tôi chỉ khuyên xoá đúng các thư mục tạm đã nêu tên ở trên, không xoá cả <code>Cache</code>.</p>
 
+<h2 id="trong-capcut">Dọn bằng chính CapCut</h2>
+<p>CapCut có sẵn nút xoá trong phần Cài đặt (biểu tượng bánh răng ở màn hình chính). Trên máy chúng tôi kiểm, CapCut hiện bằng tiếng Anh với các mục sau:</p>
+<div class="tbl"><table>
+<tr><th>Tab</th><th>Mục</th><th>Làm gì</th></tr>
+<tr><td><b>Draft</b></td><td><b>Cache size</b> + nút thùng rác</td><td>Xem và xoá ngay bộ nhớ đệm chung</td></tr>
+<tr><td><b>Draft</b></td><td><b>Cache</b>: Don't delete / Auto delete cache from 30 days ago</td><td>Mặc định là không tự xoá. Chọn dòng dưới để CapCut tự xoá bộ nhớ đệm cũ hơn số ngày bạn đặt</td></tr>
+<tr><td><b>Performance</b></td><td><b>Rendering cache size</b> + nút thùng rác</td><td>Xoá bản dựng sẵn để xem trước</td></tr>
+<tr><td><b>Performance</b></td><td><b>Auto clear</b>: 10 GB</td><td>Bản dựng sẵn cũ tự xoá khi vượt mức này. Máy ổ nhỏ có thể hạ xuống</td></tr>
+<tr><td><b>Performance</b></td><td><b>Proxy size</b>, <b>File size</b> (Auto remux) + nút thùng rác</td><td>Xoá file proxy và file đã đổi sang MOV</td></tr>
+</table></div>
+<p>Các nút này chỉ xoá bộ nhớ đệm, không đụng tới dự án. Tab <b>Draft</b> còn có dòng <b>Save to</b> cho biết dự án đang lưu ở đâu.</p>
+
 <h2 id="don-tay">Dọn bộ nhớ đệm CapCut bằng tay</h2>
+<p>Nút <b>Cache size</b> xoá gần như cả bộ nhớ đệm. Nếu chỉ muốn bỏ phần tạo lại nhanh mà giữ hiệu ứng, mẫu, nhạc đã tải:</p>
 <ol class="steps">
 <li><b>Thoát hẳn CapCut</b> (Cmd+Q).</li>
 <li>Trong Finder bấm <b>Shift+Cmd+G</b>, mở <code>~/Movies/CapCut/User Data/Cache</code>.</li>
@@ -1657,7 +1673,7 @@ dict(
 
 <h2 id="khong-xoa">Những thứ không được xoá</h2>
 <ul>
-<li><b>Thư mục <code>Projects</code></b>: chứa dòng thời gian, hiệu ứng, chỉnh sửa của từng dự án. Xoá là mất bản dựng.</li>
+<li><b>Thư mục <code>Projects</code></b> (dòng <b>Save to</b> trong tab Draft): chứa dòng thời gian, hiệu ứng, chỉnh sửa của từng dự án. Xoá là mất bản dựng. Muốn bỏ dự án cũ, xoá ngay trong danh sách Projects của CapCut.</li>
 <li><b>Video đã xuất</b>: CapCut lưu ở chỗ bạn chọn khi xuất (xem trong phần cài đặt xuất của CapCut). Đó là thành phẩm của bạn, không phải rác.</li>
 <li><b>Cả thư mục <code>User Data</code></b>: đừng xoá cả cụm. Chỉ chọn đúng phần tạm.</li>
 </ul>
@@ -1668,14 +1684,15 @@ dict(
 <ul>
 <li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích) được chọn sẵn, ghi rõ dung lượng;</li>
 <li>nhóm <b>Dự án</b> hiện ra để bạn thấy nó nặng bao nhiêu, nhưng <b>bị khoá</b>, Tidymint không bao giờ đụng vào;</li>
-<li>Tidymint không đụng tới các thư mục khác trong <code>Cache</code>, để tránh xoá nhầm bản sao video của bạn.</li>
+<li>Tidymint không đụng tới các thư mục khác trong <code>Cache</code>, để tránh xoá nhầm bản sao video của bạn. Bản dựng sẵn và proxy thì dùng nút trong tab Performance của CapCut.</li>
 </ul>
 <p>Mọi thứ luôn vào Thùng rác trước, có thể hoàn tác.</p>
 {CTA}
 """,
   faq=[
     ("CapCut lưu file ở đâu trên Mac?", "Trong ~/Movies/CapCut/User Data. Thư mục Cache chứa bộ nhớ đệm, thư mục Projects chứa các dự án bạn đang dựng."),
-    ("Xoá Cache của CapCut có mất dự án không?", "Không, nếu bạn chỉ xoá các thư mục tạm như frameThumbnail, audioWave, recognize, AlgorithmCache, ttsTemp. Dự án nằm ở thư mục Projects, riêng biệt với Cache."),
+    ("Xoá Cache của CapCut có mất dự án không?", "Không. Nút Cache size trong Cài đặt › Draft và các nút xoá trong tab Performance chỉ xoá bộ nhớ đệm. Dự án nằm ở thư mục Projects, riêng biệt với Cache."),
+    ("Có nên bật tự xoá bộ nhớ đệm trong CapCut không?", "Nên, nếu ổ máy nhỏ. Trong Cài đặt › Draft, mục Cache chọn Auto delete cache from 30 days ago. Trong tab Performance, Auto clear giới hạn bản dựng sẵn ở 10 GB, có thể hạ xuống."),
     ("Vì sao CapCut chiếm nhiều dung lượng vậy?", "Mỗi lần dựng, CapCut tạo ảnh thu nhỏ khung hình, sóng âm, dữ liệu phân tích và tải hiệu ứng, mẫu, nhạc về máy. Dựng càng nhiều, Cache càng lớn."),
     ("Dọn xong CapCut có chậm không?", "Lần mở dự án đầu tiên sau khi dọn có thể chậm hơn một chút vì CapCut tạo lại ảnh thu nhỏ và sóng âm. Sau đó trở lại bình thường."),
     ("Tidymint dọn CapCut có an toàn không?", "Tidymint chỉ chọn sẵn các thư mục tạm, khoá thư mục Dự án và chuyển mọi thứ vào Thùng rác, nên lỡ tay vẫn lấy lại được."),
