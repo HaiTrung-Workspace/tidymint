@@ -10,6 +10,10 @@ import UserNotifications
 import ServiceManagement
 import CryptoKit
 import QuickLookThumbnailing
+import Vision
+import PDFKit
+import Charts
+import ImageIO
 
 // MARK: - Theme
 
@@ -253,7 +257,8 @@ struct CleanItem: Identifiable, Hashable {
     var noteColor: Color { !refStrong.isEmpty || hasDB ? Theme.danger : Theme.warn }
     var refHelp: String { (refStrong + refWeak).map { $0.replacingOccurrences(of: NSHomeDirectory(), with: "~") }.joined(separator: "\n") }
     var date: Date? = nil
-    var name: String { url.lastPathComponent }
+    var label: String? = nil       // friendlier name than the file name (e.g. "My iPhone · Oct 2, 2026")
+    var name: String { label ?? url.lastPathComponent }
     var shortPath: String { url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~") }
 }
 
@@ -469,6 +474,14 @@ enum Scanner {
                              descEN: "npm cache, downloaded aerial wallpapers", descVI: "Bộ nhớ đệm npm, hình nền động đã tải",
                              items: make(dev, running: run)))
 
+        let derived = lib.appendingPathComponent("Developer/Xcode/DerivedData")
+        if fm.fileExists(atPath: derived.path) {
+            cats.append(Category(id: "xcode", titleEN: "Xcode Build Data", titleVI: "Dữ liệu build Xcode", icon: "hammer.circle",
+                                 descEN: "DerivedData, one folder per project. Not selected by default", descVI: "DerivedData, mỗi dự án một thư mục. Mặc định không tick",
+                                 safety: .review, whyEN: "Xcode rebuilds it. The next build of that project takes longer.", whyVI: "Xcode tự tạo lại. Lần build sau của dự án đó sẽ lâu hơn.",
+                                 items: make(children(derived), running: run, defaultOn: false)))
+        }
+
         let projects = Prefs.projectFolders.map { URL(fileURLWithPath: $0) }
         step(4, projects.first.map { $0.path.replacingOccurrences(of: NSHomeDirectory(), with: "~") } ?? "")
         cats.append(Category(id: "drafts", titleEN: "Project Drafts", titleVI: "Nháp trong thư mục dự án", icon: "tray.full",
@@ -656,13 +669,21 @@ enum AppRules {
         chromium(id: "edge", nameEN: "Microsoft Edge", nameVI: "Microsoft Edge", bundle: "com.microsoft.edgemac", support: "Microsoft Edge", caches: "Microsoft Edge", aiModel: true),
         // Unverified on a real Mac: folder names taken from the Chromium layout and public tooling that reads Cốc Cốc profiles.
         chromium(id: "coccoc", nameEN: "Cốc Cốc", nameVI: "Cốc Cốc", bundle: "com.coccoc.Coccoc", support: "Coccoc", caches: "Coccoc"),
-        // Unverified on a real Mac. Only scratch folders inside Cache: rendered media in there can be the last copy of a clip.
+        // Checked on a real Mac (App Store build, 10/2026): data in ~/Movies/CapCut/User Data, Settings > Draft and > Performance
+        // offer their own delete buttons for Cache, rendering cache (prerender), proxies (agencycache) and remux files.
+        // Other Cache subfolders can hold imported media, so they are left alone.
         AppRule(id: "capcut", nameEN: "CapCut", nameVI: "CapCut", bundleIDs: ["com.lemon.lvoverseas"], marker: "Movies/CapCut/User Data", sections: [
             AppSection(id: "cache", titleEN: "Scratch files", titleVI: "File tạm khi dựng video",
-                       paths: ["recognize", "frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       paths: ["recognize", "frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" }
+                              + ["Movies/CapCut/User Data/Log"],
                        safety: .safe,
-                       whyEN: "Thumbnails, waveforms and analysis caches. CapCut rebuilds them when you open a project.",
-                       whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích. CapCut tự tạo lại khi mở dự án."),
+                       whyEN: "Thumbnails, waveforms, analysis caches and logs. CapCut rebuilds them when you open a project.",
+                       whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký. CapCut tự tạo lại khi mở dự án."),
+            AppSection(id: "render", titleEN: "Rendering cache and proxies", titleVI: "Bản dựng sẵn và proxy",
+                       paths: ["prerender", "agencycache", "RemuxCache"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       safety: .review,
+                       whyEN: "Pre-rendered previews and low-res copies of your clips. CapCut makes them again, but previews may lag until it does. Same as the delete buttons in CapCut Settings > Performance.",
+                       whyVI: "Bản dựng sẵn để xem trước và bản sao độ phân giải thấp của video. CapCut tạo lại, nhưng xem trước có thể giật cho tới khi tạo xong. Giống nút xoá trong Cài đặt › Performance của CapCut."),
             AppSection(id: "projects", titleEN: "Projects", titleVI: "Dự án",
                        paths: ["Movies/CapCut/User Data/Projects"],
                        safety: .locked, whyEN: "Your edits. Tidymint never touches them.", whyVI: "Dự án bạn đang dựng. Tidymint không bao giờ đụng vào.", dbGuard: false),
@@ -1260,8 +1281,9 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var hoverNode: UUID? = nil
     @Published var lang: String = appLang
     static let advancedPages: Set<Page> = [.large, .dupes, .lens, .cloud, .startup, .stats, .ignore]
-    @Published var advancedOpen: Bool = UserDefaults.standard.bool(forKey: "nav-advanced")
-    func setAdvanced(_ on: Bool) { advancedOpen = on; UserDefaults.standard.set(on, forKey: "nav-advanced") }
+    /// Folded on every launch so the first screen stays simple; opens when the user asks or an advanced page is shown.
+    @Published var advancedOpen: Bool = false
+    func setAdvanced(_ on: Bool) { advancedOpen = on }
 
     func setLang(_ l: String) { appLang = l; UserDefaults.standard.set(l, forKey: "lang"); lang = l }
     @Published var textSize: String = appTextSize
@@ -1633,6 +1655,7 @@ enum Phase { case idle, scanning, summary, review, done }
         let v = try? URL(fileURLWithPath: NSHomeDirectory()).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeTotalCapacityKey])
         freeGB = Double(v?.volumeAvailableCapacityForImportantUsage ?? 0) / 1_000_000_000
         totalGB = Double(v?.volumeTotalCapacity ?? 0) / 1_000_000_000
+        if freeGB > 0 { DiskHistory.record(freeGB) }
     }
 
     func refreshTrash() {
@@ -1691,7 +1714,7 @@ enum Phase { case idle, scanning, summary, review, done }
         case .dupes: scanDupes()
         case .apps: scanApps()
         case .byapp: scanByApp()
-        case .lens: rescanLens()
+        case .lens: if sysOpen { scanSys() } else { rescanLens() }
         default: break
         }
     }
@@ -1702,6 +1725,31 @@ enum Phase { case idle, scanning, summary, review, done }
                                       t("Developer tools", "Công cụ lập trình"), t("Project drafts", "Nháp dự án"), t("Old downloads", "Downloads cũ")] }
     nonisolated func stepCallback() -> (Int, String) -> Void {
         { i, d in DispatchQueue.main.async { self.scanStep = i; self.scanDetail = d } }
+    }
+    // System Data explainer (a view inside Space Lens)
+    @Published var sysOpen = false
+    @Published var sysBusy = false
+    @Published var sysParts: [SysPart] = []
+    @Published var sysPurgeable: Int64 = 0
+    func openSys() { if doneInfo?.page == .lens { doneInfo = nil }; sysOpen = true; if sysParts.isEmpty { scanSys() } }
+    func scanSys() {
+        sysBusy = true
+        Task.detached {
+            let (parts, purge) = SysData.scan()
+            await MainActor.run { self.sysParts = parts; self.sysPurgeable = purge; self.sysBusy = false }
+        }
+    }
+    func trashSys() {
+        let picked = sysParts.flatMap { $0.items.filter(\.selected) }.filter { !Scanner.blocked($0.url.path) }
+        guard !picked.isEmpty else { return }
+        guard confirm(t("Move \(picked.count) items to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
+                      picked.prefix(8).map { "• \($0.name), \(fmt($0.size))" }.joined(separator: "\n") + (picked.count > 8 ? "\n…" : ""),
+                      t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
+        let (ok, fail) = trash(picked.map(\.url), label: "sysdata")
+        let freed = okSize(picked)
+        log("System Data: moved \(ok) items (\(fmt(freed))) to Trash")
+        finished(.lens, ok, freed, fail)
+        scanSys(); refreshTrash(); refreshDisk()
     }
     // Space Lens selection and history
     @Published var lensSel = Set<URL>()
@@ -2284,8 +2332,18 @@ func folderInfo(_ u: URL) -> String? {
         "Draw Things": ("Draw Things AI models. Large; remove unused models inside the app.", "Model AI của Draw Things. Rất nặng, gỡ model không dùng ngay trong app."),
         "huggingface": ("Downloaded AI models (Hugging Face). Re-downloadable.", "Model AI tải từ Hugging Face. Tải lại được."),
         ".ollama": ("Ollama AI models. Remove unused ones with 'ollama rm'.", "Model AI của Ollama. Gỡ model không dùng bằng 'ollama rm'."),
-        "LM Studio": ("LM Studio AI models. Manage them inside the app.", "Model AI của LM Studio. Quản lý trong app.")
+        "LM Studio": ("LM Studio AI models. Manage them inside the app.", "Model AI của LM Studio. Quản lý trong app."),
+        "CapCut": ("CapCut data. Clear caches in CapCut Settings; never delete Projects.", "Dữ liệu CapCut. Xoá bộ nhớ đệm trong Cài đặt của CapCut, đừng xoá Projects."),
+        "com.lveditor.draft": ("CapCut projects. Do not delete here; remove old projects inside CapCut.", "Dự án CapCut. Đừng xoá ở đây, xoá dự án cũ ngay trong CapCut."),
+        "prerender": ("Rendering cache (CapCut). Clear in CapCut Settings > Performance.", "Bản dựng sẵn của CapCut. Xoá trong Cài đặt › Performance của CapCut."),
+        "agencycache": ("Proxy copies of your clips (CapCut). Clear in CapCut Settings > Performance.", "Bản proxy video của CapCut. Xoá trong Cài đặt › Performance của CapCut."),
+        "Homebrew": ("Homebrew downloads. Run 'brew cleanup' to clear what is no longer needed.", "File tải của Homebrew. Chạy 'brew cleanup' để dọn phần không cần."),
+        "com.docker.docker": ("Docker data. Shrink it with 'docker system prune'; don't delete files by hand.", "Dữ liệu Docker. Thu gọn bằng 'docker system prune', đừng xoá tay."),
+        "Docker.raw": ("Docker's disk image. Shrink it with 'docker system prune'; deleting it wipes all containers and images.", "Ổ đĩa ảo của Docker. Thu gọn bằng 'docker system prune'; xoá file này là mất hết container và image.")
     ]
+    if p.hasSuffix("/Developer/Xcode/Archives") {
+        return t("Xcode archives. Keep the ones you shipped: you need them to read crash reports.", "Bản archive Xcode. Giữ các bản đã phát hành: cần để đọc báo cáo lỗi.")
+    }
     if let v = m[n] {
         if Scanner.limited && (n == "Pictures" || n == "Music") {
             return t(v.0, v.1) + t(" Library not counted: needs Full Disk Access.", " Chưa tính thư viện: cần quyền Truy cập toàn bộ ổ đĩa.")
@@ -2348,6 +2406,45 @@ enum Stats {
         return Int64(v * mult)
     }
 }
+
+/// Free space once per day (the last reading of the day), kept on this Mac for the Statistics chart. Nothing is sent anywhere.
+enum DiskHistory {
+    static var path: String { Stats.dir + "/disk-history.json" }
+    static let key: DateFormatter = { let d = DateFormatter(); d.dateFormat = "yyyy-MM-dd"; d.locale = Locale(identifier: "en_US_POSIX"); return d }()
+    static func load() -> [String: Double] {
+        guard let d = FileManager.default.contents(atPath: path), let m = try? JSONDecoder().decode([String: Double].self, from: d) else { return [:] }
+        return m
+    }
+    static func record(_ gb: Double) {
+        var m = load()
+        m[key.string(from: Date())] = (gb * 10).rounded() / 10
+        if m.count > 400 { for k in m.keys.sorted().prefix(m.count - 400) { m.removeValue(forKey: k) } }
+        _ = Stats.path
+        if let d = try? JSONEncoder().encode(m) { try? d.write(to: URL(fileURLWithPath: path)) }
+    }
+    struct Day: Identifiable { let date: Date; let free: Double; let freed: Int64; var id: Date { date } }
+    /// One point per day for the last `days` days: the daily record, or the last value from the activity log for days before it existed.
+    static func series(days: Int, log: [LogEntry]) -> [Day] {
+        let cal = Calendar.current
+        var free: [String: Double] = [:]
+        var cleaned: [String: Int64] = [:]
+        for e in log {   // the log is in time order, so the last reading of each day wins
+            let k = key.string(from: e.date)
+            if let f = e.freeGB { free[k] = f }
+            cleaned[k, default: 0] += e.freed
+        }
+        for (k, v) in load() { free[k] = v }   // the daily record is preferred where it exists
+        let today = cal.startOfDay(for: Date())
+        return (0..<days).reversed().compactMap { back in
+            guard let d = cal.date(byAdding: .day, value: -back, to: today) else { return nil }
+            let k = key.string(from: d)
+            guard let f = free[k] else { return nil }
+            return Day(date: d, free: f, freed: cleaned[k] ?? 0)
+        }
+    }
+}
+
+final class RangePick: ObservableObject { @Published var days = 30; @Published var sel: Date? = nil }
 
 /// Undo journal: where the last clean moved each item. One session only, stored as JSON next to the activity log.
 enum Journal {
@@ -2640,6 +2737,286 @@ struct JunkCard: View {
     }
 }
 
+// MARK: - System Data explainer (inside Space Lens)
+
+/// One piece of what macOS lumps into "System Data", with what can be done about it.
+struct SysPart: Identifiable {
+    enum Kind { case clean, elsewhere, system }
+    enum Action { case none, url(URL), page(Page) }
+    let id: String
+    let icon: String
+    let title: String
+    let note: String
+    var size: Int64              // -1 = macOS does not report it
+    var kind: Kind
+    var items: [CleanItem] = []
+    var detail = ""
+    var actionTitle = ""
+    var action: Action = .none
+    var selectedSize: Int64 { items.filter(\.selected).reduce(0) { $0 + $1.size } }
+    var state: Int { let n = items.filter(\.selected).count; return n == 0 ? 0 : (n == items.count ? 2 : 1) }
+}
+
+enum SysData {
+    static let fm = FileManager.default
+    static var lib: URL { Scanner.lib }
+    static func dir(_ rel: String) -> URL { lib.appendingPathComponent(rel) }
+    static func sz(_ u: URL) -> Int64 { fm.fileExists(atPath: u.path) ? Scanner.size(u) : 0 }
+    static func modDate(_ u: URL) -> Date? { try? u.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate }
+
+    static func item(_ u: URL, on: Bool, label: String? = nil, minSize: Int64 = 1_000_000) -> CleanItem? {
+        guard !Scanner.skip(u.path) else { return nil }
+        let s = Scanner.size(u)
+        guard s >= minSize else { return nil }
+        var it = CleanItem(url: u, size: s, selected: on)
+        it.label = label
+        return it
+    }
+
+    /// Time Machine snapshots kept on the startup disk ("com.apple.TimeMachine.2026-10-28-101500.local").
+    static func snapshots() -> [String] {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/bin/tmutil"); p.arguments = ["listlocalsnapshots", "/"]
+        let pipe = Pipe(); p.standardOutput = pipe; p.standardError = FileHandle.nullDevice
+        do { try p.run() } catch { return [] }
+        let d = pipe.fileHandleForReading.readDataToEndOfFile(); p.waitUntilExit()
+        return String(decoding: d, as: UTF8.self).split(separator: "\n").map(String.init).filter { $0.contains("com.apple.TimeMachine.") }
+    }
+    static func snapshotDate(_ s: String) -> Date? {
+        guard let r = s.range(of: #"\d{4}-\d{2}-\d{2}-\d{6}"#, options: .regularExpression) else { return nil }
+        let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd-HHmmss"
+        return f.date(from: String(s[r]))
+    }
+
+    /// Space macOS counts as free for big jobs (updates, installs) but is still held by purgeable data such as snapshots.
+    static func purgeable() -> Int64 {
+        let v = try? Scanner.home.resourceValues(forKeys: [.volumeAvailableCapacityKey, .volumeAvailableCapacityForImportantUsageKey])
+        let important = Int64(v?.volumeAvailableCapacityForImportantUsage ?? 0), plain = Int64(v?.volumeAvailableCapacity ?? 0)
+        return max(0, important - plain)
+    }
+
+    static func scan() -> ([SysPart], Int64) {
+        var clean: [SysPart] = [], other: [SysPart] = []
+
+        // iPhone / iPad backups made through Finder
+        let bk = dir("Application Support/MobileSync/Backup")
+        let backups: [CleanItem] = Scanner.children(bk).compactMap { d in
+            let info = NSDictionary(contentsOf: d.appendingPathComponent("Info.plist"))
+            let name = (info?["Device Name"] as? String) ?? (info?["Display Name"] as? String) ?? d.lastPathComponent
+            let date = (info?["Last Backup Date"] as? Date) ?? modDate(d)
+            return item(d, on: false, label: name + (date.map { " · " + shortDate($0) } ?? ""))
+        }.sorted { $0.size > $1.size }
+        if !backups.isEmpty {
+            clean.append(SysPart(id: "backups", icon: "iphone", title: t("iPhone and iPad backups", "Bản sao lưu iPhone, iPad"),
+                                 note: t("Made by Finder when the phone was plugged in. Keep the newest one of each device you still use; old devices and old copies can go.",
+                                         "Finder tạo khi cắm điện thoại vào máy. Giữ bản mới nhất của máy còn dùng; máy cũ và bản cũ thì bỏ được."),
+                                 size: backups.reduce(0) { $0 + $1.size }, kind: .clean, items: backups))
+        }
+
+        // iOS update files (downloaded again when needed)
+        let ipsw: [CleanItem] = ["iTunes/iPhone Software Updates", "iTunes/iPad Software Updates", "iTunes/iPod Software Updates"].flatMap { r in
+            Scanner.children(dir(r)).filter { $0.pathExtension.lowercased() == "ipsw" }.compactMap { item($0, on: true) }
+        }
+        if !ipsw.isEmpty {
+            clean.append(SysPart(id: "ipsw", icon: "arrow.down.circle", title: t("iOS update files", "File cập nhật iOS"),
+                                 note: t("Firmware downloaded to update or restore a device. Downloaded again when needed.", "Bản cài iOS tải về để cập nhật hay khôi phục máy. Cần thì tải lại."),
+                                 size: ipsw.reduce(0) { $0 + $1.size }, kind: .clean, items: ipsw))
+        }
+
+        // Xcode leftovers
+        var xc: [CleanItem] = []
+        if let i = item(dir("Developer/Xcode/DerivedData"), on: false, label: t("Build files (DerivedData)", "File build (DerivedData)")) { xc.append(i) }
+        if let i = item(dir("Developer/CoreSimulator/Caches"), on: true, label: t("Simulator caches", "Bộ nhớ đệm máy ảo")) { xc.append(i) }
+        for r in ["iOS DeviceSupport", "watchOS DeviceSupport", "tvOS DeviceSupport", "visionOS DeviceSupport"] {
+            xc += Scanner.children(dir("Developer/Xcode/" + r)).compactMap { item($0, on: false, label: r.replacingOccurrences(of: "DeviceSupport", with: "") + $0.lastPathComponent) }
+        }
+        xc += Scanner.children(dir("Developer/Xcode/Archives")).compactMap { item($0, on: false, label: t("Archive ", "Bản lưu trữ ") + $0.lastPathComponent) }
+        if !xc.isEmpty {
+            clean.append(SysPart(id: "xcode", icon: "hammer", title: t("Xcode leftovers", "Rác của Xcode"),
+                                 note: t("Build files rebuild on their own. Device support files are fetched again when a device is plugged in. Archives are builds you shipped: keep the ones you still need.",
+                                         "File build tự tạo lại. File hỗ trợ thiết bị tải lại khi cắm máy. Bản lưu trữ là bản build đã nộp: giữ bản còn cần."),
+                                 size: xc.reduce(0) { $0 + $1.size }, kind: .clean, items: xc.sorted { $0.size > $1.size }))
+        }
+
+        // Things that are cleaned elsewhere
+        let cache = sz(dir("Caches")) + sz(dir("Logs"))
+        if cache >= 50_000_000 {
+            other.append(SysPart(id: "caches", icon: "internaldrive", title: t("Caches and logs", "Bộ nhớ đệm và nhật ký"),
+                                 note: t("Part of System Data too. Clean them on the Clean Now page, where each item says what happens after.",
+                                         "Cũng nằm trong System Data. Dọn ở trang Dọn ngay, mỗi mục ghi rõ dọn xong thì sao."),
+                                 size: cache, kind: .elsewhere, actionTitle: Page.smart.label, action: .page(.smart)))
+        }
+        let sims = sz(dir("Developer/CoreSimulator/Devices"))
+        if sims >= 50_000_000 {
+            other.append(SysPart(id: "sims", icon: "ipad.and.iphone", title: t("iPhone simulators", "Máy ảo iPhone"),
+                                 note: t("Delete old ones in Xcode: Window > Devices and Simulators. Removing the folder by hand confuses Xcode.",
+                                         "Xoá máy ảo cũ trong Xcode: Window > Devices and Simulators. Xoá tay thư mục sẽ làm Xcode lỗi."),
+                                 size: sims, kind: .elsewhere))
+        }
+        let docker = sz(dir("Containers/com.docker.docker/Data/vms"))
+        if docker >= 50_000_000 {
+            other.append(SysPart(id: "docker", icon: "shippingbox", title: t("Docker disk", "Ổ ảo của Docker"),
+                                 note: t("One big file holding every image and container. Shrink it from Docker Desktop (Troubleshoot > Clean / Purge data) or with docker system prune.",
+                                         "Một file lớn chứa mọi image, container. Thu nhỏ trong Docker Desktop (Troubleshoot > Clean / Purge data) hoặc lệnh docker system prune."),
+                                 size: docker, kind: .elsewhere))
+        }
+        let msg = sz(dir("Messages/Attachments"))
+        if msg >= 50_000_000 {
+            other.append(SysPart(id: "messages", icon: "message", title: t("Messages attachments", "Ảnh, file trong Tin nhắn"),
+                                 note: t("Photos and files from iMessage chats. Remove them in Messages (Settings > General > Keep messages) so the chats stay intact.",
+                                         "Ảnh, file trong các cuộc trò chuyện iMessage. Xoá trong app Tin nhắn (Cài đặt > Chung > Giữ tin nhắn) để cuộc trò chuyện không bị hỏng."),
+                                 size: msg, kind: .elsewhere))
+        }
+
+        // Things macOS manages itself
+        let snaps = snapshots()
+        let tmURL = URL(string: "x-apple.systempreferences:com.apple.Time-Machine-Settings.extension")!
+        let last = snaps.compactMap(snapshotDate).max()
+        other.append(SysPart(id: "snapshots", icon: "clock.arrow.circlepath", title: t("Time Machine snapshots on this Mac", "Bản sao lưu Time Machine nằm trên máy"),
+                             note: snaps.isEmpty
+                                ? t("None right now. When Time Machine is on and the backup disk is not plugged in, macOS keeps hourly snapshots here and removes them by itself.",
+                                    "Hiện không có. Khi bật Time Machine mà không cắm ổ sao lưu, macOS giữ bản sao lưu theo giờ ở đây và tự xoá.")
+                                : t("Kept when Time Machine runs without the backup disk. macOS removes them after about a day, or sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
+                                    "Có khi Time Machine chạy mà chưa cắm ổ sao lưu. macOS tự xoá sau khoảng một ngày, hoặc sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
+                             size: -1, kind: snaps.isEmpty ? .system : .elsewhere,
+                             detail: snaps.isEmpty ? "" : t("\(snaps.count) snapshots", "\(snaps.count) bản") + (last.map { t(", newest ", ", mới nhất ") + shortDate($0) } ?? ""),
+                             actionTitle: t("Time Machine Settings", "Mở cài đặt Time Machine"), action: .url(tmURL)))
+
+        var vm: Int64 = 0
+        for u in Scanner.children(URL(fileURLWithPath: "/private/var/vm"), hidden: true) {
+            vm += Int64((try? u.resourceValues(forKeys: [.totalFileAllocatedSizeKey]).totalFileAllocatedSize) ?? 0)
+        }
+        if vm > 0 {
+            other.append(SysPart(id: "vm", icon: "memorychip", title: t("Swap and sleep files", "Bộ nhớ ảo và file ngủ"),
+                                 note: t("Used when memory runs short and when the Mac sleeps. macOS creates and removes them; a restart usually shrinks them. Do not delete.",
+                                         "Dùng khi thiếu RAM và khi máy ngủ. macOS tự tạo, tự xoá; khởi động lại máy thường nhỏ đi. Không nên xoá."),
+                                 size: vm, kind: .system))
+        }
+        return (clean.sorted { $0.size > $1.size } + other, purgeable())
+    }
+}
+
+final class OpenSet: ObservableObject { @Published var v = Set<String>() }
+
+struct SysPartCard: View {
+    @Binding var part: SysPart
+    @ObservedObject var vm: VM
+    @ObservedObject var open: OpenSet
+    var badge: (String, Color) {
+        switch part.kind {
+        case .clean: return (t("Can clean here", "Dọn được ở đây"), Theme.green)
+        case .elsewhere: return (t("Handled elsewhere", "Dọn ở chỗ khác"), Theme.warn)
+        case .system: return (t("Leave to macOS", "Để macOS lo"), Theme.sub)
+        }
+    }
+    var body: some View {
+        let isOpen = open.v.contains(part.id)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                if part.kind == .clean {
+                    Button { let on = part.state != 2; for i in part.items.indices { part.items[i].selected = on } } label: { CheckBox(state: part.state) }
+                        .buttonStyle(.plain).padding(.top, 8)
+                }
+                Image(systemName: part.icon).font(.system(size: fs(15))).foregroundStyle(Theme.accent)
+                    .frame(width: 32, height: 32).background(Circle().fill(Theme.accent.opacity(0.14)))
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text(part.title).font(.system(size: fs(14), weight: .semibold)).foregroundColor(Theme.text)
+                        Text(badge.0).font(.system(size: fs(10), weight: .semibold)).foregroundColor(badge.1)
+                            .padding(.horizontal, 7).padding(.vertical, 2).background(Capsule().fill(badge.1.opacity(0.15)))
+                    }
+                    Text(part.note).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 14) {
+                        if part.kind == .clean {
+                            TextLink(isOpen ? t("Hide items", "Ẩn danh sách") : t("Show \(part.items.count) items", "Xem \(part.items.count) mục"), size: fs(12), weight: .semibold) {
+                                if isOpen { open.v.remove(part.id) } else { open.v.insert(part.id) }
+                            }
+                        }
+                        if !part.actionTitle.isEmpty {
+                            TextLink(part.actionTitle, size: fs(12), weight: .semibold) {
+                                switch part.action {
+                                case .url(let u): NSWorkspace.shared.open(u)
+                                case .page(let p): vm.page = p
+                                case .none: break
+                                }
+                            }
+                        }
+                    }.padding(.top, 2)
+                }
+                Spacer(minLength: 8)
+                if part.size >= 0 || !part.detail.isEmpty { VStack(alignment: .trailing, spacing: 2) {
+                    Text(part.size < 0 ? part.detail : fmt(part.size))
+                        .font(.system(size: fs(part.size < 0 ? 13 : 17), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
+                    if part.size < 0 && !part.detail.isEmpty {
+                        Text(t("size not reported by macOS", "macOS không báo dung lượng")).font(.system(size: fs(10))).foregroundColor(Theme.sub)
+                    }
+                } }
+            }.padding(14)
+            if isOpen && part.kind == .clean {
+                VStack(spacing: 2) {
+                    ForEach($part.items) { $it in ItemRow(item: $it, vm: vm) }
+                }.padding(.horizontal, 8).padding(.bottom, 8)
+            }
+        }
+        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+    }
+}
+
+struct SysDataView: View {
+    @ObservedObject var vm: VM
+    @StateObject private var open = OpenSet()
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text).help(t("Back", "Lùi"))
+                Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
+                Spacer()
+                if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
+            }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
+            Text(t("macOS puts everything it cannot file under Apps, Documents or Photos into System Data. These are the parts Tidymint can measure: the ones with a checkbox can be cleaned here, the rest say where to handle them or to leave them alone.",
+                   "macOS gom mọi thứ không xếp được vào Ứng dụng, Tài liệu, Ảnh vào System Data. Đây là những phần Tidymint đo được: phần có ô chọn thì dọn được ở đây, phần còn lại ghi rõ dọn ở đâu hoặc nên để yên."))
+                .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 12)
+            DoneBanner(vm: vm, page: .lens)
+            if vm.sysBusy && vm.sysParts.isEmpty {
+                Scanning(text: t("Looking inside System Data...", "Đang xem System Data gồm những gì...")).frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    VStack(spacing: 10) {
+                        if vm.sysPurgeable >= 1_000_000_000 {
+                            HStack(spacing: 10) {
+                                Image(systemName: "info.circle").foregroundColor(Theme.link)
+                                Text(t("About \(fmt(vm.sysPurgeable)) is held by data macOS can free on its own (snapshots, iCloud copies, caches). It is released when an update or a big file needs the room.",
+                                       "Khoảng \(fmt(vm.sysPurgeable)) đang bị giữ bởi dữ liệu macOS tự giải phóng được (bản sao lưu tạm, bản iCloud, bộ nhớ đệm). Khi cài bản cập nhật hay chép file lớn cần chỗ, macOS sẽ tự nhả ra."))
+                                    .font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
+                                Spacer(minLength: 0)
+                            }.padding(14).background(RoundedRectangle(cornerRadius: 14).fill(Theme.link.opacity(0.10)))
+                        }
+                        ForEach($vm.sysParts) { $p in SysPartCard(part: $p, vm: vm, open: open) }
+                        Text(t("The rest of System Data is macOS itself: system files, the Spotlight index, system caches. macOS looks after it; Tidymint does not touch it.",
+                               "Phần còn lại của System Data là của chính macOS: file hệ thống, chỉ mục Spotlight, bộ nhớ đệm hệ thống. macOS tự quản, Tidymint không đụng tới."))
+                            .font(.system(size: fs(11))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
+                    }.padding(.horizontal, 24).padding(.bottom, 16)
+                }
+            }
+            HStack {
+                let sel = vm.sysParts.flatMap { $0.items.filter(\.selected) }
+                if sel.isEmpty {
+                    Text(t("Tick items to move them to the Trash.", "Tick mục muốn chuyển vào Thùng rác.")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                    Spacer()
+                } else {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(selLabel(sel.count, sel.reduce(0) { $0 + $1.size })).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
+                        Text(t("Moved to the Trash, not deleted yet.", "Chỉ chuyển vào Thùng rác, chưa xoá hẳn.")).foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                    }
+                    Spacer()
+                    PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.trashSys() })
+                }
+            }.padding(.horizontal, 24).padding(.vertical, 12).background(Theme.shade.opacity(0.25))
+        }
+    }
+}
+
 // MARK: - Pages
 
 struct Tile: View {
@@ -2744,6 +3121,9 @@ struct SmartView: View {
                     Text(t("Not selected: \(fmt(vm.junkTotal - vm.junkSelected)) that only you can decide on. Tick it under Review every item.", "Chưa tick: \(fmt(vm.junkTotal - vm.junkSelected)) là phần bạn tự quyết. Muốn dọn thì tick ở Xem từng mục."))
                         .font(.system(size: fs(11))).foregroundColor(Theme.sub)
                 }
+                TextLink(t("Disk still full of \"System Data\"? See what is in it", "Ổ vẫn đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(12), weight: .semibold) {
+                    vm.page = .lens; vm.openSys()
+                }.padding(.top, 2)
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { vm.refreshTrash() }
@@ -3091,7 +3471,9 @@ struct LargeView: View {
 struct LensView: View {
     @ObservedObject var vm: VM
     var body: some View {
-        if vm.lensPath.isEmpty {
+        if vm.sysOpen {
+            SysDataView(vm: vm)
+        } else if vm.lensPath.isEmpty {
             VStack(spacing: 28) {
                 Header(title: t("Space Lens", "Bản đồ ổ đĩa"), sub: t("See what takes up space, folder by folder.\nClick a bubble to look inside.", "Xem thư mục nào chiếm chỗ.\nBấm vào bong bóng để xem bên trong."))
                 BigScanButton(label: t("Scan", "Quét")) { vm.openLens(Scanner.home) }
@@ -3099,6 +3481,7 @@ struct LensView: View {
                     GhostButton(title: "Library") { vm.openLens(Scanner.lib) }
                     GhostButton(title: "Documents") { vm.openLens(Scanner.home.appendingPathComponent("Documents")) }
                 }
+                TextLink(t("Disk full of \"System Data\"? See what is in it", "Ổ đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(13), weight: .semibold) { vm.openSys() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack(spacing: 0) {
@@ -4186,6 +4569,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sharedVM.page = pg
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
+            if pg == .lens && a.contains("--sysdata") { sharedVM.openSys() }
             if pg == .smart && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .summary; sharedVM.lastFreed = sharedVM.junkSelected; sharedVM.lastCount = 38 }
             if a.contains("--done") { sharedVM.lastResult = t("Moved 128 items (6.2 GB) to the Trash.", "Đã chuyển 128 mục (6,2 GB) vào Thùng rác.") }
         }
@@ -4211,6 +4595,7 @@ func cachedIcon(_ p: Palette) -> NSImage {
     if let i = iconCache[p.id] { return i }
     let i = makeAppIcon(p); iconCache[p.id] = i; return i
 }
+
 
 func makeAppIcon(_ p: Palette) -> NSImage {
     let img = NSImage(size: NSSize(width: 1024, height: 1024), flipped: true) { _ in
@@ -4256,72 +4641,38 @@ func makeAppIcon(_ p: Palette) -> NSImage {
         NSBezierPath(ovalIn: NSRect(x: 707, y: 560, width: 30, height: 30)).fill()
         NSColor.black.setFill()
         NSBezierPath(ovalIn: NSRect(x: 715, y: 568, width: 14, height: 14)).fill()
-        // Mint leaf above the Mac mini: serrated edge, dark veins, short stem (geometry in tools/leaf.py)
+        // Mint leaf above the Mac mini (Creative Fabrica leaf approved 28/10, same outline as docs/logo.svg):
+        // the open vein is part of the outline, so the leaf takes the palette colour with no extra strokes.
+        let lp: [CGFloat] = [
+            708.0,168.0, 705.5,168.5, 701.7,169.6, 696.6,171.9, 691.9,174.8, 686.9,178.9, 682.4,183.6, 678.3,189.0, 674.5,195.0, 671.6,201.1,
+            671.1,201.1, 670.6,200.8, 669.4,199.5, 668.8,198.4, 667.4,195.2, 666.3,191.6, 662.5,193.4, 657.8,196.8, 655.5,198.8, 652.6,202.0,
+            649.8,205.5, 647.6,209.0, 643.7,216.6, 642.1,220.7, 640.9,224.9, 640.7,224.8, 636.0,213.7, 629.8,218.8, 625.3,223.2, 621.7,227.4,
+            616.7,234.4, 614.0,239.2, 611.5,244.5, 609.5,250.1, 608.1,255.1, 607.4,258.7, 607.2,261.3, 606.9,261.3, 601.4,248.4, 601.1,248.6,
+            599.5,251.0, 597.2,254.8, 595.2,258.9, 592.7,265.0, 590.9,270.8, 589.5,276.5, 588.4,283.4, 587.7,291.8, 587.7,298.1, 587.9,300.1,
+            587.5,300.1, 575.6,291.7, 575.4,291.9, 575.1,305.3, 575.2,309.8, 575.9,318.6, 576.6,324.5, 578.2,334.5, 580.0,343.1, 581.1,347.2,
+            579.0,347.3, 576.5,346.9, 574.2,346.2, 570.8,344.6, 570.6,344.7, 572.3,353.1, 574.6,361.4, 576.2,366.1, 578.6,372.5, 581.6,378.8,
+            586.6,387.7, 592.0,395.5, 597.7,402.3, 604.3,408.9, 611.1,414.5, 619.3,420.2, 619.7,426.6, 620.4,433.1, 620.6,433.7, 621.3,439.0,
+            622.6,445.6, 625.6,455.7, 627.2,460.0, 629.4,465.1, 629.5,464.9, 629.3,464.3, 628.6,459.1, 628.2,452.1, 628.2,446.0, 628.6,438.6,
+            630.2,427.2, 631.6,420.7, 633.8,412.0, 636.3,404.2, 638.8,397.4, 642.0,389.7, 646.8,379.4, 654.7,364.0, 668.8,338.8, 676.5,324.4,
+            683.5,309.9, 688.7,297.2, 691.0,290.8, 693.7,281.6, 695.3,274.9, 696.6,267.4, 697.6,259.9, 697.9,252.6, 697.8,244.7, 697.3,239.6,
+            697.1,239.0, 697.2,237.8, 697.4,238.1, 698.3,243.8, 699.0,251.7, 699.0,261.7, 698.8,263.0, 698.8,265.4, 698.1,271.9, 696.5,281.5,
+            695.2,287.7, 692.7,296.9, 688.4,309.7, 682.7,323.6, 676.4,337.6, 665.7,359.3, 659.4,372.8, 655.3,382.1, 651.2,392.3, 648.0,401.5,
+            645.5,410.0, 643.0,421.0, 641.7,430.3, 646.5,431.5, 653.2,432.4, 664.0,432.4, 668.5,432.0, 674.1,431.1, 679.3,430.0, 685.0,428.4,
+            690.4,426.6, 695.6,424.5, 705.6,419.8, 705.6,419.4, 704.6,419.2, 701.5,417.4, 698.8,415.0, 699.0,414.6, 701.9,414.5, 706.1,413.9,
+            712.3,412.0, 716.1,410.5, 720.2,408.4, 727.4,403.9, 733.8,398.7, 737.9,394.7, 738.8,393.6, 736.9,394.7, 734.4,395.6, 731.7,396.1,
+            728.9,396.1, 724.5,395.2, 721.6,394.0, 720.9,393.5, 726.9,390.5, 732.0,386.9, 737.8,381.3, 742.4,375.5, 746.5,369.3, 751.1,360.8,
+            754.5,352.9, 757.2,344.6, 756.9,344.6, 755.2,345.7, 752.2,347.1, 750.1,347.5, 749.0,347.5, 747.2,346.9, 746.3,346.0, 745.7,344.5,
+            748.3,342.0, 751.1,338.1, 752.9,334.7, 755.1,329.4, 757.4,322.6, 759.7,314.0, 762.0,301.4, 761.9,301.3, 760.9,302.0, 759.2,302.4,
+            754.9,302.4, 749.2,301.4, 748.7,301.1, 750.8,298.5, 753.1,294.0, 754.9,288.0, 756.0,281.4, 756.5,276.4, 756.6,265.4, 756.3,257.8,
+            755.4,249.4, 753.4,251.4, 750.8,253.0, 747.7,253.9, 746.0,254.0, 745.7,253.8, 746.0,250.4, 745.8,245.0, 744.7,235.6, 742.0,221.8,
+            738.1,207.1, 737.8,207.1, 735.5,210.2, 732.4,213.3, 729.9,215.3, 729.3,215.3, 729.3,213.7, 728.8,210.8, 727.7,206.7, 725.7,201.0,
+            723.4,195.8, 716.8,182.8, 711.6,173.8
+        ]
         let leaf = NSBezierPath()
-        leaf.move(to: NSPoint(x: 693.0, y: 427.6))
-        leaf.quad(to: NSPoint(x: 708.0, y: 410.4), control: NSPoint(x: 707.1, y: 417.1))
-        leaf.quad(to: NSPoint(x: 718.4, y: 394.6), control: NSPoint(x: 723.4, y: 399.6))
-        leaf.line(to: NSPoint(x: 733.7, y: 377.3))
-        leaf.quad(to: NSPoint(x: 732.2, y: 364.9), control: NSPoint(x: 739.5, y: 369.2))
-        leaf.line(to: NSPoint(x: 743.2, y: 348.9))
-        leaf.quad(to: NSPoint(x: 737.6, y: 337.7), control: NSPoint(x: 747.0, y: 341.4))
-        leaf.line(to: NSPoint(x: 744.6, y: 322.8))
-        leaf.quad(to: NSPoint(x: 735.1, y: 312.7), control: NSPoint(x: 746.4, y: 315.9))
-        leaf.line(to: NSPoint(x: 738.6, y: 298.9))
-        leaf.quad(to: NSPoint(x: 725.8, y: 289.7), control: NSPoint(x: 738.8, y: 292.4))
-        leaf.line(to: NSPoint(x: 726.3, y: 276.7))
-        leaf.quad(to: NSPoint(x: 710.8, y: 268.3), control: NSPoint(x: 725.1, y: 270.6))
-        leaf.line(to: NSPoint(x: 708.9, y: 256.0))
-        leaf.quad(to: NSPoint(x: 691.6, y: 248.1), control: NSPoint(x: 706.8, y: 250.2))
-        leaf.line(to: NSPoint(x: 688.1, y: 236.2))
-        leaf.quad(to: NSPoint(x: 669.6, y: 228.7), control: NSPoint(x: 685.4, y: 230.6))
-        leaf.line(to: NSPoint(x: 665.4, y: 217.1))
-        leaf.quad(to: NSPoint(x: 646.5, y: 209.6), control: NSPoint(x: 658.9, y: 212.5))
-        leaf.quad(to: NSPoint(x: 635.2, y: 200.0), control: NSPoint(x: 647.4, y: 202.9))
-        leaf.quad(to: NSPoint(x: 624.9, y: 190.1), control: NSPoint(x: 636.6, y: 193.2))
-        leaf.quad(to: NSPoint(x: 624.9, y: 190.1), control: NSPoint(x: 652.4, y: 310.7))
-        leaf.quad(to: NSPoint(x: 621.4, y: 204.0), control: NSPoint(x: 616.6, y: 198.9))
-        leaf.quad(to: NSPoint(x: 616.9, y: 218.1), control: NSPoint(x: 608.9, y: 214.0))
-        leaf.line(to: NSPoint(x: 604.9, y: 234.4))
-        leaf.quad(to: NSPoint(x: 607.5, y: 246.5), control: NSPoint(x: 599.6, y: 242.4))
-        leaf.line(to: NSPoint(x: 595.8, y: 262.7))
-        leaf.quad(to: NSPoint(x: 599.1, y: 274.6), control: NSPoint(x: 590.9, y: 270.6))
-        leaf.line(to: NSPoint(x: 588.5, y: 290.5))
-        leaf.quad(to: NSPoint(x: 593.5, y: 301.9), control: NSPoint(x: 584.4, y: 298.1))
-        leaf.line(to: NSPoint(x: 584.8, y: 317.3))
-        leaf.quad(to: NSPoint(x: 592.1, y: 328.0), control: NSPoint(x: 581.9, y: 324.5))
-        leaf.line(to: NSPoint(x: 586.1, y: 342.6))
-        leaf.quad(to: NSPoint(x: 596.4, y: 352.5), control: NSPoint(x: 584.7, y: 349.4))
-        leaf.line(to: NSPoint(x: 593.8, y: 366.1))
-        leaf.quad(to: NSPoint(x: 607.6, y: 375.0), control: NSPoint(x: 594.1, y: 372.4))
-        leaf.line(to: NSPoint(x: 608.7, y: 387.5))
-        leaf.quad(to: NSPoint(x: 626.5, y: 395.2), control: NSPoint(x: 611.1, y: 393.2))
-        leaf.line(to: NSPoint(x: 631.8, y: 406.6))
-        leaf.quad(to: NSPoint(x: 653.9, y: 413.1), control: NSPoint(x: 640.0, y: 410.6))
-        leaf.quad(to: NSPoint(x: 671.2, y: 421.0), control: NSPoint(x: 656.0, y: 418.9))
-        leaf.quad(to: NSPoint(x: 693.0, y: 427.6), control: NSPoint(x: 675.5, y: 426.1))
+        leaf.move(to: NSPoint(x: lp[0], y: lp[1]))
+        for i in stride(from: 2, to: lp.count, by: 2) { leaf.line(to: NSPoint(x: lp[i], y: lp[i + 1])) }
         leaf.close()
-        NSGraphicsContext.saveGraphicsState()
-        let lg = NSShadow(); lg.shadowOffset = NSSize(width: 6, height: 14); lg.shadowBlurRadius = 20
-        lg.shadowColor = NSColor.black.withAlphaComponent(0.38); lg.set()
         NSColor(hex: p.leaf).setFill(); leaf.fill()
-        NSGraphicsContext.restoreGraphicsState()
-        NSGradient(colors: [NSColor.white.withAlphaComponent(0.32), NSColor.white.withAlphaComponent(0)], atLocations: [0, 1], colorSpace: .sRGB)?
-            .draw(in: leaf, angle: -60)
-        let v = NSBezierPath(); v.lineWidth = 6; v.lineCapStyle = .round
-        v.move(to: NSPoint(x: 689.9, y: 416.6)); v.curve(to: NSPoint(x: 629.1, y: 204.7), controlPoint1: NSPoint(x: 673.1, y: 358.2), controlPoint2: NSPoint(x: 652.1, y: 285.1))
-        v.move(to: NSPoint(x: 682.5, y: 391.0)); v.curve(to: NSPoint(x: 700.3, y: 338.5), controlPoint1: NSPoint(x: 692.5, y: 374.3), controlPoint2: NSPoint(x: 700.4, y: 356.3))
-        v.move(to: NSPoint(x: 682.5, y: 391.0)); v.curve(to: NSPoint(x: 639.6, y: 355.9), controlPoint1: NSPoint(x: 665.2, y: 382.2), controlPoint2: NSPoint(x: 648.9, y: 371.0))
-        v.move(to: NSPoint(x: 670.0, y: 347.2)); v.curve(to: NSPoint(x: 703.5, y: 290.2), controlPoint1: NSPoint(x: 687.0, y: 328.5), controlPoint2: NSPoint(x: 701.3, y: 308.6))
-        v.move(to: NSPoint(x: 670.0, y: 347.2)); v.curve(to: NSPoint(x: 611.3, y: 316.6), controlPoint1: NSPoint(x: 645.6, y: 340.4), controlPoint2: NSPoint(x: 622.9, y: 331.0))
-        v.move(to: NSPoint(x: 657.4, y: 303.4)); v.curve(to: NSPoint(x: 689.4, y: 246.7), controlPoint1: NSPoint(x: 673.8, y: 284.8), controlPoint2: NSPoint(x: 687.5, y: 265.1))
-        v.move(to: NSPoint(x: 657.4, y: 303.4)); v.curve(to: NSPoint(x: 600.2, y: 272.3), controlPoint1: NSPoint(x: 633.6, y: 296.3), controlPoint2: NSPoint(x: 611.6, y: 286.9))
-        v.move(to: NSPoint(x: 644.8, y: 259.5)); v.curve(to: NSPoint(x: 663.0, y: 206.9), controlPoint1: NSPoint(x: 655.0, y: 242.8), controlPoint2: NSPoint(x: 663.1, y: 224.6))
-        v.move(to: NSPoint(x: 644.8, y: 259.5)); v.curve(to: NSPoint(x: 601.5, y: 224.5), controlPoint1: NSPoint(x: 627.3, y: 250.7), controlPoint2: NSPoint(x: 610.8, y: 239.6))
-        dark.withAlphaComponent(0.8).setStroke(); v.stroke()
-        let st = NSBezierPath(); st.lineWidth = 9; st.lineCapStyle = .round
-        st.move(to: NSPoint(x: 693.0, y: 427.6)); st.curve(to: NSPoint(x: 696.5, y: 450.3), controlPoint1: NSPoint(x: 694.7, y: 437.0), controlPoint2: NSPoint(x: 695.9, y: 444.5))
-        NSColor(hex: p.leaf).setStroke(); st.stroke()
         return true
     }
     return img
@@ -4457,7 +4808,6 @@ struct StatsView: View {
         let log = Stats.load()
         let freed = log.reduce(0) { $0 + $1.freed }
         let runs = log.filter { $0.freed > 0 }.count
-        let points = log.compactMap { e in e.freeGB.map { (e.date, $0) } }
         let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
         VStack(alignment: .leading, spacing: 16) {
             Text(t("Statistics", "Thống kê")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
@@ -4467,22 +4817,7 @@ struct StatsView: View {
                 statCard(t("Free now", "Đang trống"), String(format: "%.0f GB", vm.freeGB))
                 statCard(t("Trash now", "Thùng rác"), fmt(vm.trashSize))
             }
-            VStack(alignment: .leading, spacing: 8) {
-                Text(t("Free space over time (GB)", "Dung lượng trống theo thời gian (GB)")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
-                GeometryReader { g in
-                    let vals = points.suffix(30).map { $0.1 }
-                    let mx = max(vals.max() ?? 1, 1)
-                    HStack(alignment: .bottom, spacing: 4) {
-                        ForEach(Array(vals.enumerated()), id: \.offset) { _, v in
-                            VStack(spacing: 2) {
-                                Text(String(format: "%.0f", v)).font(.system(size: fs(9))).foregroundColor(Theme.sub)
-                                RoundedRectangle(cornerRadius: 3).fill(Theme.accent)
-                                    .frame(height: max(4, CGFloat(v / mx) * (g.size.height - 16)))
-                            }.frame(maxWidth: 28)
-                        }
-                    }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                }.frame(height: 120)
-            }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            FreeSpaceChart(vm: vm, log: log)
             HStack {
                 Text(t("Recent activity", "Hoạt động gần đây")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
                 Spacer()
@@ -4892,5 +5227,71 @@ struct InviteCard: View {
                    AppEntry(url: URL(fileURLWithPath: "/Applications/Ollama.app"), name: "Ollama", bundleID: "com.electron.ollama", size: mb(380), lastUsed: Date().addingTimeInterval(-12 * 86400)),
                    AppEntry(url: URL(fileURLWithPath: "/Applications/Spotify.app"), name: "Spotify", bundleID: "com.spotify.client", size: mb(290), lastUsed: Date())]
         vm.selApp = z.id
+    }
+}
+
+// MARK: - Free space chart (Stats page)
+
+/// Free space per day: a line with a soft fill, a green dot on days with a cleanup, 7/30/90-day ranges, hover for the day's numbers.
+struct FreeSpaceChart: View {
+    @ObservedObject var vm: VM
+    let log: [LogEntry]
+    @StateObject private var pick = RangePick()
+    var body: some View {
+        let data = DiskHistory.series(days: pick.days, log: log)
+        let dm: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM"; return f }()
+        let top = max(vm.totalGB, (data.map(\.free).max() ?? 1) * 1.1)
+        let sel = pick.sel.flatMap { s in data.min { abs($0.date.timeIntervalSince(s)) < abs($1.date.timeIntervalSince(s)) } }
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(t("Free space per day (GB)", "Dung lượng trống mỗi ngày (GB)")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
+                Spacer()
+                if let d = sel {
+                    Text(dm.string(from: d.date) + ": " + t("free ", "trống ") + String(format: "%.0f GB", d.free)
+                         + (d.freed > 0 ? t(", cleaned ", ", đã dọn ") + fmt(d.freed) : ""))
+                        .font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.text)
+                }
+                Picker("", selection: $pick.days) {
+                    Text(t("7 days", "7 ngày")).tag(7); Text(t("30 days", "30 ngày")).tag(30); Text(t("90 days", "90 ngày")).tag(90)
+                }.pickerStyle(.segmented).frame(width: 220)
+            }
+            if data.count < 2 {
+                Text(t("Not enough days yet. Tidymint notes the free space once a day while it is open.",
+                       "Chưa đủ số ngày. Tidymint ghi dung lượng trống mỗi ngày một lần khi app đang mở."))
+                    .font(.system(size: fs(12))).foregroundColor(Theme.sub).frame(height: 140)
+            } else {
+                Chart {
+                    ForEach(data) { d in
+                        AreaMark(x: .value("Day", d.date, unit: .day), y: .value("GB", d.free))
+                            .foregroundStyle(LinearGradient(colors: [Theme.accentSolid.opacity(0.35), Theme.accentSolid.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                        LineMark(x: .value("Day", d.date, unit: .day), y: .value("GB", d.free))
+                            .foregroundStyle(Theme.accentSolid).lineStyle(StrokeStyle(lineWidth: 2))
+                        if d.freed > 0 {
+                            PointMark(x: .value("Day", d.date, unit: .day), y: .value("GB", d.free)).foregroundStyle(Theme.green).symbolSize(40)
+                        }
+                    }
+                    if let d = sel {
+                        RuleMark(x: .value("Day", d.date, unit: .day)).foregroundStyle(Theme.ink.opacity(0.3))
+                    }
+                }
+                .chartYScale(domain: 0...top)
+                // The axis always spans the whole range, so the line sits on the right dates even when early days are missing.
+                .chartXScale(domain: (Calendar.current.date(byAdding: .day, value: -(pick.days - 1), to: Calendar.current.startOfDay(for: Date())) ?? Date())...Calendar.current.startOfDay(for: Date()).addingTimeInterval(86400))
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .day, count: pick.days <= 7 ? 1 : (pick.days <= 30 ? 7 : 14))) { v in
+                        AxisGridLine().foregroundStyle(Theme.ink.opacity(0.08))
+                        AxisValueLabel { if let d = v.as(Date.self) { Text(dm.string(from: d)).font(.system(size: fs(10))).foregroundColor(Theme.sub) } }
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { v in
+                        AxisGridLine().foregroundStyle(Theme.ink.opacity(0.08))
+                        AxisValueLabel { if let g = v.as(Double.self) { Text(String(format: "%.0f", g)).font(.system(size: fs(10))).foregroundColor(Theme.sub) } }
+                    }
+                }
+                .chartXSelection(value: $pick.sel)
+                .frame(height: 150)
+            }
+        }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
     }
 }

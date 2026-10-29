@@ -1,6 +1,19 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.3.6", date="2026-11-01", status="released",
+         en=["New: \"What is in System Data\" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, and where to handle the rest",
+             "New: Statistics shows a chart of free space per day (7, 30 or 90 days)",
+             "Clean Now lists Xcode build data per project, never pre-selected",
+             "Clean by App: CapCut rendering cache and proxies, now checked on a real Mac",
+             "Space Lens explains more folders: CapCut, Docker, Homebrew, Xcode archives",
+             "New app icon; Advanced in the sidebar starts folded"],
+         vi=["Mới: \"System Data gồm những gì\" trong Bản đồ ổ đĩa, chỉ ra bản sao lưu iPhone, file cập nhật iOS, rác Xcode dọn được, và chỗ xử lý phần còn lại",
+             "Mới: Thống kê có biểu đồ dung lượng trống theo ngày (7, 30, 90 ngày)",
+             "Dọn ngay liệt kê dữ liệu build Xcode theo từng dự án, không chọn sẵn",
+             "Dọn theo ứng dụng: thêm bản dựng sẵn và proxy của CapCut, đã kiểm trên Mac thật",
+             "Bản đồ ổ đĩa giải thích thêm thư mục: CapCut, Docker, Homebrew, archive Xcode",
+             "Icon app mới; nhóm Nâng cao ở menu trái mặc định thu gọn"]),
     dict(ver="0.3.5", date="2026-10-28", status="released",
          en=["Clean Now shows results as cards, and the scan shows which step it is on",
              "Done screen after a clean: space recovered, with Undo and Open Trash",
