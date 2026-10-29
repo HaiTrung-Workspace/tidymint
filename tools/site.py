@@ -15,7 +15,7 @@ def icon(k, size=22):
 ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec"
 # Brand accounts. Logos: Simple Icons (CC0), LinkedIn from Lucide (ISC), drawn filled.
 SOCIAL = [("github", GH, "GitHub"),
-          ("facebook", "https://www.facebook.com/profile.php?id=61595684323814", "Facebook"),
+          ("facebook", "https://www.facebook.com/tidymintapp", "Facebook"),
           ("x", "https://x.com/tidymintapp", "X"),
           ("instagram", "https://www.instagram.com/tidymint.app/", "Instagram"),
           ("linkedin", "https://www.linkedin.com/company/tidymint/", "LinkedIn")]
