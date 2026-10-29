@@ -136,6 +136,45 @@ func shortDate(_ d: Date) -> String {
 /// Replacement for @State.
 final class Flag: ObservableObject { @Published var v = false }
 
+/// Tooltip drawn by the app itself. macOS help tags often never appear on SwiftUI views that also track the mouse
+/// (hover tiles, cursors), so every tooltip in Tidymint uses this: a small bubble under the control after half a second.
+final class TipState: ObservableObject {
+    @Published var shown = false
+    private var item: DispatchWorkItem?
+    func hover(_ inside: Bool) {
+        item?.cancel(); item = nil
+        guard inside else { shown = false; return }
+        let i = DispatchWorkItem { [weak self] in withAnimation(.easeOut(duration: 0.12)) { self?.shown = true } }
+        item = i; DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: i)
+    }
+}
+struct Tip: ViewModifier {
+    let text: String
+    var trailing = false   // controls near the right edge: the bubble grows to the left so the window does not cut it
+    @StateObject private var st = TipState()
+    func body(content: Content) -> some View {
+        content
+            .onHover { st.hover($0 && !text.isEmpty) }
+            .overlay(alignment: trailing ? .bottomTrailing : .bottom) {
+                if st.shown {
+                    Text(text).font(.system(size: fs(11))).foregroundColor(Color(nsColor: .labelColor))
+                        .multilineTextAlignment(.leading).frame(maxWidth: 280, alignment: .leading).fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 8).padding(.vertical, 5)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .windowBackgroundColor)))
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: .separatorColor), lineWidth: 1))
+                        .shadow(color: .black.opacity(0.25), radius: 6, y: 2)
+                        .fixedSize()
+                        .alignmentGuide(.bottom) { $0[.top] - 6 }
+                        .allowsHitTesting(false).transition(.opacity)
+                }
+            }
+            .zIndex(st.shown ? 100 : 0)
+    }
+}
+extension View {
+    func tip(_ text: String, trailing: Bool = false) -> some View { modifier(Tip(text: text, trailing: trailing)) }
+}
+
 /// macOS-style hover: soft highlight behind the row.
 struct HoverBG: ViewModifier {
     var radius: CGFloat = 8
@@ -2523,7 +2562,7 @@ struct SafetyBadge: View {
         }
         .foregroundColor(level.color).padding(.horizontal, 7).padding(.vertical, 2)
         .background(Capsule().fill(level.color.opacity(0.15)))
-        .help(why)
+        .tip(why)
     }
 }
 
@@ -2673,7 +2712,7 @@ struct ItemRow: View {
                     if !item.note.isEmpty {
                         Text(item.note).font(.system(size: fs(10), weight: .semibold)).foregroundColor(item.noteColor)
                             .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(item.noteColor.opacity(0.15)))
-                            .help(item.refHelp)
+                            .tip(item.refHelp)
                     }
                 }
             }
@@ -2714,7 +2753,7 @@ struct DoneBanner: View {
                 if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
                 GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.doneInfo = nil; vm.page = .trash }
                 Button { vm.doneInfo = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
-                    .buttonStyle(.icon).foregroundColor(Theme.sub).help(t("Close", "Đóng"))
+                    .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
             }
             .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.green.opacity(0.12)))
             .padding(.horizontal, 24).padding(.bottom, 10)
@@ -3005,7 +3044,7 @@ struct SysDataView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
-                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon).foregroundColor(Theme.text).help(t("Back", "Lùi"))
+                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon).foregroundColor(Theme.text).tip(t("Back", "Lùi"))
                 Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
                 Spacer()
                 if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
@@ -3476,7 +3515,7 @@ struct LargeView: View {
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
                 if vm.large.isEmpty {
@@ -3527,11 +3566,11 @@ struct LensView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon)
-                            .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).help(t("Back", "Lùi"))
+                            .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).tip(t("Back", "Lùi"))
                         Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.icon)
-                            .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).help(t("Forward", "Tiến"))
+                            .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).tip(t("Forward", "Tiến"))
                             .padding(.trailing, 8)
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).help(t("Go to your home folder", "Về thư mục người dùng")).foregroundColor(Theme.text)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).tip(t("Go to your home folder", "Về thư mục người dùng")).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: fs(10))).foregroundColor(Theme.sub)
                             Button { vm.lensUp(to: i) } label: {
@@ -3563,14 +3602,14 @@ struct LensView: View {
                                         let blocked = Scanner.blocked(n.url.path)
                                         Button { if vm.lensSel.contains(n.url) { vm.lensSel.remove(n.url) } else { vm.lensSel.insert(n.url) } } label: {
                                             CheckBox(state: vm.lensSel.contains(n.url) ? 2 : 0).opacity(blocked ? 0.25 : 1)
-                                        }.buttonStyle(.plain).disabled(blocked).help(blocked ? t("Protected", "Được bảo vệ") : "")
+                                        }.buttonStyle(.plain).disabled(blocked).tip(blocked ? t("Protected", "Được bảo vệ") : "")
                                         FileThumb(url: n.url, side: 22 * uiScale)
                                         VStack(alignment: .leading, spacing: 1) {
                                             Text(n.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
                                             if n.otherCount == 0, let info = folderInfo(n.url) {
                                                 Text(info).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
                                             }
-                                        }.help(n.otherCount == 0 ? (folderInfo(n.url) ?? "") : "")
+                                        }.tip(n.otherCount == 0 ? (folderInfo(n.url) ?? "") : "")
                                         Spacer()
                                         Text(fmt(n.size)).foregroundColor(Theme.sub).font(.system(size: fs(12)).monospacedDigit())
                                     }
@@ -3612,7 +3651,7 @@ struct LensView: View {
                                     .onTapGesture { if b.node.isDir && b.node.otherCount == 0 { vm.openLens(b.node.url) } }
                                     .onHover { h in vm.hoverNode = h ? b.node.id : nil }
                                     .contextMenu { if b.node.otherCount == 0 { nodeMenu(b.node) } }
-                                    .help(b.node.otherCount > 0
+                                    .tip(b.node.otherCount > 0
                                           ? t("\(b.node.otherCount) small items (under 1% each), \(fmt(b.node.size)). See the list on the left.",
                                               "\(b.node.otherCount) mục nhỏ (mỗi mục dưới 1%), \(fmt(b.node.size)). Xem ở danh sách bên trái.")
                                           : "\(b.node.name): \(fmt(b.node.size))" + (folderInfo(b.node.url).map { "\n" + $0 } ?? ""))
@@ -3807,7 +3846,7 @@ struct NavBadge: View {
             // A new result not seen yet: a small dot. Startup Items with something worth a look: warning colour.
             let warn = p == .startup && vm.launchAttention > 0
             Circle().fill(selected ? Color.white : (warn ? Theme.warn : Theme.accentSolid)).frame(width: 8, height: 8)
-                .help(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
+                .tip(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
         }
     }
 }
@@ -3830,7 +3869,7 @@ struct LangSwitch: View {
         }
         .padding(2)
         .background(RoundedRectangle(cornerRadius: 6).stroke(Theme.ink.opacity(0.2), lineWidth: 1))
-        .help(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
+        .tip(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
     }
 }
 
@@ -4037,7 +4076,7 @@ struct AppsView: View {
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
@@ -4191,7 +4230,7 @@ struct DupesView: View {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
                 }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .dupes)
             if !vm.dupMsg.isEmpty {
@@ -4281,7 +4320,7 @@ struct CloudView: View {
                 }
                 Spacer()
                 if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text)
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -4354,7 +4393,7 @@ struct SettingsView: View {
                                 Text(appLang == "vi" ? pl.nameVI.components(separatedBy: " (").first ?? pl.nameVI : pl.nameEN)
                                     .font(.system(size: fs(10))).foregroundColor(vm.theme == pl.id ? Theme.text : Theme.sub)
                             }
-                        }.buttonStyle(.plain).hoverLift().help(appLang == "vi" ? pl.nameVI : pl.nameEN)
+                        }.buttonStyle(.plain).hoverLift().tip(appLang == "vi" ? pl.nameVI : pl.nameEN)
                     }
                 }
             }
@@ -4819,8 +4858,8 @@ struct LaunchRow: View {
                     Text(e.owner).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium)).lineLimit(1)
                     if e.orphan { badge(t("App removed", "App đã gỡ"), Theme.danger) }
                     if e.running == true { badge(t("Running", "Đang chạy"), Theme.green) }
-                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).help(e.sign.help) }
-                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).help(f.help) }
+                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).tip(e.sign.help) }
+                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).tip(f.help) }
                 }
                 Text(e.label).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
             }
@@ -4830,7 +4869,7 @@ struct LaunchRow: View {
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
         .hoverBG(10, Theme.ink.opacity(0.06))
-        .help(e.program)
+        .tip(e.program)
     }
     func badge(_ s: String, _ c: Color) -> some View {
         Text(s).font(.system(size: fs(10), weight: .semibold)).foregroundColor(c)
