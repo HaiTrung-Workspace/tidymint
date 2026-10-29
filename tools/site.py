@@ -495,7 +495,8 @@ function set(v){{try{{localStorage.setItem('tm-consent',v)}}catch(e){{}};gtag('c
 document.getElementById('ckY').onclick=function(){{set('yes')}};document.getElementById('ckN').onclick=function(){{set('no')}};
 document.getElementById('ckOpen').onclick=function(){{show(true)}};
 if(!tmC)show(true);
-document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang}})}})}});}})();
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang}})}})}});
+document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','sponsor_click',{{link_url:a.href,page_lang:document.documentElement.lang,link_location:a.closest('footer')?'footer':'page'}})}})}});}})();
 fetch("{img}version.txt",{{cache:"no-store"}}).then(function(r){{return r.ok?r.text():null}}).then(function(v){{v=(v||"").trim();if(/^\\d+(\\.\\d+)+$/.test(v))document.querySelectorAll(".ver").forEach(function(e){{e.textContent=v}})}}).catch(function(){{}});
 const ENDPOINT = "{ENDPOINT}";
 document.getElementById('f').addEventListener('submit', async (e) => {{
