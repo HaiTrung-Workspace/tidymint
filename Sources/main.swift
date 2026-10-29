@@ -2533,6 +2533,9 @@ struct CheckBox: View {
         Image(systemName: state == 2 ? "checkmark.square.fill" : (state == 1 ? "minus.square.fill" : "square"))
             .font(.system(size: fs(17), weight: .medium))
             .foregroundStyle(state == 0 ? AnyShapeStyle(Theme.ink.opacity(0.5)) : AnyShapeStyle(Theme.accent))
+            // The whole square takes the click, not only the outline; hand cursor, no hover colour (lists stay calm).
+            .contentShape(Rectangle())
+            .onHover { ($0 ? NSCursor.pointingHand : NSCursor.arrow).set() }
     }
 }
 
@@ -3228,7 +3231,7 @@ struct ReviewView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
@@ -3236,7 +3239,7 @@ struct ReviewView: View {
                     Button(t("Select All", "Chọn tất cả")) { vm.setAll(true) }
                     Button(t("Deselect All", "Bỏ chọn tất cả")) { vm.setAll(false) }
                     Button(t("Smart Selection", "Chọn thông minh")) { vm.scanJunk(thenReview: true) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
 
             ScrollView {
@@ -3368,7 +3371,7 @@ struct AppDetail: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
                     Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
@@ -3473,7 +3476,7 @@ struct LargeView: View {
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
                 if vm.large.isEmpty {
@@ -3528,11 +3531,12 @@ struct LensView: View {
                         Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.icon)
                             .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).help(t("Forward", "Tiến"))
                             .padding(.trailing, 8)
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).foregroundColor(Theme.text)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).help(t("Go to your home folder", "Về thư mục người dùng")).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: fs(10))).foregroundColor(Theme.sub)
-                            Button(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent) { vm.lensUp(to: i) }
-                                .buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
+                            Button { vm.lensUp(to: i) } label: {
+                                Text(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent).padding(.horizontal, 4).padding(.vertical, 2).hoverTile()
+                            }.buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
                         }
                     }
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -3820,7 +3824,7 @@ struct LangSwitch: View {
                         .foregroundColor(Theme.ink.opacity(vm.lang == l ? 1 : 0.55))
                         .frame(width: 22, height: 16)
                         .background(RoundedRectangle(cornerRadius: 4).fill(vm.lang == l ? Theme.ink.opacity(0.22) : .clear))
-                        .contentShape(Rectangle())
+                        .hoverTile(vm.lang != l)
                 }.buttonStyle(.plain)
             }
         }
@@ -3867,7 +3871,7 @@ struct Sidebar: View {
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: fs(9), weight: .bold)).foregroundColor(Theme.sub)
                         .rotationEffect(.degrees(vm.advancedOpen ? 90 : 0)).padding(.trailing, 10)
-                }.contentShape(Rectangle())
+                }.padding(.vertical, 2).hoverTile()
             }.buttonStyle(.plain)
             if vm.advancedOpen {
                 NavItem(p: .lens, vm: vm)
@@ -4033,7 +4037,7 @@ struct AppsView: View {
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
@@ -4060,7 +4064,7 @@ struct AppsView: View {
                     }
                 } label: {
                     Text(filterName(vm.appsFilter) + " (\(vm.appsMatching(vm.appsFilter).count))").font(.system(size: fs(12), weight: .semibold))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
                 Spacer()
                 Menu {
                     Button(t("Size", "Dung lượng")) { vm.appsSort = 0 }
@@ -4186,8 +4190,8 @@ struct DupesView: View {
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).padding(.leading, 6)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .dupes)
             if !vm.dupMsg.isEmpty {
@@ -4277,7 +4281,7 @@ struct CloudView: View {
                 }
                 Spacer()
                 if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text)
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).help(t("Scan again", "Quét lại")).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -4981,8 +4985,9 @@ struct ConCaoHint: View {
                 Text("Dọn xong rồi, thưởng mình một ly?").foregroundColor(Theme.sub)
                 TextLink("Gợi ý ở Cồn Cào →", url: ConCao.url("done"), size: 13)
                 Spacer()
-                Button("Đừng hiện nữa") { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub)
+                Button { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true } label: {
+                    Text("Đừng hiện nữa").padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain).foregroundColor(Theme.sub)
             }
             .font(.system(size: fs(12)))
             .padding(.horizontal, 14).padding(.vertical, 10)
