@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://tidymint.app/</loc><lastmod>2026-10-29</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
-  <url><loc>https://tidymint.app/vi/</loc><lastmod>2026-10-29</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
-  <url><loc>https://tidymint.app/guides/</loc><lastmod>2026-10-29</lastmod></url>
-  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>2026-10-29</lastmod></url>
-  <url><loc>https://tidymint.app/changelog/</loc><lastmod>2026-10-29</lastmod></url>
-  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://tidymint.app/</loc><lastmod>2026-10-30</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
+  <url><loc>https://tidymint.app/vi/</loc><lastmod>2026-10-30</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
+  <url><loc>https://tidymint.app/guides/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>https://tidymint.app/changelog/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://tidymint.app/vi/cleanmymac-mien-phi/</loc><lastmod>2026-10-26</lastmod></url>
@@ -30,4 +30,6 @@
   <url><loc>https://tidymint.app/vi/xoa-file-trung-mac/</loc><lastmod>2026-10-29</lastmod></url>
   <url><loc>https://tidymint.app/free-up-ram-mac/</loc><lastmod>2026-10-29</lastmod></url>
   <url><loc>https://tidymint.app/vi/capcut-chiem-dung-luong-mac/</loc><lastmod>2026-10-29</lastmod></url>
+  <url><loc>https://tidymint.app/vi/quyen-rieng-tu-tidymint/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>https://tidymint.app/tidymint-privacy/</loc><lastmod>2026-10-30</lastmod></url>
 </urlset>
