@@ -6973,9 +6973,14 @@ struct OrgShowBar: View {
             }.pickerStyle(.segmented).labelsHidden().fixedSize()
             Spacer()
             Picker("", selection: $org.treeView) {
-                Label(t("List", "Danh sách"), systemImage: "list.bullet").tag(false)
-                Label(t("Folder tree", "Cây thư mục"), systemImage: "list.bullet.indent").tag(true)
+                // Named by what each side is for: the list is where files are changed, the tree only shows the result.
+                Label(t("Edit", "Chỉnh sửa"), systemImage: "list.bullet").tag(false)
+                    .help(t("Rename, tag and regroup each file", "Đổi tên, tag, nhóm cho từng file"))
+                Label(t("Preview", "Xem trước"), systemImage: "list.bullet.indent").tag(true)
+                    .help(t("See the folders before and after Apply", "Xem thư mục trước và sau khi áp dụng"))
             }.pickerStyle(.segmented).labelsHidden().fixedSize()
+            .help(t("Edit: rename, tag and regroup each file. Preview: the folders before and after Apply.",
+                    "Chỉnh sửa: đổi tên, tag, nhóm cho từng file. Xem trước: thư mục trước và sau khi áp dụng."))
         }
     }
 }
