@@ -87,7 +87,7 @@ RELEASES = [
              "Everything goes to the Trash, nothing is deleted outright",
              "English and Vietnamese"],
          vi=["Bản đầu tiên: Quét thông minh, Dọn rác, Gỡ app, File lớn và cũ, File trùng, Bản đồ ổ đĩa, Dữ liệu đám mây, Tự chạy khi bật máy, Thống kê",
-             "Mọi thứ vào Thùng rác, không xoá thẳng",
+             "Mọi thứ luôn vào Thùng rác, không xoá thẳng",
              "Tiếng Anh và tiếng Việt"]),
 ]
 
