@@ -1078,8 +1078,8 @@ struct WebAppTag: View {
     }
 }
 func webAppNote(_ browser: String) -> String {
-    t("A shortcut \(browser) made when a website was installed as an app. It holds only an icon and a launcher, no data. What the site keeps (passwords, documents) is stored by \(browser) and your account, and Tidymint never touches it.",
-      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app. Gói này chỉ có icon và lệnh mở trang, không chứa dữ liệu. Những gì trang web lưu (mật khẩu, tài liệu) do \(browser) và tài khoản của bạn giữ, Tidymint không đụng tới.")
+    t("A shortcut \(browser) made when you installed a website as an app. It holds only an icon and a launcher. Passwords and site data are kept by \(browser) in your account or on this Mac, not here. Deleting the shortcut does not remove the app from \(browser); to remove it completely, open the app › ⋮ menu › Uninstall.",
+      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app, chỉ chứa icon và lệnh mở trang. Mật khẩu và dữ liệu trang được \(browser) lưu trong tài khoản hoặc trên máy, không nằm ở đây. Xoá lối tắt không gỡ app khỏi \(browser); muốn gỡ hẳn, mở app › menu ⋮ › Gỡ cài đặt.")
 }
 
 enum Apps {
