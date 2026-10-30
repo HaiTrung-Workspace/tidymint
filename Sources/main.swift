@@ -1053,6 +1053,29 @@ struct AppEntry: Identifiable {
     var size: Int64
     var lastUsed: Date?
     var related: [CleanItem] = []
+    /// Chromium browsers "install" a website as a tiny launcher app (bundle id <browser>.app.<id>, e.g. Google Password
+    /// Manager, Docs). It only opens the site; the data stays in the browser profile and the account, which Tidymint never touches.
+    var webAppBrowser: String? {
+        let hosts = [("com.google.Chrome", "Chrome"), ("com.google.Chrome.beta", "Chrome"), ("com.microsoft.edgemac", "Edge"),
+                     ("com.brave.Browser", "Brave"), ("org.chromium.Chromium", "Chromium"), ("com.vivaldi.Vivaldi", "Vivaldi"),
+                     ("com.coccoc.Coccoc", "Cốc Cốc"), ("com.operasoftware.Opera", "Opera")]
+        return hosts.first { bundleID.hasPrefix($0.0 + ".app.") }?.1
+    }
+}
+
+/// Small grey tag for a browser web app, with the reassurance as a tooltip.
+struct WebAppTag: View {
+    let browser: String
+    var body: some View {
+        Text(t("\(browser) web app", "Web app của \(browser)")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.sub)
+            .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(Theme.sub.opacity(0.15)))
+            .fixedSize()
+            .tip(webAppNote(browser))
+    }
+}
+func webAppNote(_ browser: String) -> String {
+    t("Only a shortcut that opens a website. Removing it loses no data: what you saved stays in \(browser) and your account.",
+      "Chỉ là lối tắt mở trang web. Gỡ đi không mất dữ liệu: những gì bạn lưu vẫn nằm trong \(browser) và tài khoản của bạn.")
 }
 
 enum Apps {
@@ -4183,7 +4206,10 @@ struct AppsView: View {
                         HStack(spacing: 10) {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: a.url.path)).resizable().frame(width: 26, height: 26)
                             VStack(alignment: .leading, spacing: 1) {
-                                Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
+                                HStack(spacing: 6) {
+                                    Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
+                                    if let b = a.webAppBrowser { WebAppTag(browser: b) }
+                                }
                                 if let d = a.lastUsed {
                                     Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10)))
                                 } else {
@@ -4212,6 +4238,12 @@ struct AppsView: View {
                             Text(vm.apps[i].bundleID).font(.system(size: fs(11))).foregroundColor(Theme.sub)
                         }
                     }.padding(20)
+                    if let b = vm.apps[i].webAppBrowser {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "info.circle").foregroundColor(Theme.sub)
+                            Text(webAppNote(b)).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                        }.padding(.horizontal, 20).padding(.bottom, 12).padding(.top, -8)
+                    }
                     ScrollView {
                         LazyVStack(spacing: 2) {
                             HStack(spacing: 12) {
