@@ -1942,9 +1942,11 @@ enum Phase { case idle, scanning, summary, review, done }
 
     @Published var lastFreed: Int64 = 0
     @Published var lastCount = 0
-    struct DoneInfo { let page: Page; let count: Int; let size: Int64; let fail: Int }
+    struct DoneInfo { let page: Page; let count: Int; let size: Int64; let fail: Int; var session: Date? = nil }
     @Published var doneInfo: DoneInfo? = nil
-    func finished(_ p: Page, _ count: Int, _ size: Int64, _ fail: Int) { doneInfo = count > 0 ? DoneInfo(page: p, count: count, size: size, fail: fail) : nil }
+    func finished(_ p: Page, _ count: Int, _ size: Int64, _ fail: Int) { doneInfo = count > 0 ? DoneInfo(page: p, count: count, size: size, fail: fail, session: undoable?.date) : nil }
+    /// The banner's Undo only belongs to the clean it reports: a later clean elsewhere replaces the Undo journal.
+    var bannerCanUndo: Bool { guard let d = doneInfo, let u = undoable else { return false }; return d.session == nil || d.session == u.date }
     /// Undo from a list page: put the files back, then measure that page again so the list shows them.
     func undoFromBanner() {
         guard let d = doneInfo else { return }
@@ -2098,8 +2100,10 @@ enum Phase { case idle, scanning, summary, review, done }
     /// Put everything from the last run back where it was (only items still sitting in the Trash).
     func undoLast() {
         guard let s = undoable else { return }
-        guard confirm(t("Undo the last clean?", "Hoàn tác lần dọn vừa rồi?"),
-                      t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ."),
+        let needsPassword = s.entries.contains { ((try? FileManager.default.attributesOfItem(atPath: $0.to)[.ownerAccountID] as? NSNumber)?.intValue) == 0 }
+        guard confirm(t("Undo the last clean\(sessionName(s))?", "Hoàn tác lần dọn vừa rồi\(sessionName(s))?"),
+                      t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ.")
+                        + (needsPassword ? t(" An app installed for every user goes back through Finder: macOS asks for an administrator password in its own window.", " App cài cho mọi tài khoản được Finder trả về: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS.") : ""),
                       t("Put Back", "Trả về chỗ cũ")) else { return }
         let r = Journal.restore(s)
         lastResult = t("Put back \(r.ok) items.", "Đã trả về \(r.ok) mục.") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
@@ -2937,8 +2941,8 @@ struct DoneBanner: View {
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 8)
-                if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
-                GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.doneInfo = nil; vm.page = .trash }
+                if vm.bannerCanUndo { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
+                GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.page = .trash }
                 Button { vm.doneInfo = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
                     .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
             }
@@ -3911,6 +3915,13 @@ struct LensView: View {
     }
 }
 
+/// " (CapCut)" for an uninstall, " (Clean Now)" and so on for the other pages; empty when unknown.
+func sessionName(_ s: Journal.Session) -> String {
+    let names = ["cleanup": Page.smart.label, "large": Page.large.label, "lens": Page.lens.label, "sysdata": "System Data"]
+    let n = names[s.label] ?? s.label
+    return n.isEmpty ? "" : " (\(n))"
+}
+
 struct TrashView: View {
     @ObservedObject var vm: VM
     var body: some View {
@@ -3925,9 +3936,11 @@ struct TrashView: View {
             Text(t("Emptying cannot be undone. Take a quick look first.", "Dọn sạch rồi thì không lấy lại được. Liếc qua một lượt trước đã.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
             if let s = vm.undoable {
                 VStack(spacing: 8) {
-                    Text(t("Last clean: \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi: \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
-                        .font(.system(size: fs(12))).foregroundColor(Theme.sub)
+                    Text(t("Last clean\(sessionName(s)): \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi\(sessionName(s)): \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
+                        .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     GhostButton(title: t("Undo last clean", "Hoàn tác lần dọn vừa rồi")) { vm.undoLast() }
+                    Text(t("Undo puts back only these items. The Trash total above also counts what was there before.", "Hoàn tác chỉ trả về đúng các mục này. Con số Thùng rác ở trên tính cả những thứ đã có từ trước."))
+                        .font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 }.padding(.top, 10)
             }
         }
