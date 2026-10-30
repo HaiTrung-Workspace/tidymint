@@ -15,7 +15,16 @@ jobs:
   build:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      # Pinned to a commit (v4.4.0): a tag can be moved, a commit cannot.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      # Fixed Xcode so a runner image update cannot change the Swift compiler under us.
+      # Raise it on purpose (list: actions/runner-images, images/macos/macos-26-arm64-Readme.md).
+      - name: Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+          xcodebuild -version
+          swiftc --version
 
       - name: Version
         id: v
@@ -27,7 +36,6 @@ jobs:
 
       - name: Build
         run: |
-          swiftc --version
           ./build.sh --release
           cp "build/Tidymint-${{ steps.v.outputs.version }}.zip" build/Tidymint.zip
           shasum -a 256 build/Tidymint.zip | tee build/sha256.txt
