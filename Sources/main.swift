@@ -498,6 +498,8 @@ enum Scanner {
             case n.contains("Outlook"): k += ["Outlook"]
             case n.contains("WhatsApp"): k += ["whatsapp", "WhatsApp"]
             case n.contains("Firefox"): k += ["Firefox", "Mozilla"]
+            // Xcode and Simulator: their data lives under Developer/, which holds no bundle id to match.
+            case b == "com.apple.dt.Xcode" || b == "com.apple.iphonesimulator": k += ["/Developer/Xcode/", "/Developer/CoreSimulator/"]
             default: break
             }
             if !b.isEmpty { k.append(b) }
@@ -1508,9 +1510,16 @@ enum Phase { case idle, scanning, summary, review, done }
                       t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.",
                         "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."),
                       t("Uninstall", "Gỡ")) else { return }
-        NSWorkspace.shared.recycle([a.url]) { _, err in
+        NSWorkspace.shared.recycle([a.url]) { newURLs, err in
             Task { @MainActor in
-                let (ok, _) = self.trash(extra.map(\.url))
+                guard err == nil else {
+                    // The app itself could not go to the Trash: leave its related files where they are.
+                    self.appsMsg = t("Could not move \(a.name) to the Trash: \(err!.localizedDescription)", "Không chuyển được \(a.name) vào Thùng rác: \(err!.localizedDescription)")
+                    self.log(self.appsMsg); return
+                }
+                // Record the app in the Undo journal together with its related files, so Undo puts all of it back.
+                let appEntry = newURLs[a.url].map { [Journal.Entry(from: a.url.path, to: $0.path, size: a.size)] } ?? []
+                let (ok, _) = self.trash(extra.map(\.url), label: a.name, alsoUndo: appEntry)
                 if err == nil {
                     self.apps.removeAll { $0.id == id }; self.selApp = nil
                     self.finished(.apps, ok + 1, total, 0)
@@ -1967,10 +1976,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var undoable: Journal.Session? = Journal.load()
     /// Move items to the Trash and remember where each one went, so the whole run can be undone.
     /// `strict` refuses paths outside the home folder or too close to its root (off only for a folder the user picked by hand).
-    func trash(_ urls: [URL], label: String = "", strict: Bool = true) -> (Int, Int) {
+    func trash(_ urls: [URL], label: String = "", strict: Bool = true, alsoUndo: [Journal.Entry] = []) -> (Int, Int) {
         var ok = 0, fail = 0
         lastOK = []; lastErr = ""
-        var moved: [Journal.Entry] = []
+        var moved: [Journal.Entry] = alsoUndo
         for u in urls {
             if strict && !Scanner.safeToTrash(u) {
                 fail += 1
@@ -1982,8 +1991,10 @@ enum Phase { case idle, scanning, summary, review, done }
             do { try FileManager.default.trashItem(at: u, resultingItemURL: &dest); ok += 1; lastOK.insert(u)
                  if let d = dest as URL? { moved.append(Journal.Entry(from: u.path, to: d.path, size: size)) } }
             catch {
-                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly
-                if FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
+                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly.
+                // Only for iCloud Drive on the startup volume: anything else (external or network drive, other errors)
+                // is reported, never copied across drives. Source: research/nguon-chinh-thuc/macos-thung-rac.md
+                if isICloudDriveOnHomeVolume(u), FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
                     ok += 1; lastOK.insert(u)
                     moved.append(Journal.Entry(from: u.path, to: d.path, size: size))
                     continue
@@ -2255,6 +2266,17 @@ enum Phase { case idle, scanning, summary, review, done }
 }
 
 /// Move a file into ~/.Trash directly (used when the standard Trash refuses, e.g. iCloud Drive files).
+/// True for a file inside ~/Library/Mobile Documents (iCloud Drive) that sits on the same volume as the home folder.
+func isICloudDriveOnHomeVolume(_ u: URL) -> Bool {
+    let home = URL(fileURLWithPath: NSHomeDirectory())
+    let icloud = home.appendingPathComponent("Library/Mobile Documents").resolvingSymlinksInPath().path + "/"
+    guard u.resolvingSymlinksInPath().path.hasPrefix(icloud) else { return false }
+    let a = try? u.resourceValues(forKeys: [.volumeIdentifierKey]).volumeIdentifier as? NSObject
+    let b = try? home.resourceValues(forKeys: [.volumeIdentifierKey]).volumeIdentifier as? NSObject
+    guard let a, let b else { return false }
+    return a.isEqual(b)
+}
+
 func moveToUserTrash(_ u: URL) throws -> URL {
     let trash = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".Trash")
     var dest = trash.appendingPathComponent(u.lastPathComponent)
@@ -2464,8 +2486,8 @@ func folderInfo(_ u: URL) -> String? {
         "Group Containers": ("Data shared between apps of one maker (Office, Messages...).", "Dữ liệu dùng chung giữa các app cùng hãng (Office, Tin nhắn...)."),
         "Mobile Documents": ("iCloud Drive files kept on this Mac.", "File iCloud Drive đang lưu trên máy."),
         "CloudStorage": ("Google Drive / OneDrive / Dropbox files on this Mac. Use Cloud Cleanup.", "File Google Drive / OneDrive / Dropbox trên máy. Dọn ở mục Dữ liệu đám mây."),
-        "Developer": ("Xcode data, simulators and build files. Often large, mostly safe to clear.", "Dữ liệu Xcode, máy ảo, file build. Thường nặng, phần lớn xoá được."),
-        "DerivedData": ("Xcode build files. Safe to clear.", "File build của Xcode. Xoá được."),
+        "Developer": ("Xcode data, simulators, build files and archives. Build files can go; keep the archives of apps you released.", "Dữ liệu Xcode, máy ảo, file build và bản archive. File build xoá được; giữ archive của bản đã phát hành."),
+        "DerivedData": ("Xcode build files. Xcode makes them again; the next build is slower. Quit Xcode first.", "File build của Xcode. Xcode tự tạo lại, lần build sau lâu hơn. Đóng Xcode trước."),
         "CoreSimulator": ("iPhone simulators. Delete old ones in Xcode.", "Máy ảo iPhone. Xoá bản cũ trong Xcode."),
         "Logs": ("Log files. Safe to clear.", "File nhật ký. Xoá được."),
         "Mail": ("Mail messages and attachments. Manage in the Mail app.", "Thư và tệp đính kèm. Dọn trong app Mail."),
@@ -2483,7 +2505,7 @@ func folderInfo(_ u: URL) -> String? {
         ".Trash": ("The Trash.", "Thùng rác."),
         "Photos Library.photoslibrary": ("Photos library. Do not delete here, manage in Photos.", "Thư viện Ảnh. Đừng xoá ở đây, dọn trong app Ảnh."),
         "Saved Application State": ("Window positions of apps. Safe to clear.", "Vị trí cửa sổ app. Xoá được."),
-        "iOS DeviceSupport": ("Debug files for each iPhone you plugged in. Safe to clear.", "File gỡ lỗi cho từng iPhone từng cắm. Xoá được."),
+        "iOS DeviceSupport": ("System symbols copied from each iPhone you plugged in, used to read crash reports. Old versions can go; Xcode copies them again only from a device still on that version.", "Ký hiệu hệ thống chép từ từng iPhone từng cắm, dùng để đọc báo cáo lỗi. Bản cũ xoá được; Xcode chỉ chép lại từ máy còn chạy đúng bản đó."),
         "Draw Things": ("Draw Things AI models. Large; remove unused models inside the app.", "Model AI của Draw Things. Rất nặng, gỡ model không dùng ngay trong app."),
         "huggingface": ("Downloaded AI models (Hugging Face). Re-downloadable.", "Model AI tải từ Hugging Face. Tải lại được."),
         ".ollama": ("Ollama AI models. Remove unused ones with 'ollama rm'.", "Model AI của Ollama. Gỡ model không dùng bằng 'ollama rm'."),
@@ -2965,8 +2987,8 @@ enum SysData {
         }.sorted { $0.size > $1.size }
         if !backups.isEmpty {
             clean.append(SysPart(id: "backups", icon: "iphone", title: t("iPhone and iPad backups", "Bản sao lưu iPhone, iPad"),
-                                 note: t("Made by Finder when the phone was plugged in. Keep the newest one of each device you still use; old devices and old copies can go.",
-                                         "Finder tạo khi cắm điện thoại vào máy. Giữ bản mới nhất của máy còn dùng; máy cũ và bản cũ thì bỏ được."),
+                                 note: t("Made by Finder when the phone was plugged in. Keep the newest one of each device you still use. Remove an old device's backup only if you are sure you no longer need what is in it: it may be the only copy. Apple's way: Finder > select the device > Manage Backups.",
+                                         "Finder tạo khi cắm điện thoại vào máy. Giữ bản mới nhất của máy còn dùng. Bản của máy cũ chỉ bỏ khi chắc không cần dữ liệu trong đó: có thể đó là bản duy nhất. Cách của Apple: Finder > chọn máy > Quản lý bản sao lưu."),
                                  size: backups.reduce(0) { $0 + $1.size }, kind: .clean, items: backups))
         }
 
@@ -2983,16 +3005,25 @@ enum SysData {
         // Xcode leftovers
         var xc: [CleanItem] = []
         if let i = item(dir("Developer/Xcode/DerivedData"), on: false, label: t("Build files (DerivedData)", "File build (DerivedData)")) { xc.append(i) }
-        if let i = item(dir("Developer/CoreSimulator/Caches"), on: true, label: t("Simulator caches", "Bộ nhớ đệm máy ảo")) { xc.append(i) }
+        if let i = item(dir("Developer/CoreSimulator/Caches"), on: false, label: t("Simulator caches", "Bộ nhớ đệm máy ảo")) { xc.append(i) }
         for r in ["iOS DeviceSupport", "watchOS DeviceSupport", "tvOS DeviceSupport", "visionOS DeviceSupport"] {
             xc += Scanner.children(dir("Developer/Xcode/" + r)).compactMap { item($0, on: false, label: r.replacingOccurrences(of: "DeviceSupport", with: "") + $0.lastPathComponent) }
         }
-        xc += Scanner.children(dir("Developer/Xcode/Archives")).compactMap { item($0, on: false, label: t("Archive ", "Bản lưu trữ ") + $0.lastPathComponent) }
         if !xc.isEmpty {
             clean.append(SysPart(id: "xcode", icon: "hammer", title: t("Xcode leftovers", "Rác của Xcode"),
-                                 note: t("Build files rebuild on their own. Device support files are fetched again when a device is plugged in. Archives are builds you shipped: keep the ones you still need.",
-                                         "File build tự tạo lại. File hỗ trợ thiết bị tải lại khi cắm máy. Bản lưu trữ là bản build đã nộp: giữ bản còn cần."),
+                                 note: t("Build files rebuild on their own, the next build is slower; quit Xcode first. Device support files are copied again only from a device still on that system version.",
+                                         "File build tự tạo lại, lần build sau lâu hơn; đóng Xcode trước. File hỗ trợ thiết bị chỉ được chép lại từ máy còn chạy đúng bản hệ điều hành đó."),
                                  size: xc.reduce(0) { $0 + $1.size }, kind: .clean, items: xc.sorted { $0.size > $1.size }))
+        }
+
+        // Archives: never offered here. Apple asks developers to keep the archive of every release (crash reports, re-distribution).
+        // Source: research/nguon-chinh-thuc/xcode.md
+        let archives = sz(dir("Developer/Xcode/Archives"))
+        if archives >= 50_000_000 {
+            other.append(SysPart(id: "archives", icon: "archivebox", title: t("Xcode archives", "Bản archive của Xcode"),
+                                 note: t("Builds you archived in Xcode. Keep the archive of every version you released: it is needed to read crash reports and to distribute that build again. Remove old ones in Xcode's Organizer.",
+                                         "Các bản build đã archive trong Xcode. Giữ archive của mọi bản đã phát hành: cần để đọc báo cáo lỗi và phát hành lại bản đó. Xoá bản cũ trong cửa sổ Organizer của Xcode."),
+                                 size: archives, kind: .elsewhere))
         }
 
         // Things that are cleaned elsewhere
@@ -3006,22 +3037,22 @@ enum SysData {
         let sims = sz(dir("Developer/CoreSimulator/Devices"))
         if sims >= 50_000_000 {
             other.append(SysPart(id: "sims", icon: "ipad.and.iphone", title: t("iPhone simulators", "Máy ảo iPhone"),
-                                 note: t("Delete old ones in Xcode: Window > Devices and Simulators. Removing the folder by hand confuses Xcode.",
-                                         "Xoá máy ảo cũ trong Xcode: Window > Devices and Simulators. Xoá tay thư mục sẽ làm Xcode lỗi."),
+                                 note: t("Delete old ones in Xcode, or run xcrun simctl delete unavailable, so Xcode keeps track of them. Don't delete the folder by hand.",
+                                         "Xoá máy ảo cũ trong Xcode, hoặc chạy lệnh xcrun simctl delete unavailable, để Xcode không bị lẫn. Đừng xoá tay thư mục."),
                                  size: sims, kind: .elsewhere))
         }
         let docker = sz(dir("Containers/com.docker.docker/Data/vms"))
         if docker >= 50_000_000 {
             other.append(SysPart(id: "docker", icon: "shippingbox", title: t("Docker disk", "Ổ ảo của Docker"),
-                                 note: t("One big file holding every image and container. Shrink it from Docker Desktop (Troubleshoot > Clean / Purge data) or with docker system prune.",
-                                         "Một file lớn chứa mọi image, container. Thu nhỏ trong Docker Desktop (Troubleshoot > Clean / Purge data) hoặc lệnh docker system prune."),
+                                 note: t("One big file holding every image and container. Shrink it from Docker Desktop (Troubleshoot > Clean up data, which removes every container and image) or with docker system prune.",
+                                         "Một file lớn chứa mọi image, container. Thu nhỏ trong Docker Desktop (Troubleshoot > Clean up data, xoá hết container và image) hoặc lệnh docker system prune."),
                                  size: docker, kind: .elsewhere))
         }
         let msg = sz(dir("Messages/Attachments"))
         if msg >= 50_000_000 {
             other.append(SysPart(id: "messages", icon: "message", title: t("Messages attachments", "Ảnh, file trong Tin nhắn"),
-                                 note: t("Photos and files from iMessage chats. Remove them in Messages (Settings > General > Keep messages) so the chats stay intact.",
-                                         "Ảnh, file trong các cuộc trò chuyện iMessage. Xoá trong app Tin nhắn (Cài đặt > Chung > Giữ tin nhắn) để cuộc trò chuyện không bị hỏng."),
+                                 note: t("Photos and files from iMessage chats. Remove them in Messages or in System Settings > General > Storage > Messages, not by deleting the folder. Note: changing Keep messages deletes whole older conversations, not only the files.",
+                                         "Ảnh, file trong các cuộc trò chuyện iMessage. Xoá trong app Tin nhắn hoặc Cài đặt hệ thống > Cài đặt chung > Dung lượng > Tin nhắn, đừng xoá tay thư mục. Lưu ý: đổi mục Giữ tin nhắn sẽ xoá cả các cuộc trò chuyện cũ, không chỉ file."),
                                  size: msg, kind: .elsewhere))
         }
 
@@ -3031,10 +3062,10 @@ enum SysData {
         let last = snaps.compactMap(snapshotDate).max()
         other.append(SysPart(id: "snapshots", icon: "clock.arrow.circlepath", title: t("Time Machine snapshots on this Mac", "Bản sao lưu Time Machine nằm trên máy"),
                              note: snaps.isEmpty
-                                ? t("None right now. When Time Machine is on and the backup disk is not plugged in, macOS keeps hourly snapshots here and removes them by itself.",
-                                    "Hiện không có. Khi bật Time Machine mà không cắm ổ sao lưu, macOS giữ bản sao lưu theo giờ ở đây và tự xoá.")
-                                : t("Kept when Time Machine runs without the backup disk. macOS removes them after about a day, or sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
-                                    "Có khi Time Machine chạy mà chưa cắm ổ sao lưu. macOS tự xoá sau khoảng một ngày, hoặc sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
+                                ? t("None right now. When automatic Time Machine backups are on, macOS keeps hourly snapshots on this Mac and removes them by itself.",
+                                    "Hiện không có. Khi bật sao lưu Time Machine tự động, macOS giữ bản chụp theo giờ trên máy và tự xoá.")
+                                : t("Time Machine takes these every hour while automatic backups are on. Hourly ones are kept for 24 hours, a few for longer, and macOS removes them sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
+                                    "Time Machine chụp mỗi giờ khi bật sao lưu tự động. Bản theo giờ giữ 24 giờ, vài bản giữ lâu hơn, và macOS xoá sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
                              size: -1, kind: snaps.isEmpty ? .system : .elsewhere,
                              detail: snaps.isEmpty ? "" : t("\(snaps.count) snapshots", "\(snaps.count) bản") + (last.map { t(", newest ", ", mới nhất ") + shortDate($0) } ?? ""),
                              actionTitle: t("Time Machine Settings", "Mở cài đặt Time Machine"), action: .url(tmURL)))
@@ -3045,8 +3076,8 @@ enum SysData {
         }
         if vm > 0 {
             other.append(SysPart(id: "vm", icon: "memorychip", title: t("Swap and sleep files", "Bộ nhớ ảo và file ngủ"),
-                                 note: t("Used when memory runs short and when the Mac sleeps. macOS creates and removes them; a restart usually shrinks them. Do not delete.",
-                                         "Dùng khi thiếu RAM và khi máy ngủ. macOS tự tạo, tự xoá; khởi động lại máy thường nhỏ đi. Không nên xoá."),
+                                 note: t("Used when memory runs short and when the Mac sleeps. macOS creates and removes them. Do not delete.",
+                                         "Dùng khi thiếu RAM và khi máy ngủ. macOS tự tạo, tự xoá. Không nên xoá."),
                                  size: vm, kind: .system))
         }
         return (clean.sorted { $0.size > $1.size } + other, purgeable())
@@ -3105,7 +3136,7 @@ struct SysPartCard: View {
                     Text(part.size < 0 ? part.detail : fmt(part.size))
                         .font(.system(size: fs(part.size < 0 ? 13 : 17), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
                     if part.size < 0 && !part.detail.isEmpty {
-                        Text(t("size not reported by macOS", "macOS không báo dung lượng")).font(.system(size: fs(10))).foregroundColor(Theme.sub)
+                        Text(t("size not measured", "chưa đo được dung lượng")).font(.system(size: fs(10))).foregroundColor(Theme.sub)
                     }
                 } }
             }.padding(14)
@@ -3130,8 +3161,8 @@ struct SysDataView: View {
                 Spacer()
                 if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
-            Text(t("macOS puts everything it cannot file under Apps, Documents or Photos into System Data. These are the parts Tidymint can measure: the ones with a checkbox can be cleaned here, the rest say where to handle them or to leave them alone.",
-                   "macOS gom mọi thứ không xếp được vào Ứng dụng, Tài liệu, Ảnh vào System Data. Đây là những phần Tidymint đo được: phần có ô chọn thì dọn được ở đây, phần còn lại ghi rõ dọn ở đâu hoặc nên để yên."))
+            Text(t("System Data is what macOS cannot file under another category: mostly logs, caches and temporary files. Below are the things that most often fill a Mac, including a few macOS lists under other categories (iOS Files, Messages, Developer). The ones with a checkbox can be cleaned here, the rest say where to handle them or to leave them alone.",
+                   "Dữ liệu hệ thống là phần macOS không xếp được vào nhóm nào khác: chủ yếu nhật ký, bộ nhớ đệm, file tạm. Dưới đây là những thứ hay làm đầy ổ mà Tidymint đo được, kể cả vài thứ macOS xếp ở nhóm khác (File iOS, Tin nhắn, Nhà phát triển). Phần có ô chọn thì dọn được ở đây, phần còn lại ghi rõ dọn ở đâu hoặc nên để yên."))
                 .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 12)
             DoneBanner(vm: vm, page: .lens)
@@ -3143,15 +3174,15 @@ struct SysDataView: View {
                         if vm.sysPurgeable >= 1_000_000_000 {
                             HStack(spacing: 10) {
                                 Image(systemName: "info.circle").foregroundColor(Theme.link)
-                                Text(t("About \(fmt(vm.sysPurgeable)) is held by data macOS can free on its own (snapshots, iCloud copies, caches). It is released when an update or a big file needs the room.",
-                                       "Khoảng \(fmt(vm.sysPurgeable)) đang bị giữ bởi dữ liệu macOS tự giải phóng được (bản sao lưu tạm, bản iCloud, bộ nhớ đệm). Khi cài bản cập nhật hay chép file lớn cần chỗ, macOS sẽ tự nhả ra."))
+                                Text(t("About \(fmt(vm.sysPurgeable)) is held by data macOS can free on its own, such as caches. It is released when an update or a big file needs the room.",
+                                       "Khoảng \(fmt(vm.sysPurgeable)) đang bị giữ bởi dữ liệu macOS tự giải phóng được, ví dụ bộ nhớ đệm. Khi cài bản cập nhật hay chép file lớn cần chỗ, macOS sẽ tự nhả ra."))
                                     .font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
                                 Spacer(minLength: 0)
                             }.padding(14).background(RoundedRectangle(cornerRadius: 14).fill(Theme.link.opacity(0.10)))
                         }
                         ForEach($vm.sysParts) { $p in SysPartCard(part: $p, vm: vm, open: open) }
-                        Text(t("The rest of System Data is macOS itself: system files, the Spotlight index, system caches. macOS looks after it; Tidymint does not touch it.",
-                               "Phần còn lại của System Data là của chính macOS: file hệ thống, chỉ mục Spotlight, bộ nhớ đệm hệ thống. macOS tự quản, Tidymint không đụng tới."))
+                        Text(t("The rest is data macOS manages itself: logs, caches and temporary files of the system. Tidymint does not touch it.",
+                               "Phần còn lại là dữ liệu macOS tự quản: nhật ký, bộ nhớ đệm, file tạm của hệ thống. Tidymint không đụng tới."))
                             .font(.system(size: fs(11))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
                     }.padding(.horizontal, 24).padding(.bottom, 16)
