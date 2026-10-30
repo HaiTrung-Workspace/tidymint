@@ -314,6 +314,15 @@ T = {
 IDS = {"en": dict(f="features", h="how", q="faq", i="install", s="signup"),
        "vi": dict(f="tinh-nang", h="cach-dung", q="hoi-dap", i="cai-dat", s="dang-ky")}
 
+def marquee(t):
+    dot = '<span class="dot" aria-hidden="true">%s</span>' % icon("leaf", 20)
+    g1 = '<div class="grp"@H@><span class="big">Keep your Mac in <span>mint condition.</span></span>' + dot + "".join('<span class="it"><span class="ic" aria-hidden="true">%s</span>%s</span>' % (icon(k, 20), x) for k, x in zip(("free", "source", "privacy", "undo"), t["mq_items"])) + dot + '</div>'
+    g2 = '<div class="grp"@H@><span class="lbl">' + t["mq_lbl"] + '</span>' + "".join('<a href="%s" target="_blank" rel="noopener"@T@>%s</a>' % (u, n) for n, u in LISTED_LINKS) + '</div>'
+    hid = lambda g: g.replace("@H@", ' aria-hidden="true"').replace("@T@", ' tabindex="-1"')
+    vis = lambda g: g.replace("@H@", "").replace("@T@", "")
+    mq = '<div class="mq"><div class="row">' + vis(g1) + hid(g1) + '</div><div class="row r2">' + vis(g2) + hid(g2) * 3 + '</div></div>'
+    return mq
+
 def page(k):
     t = T[k]; i = IDS[k]; img = t["img"]; shot = t["shot"]
     url = "https://tidymint.app/" + t["path"]
@@ -343,12 +352,7 @@ def page(k):
     arr = '<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>'
     arr = '<span class="arr" aria-hidden="true">%s</span>' % icon("arrow", 20)
     how = arr.join('<div class="card"><div class="hd"><span class="n"></span><b>%s</b></div><span>%s</span></div>' % h for h in t["how"])
-    dot = '<span class="dot" aria-hidden="true">%s</span>' % icon("leaf", 20)
-    g1 = '<div class="grp"@H@><span class="big">Keep your Mac in <span>mint condition.</span></span>' + dot + "".join('<span class="it"><span class="ic" aria-hidden="true">%s</span>%s</span>' % (icon(k, 20), x) for k, x in zip(("free", "source", "privacy", "undo"), t["mq_items"])) + dot + '</div>'
-    g2 = '<div class="grp"@H@><span class="lbl">' + t["mq_lbl"] + '</span>' + "".join('<a href="%s" target="_blank" rel="noopener"@T@>%s</a>' % (u, n) for n, u in LISTED_LINKS) + '</div>'
-    hid = lambda g: g.replace("@H@", ' aria-hidden="true"').replace("@T@", ' tabindex="-1"')
-    vis = lambda g: g.replace("@H@", "").replace("@T@", "")
-    mq = '<div class="mq"><div class="row">' + vis(g1) + hid(g1) + '</div><div class="row r2">' + vis(g2) + hid(g2) * 3 + '</div></div>'
+    mq = marquee(t)
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), html.escape(a)) for q, a in t["faq"])
     inst = "".join('<li><span class="n">%d</span><h3>%s</h3><p>%s</p></li>' % (k+1, a, b.replace("{img}", img)) for k, (a, b) in enumerate(t["inst"]))
     fcols = "".join('<div><h3>%s</h3>%s</div>' % (h, "".join('<a href="%s">%s</a>' % l for l in links)) for h, links in t["f_cols"])
