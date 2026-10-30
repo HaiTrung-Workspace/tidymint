@@ -1078,8 +1078,8 @@ struct WebAppTag: View {
     }
 }
 func webAppNote(_ browser: String) -> String {
-    t("A shortcut \(browser) made when you installed a website as an app. It holds only an icon and a launcher. Passwords and site data are kept by \(browser) in your account or on this Mac, not here. Deleting the shortcut does not remove the app from \(browser); to remove it completely, open the app › ⋮ menu › Uninstall.",
-      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app, chỉ chứa icon và lệnh mở trang. Mật khẩu và dữ liệu trang được \(browser) lưu trong tài khoản hoặc trên máy, không nằm ở đây. Xoá lối tắt không gỡ app khỏi \(browser); muốn gỡ hẳn, mở app › menu ⋮ › Gỡ cài đặt.")
+    t("A shortcut \(browser) made when you installed a website as an app. It holds only an icon and a launcher. Passwords and site data are kept by \(browser) in your account or on this Mac, not here. Deleting the shortcut does not remove the app from \(browser), which recreates it the next time you open the app. To remove it completely: open the app › ⋮ menu › Uninstall.",
+      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app, chỉ chứa icon và lệnh mở trang. Mật khẩu và dữ liệu trang được \(browser) lưu trong tài khoản hoặc trên máy, không nằm ở đây. Xoá lối tắt không gỡ app khỏi \(browser), lần sau mở app \(browser) sẽ tạo lại. Muốn gỡ hẳn: mở app › menu ⋮ › Gỡ cài đặt.")
 }
 
 enum Apps {
