@@ -1059,7 +1059,11 @@ struct AppEntry: Identifiable {
         let hosts = [("com.google.Chrome", "Chrome"), ("com.google.Chrome.beta", "Chrome"), ("com.microsoft.edgemac", "Edge"),
                      ("com.brave.Browser", "Brave"), ("org.chromium.Chromium", "Chromium"), ("com.vivaldi.Vivaldi", "Vivaldi"),
                      ("com.coccoc.Coccoc", "Cốc Cốc"), ("com.operasoftware.Opera", "Opera")]
-        return hosts.first { bundleID.hasPrefix($0.0 + ".app.") }?.1
+        guard let b = hosts.first(where: { bundleID.hasPrefix($0.0 + ".app.") })?.1 else { return nil }
+        // Only the real launcher shape counts: a single app_mode_loader binary, nothing else that could hold data.
+        let bin = url.appendingPathComponent("Contents/MacOS")
+        guard (try? FileManager.default.contentsOfDirectory(atPath: bin.path)) == ["app_mode_loader"] else { return nil }
+        return b
     }
 }
 
@@ -1074,8 +1078,8 @@ struct WebAppTag: View {
     }
 }
 func webAppNote(_ browser: String) -> String {
-    t("Only a shortcut that opens a website. Removing it loses no data: what you saved stays in \(browser) and your account.",
-      "Chỉ là lối tắt mở trang web. Gỡ đi không mất dữ liệu: những gì bạn lưu vẫn nằm trong \(browser) và tài khoản của bạn.")
+    t("A shortcut \(browser) made when a website was installed as an app. It holds only an icon and a launcher, no data. What the site keeps (passwords, documents) is stored by \(browser) and your account, and Tidymint never touches it.",
+      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app. Gói này chỉ có icon và lệnh mở trang, không chứa dữ liệu. Những gì trang web lưu (mật khẩu, tài liệu) do \(browser) và tài khoản của bạn giữ, Tidymint không đụng tới.")
 }
 
 enum Apps {
