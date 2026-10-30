@@ -79,6 +79,20 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-siz
 
 .fcols .tagline{margin:10px 0 0;font-size:15px;font-weight:600;color:var(--leaf)}
 .endcard h2 .mt{color:var(--leaf);white-space:nowrap}
+.mqs{padding-top:24px;padding-bottom:24px}
+.mq{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mq .row{display:flex;width:max-content;animation:mq 40s linear infinite}
+.mq .row.r2{animation-direction:reverse;animation-duration:50s;margin-top:14px}
+.mq .grp{display:flex;align-items:center;gap:28px;padding-right:28px;white-space:nowrap}
+.mq .big{font-size:28px;font-weight:800;letter-spacing:-.5px;color:var(--text)}.mq .big span{color:var(--leaf)}
+.mq .it{font-size:20px;font-weight:600;color:var(--sub)}
+.mq .dot{color:var(--leaf);display:inline-flex}
+.mq .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--leaf)}
+.mq .r2 a{font-size:16px;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:7px 14px}
+.mq .r2 a:hover{color:var(--text);border-color:#2fd39faa;text-decoration:none}
+.mq:hover .row{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mq .row{animation:none}}
 
 .topnav{position:sticky;top:0;z-index:10;background:#030c09e6;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #ffffff12}
 nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
