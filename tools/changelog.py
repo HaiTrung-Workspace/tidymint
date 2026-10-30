@@ -1,7 +1,7 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
-    dict(ver="0.3.6", date="2026-11-01", status="released",
+    dict(ver="0.3.6", date="2026-10-30", status="released",
          en=["New: \"What is in System Data\" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, and where to handle the rest",
              "New: Statistics shows a chart of free space per day (7, 30 or 90 days)",
              "Clean Now lists Xcode build data per project, never pre-selected",
