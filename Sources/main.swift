@@ -64,7 +64,10 @@ var systemTextScale: CGFloat { min(1.4, max(0.9, NSFont.preferredFont(forTextSty
 var uiScale: CGFloat { systemTextScale * (appTextSize == "small" ? 0.8 : (appTextSize == "large" ? 1.2 : 1.0)) }
 func fs(_ v: CGFloat) -> CGFloat { v * uiScale }
 /// Sponsor page on the website (not GitHub directly), so the destination can change without a new app release.
-var sponsorURL: URL { URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/"))! }
+/// Sponsor page with UTM so GA4 can tell clicks from the app (place: "button" or "menubar").
+func sponsorURL(_ place: String) -> URL {
+    URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/") + "?utm_source=tidymint&utm_medium=app&utm_campaign=sponsor&utm_content=\(place)")!
+}
 
 var appTheme: String = UserDefaults.standard.string(forKey: "theme").flatMap { id in palettes.contains { $0.id == id } ? id : nil } ?? "mint"
 
@@ -133,6 +136,96 @@ func shortDate(_ d: Date) -> String {
 /// Replacement for @State.
 final class Flag: ObservableObject { @Published var v = false }
 
+/// Tooltip drawn by the app itself. macOS help tags often never appear on SwiftUI views that also track the mouse
+/// (hover tiles, cursors), so every tooltip in Tidymint uses this: a small bubble near the pointer after half a second.
+/// The bubble lives in its own borderless panel above the window, so it is never clipped by the window edge,
+/// a scroll view or a neighbouring control, and it is kept inside the visible screen.
+final class TipPanel {
+    static let shared = TipPanel()
+    private var panel: NSPanel?
+    private var owner: ObjectIdentifier?
+    private var monitor: Any?
+    private let maxW: CGFloat = 280
+
+    func show(_ text: String, owner o: ObjectIdentifier) {
+        guard !text.isEmpty else { return }
+        let font = NSFont.systemFont(ofSize: fs(11))
+        let line = (text as NSString).size(withAttributes: [.font: font]).width
+        let w = min(ceil(line) + 2, maxW)
+        let host = NSHostingView(rootView: TipBubble(text: text, width: w))
+        let size = host.fittingSize
+        let p = panel ?? make()
+        p.contentView = host
+        let mouse = NSEvent.mouseLocation
+        var origin = NSPoint(x: mouse.x - 14, y: mouse.y - size.height - 14)
+        if let scr = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main {
+            let vf = scr.visibleFrame
+            origin.x = min(max(origin.x, vf.minX + 4), vf.maxX - size.width - 4)
+            if origin.y < vf.minY + 4 { origin.y = mouse.y + 18 }
+        }
+        p.setFrame(NSRect(origin: origin, size: size), display: true)
+        p.orderFrontRegardless()
+        owner = o
+    }
+    func hide(owner o: ObjectIdentifier? = nil) {
+        if let o, o != owner { return }
+        panel?.orderOut(nil); owner = nil
+    }
+    private func make() -> NSPanel {
+        let p = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = false
+        p.level = .popUpMenu; p.ignoresMouseEvents = true; p.isReleasedWhenClosed = false
+        p.collectionBehavior = [.canJoinAllSpaces, .transient, .ignoresCycle]
+        panel = p
+        // Like system tooltips: any click, scroll or key press dismisses the bubble.
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .scrollWheel, .keyDown]) { [weak self] e in
+            self?.hide(); return e
+        }
+        NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in self?.hide() }
+        return p
+    }
+}
+struct TipBubble: View {
+    let text: String; let width: CGFloat
+    var body: some View {
+        Text(text).font(.system(size: fs(11))).foregroundColor(Color(nsColor: .labelColor))
+            .multilineTextAlignment(.leading).frame(width: width, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .windowBackgroundColor)))
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: .separatorColor), lineWidth: 1))
+            .shadow(color: .black.opacity(0.25), radius: 5, y: 2)
+            .padding(8)   // room for the shadow inside the panel
+    }
+}
+final class TipState: ObservableObject {
+    private var item: DispatchWorkItem?
+    var text = ""
+    func hover(_ inside: Bool) {
+        item?.cancel(); item = nil
+        let me = ObjectIdentifier(self)
+        guard inside, !text.isEmpty else { TipPanel.shared.hide(owner: me); return }
+        let i = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            TipPanel.shared.show(self.text, owner: ObjectIdentifier(self))
+        }
+        item = i; DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: i)
+    }
+}
+struct Tip: ViewModifier {
+    let text: String
+    var trailing = false   // kept for call sites; the floating bubble places itself inside the screen
+    @StateObject private var st = TipState()
+    func body(content: Content) -> some View {
+        content
+            .onHover { inside in st.text = text; st.hover(inside) }
+            .onDisappear { st.hover(false) }
+    }
+}
+extension View {
+    func tip(_ text: String, trailing: Bool = false) -> some View { modifier(Tip(text: text, trailing: trailing)) }
+}
+
 /// macOS-style hover: soft highlight behind the row.
 struct HoverBG: ViewModifier {
     var radius: CGFloat = 8
@@ -154,6 +247,38 @@ struct HoverLift: ViewModifier {
             .onHover { v in withAnimation(.easeOut(duration: 0.12)) { h.v = v } }
     }
 }
+/// Soft tile behind a small control on hover, hand cursor: shows it is clickable without a permanent border.
+struct HoverTile: ViewModifier {
+    var enabled = true
+    @StateObject private var h = Flag()
+    func body(content: Content) -> some View {
+        content
+            .background(RoundedRectangle(cornerRadius: 6).fill(Theme.text.opacity(h.v && enabled ? 0.12 : 0)))
+            .contentShape(Rectangle())
+            .onHover { v in
+                withAnimation(.easeOut(duration: 0.12)) { h.v = v }
+                if enabled { (v ? NSCursor.pointingHand : NSCursor.arrow).set() }
+            }
+    }
+}
+extension View { func hoverTile(_ enabled: Bool = true) -> some View { modifier(HoverTile(enabled: enabled)) } }
+/// Icon-only buttons: the whole square takes the click (not only the icon's strokes), tile on hover, slight press.
+struct IconButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View { IconBody(configuration: configuration) }
+    struct IconBody: View {
+        let configuration: Configuration
+        @Environment(\.isEnabled) private var enabled
+        var body: some View {
+            configuration.label
+                .padding(.horizontal, 5).frame(minWidth: 26 * uiScale, minHeight: 24 * uiScale)
+                .hoverTile(enabled)
+                .scaleEffect(configuration.isPressed ? 0.92 : 1)
+                .opacity(enabled ? 1 : 0.35)
+        }
+    }
+}
+extension ButtonStyle where Self == IconButtonStyle { static var icon: IconButtonStyle { IconButtonStyle() } }
+
 /// Clickable text: link colour, underline + brighter + hand cursor on hover, so it reads as a link.
 struct TextLink: View {
     let title: String
@@ -373,6 +498,8 @@ enum Scanner {
             case n.contains("Outlook"): k += ["Outlook"]
             case n.contains("WhatsApp"): k += ["whatsapp", "WhatsApp"]
             case n.contains("Firefox"): k += ["Firefox", "Mozilla"]
+            // Xcode and Simulator: their data lives under Developer/, which holds no bundle id to match.
+            case b == "com.apple.dt.Xcode" || b == "com.apple.iphonesimulator": k += ["/Developer/Xcode/", "/Developer/CoreSimulator/"]
             default: break
             }
             if !b.isEmpty { k.append(b) }
@@ -673,17 +800,25 @@ enum AppRules {
         // offer their own delete buttons for Cache, rendering cache (prerender), proxies (agencycache) and remux files.
         // Other Cache subfolders can hold imported media, so they are left alone.
         AppRule(id: "capcut", nameEN: "CapCut", nameVI: "CapCut", bundleIDs: ["com.lemon.lvoverseas"], marker: "Movies/CapCut/User Data", sections: [
+            // Pre-selected only what is shown to be rebuilt (thumbnails, waveforms, analysis caches, logs).
+            // recognize (auto captions), ttsTemp (text-to-speech audio) and tmp are not verified: a project may point to them,
+            // so they are offered but not pre-selected. Source: research/nguon-chinh-thuc/capcut.md
             AppSection(id: "cache", titleEN: "Scratch files", titleVI: "File tạm khi dựng video",
-                       paths: ["recognize", "frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" }
+                       paths: ["frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB"].map { "Movies/CapCut/User Data/Cache/\($0)" }
                               + ["Movies/CapCut/User Data/Log"],
                        safety: .safe,
                        whyEN: "Thumbnails, waveforms, analysis caches and logs. CapCut rebuilds them when you open a project.",
                        whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký. CapCut tự tạo lại khi mở dự án."),
+            AppSection(id: "speech", titleEN: "Captions and voice-over scratch", titleVI: "File tạm phụ đề và giọng đọc",
+                       paths: ["recognize", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       safety: .review,
+                       whyEN: "Working files for auto captions and text-to-speech. A project you are still editing may use them, so check before removing.",
+                       whyVI: "File làm việc của phụ đề tự động và giọng đọc. Dự án đang dựng có thể còn dùng, nên xem kỹ trước khi bỏ."),
             AppSection(id: "render", titleEN: "Rendering cache and proxies", titleVI: "Bản dựng sẵn và proxy",
                        paths: ["prerender", "agencycache", "RemuxCache"].map { "Movies/CapCut/User Data/Cache/\($0)" },
                        safety: .review,
-                       whyEN: "Pre-rendered previews and low-res copies of your clips. CapCut makes them again, but previews may lag until it does. Same as the delete buttons in CapCut Settings > Performance.",
-                       whyVI: "Bản dựng sẵn để xem trước và bản sao độ phân giải thấp của video. CapCut tạo lại, nhưng xem trước có thể giật cho tới khi tạo xong. Giống nút xoá trong Cài đặt › Performance của CapCut."),
+                       whyEN: "Preview renders, low-res proxies and converted copies of your clips. CapCut makes them again; previews may lag for a while. CapCut also clears them in Settings > Performance.",
+                       whyVI: "Bản dựng sẵn, proxy và bản chuyển định dạng của video. CapCut tạo lại, xem trước có thể giật một lúc. Trong CapCut cũng xoá được ở Cài đặt › Performance."),
             AppSection(id: "projects", titleEN: "Projects", titleVI: "Dự án",
                        paths: ["Movies/CapCut/User Data/Projects"],
                        safety: .locked, whyEN: "Your edits. Tidymint never touches them.", whyVI: "Dự án bạn đang dựng. Tidymint không bao giờ đụng vào.", dbGuard: false),
@@ -928,6 +1063,33 @@ struct AppEntry: Identifiable {
     var size: Int64
     var lastUsed: Date?
     var related: [CleanItem] = []
+    /// Chromium browsers "install" a website as a tiny launcher app (bundle id <browser>.app.<id>, e.g. Google Password
+    /// Manager, Docs). It only opens the site; the data stays in the browser profile and the account, which Tidymint never touches.
+    var webAppBrowser: String? {
+        let hosts = [("com.google.Chrome", "Chrome"), ("com.google.Chrome.beta", "Chrome"), ("com.microsoft.edgemac", "Edge"),
+                     ("com.brave.Browser", "Brave"), ("org.chromium.Chromium", "Chromium"), ("com.vivaldi.Vivaldi", "Vivaldi"),
+                     ("com.coccoc.Coccoc", "Cốc Cốc"), ("com.operasoftware.Opera", "Opera")]
+        guard let b = hosts.first(where: { bundleID.hasPrefix($0.0 + ".app.") })?.1 else { return nil }
+        // Only the real launcher shape counts: a single app_mode_loader binary, nothing else that could hold data.
+        let bin = url.appendingPathComponent("Contents/MacOS")
+        guard (try? FileManager.default.contentsOfDirectory(atPath: bin.path)) == ["app_mode_loader"] else { return nil }
+        return b
+    }
+}
+
+/// Small grey tag for a browser web app, with the reassurance as a tooltip.
+struct WebAppTag: View {
+    let browser: String
+    var body: some View {
+        Text(t("\(browser) web app", "Web app của \(browser)")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.sub)
+            .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(Theme.sub.opacity(0.15)))
+            .fixedSize()
+            .tip(webAppNote(browser))
+    }
+}
+func webAppNote(_ browser: String) -> String {
+    t("A shortcut \(browser) made when you installed a website as an app. It holds only an icon and a launcher. Passwords and site data are kept by \(browser) in your account or on this Mac, not here. Deleting the shortcut does not remove the app from \(browser), which recreates it the next time you open the app. To remove it completely: open the app › ⋮ menu › Uninstall.",
+      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app, chỉ chứa icon và lệnh mở trang. Mật khẩu và dữ liệu trang được \(browser) lưu trong tài khoản hoặc trên máy, không nằm ở đây. Xoá lối tắt không gỡ app khỏi \(browser), lần sau mở app \(browser) sẽ tạo lại. Muốn gỡ hẳn: mở app › menu ⋮ › Gỡ cài đặt.")
 }
 
 enum Apps {
@@ -1356,9 +1518,16 @@ enum Phase { case idle, scanning, summary, review, done }
                       t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.",
                         "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."),
                       t("Uninstall", "Gỡ")) else { return }
-        NSWorkspace.shared.recycle([a.url]) { _, err in
+        NSWorkspace.shared.recycle([a.url]) { newURLs, err in
             Task { @MainActor in
-                let (ok, _) = self.trash(extra.map(\.url))
+                guard err == nil else {
+                    // The app itself could not go to the Trash: leave its related files where they are.
+                    self.appsMsg = t("Could not move \(a.name) to the Trash: \(err!.localizedDescription)", "Không chuyển được \(a.name) vào Thùng rác: \(err!.localizedDescription)")
+                    self.log(self.appsMsg); return
+                }
+                // Record the app in the Undo journal together with its related files, so Undo puts all of it back.
+                let appEntry = newURLs[a.url].map { [Journal.Entry(from: a.url.path, to: $0.path, size: a.size)] } ?? []
+                let (ok, _) = self.trash(extra.map(\.url), label: a.name, alsoUndo: appEntry)
                 if err == nil {
                     self.apps.removeAll { $0.id == id }; self.selApp = nil
                     self.finished(.apps, ok + 1, total, 0)
@@ -1815,10 +1984,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var undoable: Journal.Session? = Journal.load()
     /// Move items to the Trash and remember where each one went, so the whole run can be undone.
     /// `strict` refuses paths outside the home folder or too close to its root (off only for a folder the user picked by hand).
-    func trash(_ urls: [URL], label: String = "", strict: Bool = true) -> (Int, Int) {
+    func trash(_ urls: [URL], label: String = "", strict: Bool = true, alsoUndo: [Journal.Entry] = []) -> (Int, Int) {
         var ok = 0, fail = 0
         lastOK = []; lastErr = ""
-        var moved: [Journal.Entry] = []
+        var moved: [Journal.Entry] = alsoUndo
         for u in urls {
             if strict && !Scanner.safeToTrash(u) {
                 fail += 1
@@ -1830,8 +1999,10 @@ enum Phase { case idle, scanning, summary, review, done }
             do { try FileManager.default.trashItem(at: u, resultingItemURL: &dest); ok += 1; lastOK.insert(u)
                  if let d = dest as URL? { moved.append(Journal.Entry(from: u.path, to: d.path, size: size)) } }
             catch {
-                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly
-                if FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
+                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly.
+                // Only for iCloud Drive on the startup volume: anything else (external or network drive, other errors)
+                // is reported, never copied across drives. Source: research/nguon-chinh-thuc/macos-thung-rac.md
+                if isICloudDriveOnHomeVolume(u), FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
                     ok += 1; lastOK.insert(u)
                     moved.append(Journal.Entry(from: u.path, to: d.path, size: size))
                     continue
@@ -2103,6 +2274,17 @@ enum Phase { case idle, scanning, summary, review, done }
 }
 
 /// Move a file into ~/.Trash directly (used when the standard Trash refuses, e.g. iCloud Drive files).
+/// True for a file inside ~/Library/Mobile Documents (iCloud Drive) that sits on the same volume as the home folder.
+func isICloudDriveOnHomeVolume(_ u: URL) -> Bool {
+    let home = URL(fileURLWithPath: NSHomeDirectory())
+    let icloud = home.appendingPathComponent("Library/Mobile Documents").resolvingSymlinksInPath().path + "/"
+    guard u.resolvingSymlinksInPath().path.hasPrefix(icloud) else { return false }
+    let a = try? u.resourceValues(forKeys: [.volumeIdentifierKey]).volumeIdentifier as? NSObject
+    let b = try? home.resourceValues(forKeys: [.volumeIdentifierKey]).volumeIdentifier as? NSObject
+    guard let a, let b else { return false }
+    return a.isEqual(b)
+}
+
 func moveToUserTrash(_ u: URL) throws -> URL {
     let trash = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".Trash")
     var dest = trash.appendingPathComponent(u.lastPathComponent)
@@ -2312,8 +2494,8 @@ func folderInfo(_ u: URL) -> String? {
         "Group Containers": ("Data shared between apps of one maker (Office, Messages...).", "Dữ liệu dùng chung giữa các app cùng hãng (Office, Tin nhắn...)."),
         "Mobile Documents": ("iCloud Drive files kept on this Mac.", "File iCloud Drive đang lưu trên máy."),
         "CloudStorage": ("Google Drive / OneDrive / Dropbox files on this Mac. Use Cloud Cleanup.", "File Google Drive / OneDrive / Dropbox trên máy. Dọn ở mục Dữ liệu đám mây."),
-        "Developer": ("Xcode data, simulators and build files. Often large, mostly safe to clear.", "Dữ liệu Xcode, máy ảo, file build. Thường nặng, phần lớn xoá được."),
-        "DerivedData": ("Xcode build files. Safe to clear.", "File build của Xcode. Xoá được."),
+        "Developer": ("Xcode data, simulators, build files and archives. Build files can go; keep the archives of apps you released.", "Dữ liệu Xcode, máy ảo, file build và bản archive. File build xoá được; giữ archive của bản đã phát hành."),
+        "DerivedData": ("Xcode build files. Xcode makes them again; the next build is slower. Quit Xcode first.", "File build của Xcode. Xcode tự tạo lại, lần build sau lâu hơn. Đóng Xcode trước."),
         "CoreSimulator": ("iPhone simulators. Delete old ones in Xcode.", "Máy ảo iPhone. Xoá bản cũ trong Xcode."),
         "Logs": ("Log files. Safe to clear.", "File nhật ký. Xoá được."),
         "Mail": ("Mail messages and attachments. Manage in the Mail app.", "Thư và tệp đính kèm. Dọn trong app Mail."),
@@ -2331,7 +2513,7 @@ func folderInfo(_ u: URL) -> String? {
         ".Trash": ("The Trash.", "Thùng rác."),
         "Photos Library.photoslibrary": ("Photos library. Do not delete here, manage in Photos.", "Thư viện Ảnh. Đừng xoá ở đây, dọn trong app Ảnh."),
         "Saved Application State": ("Window positions of apps. Safe to clear.", "Vị trí cửa sổ app. Xoá được."),
-        "iOS DeviceSupport": ("Debug files for each iPhone you plugged in. Safe to clear.", "File gỡ lỗi cho từng iPhone từng cắm. Xoá được."),
+        "iOS DeviceSupport": ("System symbols copied from each iPhone you plugged in, used to read crash reports. Old versions can go; Xcode copies them again only from a device still on that version.", "Ký hiệu hệ thống chép từ từng iPhone từng cắm, dùng để đọc báo cáo lỗi. Bản cũ xoá được; Xcode chỉ chép lại từ máy còn chạy đúng bản đó."),
         "Draw Things": ("Draw Things AI models. Large; remove unused models inside the app.", "Model AI của Draw Things. Rất nặng, gỡ model không dùng ngay trong app."),
         "huggingface": ("Downloaded AI models (Hugging Face). Re-downloadable.", "Model AI tải từ Hugging Face. Tải lại được."),
         ".ollama": ("Ollama AI models. Remove unused ones with 'ollama rm'.", "Model AI của Ollama. Gỡ model không dùng bằng 'ollama rm'."),
@@ -2491,7 +2673,7 @@ struct SafetyBadge: View {
         }
         .foregroundColor(level.color).padding(.horizontal, 7).padding(.vertical, 2)
         .background(Capsule().fill(level.color.opacity(0.15)))
-        .help(why)
+        .tip(why)
     }
 }
 
@@ -2501,6 +2683,9 @@ struct CheckBox: View {
         Image(systemName: state == 2 ? "checkmark.square.fill" : (state == 1 ? "minus.square.fill" : "square"))
             .font(.system(size: fs(17), weight: .medium))
             .foregroundStyle(state == 0 ? AnyShapeStyle(Theme.ink.opacity(0.5)) : AnyShapeStyle(Theme.accent))
+            // The whole square takes the click, not only the outline; hand cursor, no hover colour (lists stay calm).
+            .contentShape(Rectangle())
+            .onHover { ($0 ? NSCursor.pointingHand : NSCursor.arrow).set() }
     }
 }
 
@@ -2638,7 +2823,7 @@ struct ItemRow: View {
                     if !item.note.isEmpty {
                         Text(item.note).font(.system(size: fs(10), weight: .semibold)).foregroundColor(item.noteColor)
                             .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(item.noteColor.opacity(0.15)))
-                            .help(item.refHelp)
+                            .tip(item.refHelp)
                     }
                 }
             }
@@ -2679,7 +2864,7 @@ struct DoneBanner: View {
                 if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
                 GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.doneInfo = nil; vm.page = .trash }
                 Button { vm.doneInfo = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub).help(t("Close", "Đóng"))
+                    .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
             }
             .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.green.opacity(0.12)))
             .padding(.horizontal, 24).padding(.bottom, 10)
@@ -2810,8 +2995,8 @@ enum SysData {
         }.sorted { $0.size > $1.size }
         if !backups.isEmpty {
             clean.append(SysPart(id: "backups", icon: "iphone", title: t("iPhone and iPad backups", "Bản sao lưu iPhone, iPad"),
-                                 note: t("Made by Finder when the phone was plugged in. Keep the newest one of each device you still use; old devices and old copies can go.",
-                                         "Finder tạo khi cắm điện thoại vào máy. Giữ bản mới nhất của máy còn dùng; máy cũ và bản cũ thì bỏ được."),
+                                 note: t("Made by Finder when the phone was plugged in. Keep the newest one of each device you still use. Remove an old device's backup only if you are sure you no longer need what is in it: it may be the only copy. Apple's way: Finder > select the device > Manage Backups.",
+                                         "Finder tạo khi cắm điện thoại vào máy. Giữ bản mới nhất của máy còn dùng. Bản của máy cũ chỉ bỏ khi chắc không cần dữ liệu trong đó: có thể đó là bản duy nhất. Cách của Apple: Finder > chọn máy > Quản lý bản sao lưu."),
                                  size: backups.reduce(0) { $0 + $1.size }, kind: .clean, items: backups))
         }
 
@@ -2828,16 +3013,25 @@ enum SysData {
         // Xcode leftovers
         var xc: [CleanItem] = []
         if let i = item(dir("Developer/Xcode/DerivedData"), on: false, label: t("Build files (DerivedData)", "File build (DerivedData)")) { xc.append(i) }
-        if let i = item(dir("Developer/CoreSimulator/Caches"), on: true, label: t("Simulator caches", "Bộ nhớ đệm máy ảo")) { xc.append(i) }
+        if let i = item(dir("Developer/CoreSimulator/Caches"), on: false, label: t("Simulator caches", "Bộ nhớ đệm máy ảo")) { xc.append(i) }
         for r in ["iOS DeviceSupport", "watchOS DeviceSupport", "tvOS DeviceSupport", "visionOS DeviceSupport"] {
             xc += Scanner.children(dir("Developer/Xcode/" + r)).compactMap { item($0, on: false, label: r.replacingOccurrences(of: "DeviceSupport", with: "") + $0.lastPathComponent) }
         }
-        xc += Scanner.children(dir("Developer/Xcode/Archives")).compactMap { item($0, on: false, label: t("Archive ", "Bản lưu trữ ") + $0.lastPathComponent) }
         if !xc.isEmpty {
             clean.append(SysPart(id: "xcode", icon: "hammer", title: t("Xcode leftovers", "Rác của Xcode"),
-                                 note: t("Build files rebuild on their own. Device support files are fetched again when a device is plugged in. Archives are builds you shipped: keep the ones you still need.",
-                                         "File build tự tạo lại. File hỗ trợ thiết bị tải lại khi cắm máy. Bản lưu trữ là bản build đã nộp: giữ bản còn cần."),
+                                 note: t("Build files rebuild on their own, the next build is slower; quit Xcode first. Device support files are copied again only from a device still on that system version.",
+                                         "File build tự tạo lại, lần build sau lâu hơn; đóng Xcode trước. File hỗ trợ thiết bị chỉ được chép lại từ máy còn chạy đúng bản hệ điều hành đó."),
                                  size: xc.reduce(0) { $0 + $1.size }, kind: .clean, items: xc.sorted { $0.size > $1.size }))
+        }
+
+        // Archives: never offered here. Apple asks developers to keep the archive of every release (crash reports, re-distribution).
+        // Source: research/nguon-chinh-thuc/xcode.md
+        let archives = sz(dir("Developer/Xcode/Archives"))
+        if archives >= 50_000_000 {
+            other.append(SysPart(id: "archives", icon: "archivebox", title: t("Xcode archives", "Bản archive của Xcode"),
+                                 note: t("Builds you archived in Xcode. Keep the archive of every version you released: it is needed to read crash reports and to distribute that build again. Remove old ones in Xcode's Organizer.",
+                                         "Các bản build đã archive trong Xcode. Giữ archive của mọi bản đã phát hành: cần để đọc báo cáo lỗi và phát hành lại bản đó. Xoá bản cũ trong cửa sổ Organizer của Xcode."),
+                                 size: archives, kind: .elsewhere))
         }
 
         // Things that are cleaned elsewhere
@@ -2851,22 +3045,22 @@ enum SysData {
         let sims = sz(dir("Developer/CoreSimulator/Devices"))
         if sims >= 50_000_000 {
             other.append(SysPart(id: "sims", icon: "ipad.and.iphone", title: t("iPhone simulators", "Máy ảo iPhone"),
-                                 note: t("Delete old ones in Xcode: Window > Devices and Simulators. Removing the folder by hand confuses Xcode.",
-                                         "Xoá máy ảo cũ trong Xcode: Window > Devices and Simulators. Xoá tay thư mục sẽ làm Xcode lỗi."),
+                                 note: t("Delete old ones in Xcode, or run xcrun simctl delete unavailable, so Xcode keeps track of them. Don't delete the folder by hand.",
+                                         "Xoá máy ảo cũ trong Xcode, hoặc chạy lệnh xcrun simctl delete unavailable, để Xcode không bị lẫn. Đừng xoá tay thư mục."),
                                  size: sims, kind: .elsewhere))
         }
         let docker = sz(dir("Containers/com.docker.docker/Data/vms"))
         if docker >= 50_000_000 {
             other.append(SysPart(id: "docker", icon: "shippingbox", title: t("Docker disk", "Ổ ảo của Docker"),
-                                 note: t("One big file holding every image and container. Shrink it from Docker Desktop (Troubleshoot > Clean / Purge data) or with docker system prune.",
-                                         "Một file lớn chứa mọi image, container. Thu nhỏ trong Docker Desktop (Troubleshoot > Clean / Purge data) hoặc lệnh docker system prune."),
+                                 note: t("One big file holding every image and container. Shrink it from Docker Desktop (Troubleshoot > Clean up data, which removes every container and image) or with docker system prune.",
+                                         "Một file lớn chứa mọi image, container. Thu nhỏ trong Docker Desktop (Troubleshoot > Clean up data, xoá hết container và image) hoặc lệnh docker system prune."),
                                  size: docker, kind: .elsewhere))
         }
         let msg = sz(dir("Messages/Attachments"))
         if msg >= 50_000_000 {
             other.append(SysPart(id: "messages", icon: "message", title: t("Messages attachments", "Ảnh, file trong Tin nhắn"),
-                                 note: t("Photos and files from iMessage chats. Remove them in Messages (Settings > General > Keep messages) so the chats stay intact.",
-                                         "Ảnh, file trong các cuộc trò chuyện iMessage. Xoá trong app Tin nhắn (Cài đặt > Chung > Giữ tin nhắn) để cuộc trò chuyện không bị hỏng."),
+                                 note: t("Photos and files from iMessage chats. Remove them in Messages or in System Settings > General > Storage > Messages, not by deleting the folder. Note: changing Keep messages deletes whole older conversations, not only the files.",
+                                         "Ảnh, file trong các cuộc trò chuyện iMessage. Xoá trong app Tin nhắn hoặc Cài đặt hệ thống > Cài đặt chung > Dung lượng > Tin nhắn, đừng xoá tay thư mục. Lưu ý: đổi mục Giữ tin nhắn sẽ xoá cả các cuộc trò chuyện cũ, không chỉ file."),
                                  size: msg, kind: .elsewhere))
         }
 
@@ -2876,10 +3070,10 @@ enum SysData {
         let last = snaps.compactMap(snapshotDate).max()
         other.append(SysPart(id: "snapshots", icon: "clock.arrow.circlepath", title: t("Time Machine snapshots on this Mac", "Bản sao lưu Time Machine nằm trên máy"),
                              note: snaps.isEmpty
-                                ? t("None right now. When Time Machine is on and the backup disk is not plugged in, macOS keeps hourly snapshots here and removes them by itself.",
-                                    "Hiện không có. Khi bật Time Machine mà không cắm ổ sao lưu, macOS giữ bản sao lưu theo giờ ở đây và tự xoá.")
-                                : t("Kept when Time Machine runs without the backup disk. macOS removes them after about a day, or sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
-                                    "Có khi Time Machine chạy mà chưa cắm ổ sao lưu. macOS tự xoá sau khoảng một ngày, hoặc sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
+                                ? t("None right now. When automatic Time Machine backups are on, macOS keeps hourly snapshots on this Mac and removes them by itself.",
+                                    "Hiện không có. Khi bật sao lưu Time Machine tự động, macOS giữ bản chụp theo giờ trên máy và tự xoá.")
+                                : t("Time Machine takes these every hour while automatic backups are on. Hourly ones are kept for 24 hours, a few for longer, and macOS removes them sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
+                                    "Time Machine chụp mỗi giờ khi bật sao lưu tự động. Bản theo giờ giữ 24 giờ, vài bản giữ lâu hơn, và macOS xoá sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
                              size: -1, kind: snaps.isEmpty ? .system : .elsewhere,
                              detail: snaps.isEmpty ? "" : t("\(snaps.count) snapshots", "\(snaps.count) bản") + (last.map { t(", newest ", ", mới nhất ") + shortDate($0) } ?? ""),
                              actionTitle: t("Time Machine Settings", "Mở cài đặt Time Machine"), action: .url(tmURL)))
@@ -2890,8 +3084,8 @@ enum SysData {
         }
         if vm > 0 {
             other.append(SysPart(id: "vm", icon: "memorychip", title: t("Swap and sleep files", "Bộ nhớ ảo và file ngủ"),
-                                 note: t("Used when memory runs short and when the Mac sleeps. macOS creates and removes them; a restart usually shrinks them. Do not delete.",
-                                         "Dùng khi thiếu RAM và khi máy ngủ. macOS tự tạo, tự xoá; khởi động lại máy thường nhỏ đi. Không nên xoá."),
+                                 note: t("Used when memory runs short and when the Mac sleeps. macOS creates and removes them. Do not delete.",
+                                         "Dùng khi thiếu RAM và khi máy ngủ. macOS tự tạo, tự xoá. Không nên xoá."),
                                  size: vm, kind: .system))
         }
         return (clean.sorted { $0.size > $1.size } + other, purgeable())
@@ -2950,7 +3144,7 @@ struct SysPartCard: View {
                     Text(part.size < 0 ? part.detail : fmt(part.size))
                         .font(.system(size: fs(part.size < 0 ? 13 : 17), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
                     if part.size < 0 && !part.detail.isEmpty {
-                        Text(t("size not reported by macOS", "macOS không báo dung lượng")).font(.system(size: fs(10))).foregroundColor(Theme.sub)
+                        Text(t("size not measured", "chưa đo được dung lượng")).font(.system(size: fs(10))).foregroundColor(Theme.sub)
                     }
                 } }
             }.padding(14)
@@ -2970,13 +3164,13 @@ struct SysDataView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
-                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text).help(t("Back", "Lùi"))
+                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon).foregroundColor(Theme.text).tip(t("Back", "Lùi"))
                 Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
                 Spacer()
                 if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
-            Text(t("macOS puts everything it cannot file under Apps, Documents or Photos into System Data. These are the parts Tidymint can measure: the ones with a checkbox can be cleaned here, the rest say where to handle them or to leave them alone.",
-                   "macOS gom mọi thứ không xếp được vào Ứng dụng, Tài liệu, Ảnh vào System Data. Đây là những phần Tidymint đo được: phần có ô chọn thì dọn được ở đây, phần còn lại ghi rõ dọn ở đâu hoặc nên để yên."))
+            Text(t("System Data is what macOS cannot file under another category: mostly logs, caches and temporary files. Below are the things that most often fill a Mac, including a few macOS lists under other categories (iOS Files, Messages, Developer). The ones with a checkbox can be cleaned here, the rest say where to handle them or to leave them alone.",
+                   "Dữ liệu hệ thống là phần macOS không xếp được vào nhóm nào khác: chủ yếu nhật ký, bộ nhớ đệm, file tạm. Dưới đây là những thứ hay làm đầy ổ mà Tidymint đo được, kể cả vài thứ macOS xếp ở nhóm khác (File iOS, Tin nhắn, Nhà phát triển). Phần có ô chọn thì dọn được ở đây, phần còn lại ghi rõ dọn ở đâu hoặc nên để yên."))
                 .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 12)
             DoneBanner(vm: vm, page: .lens)
@@ -2988,15 +3182,15 @@ struct SysDataView: View {
                         if vm.sysPurgeable >= 1_000_000_000 {
                             HStack(spacing: 10) {
                                 Image(systemName: "info.circle").foregroundColor(Theme.link)
-                                Text(t("About \(fmt(vm.sysPurgeable)) is held by data macOS can free on its own (snapshots, iCloud copies, caches). It is released when an update or a big file needs the room.",
-                                       "Khoảng \(fmt(vm.sysPurgeable)) đang bị giữ bởi dữ liệu macOS tự giải phóng được (bản sao lưu tạm, bản iCloud, bộ nhớ đệm). Khi cài bản cập nhật hay chép file lớn cần chỗ, macOS sẽ tự nhả ra."))
+                                Text(t("About \(fmt(vm.sysPurgeable)) is held by data macOS can free on its own, such as caches. It is released when an update or a big file needs the room.",
+                                       "Khoảng \(fmt(vm.sysPurgeable)) đang bị giữ bởi dữ liệu macOS tự giải phóng được, ví dụ bộ nhớ đệm. Khi cài bản cập nhật hay chép file lớn cần chỗ, macOS sẽ tự nhả ra."))
                                     .font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
                                 Spacer(minLength: 0)
                             }.padding(14).background(RoundedRectangle(cornerRadius: 14).fill(Theme.link.opacity(0.10)))
                         }
                         ForEach($vm.sysParts) { $p in SysPartCard(part: $p, vm: vm, open: open) }
-                        Text(t("The rest of System Data is macOS itself: system files, the Spotlight index, system caches. macOS looks after it; Tidymint does not touch it.",
-                               "Phần còn lại của System Data là của chính macOS: file hệ thống, chỉ mục Spotlight, bộ nhớ đệm hệ thống. macOS tự quản, Tidymint không đụng tới."))
+                        Text(t("The rest is data macOS manages itself: logs, caches and temporary files of the system. Tidymint does not touch it.",
+                               "Phần còn lại là dữ liệu macOS tự quản: nhật ký, bộ nhớ đệm, file tạm của hệ thống. Tidymint không đụng tới."))
                             .font(.system(size: fs(11))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
                     }.padding(.horizontal, 24).padding(.bottom, 16)
@@ -3196,7 +3390,7 @@ struct ReviewView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
@@ -3204,7 +3398,7 @@ struct ReviewView: View {
                     Button(t("Select All", "Chọn tất cả")) { vm.setAll(true) }
                     Button(t("Deselect All", "Bỏ chọn tất cả")) { vm.setAll(false) }
                     Button(t("Smart Selection", "Chọn thông minh")) { vm.scanJunk(thenReview: true) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
 
             ScrollView {
@@ -3336,7 +3530,7 @@ struct AppDetail: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
                     Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
@@ -3441,7 +3635,7 @@ struct LargeView: View {
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
                 if vm.large.isEmpty {
@@ -3491,16 +3685,17 @@ struct LensView: View {
                 // breadcrumb
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.plain)
-                            .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).help(t("Back", "Lùi"))
-                        Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.plain)
-                            .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).help(t("Forward", "Tiến"))
+                        Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon)
+                            .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).tip(t("Back", "Lùi"))
+                        Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.icon)
+                            .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).tip(t("Forward", "Tiến"))
                             .padding(.trailing, 8)
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).tip(t("Go to your home folder", "Về thư mục người dùng")).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: fs(10))).foregroundColor(Theme.sub)
-                            Button(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent) { vm.lensUp(to: i) }
-                                .buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
+                            Button { vm.lensUp(to: i) } label: {
+                                Text(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent).padding(.horizontal, 4).padding(.vertical, 2).hoverTile()
+                            }.buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
                         }
                     }
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -3527,14 +3722,14 @@ struct LensView: View {
                                         let blocked = Scanner.blocked(n.url.path)
                                         Button { if vm.lensSel.contains(n.url) { vm.lensSel.remove(n.url) } else { vm.lensSel.insert(n.url) } } label: {
                                             CheckBox(state: vm.lensSel.contains(n.url) ? 2 : 0).opacity(blocked ? 0.25 : 1)
-                                        }.buttonStyle(.plain).disabled(blocked).help(blocked ? t("Protected", "Được bảo vệ") : "")
+                                        }.buttonStyle(.plain).disabled(blocked).tip(blocked ? t("Protected", "Được bảo vệ") : "")
                                         FileThumb(url: n.url, side: 22 * uiScale)
                                         VStack(alignment: .leading, spacing: 1) {
                                             Text(n.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
                                             if n.otherCount == 0, let info = folderInfo(n.url) {
                                                 Text(info).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
                                             }
-                                        }.help(n.otherCount == 0 ? (folderInfo(n.url) ?? "") : "")
+                                        }.tip(n.otherCount == 0 ? (folderInfo(n.url) ?? "") : "")
                                         Spacer()
                                         Text(fmt(n.size)).foregroundColor(Theme.sub).font(.system(size: fs(12)).monospacedDigit())
                                     }
@@ -3576,7 +3771,7 @@ struct LensView: View {
                                     .onTapGesture { if b.node.isDir && b.node.otherCount == 0 { vm.openLens(b.node.url) } }
                                     .onHover { h in vm.hoverNode = h ? b.node.id : nil }
                                     .contextMenu { if b.node.otherCount == 0 { nodeMenu(b.node) } }
-                                    .help(b.node.otherCount > 0
+                                    .tip(b.node.otherCount > 0
                                           ? t("\(b.node.otherCount) small items (under 1% each), \(fmt(b.node.size)). See the list on the left.",
                                               "\(b.node.otherCount) mục nhỏ (mỗi mục dưới 1%), \(fmt(b.node.size)). Xem ở danh sách bên trái.")
                                           : "\(b.node.name): \(fmt(b.node.size))" + (folderInfo(b.node.url).map { "\n" + $0 } ?? ""))
@@ -3771,7 +3966,7 @@ struct NavBadge: View {
             // A new result not seen yet: a small dot. Startup Items with something worth a look: warning colour.
             let warn = p == .startup && vm.launchAttention > 0
             Circle().fill(selected ? Color.white : (warn ? Theme.warn : Theme.accentSolid)).frame(width: 8, height: 8)
-                .help(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
+                .tip(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
         }
     }
 }
@@ -3788,13 +3983,13 @@ struct LangSwitch: View {
                         .foregroundColor(Theme.ink.opacity(vm.lang == l ? 1 : 0.55))
                         .frame(width: 22, height: 16)
                         .background(RoundedRectangle(cornerRadius: 4).fill(vm.lang == l ? Theme.ink.opacity(0.22) : .clear))
-                        .contentShape(Rectangle())
+                        .hoverTile(vm.lang != l)
                 }.buttonStyle(.plain)
             }
         }
         .padding(2)
         .background(RoundedRectangle(cornerRadius: 6).stroke(Theme.ink.opacity(0.2), lineWidth: 1))
-        .help(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
+        .tip(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
     }
 }
 
@@ -3835,7 +4030,7 @@ struct Sidebar: View {
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: fs(9), weight: .bold)).foregroundColor(Theme.sub)
                         .rotationEffect(.degrees(vm.advancedOpen ? 90 : 0)).padding(.trailing, 10)
-                }.contentShape(Rectangle())
+                }.padding(.vertical, 2).hoverTile()
             }.buttonStyle(.plain)
             if vm.advancedOpen {
                 NavItem(p: .lens, vm: vm)
@@ -4011,7 +4206,7 @@ struct AppsView: View {
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
@@ -4038,7 +4233,7 @@ struct AppsView: View {
                     }
                 } label: {
                     Text(filterName(vm.appsFilter) + " (\(vm.appsMatching(vm.appsFilter).count))").font(.system(size: fs(12), weight: .semibold))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
                 Spacer()
                 Menu {
                     Button(t("Size", "Dung lượng")) { vm.appsSort = 0 }
@@ -4046,7 +4241,7 @@ struct AppsView: View {
                     Button(t("Last opened", "Lâu không mở")) { vm.appsSort = 2 }
                 } label: {
                     Text(t("Sort: ", "Xếp: ") + [t("Size", "Dung lượng"), t("Name", "Tên"), t("Last opened", "Lâu không mở")][vm.appsSort]).font(.system(size: fs(12)))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 18).padding(.vertical, 10)
             ScrollView {
                 LazyVStack(spacing: 2) {
@@ -4055,10 +4250,13 @@ struct AppsView: View {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: a.url.path)).resizable().frame(width: 26, height: 26)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
-                                if let d = a.lastUsed {
-                                    Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10)))
-                                } else {
-                                    Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10)))
+                                HStack(spacing: 6) {
+                                    if let d = a.lastUsed {
+                                        Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
+                                    } else {
+                                        Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
+                                    }
+                                    if let b = a.webAppBrowser { WebAppTag(browser: b) }
                                 }
                             }
                             Spacer()
@@ -4083,6 +4281,12 @@ struct AppsView: View {
                             Text(vm.apps[i].bundleID).font(.system(size: fs(11))).foregroundColor(Theme.sub)
                         }
                     }.padding(20)
+                    if let b = vm.apps[i].webAppBrowser {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "info.circle").foregroundColor(Theme.sub)
+                            Text(webAppNote(b)).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                        }.padding(.horizontal, 20).padding(.bottom, 12).padding(.top, -8)
+                    }
                     ScrollView {
                         LazyVStack(spacing: 2) {
                             HStack(spacing: 12) {
@@ -4164,8 +4368,8 @@ struct DupesView: View {
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .dupes)
             if !vm.dupMsg.isEmpty {
@@ -4255,7 +4459,7 @@ struct CloudView: View {
                 }
                 Spacer()
                 if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -4328,7 +4532,7 @@ struct SettingsView: View {
                                 Text(appLang == "vi" ? pl.nameVI.components(separatedBy: " (").first ?? pl.nameVI : pl.nameEN)
                                     .font(.system(size: fs(10))).foregroundColor(vm.theme == pl.id ? Theme.text : Theme.sub)
                             }
-                        }.buttonStyle(.plain).hoverLift().help(appLang == "vi" ? pl.nameVI : pl.nameEN)
+                        }.buttonStyle(.plain).hoverLift().tip(appLang == "vi" ? pl.nameVI : pl.nameEN)
                     }
                 }
             }
@@ -4379,7 +4583,7 @@ struct SettingsView: View {
                         if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }, width: Pill.rowWidth) }
                         else { GhostButton(title: t("Check now", "Kiểm tra ngay"), action: { vm.checkUpdates(force: true) }, width: Pill.rowWidth) }
                     }
-                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL) }, width: Pill.rowWidth)
+                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, width: Pill.rowWidth)
                 }
             }
             settingRow(t("Open at login", "Mở cùng máy"),
@@ -4485,7 +4689,7 @@ struct MenuView: View {
             }.padding(.horizontal, -8)
             Divider()
             VStack(spacing: 1) {
-                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL) }
+                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL("menubar")) }
                 MenuRow(title: t("Quit", "Thoát")) { NSApp.terminate(nil) }
             }.padding(.horizontal, -8)
         }
@@ -4579,7 +4783,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if a.contains("--demo") { Demo.load(sharedVM) }
         // `--watch-folder <dir>` watches a test folder instead of Downloads.
         if let j = a.firstIndex(of: "--watch-folder"), j + 1 < a.count { OrgVM.watchDir = URL(fileURLWithPath: a[j + 1]) }
-        if featureOrganize && sharedOrg.watchDownloads { sharedOrg.vm = sharedVM; sharedOrg.startWatch() }
+        OrgNotifier.shared.install()
+        if featureOrganize && sharedOrg.watchDownloads { sharedOrg.vm = sharedVM; sharedOrg.startWatch(catchUp: true) }
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
             sharedVM.page = pg
@@ -4842,8 +5047,8 @@ struct LaunchRow: View {
                     Text(e.owner).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium)).lineLimit(1)
                     if e.orphan { badge(t("App removed", "App đã gỡ"), Theme.danger) }
                     if e.running == true { badge(t("Running", "Đang chạy"), Theme.green) }
-                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).help(e.sign.help) }
-                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).help(f.help) }
+                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).tip(e.sign.help) }
+                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).tip(f.help) }
                 }
                 Text(e.label).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
             }
@@ -4853,7 +5058,7 @@ struct LaunchRow: View {
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
         .hoverBG(10, Theme.ink.opacity(0.06))
-        .help(e.program)
+        .tip(e.program)
     }
     func badge(_ s: String, _ c: Color) -> some View {
         Text(s).font(.system(size: fs(10), weight: .semibold)).foregroundColor(c)
@@ -5008,8 +5213,9 @@ struct ConCaoHint: View {
                 Text("Dọn xong rồi, thưởng mình một ly?").foregroundColor(Theme.sub)
                 TextLink("Gợi ý ở Cồn Cào →", url: ConCao.url("done"), size: 13)
                 Spacer()
-                Button("Đừng hiện nữa") { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub)
+                Button { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true } label: {
+                    Text("Đừng hiện nữa").padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain).foregroundColor(Theme.sub)
             }
             .font(.system(size: fs(12)))
             .padding(.horizontal, 14).padding(.vertical, 10)
@@ -5034,6 +5240,9 @@ struct FieldBox<C: View>: View {
 }
 
 struct ContactView: View {
+    static let social: [(String, String)] = [("Facebook", "https://www.facebook.com/tidymintapp"), ("Instagram", "https://www.instagram.com/tidymint.app/"),
+                                             ("X", "https://x.com/tidymintapp"), ("LinkedIn", "https://www.linkedin.com/company/tidymint/"),
+                                             ("GitHub", "https://github.com/HaiTrung-Workspace/tidymint")]
     @ObservedObject var vm: VM
     @StateObject private var f = FormState()
     var body: some View {
@@ -5048,6 +5257,15 @@ struct ContactView: View {
                         Text(t("Or email", "Hoặc gửi email tới")).foregroundColor(Theme.sub)
                         TextLink("hello@tidymint.app", url: URL(string: "mailto:hello@tidymint.app")!)
                     }.font(.system(size: fs(12)))
+                    // Brand accounts and public bug reports. Plain links: nothing is loaded until the person clicks.
+                    HStack(spacing: 4) {
+                        Text(t("Follow Tidymint:", "Theo dõi Tidymint:")).foregroundColor(Theme.sub)
+                        ForEach(Array(ContactView.social.enumerated()), id: \.offset) { i, s in
+                            if i > 0 { Text("·").foregroundColor(Theme.sub.opacity(0.6)) }
+                            TextLink(s.0, url: URL(string: s.1)!)
+                        }
+                    }.font(.system(size: fs(12)))
+                    TextLink(t("Report a bug on GitHub", "Báo lỗi trên GitHub"), url: URL(string: "https://github.com/HaiTrung-Workspace/tidymint/issues")!)
                 }.padding(.top, 34)
                 HStack(spacing: 8) {
                     ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in
@@ -5211,7 +5429,8 @@ struct InviteCard: View {
             ], running: en)
         let c = "Movies/CapCut/User Data/"
         let capcutReport = AppReport(rule: capcut, groups: [
-                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/recognize", 410, true), row(c + "Cache/audioWave", 95, true)]),
+                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/audioWave", 95, true)]),
+                AppGroup(id: "speech", section: capcut.sections.first { $0.id == "speech" }!, rows: [row(c + "Cache/recognize", 410, false)]),
                 AppGroup(id: "render", section: capcut.sections.first { $0.id == "render" }!, rows: [row(c + "Cache/prerender", 1200, false), row(c + "Cache/agencycache", 600, false)]),
                 AppGroup(id: "projects", section: capcut.sections.first { $0.id == "projects" }!, rows: [row(c + "Projects", 6200, false)]),
             ], running: false)
@@ -5296,20 +5515,34 @@ struct InviteCard: View {
         vm.lensNodes = [("Library", 48.3), ("Documents", 31.2), ("Movies", 18.4), (".ollama", 12.6), ("Downloads", 9.1),
                         ("Pictures", 7.4), ("Developer", 6.2), ("Projects", 5.8), ("Desktop", 2.3), ("Music", 1.1), (".npm", 0.9), (".cache", 0.6)]
             .map { Node(url: u($0.0), size: gb($0.1), isDir: true) }
-        let z = AppEntry(url: URL(fileURLWithPath: "/Applications/Zoom.app"), name: "Zoom", bundleID: "us.zoom.xos", size: mb(412),
-                         lastUsed: Date().addingTimeInterval(-90 * 86400),
-                         related: [item("Library/Application Support/zoom.us", mb(186), true),
-                                   item("Library/Caches/us.zoom.xos", mb(64), true),
-                                   item("Library/Preferences/us.zoom.xos.plist", 24_000, true),
-                                   item("Library/Logs/zoom.us", mb(12), true),
-                                   item("Library/Saved Application State/us.zoom.xos.savedState", 410_000, true)])
-        vm.apps = [z,
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Figma.app"), name: "Figma", bundleID: "com.figma.Desktop", size: mb(520), lastUsed: Date()),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Docker.app"), name: "Docker", bundleID: "com.docker.docker", size: gb(2.1), lastUsed: Date().addingTimeInterval(-200 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Draw Things.app"), name: "Draw Things", bundleID: "com.liuliu.draw-things", size: mb(310), lastUsed: Date().addingTimeInterval(-3 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Ollama.app"), name: "Ollama", bundleID: "com.electron.ollama", size: mb(380), lastUsed: Date().addingTimeInterval(-12 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Spotify.app"), name: "Spotify", bundleID: "com.spotify.client", size: mb(290), lastUsed: Date())]
-        vm.selApp = z.id
+        // Apps that are installed on the capture Mac, so Finder supplies real icons (a missing .app shows a blank page icon).
+        func app(_ n: String, _ bid: String, _ size: Int64, _ days: Double, _ rel: [CleanItem] = []) -> AppEntry {
+            AppEntry(url: URL(fileURLWithPath: "/Applications/\(n).app"), name: n, bundleID: bid, size: size,
+                     lastUsed: Date().addingTimeInterval(-days * 86400), related: rel)
+        }
+        let slack = app("Slack", "com.tinyspeck.slackmacgap", mb(535), 75,
+                        [item("Library/Application Support/Slack", mb(640), true),
+                         item("Library/Caches/com.tinyspeck.slackmacgap", mb(118), true),
+                         item("Library/Preferences/com.tinyspeck.slackmacgap.plist", 36_000, true),
+                         item("Library/Logs/Slack", mb(14), true),
+                         item("Library/Saved Application State/com.tinyspeck.slackmacgap.savedState", 380_000, true)])
+        let zalo = app("Zalo", "com.vng.zalo", mb(762), 0,
+                       [item("Library/Application Support/ZaloData", gb(2.9), true),
+                        item("Library/Caches/com.vng.zalo", mb(103), true),
+                        item("Library/Preferences/com.vng.zalo.plist", 28_000, true),
+                        item("Library/Saved Application State/com.vng.zalo.savedState", 290_000, true)])
+        let rest = [app("Microsoft Outlook", "com.microsoft.Outlook", gb(2.4), 40),
+                    app("CapCut", "com.lemon.lvoverseas", gb(1.9), 9),
+                    app("Google Chrome", "com.google.Chrome", gb(1.5), 0),
+                    app("Visual Studio Code", "com.microsoft.VSCode", gb(1.4), 2),
+                    app("Microsoft Edge", "com.microsoft.edgemac", gb(1.1), 120),
+                    app("WhatsApp", "net.whatsapp.WhatsApp", mb(734), 6),
+                    app("Claude", "com.anthropic.claudefordesktop", mb(619), 0),
+                    app("Telegram", "ru.keepcoder.Telegram", mb(346), 4),
+                    app("Rectangle", "com.knollsoft.Rectangle", mb(11), 1)]
+        let pickApp = appLang == "en" ? slack : zalo
+        vm.apps = [pickApp] + rest + [appLang == "en" ? zalo : slack]
+        vm.selApp = pickApp.id
     }
 }
 
@@ -5320,23 +5553,28 @@ struct InviteCard: View {
 // reviews the plan and clicks Apply; every apply can be undone. Only files directly inside the chosen folder are
 // touched, never subfolders, and nothing is ever deleted or overwritten.
 
+/// Where one group goes when sorting: a new folder name inside the chosen folder, or a folder picked elsewhere.
+struct OrgDest: Codable, Equatable { var name: String? = nil; var path: String? = nil }
+
 enum OrgGroup: String, CaseIterable, Codable {
     case screens, receipts, cv, images, video, audio, docs, sheets, slides, archives, installers, code, other
-    var label: String {
+    var label: String { let n = names; return t(n.0, n.1) }
+    /// English and Vietnamese names, to find a group folder made in the other language.
+    var names: (String, String) {
         switch self {
-        case .screens: return t("Screenshots", "Ảnh màn hình")
-        case .receipts: return t("Receipts and invoices", "Hoá đơn và biên lai")
-        case .cv: return t("CVs", "CV")
-        case .images: return t("Images", "Ảnh")
-        case .video: return t("Videos", "Video")
-        case .audio: return t("Audio", "Âm thanh")
-        case .docs: return t("Documents", "Tài liệu")
-        case .sheets: return t("Spreadsheets", "Bảng tính")
-        case .slides: return t("Presentations", "Trình chiếu")
-        case .archives: return t("Archives", "File nén")
-        case .installers: return t("Installers", "Bộ cài app")
-        case .code: return t("Code", "Code")
-        case .other: return t("Other", "Khác")
+        case .screens: return ("Screenshots", "Ảnh màn hình")
+        case .receipts: return ("Receipts and invoices", "Hoá đơn và biên lai")
+        case .cv: return ("CVs", "CV")
+        case .images: return ("Images", "Ảnh")
+        case .video: return ("Videos", "Video")
+        case .audio: return ("Audio", "Âm thanh")
+        case .docs: return ("Documents", "Tài liệu")
+        case .sheets: return ("Spreadsheets", "Bảng tính")
+        case .slides: return ("Presentations", "Trình chiếu")
+        case .archives: return ("Archives", "File nén")
+        case .installers: return ("Installers", "Bộ cài app")
+        case .code: return ("Code", "Code")
+        case .other: return ("Other", "Khác")
         }
     }
     var icon: String {
@@ -5435,7 +5673,7 @@ struct OrgFile: Identifiable {
 struct OrgNote: Identifiable { enum Kind { case skipped, kept, numbered, trashed }; let id = UUID(); let kind: Kind; let name: String; let detail: String }
 
 struct OrgMove: Codable { let from: String; let to: String; let addedTags: [String]; var trashed: Bool? = nil }
-struct OrgSession: Codable { let folder: String; var date: Date; var moves: [OrgMove]; var madeDirs: [String]; var auto: Bool? = nil }
+struct OrgSession: Codable { let folder: String; var date: Date; var moves: [OrgMove]; var madeDirs: [String]; var auto: Bool? = nil; var id: String? = nil }
 
 enum OrgEngine {
     static let fm = FileManager.default
@@ -5576,6 +5814,14 @@ enum OrgEngine {
         return x.isEqual(y)
     }
     /// Move or rename. A change of case only (IMG.JPG to IMG.jpg) goes through a temporary name, because the disk sees one file.
+    /// Another process has this file open (a torrent client still writing, an installer reading). Checked before moving a new download.
+    static func isOpen(_ u: URL) -> Bool {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof"); p.arguments = ["-t", "--", u.path]
+        p.standardOutput = FileHandle.nullDevice; p.standardError = FileHandle.nullDevice
+        do { try p.run() } catch { return false }
+        p.waitUntilExit()
+        return p.terminationStatus == 0
+    }
     static func move(_ from: URL, _ to: URL) throws {
         if from.path != to.path, from.path.lowercased() == to.path.lowercased() || sameFile(from, to) {
             let tmp = to.deletingLastPathComponent().appendingPathComponent(".tidymint-\(UUID().uuidString)")
@@ -5729,10 +5975,23 @@ enum OrgEngine {
         return (req.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
     }
 
+    /// Words that make a screenshot a real document (bill, contract, ticket, statement, ID), not just a screen full of text.
+    static let docWords = ["hợp đồng", "contract", "agreement", "vé", "ticket", "boarding pass", "booking", "đặt chỗ", "sao kê", "statement",
+                           "số tài khoản", "account number", "căn cước", "passport", "hộ chiếu", "giấy phép", "license", "certificate", "chứng nhận"]
+    /// Labels for an image. Measured on real files (29/10/2026): Apple returns "document" with exactly the same confidence as
+    /// "screenshot" for every screen capture (it is the parent label), and guesses on tiny images sit around 0.5. So: skip tiny
+    /// images, keep labels from 0.6 up, and drop "document" when it only comes along with "screenshot".
     static func labels(_ u: URL) -> [String] {
+        let bytes = (try? u.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        var side = 0
+        if let src = CGImageSourceCreateWithURL(u as CFURL, nil), let p = CGImageSourceCopyPropertiesAtIndex(src, 0, nil) as? [CFString: Any] {
+            side = max(p[kCGImagePropertyPixelWidth] as? Int ?? 0, p[kCGImagePropertyPixelHeight] as? Int ?? 0)
+        }
+        if bytes < 20_000 || (side > 0 && side < 300) { return [] }
         let req = VNClassifyImageRequest()
         try? VNImageRequestHandler(url: u).perform([req])
-        let obs = (req.results ?? []).filter { $0.confidence >= 0.3 && !generic.contains($0.identifier) }
+        var obs = (req.results ?? []).filter { $0.confidence >= 0.6 && !generic.contains($0.identifier) }
+        if obs.contains(where: { $0.identifier == "screenshot" }) { obs.removeAll { $0.identifier == "document" } }
         var out: [String] = []
         for o in obs.sorted(by: { $0.confidence > $1.confidence }) {
             let name = vi[o.identifier].map { appLang == "vi" ? $0 : o.identifier.replacingOccurrences(of: "_", with: " ").capitalized }
@@ -5760,6 +6019,12 @@ enum OrgEngine {
         else if c >= 2 { f.group = .cv; f.why = t("Text in the file looks like a CV", "Chữ trong file giống CV") }
         if image {
             f.tags = labels(f.url)
+            // A screenshot of a bill, contract or ticket is still a document: add it back when the text says so.
+            let doc = t("Document", "Giấy tờ")
+            if f.tags.contains(t("Screenshot", "Ảnh màn hình")), !f.tags.contains(doc),
+               r >= 2 || c >= 2 || docWords.map(fold).contains(where: { text.contains($0) }) {
+                f.tags.insert(doc, at: min(1, f.tags.count))
+            }
             if raw.count > 40, !f.tags.contains(t("Has text", "Có chữ")) { f.tags.append(t("Has text", "Có chữ")) }
         }
         f.tagOn = Set(f.tags)
@@ -5782,13 +6047,20 @@ enum OrgNotes {
 }
 
 @MainActor final class OrgVM: ObservableObject {
-    @Published var folder: URL = Scanner.home.appendingPathComponent("Downloads")
+    @Published var folder: URL = Scanner.home.appendingPathComponent("Downloads") { didSet { dests = Self.loadDests(for: folder) } }
     @Published var readContent = true
-    @Published var moveIntoFolders = !UserDefaults.standard.bool(forKey: "org-sub") { didSet { recomputeNames() } }
-    /// Include files in sub-folders. They are renamed and tagged where they are; nothing is moved out of its folder.
-    @Published var includeSub = UserDefaults.standard.bool(forKey: "org-sub") {
-        didSet { UserDefaults.standard.set(includeSub, forKey: "org-sub"); moveIntoFolders = !includeSub }
+    /// Sort into folders (one per group, inside the chosen folder unless the person picked another) or rename only.
+    @Published var moveIntoFolders = UserDefaults.standard.object(forKey: "org-move") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(moveIntoFolders, forKey: "org-move"); recomputeNames() }
     }
+    /// Include files in sub-folders. Those are renamed and tagged where they are; only loose files are sorted into folders.
+    @Published var includeSub = UserDefaults.standard.bool(forKey: "org-sub") {
+        didSet { UserDefaults.standard.set(includeSub, forKey: "org-sub") }
+    }
+    /// Where each group goes when sorting, remembered per chosen folder (key: group raw value).
+    @Published var dests: [String: OrgDest] = OrgVM.loadDests(for: Scanner.home.appendingPathComponent("Downloads"))
+    @Published var editingGroup: OrgGroup? = nil
+    @Published var groupDraft = ""
     @Published var phase: Phase = .idle
     @Published var files: [OrgFile] = []
     @Published var progress = 0
@@ -5841,7 +6113,9 @@ enum OrgNotes {
         let c = ctx, base = folder.standardizedFileURL.path
         func rel(_ u: URL) -> [String] {
             let p = u.standardizedFileURL.path
-            return (p.hasPrefix(base + "/") ? String(p.dropFirst(base.count + 1)) : u.lastPathComponent).split(separator: "/").map(String.init)
+            if p.hasPrefix(base + "/") { return String(p.dropFirst(base.count + 1)).split(separator: "/").map(String.init) }
+            // A folder outside the chosen one shows as one "~/..." line.
+            return [u.deletingLastPathComponent().path.replacingOccurrences(of: NSHomeDirectory(), with: "~"), u.lastPathComponent]
         }
         var now: [(path: [String], f: OrgFile, state: Int)] = [], after: [(path: [String], f: OrgFile, state: Int)] = []
         for f in inc {
@@ -5927,8 +6201,9 @@ enum OrgNotes {
             guard renameAll || files[i].needsName else { files[i].newName = nil; files[i].renameOn = false; continue }
             // Numbers restart per destination folder: the type folder when moving, otherwise the folder the file sits in.
             let own = files[i].url.deletingLastPathComponent()
-            let key = moveIntoFolders ? files[i].group.rawValue : own.path
-            let parent = moveIntoFolders ? folder.lastPathComponent : own.lastPathComponent
+            let mv = moves(files[i])
+            let key = mv ? destURL(files[i].group).standardizedFileURL.path : own.standardizedFileURL.path
+            let parent = mv ? folder.lastPathComponent : own.lastPathComponent
             counters[key, default: 0] += 1
             let n = OrgEngine.makeName(files[i], r, seq: counters[key]!, parent: parent)
             let had = files[i].newName != nil
@@ -5945,13 +6220,74 @@ enum OrgNotes {
     var example: String {
         let f = files.first { $0.pairOf == nil && (renameAll || $0.needsName) } ?? files.first
         guard let f else { return "" }
-        return OrgEngine.makeName(f, rule, seq: 1, parent: moveIntoFolders ? folder.lastPathComponent : f.url.deletingLastPathComponent().lastPathComponent)
+        return OrgEngine.makeName(f, rule, seq: 1, parent: moves(f) ? folder.lastPathComponent : f.url.deletingLastPathComponent().lastPathComponent)
+    }
+
+    // MARK: destination folders
+
+    nonisolated static let destKey = "org-dest"
+    nonisolated static func allDests() -> [String: [String: OrgDest]] {
+        UserDefaults.standard.data(forKey: destKey).flatMap { try? JSONDecoder().decode([String: [String: OrgDest]].self, from: $0) } ?? [:]
+    }
+    nonisolated static func loadDests(for f: URL) -> [String: OrgDest] { allDests()[f.standardizedFileURL.path] ?? [:] }
+    func saveDests() {
+        var all = Self.allDests(); all[folder.standardizedFileURL.path] = dests.isEmpty ? nil : dests
+        if let d = try? JSONEncoder().encode(all) { UserDefaults.standard.set(d, forKey: Self.destKey) }
+    }
+    /// A folder the person picked, or a folder named after the group (or their name for it) inside the chosen folder.
+    static func destURL(_ g: OrgGroup, _ folder: URL, _ d: [String: OrgDest]) -> URL {
+        if let p = d[g.rawValue]?.path { return URL(fileURLWithPath: p, isDirectory: true) }
+        if let n = d[g.rawValue]?.name { return folder.appendingPathComponent(n, isDirectory: true) }
+        // A folder made earlier keeps being used when the app language changes ("Images" stays, no second "Ảnh").
+        for n in [g.label, g.names.0, g.names.1] where isDir(folder.appendingPathComponent(n)) { return folder.appendingPathComponent(n, isDirectory: true) }
+        return folder.appendingPathComponent(g.label, isDirectory: true)
+    }
+    nonisolated static func isDir(_ u: URL) -> Bool { var d: ObjCBool = false; return FileManager.default.fileExists(atPath: u.path, isDirectory: &d) && d.boolValue }
+    /// Keep Downloads tidy only uses folders inside the watched folder: a group set to go elsewhere uses its default folder there.
+    nonisolated static func autoDests(for dir: URL) -> [String: OrgDest] {
+        let base = dir.standardizedFileURL.path + "/"
+        return loadDests(for: dir).filter { $0.value.path.map { URL(fileURLWithPath: $0).standardizedFileURL.path.hasPrefix(base) } ?? true }
+    }
+    func destURL(_ g: OrgGroup) -> URL { Self.destURL(g, folder, dests) }
+    func isInside(_ u: URL) -> Bool { u.standardizedFileURL.path.hasPrefix(folder.standardizedFileURL.path + "/") }
+    /// Short path for the screen: "Downloads/Images" inside the chosen folder, "~/Documents/Work" elsewhere.
+    func destLabel(_ g: OrgGroup) -> String {
+        let u = destURL(g).standardizedFileURL, base = folder.standardizedFileURL.path
+        if isInside(u) { return folder.lastPathComponent + String(u.path.dropFirst(base.count)) }
+        return u.path.replacingOccurrences(of: NSHomeDirectory(), with: "~")
+    }
+    func destExists(_ g: OrgGroup) -> Bool { var d: ObjCBool = false; return FileManager.default.fileExists(atPath: destURL(g).path, isDirectory: &d) && d.boolValue }
+    /// A file sorts into its group folder only when it sits loose in the chosen folder.
+    func moves(_ f: OrgFile) -> Bool { moveIntoFolders && f.url.deletingLastPathComponent().standardizedFileURL.path == folder.standardizedFileURL.path }
+    func groupMoves(_ g: OrgGroup) -> Bool { files.contains { $0.group == g && $0.include && $0.pairOf == nil && moves($0) } }
+    var movingGroups: [OrgGroup] { OrgGroup.allCases.filter { groupMoves($0) } }
+    var newDirCount: Int { Set(movingGroups.filter { !destExists($0) }.map { destURL($0).standardizedFileURL.path }).count }
+    var outsideGroups: [OrgGroup] { movingGroups.filter { !isInside(destURL($0)) && destURL($0).standardizedFileURL.path != folder.standardizedFileURL.path } }
+    func setDest(_ g: OrgGroup, _ d: OrgDest?) { dests[g.rawValue] = d; saveDests(); recomputeNames() }
+    func renameDest(_ g: OrgGroup, _ typed: String) {
+        let n = typed.replacingOccurrences(of: "/", with: "-").replacingOccurrences(of: ":", with: "-").trimmingCharacters(in: .whitespacesAndNewlines)
+        let clean = n.hasPrefix(".") ? String(n.drop { $0 == "." }) : n
+        setDest(g, clean.isEmpty || clean == g.label ? nil : OrgDest(name: clean))
+        editingGroup = nil
+    }
+    func chooseDest(_ g: OrgGroup) {
+        let p = NSOpenPanel(); p.canChooseDirectories = true; p.canChooseFiles = false; p.allowsMultipleSelection = false; p.canCreateDirectories = true
+        p.directoryURL = destExists(g) ? destURL(g) : folder; p.prompt = t("Use this folder", "Dùng thư mục này")
+        p.message = t("Files in \(g.label) will go into the folder you pick. You can make a new folder here.",
+                      "File nhóm \(g.label) sẽ vào thư mục bạn chọn. Có thể tạo thư mục mới ngay tại đây.")
+        guard p.runModal() == .OK, let u = p.url else { return }
+        guard OrgEngine.allowed(u) else {
+            let a = NSAlert(); a.messageText = t("Pick a folder inside your home folder", "Chọn một thư mục bên trong thư mục người dùng")
+            a.informativeText = t("Tidymint does not move files into Library or system folders.", "Tidymint không chuyển file vào Library hay thư mục hệ thống.")
+            a.runModal(); return
+        }
+        setDest(g, OrgDest(path: u.standardizedFileURL.path))
     }
 
     // MARK: where each file ends up
 
-    struct Ctx { let folder: URL; let moving: Bool }
-    var ctx: Ctx { Ctx(folder: folder, moving: moveIntoFolders && !includeSub) }
+    struct Ctx { let folder: URL; let moving: Bool; var dests: [String: OrgDest] = [:] }
+    var ctx: Ctx { Ctx(folder: folder, moving: moveIntoFolders, dests: dests) }
 
     /// The name a file will have after Apply. A typed name is cleaned the same way Apply cleans it;
     /// a file that goes with another one takes that file's new name with its own extension.
@@ -5976,7 +6312,11 @@ enum OrgNotes {
     static func target(_ f: OrgFile, _ by: [UUID: OrgFile], _ c: Ctx) -> URL {
         let dir: URL
         if let l = f.pairOf.flatMap({ by[$0] }) { dir = target(l, by, c).deletingLastPathComponent() }
-        else { dir = c.moving ? c.folder.appendingPathComponent(f.group.label, isDirectory: true) : f.url.deletingLastPathComponent() }
+        else {
+            let own = f.url.deletingLastPathComponent()
+            // Only loose files are sorted; files already in a sub-folder stay there.
+            dir = c.moving && own.standardizedFileURL.path == c.folder.standardizedFileURL.path ? Self.destURL(f.group, c.folder, c.dests) : own
+        }
         return dir.appendingPathComponent(finalName(f, by))
     }
 
@@ -6179,6 +6519,7 @@ enum OrgNotes {
     /// Apply the reviewed plan: optional move into a subfolder per group, optional rename, tags and notes.
     func apply() {
         validate()
+        let away = outsideGroups.map { "\(destURL($0).lastPathComponent) → \(destLabel($0))" }
         let o = Self.execute(included, ctx, dedupe: dedupe)
         report = o.notes
         let s = OrgSession(folder: folder.path, date: Date(), moves: o.moves, madeDirs: o.made)
@@ -6186,6 +6527,7 @@ enum OrgNotes {
         canUndo = true
         let dup = o.trashed > 0 ? t(" \(o.trashed) identical copies went to the Trash.", " \(o.trashed) bản trùng y hệt đã vào Thùng rác.") : ""
         result = t("Organized \(o.moved) files, tagged \(o.tagged).", "Đã sắp xếp \(o.moved) file, gắn tag \(o.tagged) file.") + dup + (o.fail > 0 ? t(" \(o.fail) skipped.", " Bỏ qua \(o.fail) file.") : "")
+            + (away.isEmpty ? "" : t(" Moved out of \(folder.lastPathComponent): ", " Chuyển ra ngoài \(folder.lastPathComponent): ") + away.joined(separator: ", ") + ".")
         vm?.log(t("Organized \(folder.lastPathComponent): moved or renamed \(o.moved) files, tagged \(o.tagged)", "Sắp xếp \(folder.lastPathComponent): chuyển hoặc đổi tên \(o.moved) file, gắn tag \(o.tagged) file")
                 + (o.trashed > 0 ? t(", \(o.trashed) identical copies to the Trash", ", \(o.trashed) bản trùng vào Thùng rác") : "")
                 + (o.fail > 0 ? t(", skipped \(o.fail)", ", bỏ qua \(o.fail)") : ""))
@@ -6196,16 +6538,49 @@ enum OrgNotes {
         guard let d = FileManager.default.contents(atPath: p) else { return nil }
         return try? JSONDecoder().decode(OrgSession.self, from: d)
     }
-    /// The newer of the last manual organize and today's automatic Downloads session.
+    /// The newest thing to undo: the last manual organize or the newest automatic batch.
     static func latest() -> (String, OrgSession)? {
-        [sessionPath, autoPath].compactMap { p in load(p).map { (p, $0) } }.max { $0.1.date < $1.1.date }
+        let manual = load(sessionPath).map { (sessionPath, $0) }
+        let auto = history().first.map { ("auto:" + ($0.id ?? ""), $0) }
+        return [manual, auto].compactMap { $0 }.max { $0.1.date < $1.1.date }
     }
+    static let historyPath = Stats.dir + "/organize-auto-history.json"
+    /// Automatic batches from the last 7 days, newest first. Each one can be undone on its own.
+    static func history() -> [OrgSession] {
+        var h = FileManager.default.contents(atPath: historyPath).flatMap { try? JSONDecoder().decode([OrgSession].self, from: $0) } ?? []
+        // Older builds kept one automatic session per day in a single file.
+        if var old = load(autoPath) {
+            old.id = old.id ?? UUID().uuidString; h.append(old); h.sort { $0.date > $1.date }
+            try? FileManager.default.removeItem(atPath: autoPath); saveHistory(h)
+        }
+        let cut = Date().addingTimeInterval(-7 * 86400)
+        return h.filter { $0.date > cut }
+    }
+    static func saveHistory(_ h: [OrgSession]) {
+        let cut = Date().addingTimeInterval(-7 * 86400)
+        let keep = Array(h.filter { $0.date > cut }.sorted { $0.date > $1.date }.prefix(300))
+        try? FileManager.default.createDirectory(atPath: Stats.dir, withIntermediateDirectories: true)
+        if let d = try? JSONEncoder().encode(keep) { try? d.write(to: URL(fileURLWithPath: historyPath)) }
+    }
+    /// Undo one automatic batch (from the list or the notification).
+    func undoBatch(_ id: String) {
+        guard let s = Self.history().first(where: { $0.id == id }) else { return }
+        // From a notification while a plan is open: undo, but keep the plan on screen.
+        let keep = phase == .review || phase == .scanning ? phase : nil, msg = result
+        revert(s, key: "auto:" + id)
+        if let keep { phase = keep; result = msg }
+    }
+    @Published var historyOpen = false
+    @Published var historyTick = 0
     static func lastSession() -> OrgSession? { latest()?.1 }
 
     /// Put every file back where it was (also copies sent to the Trash), remove the tags this session added,
     /// remove folders it created if now empty.
     func undo() {
         guard let (path, s) = OrgVM.latest() else { return }
+        revert(s, key: path)
+    }
+    func revert(_ s: OrgSession, key path: String) {
         let fm = FileManager.default
         var back = 0, fail = 0, notes = OrgNotes.load()
         for m in s.moves.reversed() {
@@ -6223,7 +6598,8 @@ enum OrgNotes {
             try? fm.removeItem(atPath: d + "/.DS_Store"); try? fm.removeItem(atPath: d)
         }
         OrgNotes.save(notes)
-        try? fm.removeItem(atPath: path)
+        if path.hasPrefix("auto:") { Self.saveHistory(Self.history().filter { $0.id != s.id }) } else { try? fm.removeItem(atPath: path) }
+        historyTick += 1
         report = []
         canUndo = OrgVM.lastSession() != nil
         result = t("Put back \(back) files.", "Đã đưa \(back) file về chỗ cũ.") + (fail > 0 ? t(" \(fail) could not be moved back.", " \(fail) file không đưa về được.") : "")
@@ -6241,36 +6617,76 @@ enum OrgNotes {
     private var watchSeen = Set<String>()
     private var watchSize: [String: Int64] = [:]
     private var watchBusy = false
+    static let lastRunKey = "org-watch-last"
 
-    /// Watch Downloads while Tidymint runs (window or menu bar). Files already there when watching starts are left alone;
-    /// a new file is moved into its type folder once it has stopped changing (about a minute after it lands).
-    func startWatch() {
+    /// Files Tidymint sorted, by file number (it survives renames and moves): one the person brings back to Downloads is left alone.
+    nonisolated static let movedPath = Stats.dir + "/organize-auto-moved.json"
+    private var movedIDs: [String: Date] = OrgVM.loadMoved()
+    nonisolated static func loadMoved() -> [String: Date] {
+        let m = FileManager.default.contents(atPath: movedPath).flatMap { try? JSONDecoder().decode([String: Date].self, from: $0) } ?? [:]
+        let cut = Date().addingTimeInterval(-90 * 86400)
+        return m.filter { $0.value > cut }
+    }
+    func saveMoved() { if let d = try? JSONEncoder().encode(movedIDs) { try? d.write(to: URL(fileURLWithPath: Self.movedPath)) } }
+    nonisolated static func fileNumber(_ u: URL) -> String? {
+        ((try? FileManager.default.attributesOfItem(atPath: u.path))?[.systemFileNumber] as? NSNumber).map { $0.stringValue }
+    }
+
+    /// Never touched by Keep Downloads tidy: ".torrent" is an extension, anything else is part of the name. Comma separated.
+    @Published var exclude = UserDefaults.standard.string(forKey: "org-exclude") ?? "" {
+        didSet { UserDefaults.standard.set(exclude, forKey: "org-exclude") }
+    }
+    nonisolated static func excluded(_ u: URL, _ pats: String) -> Bool {
+        let n = u.lastPathComponent.lowercased(), e = u.pathExtension.lowercased()
+        for raw in pats.split(whereSeparator: { $0 == "," || $0 == ";" || $0 == "\n" }) {
+            let p = raw.trimmingCharacters(in: .whitespaces).lowercased()
+            if p.isEmpty { continue }
+            if p.hasPrefix("."), !p.dropFirst().contains(".") { if e == String(p.dropFirst()) { return true } }
+            else if n.contains(p) { return true }
+        }
+        return false
+    }
+
+    /// Watch Downloads while Tidymint runs (window or menu bar). Turning the switch on leaves files already there alone;
+    /// when the app starts (catchUp), files that landed while it was closed are sorted too.
+    /// A new file is moved once it has stopped changing for 2 minutes and no other app has it open.
+    func startWatch(catchUp: Bool = false) {
         stopWatch()
-        watchSeen = Set(OrgEngine.files(in: Self.watchDir).map(\.path))
+        let since = catchUp ? (UserDefaults.standard.object(forKey: Self.lastRunKey) as? Date)?.addingTimeInterval(-300) : nil
+        watchSeen = Set(OrgEngine.files(in: Self.watchDir).filter { u in
+            guard let s = since, let added = (try? u.resourceValues(forKeys: [.addedToDirectoryDateKey]))?.addedToDirectoryDate else { return true }
+            return added <= s
+        }.map(\.path))
+        UserDefaults.standard.set(Date(), forKey: Self.lastRunKey)
         watchTimer = Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { _ in Task { @MainActor in sharedOrg.watchTick() } }
     }
     func stopWatch() { watchTimer?.invalidate(); watchTimer = nil; watchSize = [:] }
 
     func watchTick() {
+        UserDefaults.standard.set(Date(), forKey: Self.lastRunKey)
         // Not while the person is planning that same folder by hand.
         let busyHere = (phase == .scanning || phase == .review) && folder.standardizedFileURL.path == Self.watchDir.standardizedFileURL.path
         guard !watchBusy, !busyHere else { return }
         var ready: [URL] = []
-        let now = Date()
+        let now = Date(), pats = exclude
         for u in OrgEngine.files(in: Self.watchDir) where !watchSeen.contains(u.path) {
             if Self.partialExt.contains(u.pathExtension.lowercased()) { continue }
+            // Brought back by the person after Tidymint sorted it, or on the do-not-touch list: leave it where it is.
+            if let id = Self.fileNumber(u), movedIDs[id] != nil { watchSeen.insert(u.path); continue }
+            if Self.excluded(u, pats) { watchSeen.insert(u.path); continue }
             let v = try? u.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
             let size = Int64(v?.fileSize ?? -1)
-            // Same size as last check and untouched for 30 seconds: the download has finished.
-            if watchSize[u.path] == size, let m = v?.contentModificationDate, now.timeIntervalSince(m) > 30 { ready.append(u) }
+            // Same size as last check and untouched for 2 minutes: the download has finished.
+            if watchSize[u.path] == size, let m = v?.contentModificationDate, now.timeIntervalSince(m) > 120 { ready.append(u) }
             else { watchSize[u.path] = size }
         }
         guard !ready.isEmpty else { return }
-        for u in ready { watchSeen.insert(u.path); watchSize.removeValue(forKey: u.path) }
         watchBusy = true
         let deep = readContent, r = rule, all = renameAll, dd = dedupe
         Task.detached {
-            var list: [OrgFile] = ready.map { var o = OrgEngine.quick($0); if deep { OrgEngine.deep(&o) }; return o }
+            // A file still open in another app waits for the next check.
+            let free = ready.filter { !OrgEngine.isOpen($0) }
+            var list: [OrgFile] = free.map { var o = OrgEngine.quick($0); if deep { OrgEngine.deep(&o) }; return o }
             OrgEngine.linkPairs(&list)
             let done = list
             await MainActor.run { sharedOrg.autoApply(done, rule: r, renameAll: all, dedupe: dd) }
@@ -6279,29 +6695,74 @@ enum OrgNotes {
 
     func autoApply(_ input: [OrgFile], rule r: NameRule, renameAll all: Bool, dedupe dd: Bool) {
         defer { watchBusy = false }
+        for f in input { watchSeen.insert(f.url.path); watchSize.removeValue(forKey: f.url.path) }
         var list = input
-        let dir = Self.watchDir
+        let dir = Self.watchDir, dd2 = Self.autoDests(for: dir)
         let lead = Dictionary(uniqueKeysWithValues: list.filter { $0.pairOf == nil }.map { ($0.id, $0) })
         for i in list.indices { if let l = list[i].pairOf.flatMap({ lead[$0] }) { list[i].group = l.group } }
         // Names follow the current rule: only names that say nothing, unless "rename all" is on. Numbers continue the folder's count.
         var counters: [String: Int] = [:]
         for i in list.indices where list[i].pairOf == nil && (all || list[i].needsName) {
             let g = list[i].group.label
-            if counters[g] == nil { counters[g] = OrgEngine.files(in: dir.appendingPathComponent(g)).count }
+            if counters[g] == nil { counters[g] = OrgEngine.files(in: Self.destURL(list[i].group, dir, dd2)).count }
             counters[g]! += 1
             let n = OrgEngine.makeName(list[i], r, seq: counters[g]!, parent: dir.lastPathComponent)
             if n != list[i].name { list[i].newName = n; list[i].renameOn = true }
         }
-        let o = Self.execute(list, Ctx(folder: dir, moving: true), dedupe: dd)
+        let o = Self.execute(list, Ctx(folder: dir, moving: true, dests: dd2), dedupe: dd)
         guard !o.moves.isEmpty else { return }
-        // One session per day: a single Undo puts back everything moved automatically today.
-        var s = OrgVM.load(Self.autoPath)
-        if var x = s, Calendar.current.isDateInToday(x.date) { x.moves += o.moves; x.madeDirs += o.made; x.date = Date(); s = x }
-        else { s = OrgSession(folder: dir.path, date: Date(), moves: o.moves, madeDirs: o.made, auto: true) }
-        if let d = try? JSONEncoder().encode(s) { try? d.write(to: URL(fileURLWithPath: Self.autoPath)) }
-        canUndo = true
+        // Each batch is kept for 7 days and can be undone on its own.
+        let s = OrgSession(folder: dir.path, date: Date(), moves: o.moves, madeDirs: o.made, auto: true, id: UUID().uuidString)
+        Self.saveHistory([s] + Self.history())
+        for m in o.moves where m.trashed != true { if let n = Self.fileNumber(URL(fileURLWithPath: m.to)) { movedIDs[n] = Date() } }
+        saveMoved()
+        canUndo = true; historyTick += 1
         vm?.log(t("Kept \(dir.lastPathComponent) tidy: moved \(o.moved) new files", "Tự xếp \(dir.lastPathComponent): chuyển \(o.moved) file mới")
                 + (o.trashed > 0 ? t(", \(o.trashed) identical copies to the Trash", ", \(o.trashed) bản trùng vào Thùng rác") : ""))
+        notifyAuto(s, moved: o.moved, trashed: o.trashed)
+    }
+
+    /// "Sorted 3 new downloads · Screenshots: 2 · Documents: 1", with Show in Finder and Undo.
+    func notifyAuto(_ s: OrgSession, moved: Int, trashed: Int) {
+        let kept = s.moves.filter { $0.trashed != true }
+        let by = Dictionary(grouping: kept) { URL(fileURLWithPath: $0.to).deletingLastPathComponent().lastPathComponent }
+        let c = UNMutableNotificationContent()
+        c.title = t("Sorted \(moved) new downloads", "Đã xếp \(moved) file vừa tải về")
+        c.body = by.keys.sorted().map { "\($0): \(by[$0]!.count)" }.joined(separator: " · ")
+            + (trashed > 0 ? t(" · \(trashed) identical copies to the Trash", " · \(trashed) bản trùng vào Thùng rác") : "")
+        c.categoryIdentifier = "org-auto"
+        let dirs = Set(kept.map { URL(fileURLWithPath: $0.to).deletingLastPathComponent().path })
+        let reveal = kept.count == 1 ? kept[0].to : (dirs.count == 1 ? dirs.first! : s.folder)
+        c.userInfo = ["batch": s.id ?? "", "reveal": reveal]
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: s.id ?? UUID().uuidString, content: c, trigger: nil))
+    }
+}
+
+/// Notifications: shown while Tidymint is in front too; Show in Finder and Undo on a Keep Downloads tidy batch.
+final class OrgNotifier: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = OrgNotifier()
+    func install() {
+        let open = UNNotificationAction(identifier: "open", title: t("Show in Finder", "Mở thư mục"), options: [.foreground])
+        let undo = UNNotificationAction(identifier: "undo", title: t("Undo", "Hoàn tác"), options: [])
+        let c = UNUserNotificationCenter.current()
+        c.setNotificationCategories([UNNotificationCategory(identifier: "org-auto", actions: [open, undo], intentIdentifiers: [], options: [])])
+        c.delegate = self
+    }
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                withCompletionHandler done: @escaping (UNNotificationPresentationOptions) -> Void) { done([.banner, .sound]) }
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                withCompletionHandler done: @escaping () -> Void) {
+        let info = response.notification.request.content.userInfo
+        let batch = info["batch"] as? String ?? "", reveal = info["reveal"] as? String ?? "", act = response.actionIdentifier
+        let isAuto = response.notification.request.content.categoryIdentifier == "org-auto"
+        Task { @MainActor in
+            if act == "undo" { sharedOrg.undoBatch(batch) }
+            else if isAuto && !reveal.isEmpty {
+                let u = URL(fileURLWithPath: reveal)
+                if OrgVM.isDir(u) { NSWorkspace.shared.open(u) } else if FileManager.default.fileExists(atPath: reveal) { NSWorkspace.shared.activateFileViewerSelecting([u]) }
+            }
+        }
+        done()
     }
 }
 
@@ -6355,14 +6816,23 @@ struct OrgStart: View {
                              sub: t("Finds receipts and CVs, suggests tags like Food or Beach. Uses macOS's built-in recognition, slower.",
                                     "Nhận ra hoá đơn, CV, gợi ý tag như Đồ ăn, Biển. Dùng nhận diện có sẵn của macOS, chậm hơn."), on: $org.readContent)
                 OrgSwitchRow(title: t("Include sub-folders", "Gồm cả thư mục con"),
-                             sub: t("Files are renamed and tagged where they are, never moved out of their folder. App bundles and code projects are skipped.",
-                                    "File được đổi tên và gắn tag ngay tại chỗ, không bị chuyển ra khỏi thư mục của nó. Bỏ qua gói app và thư mục dự án code."), on: $org.includeSub)
+                             sub: t("Files in sub-folders are renamed and tagged where they are. Only loose files are sorted into folders. App bundles and code projects are skipped.",
+                                    "File trong thư mục con được đổi tên và gắn tag tại chỗ. Chỉ file nằm rời mới được xếp vào thư mục. Bỏ qua gói app và thư mục dự án code."), on: $org.includeSub)
                 OrgSwitchRow(title: t("Put identical copies in the Trash", "Bỏ bản trùng y hệt vào Thùng rác"),
                              sub: t("When a new name is taken by a file with exactly the same content, the extra copy goes to the Trash instead of getting \" 2\". Undo brings it back.",
                                     "Khi tên mới trùng một file có nội dung giống hệt, bản thừa vào Thùng rác thay vì thêm \" 2\". Hoàn tác sẽ lấy lại."), on: $org.dedupe)
                 OrgSwitchRow(title: t("Keep Downloads tidy", "Tự xếp thư mục Tải về"),
-                             sub: t("New downloads go into their type folder about a minute after they land, named by your rule. Works while Tidymint is open, even only in the menu bar. Files already there are left alone.",
-                                    "File mới tải về được chuyển vào thư mục theo loại sau khoảng 1 phút, đặt tên theo quy tắc của bạn. Chạy khi Tidymint đang mở, kể cả chỉ còn ở thanh menu. File có sẵn không bị động tới."), on: $org.watchDownloads)
+                             sub: t("New downloads go into their type folder inside Downloads about 2 minutes after they finish, named by your rule. A file still open in another app waits, and a file you drag back to Downloads stays there. Works while Tidymint is open, even only in the menu bar; downloads that came while it was closed are sorted when it opens. Files already there when you turn this on are left alone.",
+                                    "File mới tải về được chuyển vào thư mục theo loại ngay trong Tải về, khoảng 2 phút sau khi tải xong, đặt tên theo quy tắc của bạn. File đang mở trong app khác sẽ chờ; file bạn kéo ra lại Tải về được để yên. Chạy khi Tidymint đang mở, kể cả chỉ ở thanh menu; file tải lúc app tắt được xếp khi mở lại. File có sẵn lúc bật không bị động tới."), on: $org.watchDownloads)
+                if org.watchDownloads {
+                    HStack(spacing: 8) {
+                        Text(t("Never touch:", "Không động tới:")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                        TextField(t(".torrent, invoice", ".torrent, hoá đơn"), text: $org.exclude).textFieldStyle(.roundedBorder).font(.system(size: fs(12)))
+                            .tip(t("Comma separated. \".mkv\" skips that extension, any other word skips files whose name contains it.",
+                                    "Cách nhau bằng dấu phẩy. \".mkv\" bỏ qua đuôi đó, chữ khác thì bỏ qua file có tên chứa chữ đó."))
+                    }.padding(.horizontal, 14).padding(.bottom, 4)
+                }
+                OrgHistory(org: org)
             }.frame(width: 520)
             BigScanButton(label: t("Plan", "Lập kế hoạch")) { org.plan() }
             if org.canUndo { TextLink(t("Undo the last organize", "Hoàn tác lần sắp xếp gần nhất"), size: fs(12)) { org.undo() } }
@@ -6378,14 +6848,20 @@ struct OrgPlan: View {
                 Text(t("Plan for \(org.folder.lastPathComponent) (\(org.files.count) files)", "Kế hoạch cho \(org.folder.lastPathComponent) (\(org.files.count) file)"))
                     .font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
-                if org.includeSub {
-                    Text(t("Sub-folders included: files stay in place", "Gồm thư mục con: file giữ nguyên chỗ")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
-                } else {
-                Toggle(t("Move into subfolders", "Chuyển vào thư mục con"), isOn: $org.moveIntoFolders).toggleStyle(.switch).tint(Theme.accentSolid)
-                    .foregroundColor(Theme.text).font(.system(size: fs(12)))
-                }
-                Button { org.plan() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).help(t("Plan again", "Lập lại kế hoạch"))
+                PillSwitch(options: [(false, t("Rename only", "Chỉ đổi tên"), t("Keep files where they are, only rename them", "Giữ file ở chỗ cũ, chỉ đổi tên"), nil),
+                                     (true, t("Sort into folders", "Sắp xếp vào thư mục"), t("Make a folder per type and move files into it", "Tạo thư mục theo loại và chuyển file vào"), nil)],
+                           value: $org.moveIntoFolders)
+                Button { org.plan() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).foregroundColor(Theme.text).tip(t("Plan again", "Lập lại kế hoạch"), trailing: true)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 8)
+            if org.moveIntoFolders && !org.files.isEmpty {
+                let n = org.newDirCount
+                let made = n > 0 ? t("Creates \(n) new folders in \(org.folder.lastPathComponent).", "Tạo \(n) thư mục mới trong \(org.folder.lastPathComponent).") : ""
+                let stay = org.includeSub ? t(" Files already in sub-folders stay where they are, only renamed.", " File đã nằm trong thư mục con cũ giữ nguyên chỗ, chỉ đổi tên.") : ""
+                if !(made + stay).isEmpty {
+                    Text((made + stay).trimmingCharacters(in: .whitespaces)).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
+                }
+            }
             OrgNameBar(org: org).padding(.horizontal, 24).padding(.bottom, 10)
             OrgShowBar(org: org).padding(.horizontal, 24).padding(.bottom, 10)
             if org.files.isEmpty {
@@ -6419,6 +6895,13 @@ struct OrgPlan: View {
                 Text(selLabel(inc.count, inc.reduce(0) { $0 + $1.size })).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
                 Text(t("· \(inc.reduce(0) { $0 + $1.tagOn.count }) tags", "· \(inc.reduce(0) { $0 + $1.tagOn.count }) tag")).foregroundColor(Theme.sub).font(.system(size: fs(13)))
                 Spacer()
+                if org.moveIntoFolders && !org.outsideGroups.isEmpty {
+                    let n = org.outsideGroups.count
+                    let auto = org.watchDownloads && org.folder.standardizedFileURL.path == OrgVM.watchDir.standardizedFileURL.path
+                    Text(t("\(n) group(s) go outside \(org.folder.lastPathComponent). Undo puts everything back.", "Có \(n) nhóm chuyển ra ngoài \(org.folder.lastPathComponent). Hoàn tác trả lại tất cả.")
+                         + (auto ? t(" New downloads still stay inside Downloads.", " File mới tải về vẫn xếp trong Tải về.") : ""))
+                        .foregroundColor(Theme.sub).font(.system(size: fs(12))).lineLimit(2).padding(.trailing, 6)
+                }
                 GhostButton(title: t("Cancel", "Huỷ")) { org.phase = .idle; org.files = [] }
                 PrimaryButton(title: t("Apply", "Áp dụng"), action: { org.apply() }, disabled: inc.isEmpty)
             }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
@@ -6440,15 +6923,47 @@ struct OrgGroupBlock: View {
                     org.validate()
                 } label: { CheckBox(state: on == 0 ? 0 : (on == ids.count ? 2 : 1)) }.buttonStyle(.plain)
                 Image(systemName: g.icon).font(.system(size: fs(18))).foregroundColor(Theme.accentSolid).frame(width: 24)
+                let mv = org.groupMoves(g)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(org.moveIntoFolders ? "\(g.label)/" : g.label).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
-                    Text(t("\(ids.count) files · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))", "\(ids.count) file · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))"))
-                        .foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                    if org.editingGroup == g {
+                        TextField(g.label, text: $org.groupDraft).textFieldStyle(.plain).foregroundColor(Theme.text)
+                            .font(.system(size: fs(15), weight: .semibold)).frame(width: 220 * uiScale)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Theme.accentSolid, lineWidth: 1))
+                            .onSubmit { org.renameDest(g, org.groupDraft) }
+                            .onExitCommand { org.editingGroup = nil }
+                    } else {
+                        Text(mv ? org.destURL(g).lastPathComponent + "/" : g.label).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
+                    }
+                    HStack(spacing: 6) {
+                        Text(t("\(ids.count) files · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))", "\(ids.count) file · \(fmt(ids.reduce(0) { $0 + org.files[$1].size }))"))
+                        if mv {
+                            Text("→ " + org.destLabel(g)).lineLimit(1).truncationMode(.middle)
+                            let fresh = !org.destExists(g)
+                            Text(fresh ? t("NEW", "MỚI") : t("EXISTING", "CÓ SẴN")).font(.system(size: fs(9), weight: .semibold))
+                                .foregroundColor(fresh ? Theme.accentSolid : Theme.text).padding(.horizontal, 6).padding(.vertical, 1)
+                                .background(Capsule().fill(fresh ? Theme.accentSolid.opacity(0.18) : Theme.sub.opacity(0.18)))
+                                .tip(fresh ? t("This folder is created when you Apply", "Thư mục sẽ được tạo khi áp dụng") : t("This folder already exists, files are added to it", "Thư mục đã có, file được thêm vào"))
+                        }
+                    }.foregroundColor(Theme.sub).font(.system(size: fs(11)))
                 }
                 Spacer()
+                if mv {
+                    Menu {
+                        Button(t("Rename folder…", "Đổi tên thư mục…")) { org.groupDraft = org.destURL(g).lastPathComponent; org.editingGroup = g }
+                        Button(t("Choose an existing folder…", "Chọn thư mục có sẵn…")) { org.chooseDest(g) }
+                        Divider()
+                        Button(t("Back to default (in \(org.folder.lastPathComponent))", "Về mặc định (trong \(org.folder.lastPathComponent))")) { org.setDest(g, nil) }
+                            .disabled(org.dests[g.rawValue] == nil)
+                    } label: { Text(t("Change", "Đổi")).font(.system(size: fs(12))) }
+                        .menuStyle(.borderlessButton).fixedSize().foregroundColor(Theme.text)
+                        .padding(.horizontal, 8).padding(.vertical, 3).hoverTile()
+                        .tip(t("Rename this folder or pick another one", "Đổi tên thư mục này hoặc chọn thư mục khác"), trailing: true)
+                }
                 Button { if org.collapsed.contains(g) { org.collapsed.remove(g) } else { org.collapsed.insert(g) } } label: {
                     Image(systemName: "chevron.down").rotationEffect(.degrees(org.collapsed.contains(g) ? -90 : 0))
-                }.buttonStyle(.plain).foregroundColor(Theme.sub)
+                }.buttonStyle(.icon).foregroundColor(Theme.sub)
+                    .tip(org.collapsed.contains(g) ? t("Expand group", "Mở nhóm") : t("Collapse group", "Thu gọn nhóm"), trailing: true)
             }.padding(.horizontal, 14).padding(.vertical, 12)
             if !org.collapsed.contains(g) {
                 ForEach(ids, id: \.self) { i in OrgRow(org: org, i: i) }
@@ -6491,11 +7006,11 @@ struct OrgRow: View {
                     if f.pairOf == nil {
                         Menu {
                             ForEach(OrgGroup.allCases, id: \.self) { g in Button(g.label) { org.setGroup(f.id, g) } }
-                        } label: { Image(systemName: "folder") }.menuStyle(.borderlessButton).fixedSize().help(t("Move to another group", "Chuyển sang nhóm khác"))
+                        } label: { Image(systemName: "folder") }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 5).padding(.vertical, 3).hoverTile().tip(t("Move to another group", "Chuyển sang nhóm khác"), trailing: true)
                     }
                     Button { org.editing = org.editing == f.id ? nil : f.id } label: {
                         Image(systemName: f.note.isEmpty ? "square.and.pencil" : "note.text").foregroundColor(f.note.isEmpty ? Theme.sub : Theme.accentSolid)
-                    }.buttonStyle(.plain).help(t("Note", "Ghi chú"))
+                    }.buttonStyle(.icon).tip(t("Add a note (kept in Tidymint only, not written into the file)", "Thêm ghi chú (chỉ lưu trong Tidymint, không ghi vào file)"), trailing: true)
                 }
                 if f.pairOf != nil, let n = f.newName {
                     // Its name comes from the file it goes with.
@@ -6509,6 +7024,7 @@ struct OrgRow: View {
                         Button { org.edit(f.id) { $0.renameOn.toggle() } } label: {
                             Image(systemName: f.renameOn ? "checkmark.square.fill" : "square").font(.system(size: fs(13)))
                                 .foregroundStyle(f.renameOn ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.ink.opacity(0.5)))
+                                .contentShape(Rectangle()).onHover { ($0 ? NSCursor.pointingHand : NSCursor.arrow).set() }
                         }.buttonStyle(.plain)
                         Text(t("Rename to", "Đổi tên thành")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
                         TextField("", text: Binding(get: { org.file(f.id)?.newName ?? "" }, set: { v in org.edit(f.id) { $0.newName = v; $0.renameOn = true; $0.nameEdited = true } }))
@@ -6586,7 +7102,7 @@ struct OrgTreeRow: Identifiable {
         var out = [OrgTreeRow(depth: 0, name: root.lastPathComponent, isDir: true, count: items.count)]
         func walk(_ n: Node, _ depth: Int, _ at: URL) {
             for d in n.dirs.keys.sorted(by: { $0.localizedStandardCompare($1) == .orderedAscending }) {
-                let u = at.appendingPathComponent(d), k = n.dirs[d]!
+                let u = d.hasPrefix("~/") ? URL(fileURLWithPath: NSHomeDirectory() + d.dropFirst()) : at.appendingPathComponent(d), k = n.dirs[d]!
                 var r = OrgTreeRow(depth: depth, name: d, isDir: true, count: k.files.count)
                 r.isNew = markNew && !FileManager.default.fileExists(atPath: u.path)
                 r.existing = markNew && !r.isNew
@@ -6654,7 +7170,7 @@ struct OrgTreeView: View {
         .padding(.leading, CGFloat(r.depth) * 20 * uiScale).padding(.vertical, 4)
         .contentShape(Rectangle())
         .onTapGesture { if let id = r.file { org.reveal(id) } }
-        .help(r.file != nil ? t("Show this file in the list", "Xem file này trong danh sách") : "")
+        .tip(r.file != nil ? t("Show this file in the list", "Xem file này trong danh sách") : "")
     }
 }
 
@@ -6670,10 +7186,10 @@ struct OrgShowBar: View {
                 Text(t("To check (\(inc.filter { $0.warn != nil }.count))", "Cần xem (\(inc.filter { $0.warn != nil }.count))")).tag(OrgVM.Show.check)
             }.pickerStyle(.segmented).labelsHidden().fixedSize()
             Spacer()
-            Picker("", selection: $org.treeView) {
-                Label(t("List", "Danh sách"), systemImage: "list.bullet").tag(false)
-                Label(t("Folder tree", "Cây thư mục"), systemImage: "list.bullet.indent").tag(true)
-            }.pickerStyle(.segmented).labelsHidden().fixedSize()
+            // Named by what each side is for: the list is where files are changed, the tree only shows the result.
+            PillSwitch(options: [(false, t("Edit", "Chỉnh sửa"), t("Rename, tag and regroup each file", "Đổi tên, tag, nhóm cho từng file"), "square.and.pencil"),
+                                 (true, t("Preview", "Xem trước"), t("See the folders before and after Apply", "Xem thư mục trước và sau khi áp dụng"), "eye")],
+                       value: $org.treeView)
         }
     }
 }
@@ -6690,7 +7206,7 @@ struct OrgTag: View {
             .padding(.horizontal, 8).padding(.vertical, 3)
             .background(Capsule().fill(on ? Theme.accentSolid.opacity(0.25) : Color.clear))
             .overlay(Capsule().stroke(on ? Theme.accentSolid.opacity(0.6) : Theme.ink.opacity(0.25), lineWidth: 1))
-        }.buttonStyle(.plain).help(on ? t("Click to drop this tag", "Bấm để bỏ tag này") : t("Click to keep this tag", "Bấm để giữ tag này"))
+        }.buttonStyle(.plain).tip(on ? t("Click to drop this tag", "Bấm để bỏ tag này") : t("Click to keep this tag", "Bấm để giữ tag này"), trailing: true)
     }
 }
 
@@ -6731,8 +7247,12 @@ struct OrgNameBar: View {
             Menu {
                 ForEach(NamePreset.allCases, id: \.self) { p in Button(p.label) { org.preset = p } }
             } label: { Text(org.preset.label).font(.system(size: fs(12), weight: .semibold)) }.menuStyle(.borderlessButton).fixedSize()
-            Button { org.showRule.toggle() } label: { Image(systemName: "slider.horizontal.3") }.buttonStyle(.plain).foregroundColor(Theme.text)
-                .help(t("Edit the rule", "Sửa quy tắc"))
+                .padding(.horizontal, 6).padding(.vertical, 3).hoverTile().tip(t("Pick a ready-made naming style", "Chọn kiểu đặt tên có sẵn"))
+            // The whole pill takes the click (a bare icon only reacts on its thin strokes), and a click always opens the editor.
+            Button { org.showRule = true } label: {
+                Label(t("Customize", "Tuỳ chỉnh"), systemImage: "slider.horizontal.3").font(.system(size: fs(12)))
+            }.buttonStyle(.icon).foregroundColor(Theme.text)
+                .tip(t("Edit the rule", "Sửa quy tắc"))
                 .popover(isPresented: $org.showRule, arrowEdge: .bottom) { OrgRuleEditor(org: org).frame(width: 380).padding(16) }
             Text(t("e.g. ", "ví dụ: ") + org.example).foregroundColor(Theme.sub).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
             Spacer(minLength: 8)
@@ -6740,10 +7260,19 @@ struct OrgNameBar: View {
                 Button { org.show = .check } label: {
                     Label(t("\(org.warnCount) to check", "\(org.warnCount) file cần xem"), systemImage: "exclamationmark.triangle.fill")
                         .foregroundColor(Theme.warn).font(.system(size: fs(12), weight: .semibold))
-                }.buttonStyle(.plain).onHover { $0 ? NSCursor.pointingHand.push() : NSCursor.pop() }
-                    .help(t("Show only these files", "Chỉ hiện các file này"))
+                        .padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain)
+                    .tip(t("Show only these files", "Chỉ hiện các file này"))
             }
-            Text(t("\(org.renameCount) to rename", "\(org.renameCount) file sẽ đổi tên")).foregroundColor(Theme.text).font(.system(size: fs(12), weight: .semibold))
+            if org.renameCount == 0 && !org.renameAll && named.isEmpty && !org.files.isEmpty {
+                // Say why nothing is renamed: every name is already readable, so the rule leaves them alone.
+                Text(t("Names already clear, kept", "Tên đã rõ ràng, giữ nguyên")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                    .tip(t("Only names that say nothing (IMG_, Screenshot, scan, random strings) are renamed by default.",
+                            "Mặc định chỉ đổi tên file có tên vô nghĩa (IMG_, Screenshot, scan, chuỗi ngẫu nhiên)."))
+                TextLink(t("Rename these too", "Đổi cả các file này"), size: fs(12)) { org.renameAll = true }
+            } else {
+                Text(t("\(org.renameCount) to rename", "\(org.renameCount) file sẽ đổi tên")).foregroundColor(Theme.text).font(.system(size: fs(12), weight: .semibold))
+            }
             if !named.isEmpty {
                 let allOn = named.allSatisfy { org.files[$0].renameOn }
                 TextLink(allOn ? t("Keep all old names", "Giữ tên cũ tất cả") : t("Rename all", "Đổi tên tất cả"), size: fs(12)) {
@@ -6771,7 +7300,7 @@ struct OrgRuleEditor: View {
                 ForEach(r.parts) { p in
                     let i = r.parts.firstIndex(of: p) ?? 0
                     HStack(spacing: 8) {
-                        Image(systemName: "line.3.horizontal").foregroundColor(.secondary).help(t("Drag to reorder", "Kéo để đổi chỗ"))
+                        Image(systemName: "line.3.horizontal").foregroundColor(.secondary).tip(t("Drag to reorder", "Kéo để đổi chỗ"))
                         if p.kind == .text {
                             TextField(t("Your text, e.g. ACME", "Chữ tự gõ, ví dụ ACME"), text: Binding(
                                 get: { org.rule.parts.first { $0.id == p.id }?.text ?? "" },
@@ -6781,10 +7310,10 @@ struct OrgRuleEditor: View {
                             Text(p.kind.label).font(.system(size: fs(12)))
                             Spacer()
                         }
-                        Button { move(i, -1) } label: { Image(systemName: "chevron.up") }.buttonStyle(.plain).disabled(i == 0)
-                        Button { move(i, 1) } label: { Image(systemName: "chevron.down") }.buttonStyle(.plain).disabled(i == r.parts.count - 1)
+                        Button { move(i, -1) } label: { Image(systemName: "chevron.up") }.buttonStyle(.icon).disabled(i == 0)
+                        Button { move(i, 1) } label: { Image(systemName: "chevron.down") }.buttonStyle(.icon).disabled(i == r.parts.count - 1)
                         Button { set { r in r.parts.removeAll { $0.id == p.id } } } label: { Image(systemName: "xmark.circle.fill").foregroundColor(.secondary) }
-                            .buttonStyle(.plain).help(t("Remove", "Bỏ phần này"))
+                            .buttonStyle(.icon).tip(t("Remove", "Bỏ phần này"))
                     }.padding(.vertical, 2)
                 }
                 .onMove { from, to in set { r in r.parts.move(fromOffsets: from, toOffset: to) } }
@@ -6797,7 +7326,7 @@ struct OrgRuleEditor: View {
                     Button { set { r in r.parts.append(NamePart(kind: k)) } } label: {
                         Label(k.label, systemImage: k == .text ? "character.cursor.ibeam" : "plus").font(.system(size: fs(11)))
                             .padding(.horizontal, 8).padding(.vertical, 4).frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Capsule().stroke(Color.secondary.opacity(0.4)))
+                            .background(Capsule().stroke(Color.secondary.opacity(0.4))).hoverTile()
                     }.buttonStyle(.plain)
                 }
             }
@@ -6836,6 +7365,57 @@ struct OrgRuleEditor: View {
 
 /// A settings-style row: title and explanation on the left, the switch pinned to the right edge,
 /// so every switch lines up with the others and with the button in the folder card above.
+/// Keep Downloads tidy batches from the last 7 days, each with its own Undo.
+struct OrgHistory: View {
+    @ObservedObject var org: OrgVM
+    var body: some View {
+        let _ = org.historyTick
+        let h = OrgVM.history()
+        if !h.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                TextLink(org.historyOpen ? t("Hide automatic batches", "Ẩn các đợt tự xếp") : t("Automatic batches, last 7 days (\(h.count))", "Các đợt tự xếp 7 ngày qua (\(h.count))"), size: fs(12)) {
+                    org.historyOpen.toggle()
+                }
+                if org.historyOpen {
+                    let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
+                    ForEach(h.prefix(30), id: \.date) { b in
+                        let kept = b.moves.filter { $0.trashed != true }
+                        let dirs = Array(Set(kept.map { URL(fileURLWithPath: $0.to).deletingLastPathComponent().lastPathComponent })).sorted()
+                        HStack(spacing: 8) {
+                            Text(df.string(from: b.date)).foregroundColor(Theme.sub).monospacedDigit()
+                            Text(t("\(kept.count) files", "\(kept.count) file") + (dirs.isEmpty ? "" : " · " + dirs.joined(separator: ", ")))
+                                .foregroundColor(Theme.text).lineLimit(1).truncationMode(.tail)
+                            Spacer(minLength: 8)
+                            TextLink(t("Undo", "Hoàn tác"), size: fs(12)) { if let id = b.id { org.undoBatch(id) } }
+                        }.font(.system(size: fs(12)))
+                    }
+                }
+            }.padding(.horizontal, 14).padding(.vertical, 6).frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+/// Two-option switch made of buttons, so each option has its own tooltip and hover tile (a segmented picker has neither).
+struct PillSwitch: View {
+    let options: [(Bool, String, String, String?)]   // value, label, tooltip, SF symbol
+    @Binding var value: Bool
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(options, id: \.0) { v, label, tip, icon in
+                Button { value = v } label: {
+                    HStack(spacing: 5) {
+                        if let icon { Image(systemName: icon) }
+                        Text(label)
+                    }.font(.system(size: fs(12), weight: .medium)).foregroundColor(value == v ? .white : Theme.sub)
+                        .padding(.horizontal, 12).padding(.vertical, 5)
+                        .background(Capsule().fill(value == v ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Color.clear)))
+                        .hoverTile(value != v)
+                }.buttonStyle(.plain).tip(tip)
+            }
+        }.padding(3).background(Capsule().fill(Theme.card))
+    }
+}
+
 struct OrgSwitchRow: View {
     let title: String; let sub: String
     @Binding var on: Bool
