@@ -1,0 +1,60 @@
+name: Release
+
+# Builds the macOS app on a GitHub runner and publishes the release.
+# - Push a tag vX.Y.Z (on a commit whose CHANGELOG.md has a "## X.Y.Z" section): public release, marked Latest.
+# - Push to the branch release-dryrun: same build, saved as a draft release (not public) for checking.
+on:
+  push:
+    tags: ['v*']
+    branches: [release-dryrun]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version
+        id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then V="${GITHUB_REF_NAME#v}"; DRAFT=0; else V="$(cat VERSION)"; DRAFT=1; fi
+          echo "$V" > VERSION
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "draft=$DRAFT" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: |
+          swiftc --version
+          ./build.sh --release
+          cp "build/Tidymint-${{ steps.v.outputs.version }}.zip" build/Tidymint.zip
+          shasum -a 256 build/Tidymint.zip | tee build/sha256.txt
+
+      - name: Release notes
+        run: |
+          V="${{ steps.v.outputs.version }}"
+          SHA="$(cut -d' ' -f1 build/sha256.txt)"
+          awk -v v="$V" '$0 ~ "^## "v" " {f=1; next} /^## /{f=0} f && /^- /' CHANGELOG.md > build/items.md
+          if [ ! -s build/items.md ]; then echo "CHANGELOG.md has no section for $V"; exit 1; fi
+          {
+            echo "## What's new"; echo
+            cat build/items.md; echo
+            echo "Universal build (Apple silicon and Intel), macOS 14 or later. Not notarized yet: open it once via System Settings › Privacy & Security › Open Anyway ([Apple's guide](https://support.apple.com/102445))."
+            echo
+            echo "SHA-256 \`Tidymint.zip\`: \`$SHA\`"
+          } > build/notes.md
+          cat build/notes.md
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${{ steps.v.outputs.version }}"
+          if [ "${{ steps.v.outputs.draft }}" = "1" ]; then
+            gh release create "v$V-dryrun-${{ github.run_number }}" build/Tidymint.zip --draft --target "$GITHUB_SHA" \
+              --title "Tidymint $V (dry run)" --notes-file build/notes.md
+          else
+            gh release create "v$V" build/Tidymint.zip --title "Tidymint $V" --notes-file build/notes.md --latest --verify-tag
+          fi
