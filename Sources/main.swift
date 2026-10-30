@@ -5388,20 +5388,34 @@ struct InviteCard: View {
         vm.lensNodes = [("Library", 48.3), ("Documents", 31.2), ("Movies", 18.4), (".ollama", 12.6), ("Downloads", 9.1),
                         ("Pictures", 7.4), ("Developer", 6.2), ("Projects", 5.8), ("Desktop", 2.3), ("Music", 1.1), (".npm", 0.9), (".cache", 0.6)]
             .map { Node(url: u($0.0), size: gb($0.1), isDir: true) }
-        let z = AppEntry(url: URL(fileURLWithPath: "/Applications/Zoom.app"), name: "Zoom", bundleID: "us.zoom.xos", size: mb(412),
-                         lastUsed: Date().addingTimeInterval(-90 * 86400),
-                         related: [item("Library/Application Support/zoom.us", mb(186), true),
-                                   item("Library/Caches/us.zoom.xos", mb(64), true),
-                                   item("Library/Preferences/us.zoom.xos.plist", 24_000, true),
-                                   item("Library/Logs/zoom.us", mb(12), true),
-                                   item("Library/Saved Application State/us.zoom.xos.savedState", 410_000, true)])
-        vm.apps = [z,
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Figma.app"), name: "Figma", bundleID: "com.figma.Desktop", size: mb(520), lastUsed: Date()),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Docker.app"), name: "Docker", bundleID: "com.docker.docker", size: gb(2.1), lastUsed: Date().addingTimeInterval(-200 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Draw Things.app"), name: "Draw Things", bundleID: "com.liuliu.draw-things", size: mb(310), lastUsed: Date().addingTimeInterval(-3 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Ollama.app"), name: "Ollama", bundleID: "com.electron.ollama", size: mb(380), lastUsed: Date().addingTimeInterval(-12 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Spotify.app"), name: "Spotify", bundleID: "com.spotify.client", size: mb(290), lastUsed: Date())]
-        vm.selApp = z.id
+        // Apps that are installed on the capture Mac, so Finder supplies real icons (a missing .app shows a blank page icon).
+        func app(_ n: String, _ bid: String, _ size: Int64, _ days: Double, _ rel: [CleanItem] = []) -> AppEntry {
+            AppEntry(url: URL(fileURLWithPath: "/Applications/\(n).app"), name: n, bundleID: bid, size: size,
+                     lastUsed: Date().addingTimeInterval(-days * 86400), related: rel)
+        }
+        let slack = app("Slack", "com.tinyspeck.slackmacgap", mb(535), 75,
+                        [item("Library/Application Support/Slack", mb(640), true),
+                         item("Library/Caches/com.tinyspeck.slackmacgap", mb(118), true),
+                         item("Library/Preferences/com.tinyspeck.slackmacgap.plist", 36_000, true),
+                         item("Library/Logs/Slack", mb(14), true),
+                         item("Library/Saved Application State/com.tinyspeck.slackmacgap.savedState", 380_000, true)])
+        let zalo = app("Zalo", "com.vng.zalo", mb(762), 0,
+                       [item("Library/Application Support/ZaloData", gb(2.9), true),
+                        item("Library/Caches/com.vng.zalo", mb(103), true),
+                        item("Library/Preferences/com.vng.zalo.plist", 28_000, true),
+                        item("Library/Saved Application State/com.vng.zalo.savedState", 290_000, true)])
+        let rest = [app("Microsoft Outlook", "com.microsoft.Outlook", gb(2.4), 40),
+                    app("CapCut", "com.lemon.lvoverseas", gb(1.9), 9),
+                    app("Google Chrome", "com.google.Chrome", gb(1.5), 0),
+                    app("Visual Studio Code", "com.microsoft.VSCode", gb(1.4), 2),
+                    app("Microsoft Edge", "com.microsoft.edgemac", gb(1.1), 120),
+                    app("WhatsApp", "net.whatsapp.WhatsApp", mb(734), 6),
+                    app("Claude", "com.anthropic.claudefordesktop", mb(619), 0),
+                    app("Telegram", "ru.keepcoder.Telegram", mb(346), 4),
+                    app("Rectangle", "com.knollsoft.Rectangle", mb(11), 1)]
+        let pickApp = appLang == "en" ? slack : zalo
+        vm.apps = [pickApp] + rest + [appLang == "en" ? zalo : slack]
+        vm.selApp = pickApp.id
     }
 }
 
