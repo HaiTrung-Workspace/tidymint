@@ -10,7 +10,7 @@ dict(
   h1="CleanMyMac miễn phí: có cách nào hợp pháp không?",
   tldr="CleanMyMac <b>không có bản miễn phí lâu dài</b>, chỉ cho dùng thử 7 ngày, sau đó phải trả khoảng 40 USD/năm cho một máy. Bản crack trôi nổi trên mạng là con đường lây mã độc quen thuộc trên Mac. Nếu bạn chỉ cần <b>dọn rác, gỡ app sạch và lấy lại dung lượng</b>, có thể dùng công cụ sẵn trong macOS hoặc các app miễn phí, mã nguồn mở như <b>Tidymint</b>.",
   toc=[("co-mien-phi-khong","CleanMyMac có miễn phí không?"),("vi-sao-khong-crack","Vì sao không nên dùng bản crack"),
-       ("ban-can-gi","Bạn thật sự cần CleanMyMac để làm gì?"),("lua-chon-mien-phi","4 lựa chọn miễn phí, hợp pháp"),
+       ("ban-can-gi","Bạn cần CleanMyMac để làm gì?"),("lua-chon-mien-phi","4 lựa chọn miễn phí, hợp pháp"),
        ("tidymint-vs-cleanmymac","Tidymint và CleanMyMac khác nhau thế nào"),("cai-tidymint","Cài Tidymint trong 2 phút"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="co-mien-phi-khong">CleanMyMac có miễn phí không?</h2>
@@ -36,7 +36,7 @@ dict(
 <div class="warn"><p>Ngoài mã độc, bản crack không nhận được bản vá lỗi, dễ hỏng sau mỗi lần cập nhật macOS, và là vi phạm bản quyền.</p></div>
 <p>Tin tốt: phần lớn người tìm CleanMyMac chỉ cần vài việc cơ bản, và những việc đó làm miễn phí được.</p>
 
-<h2 id="ban-can-gi">Bạn thật sự cần CleanMyMac để làm gì?</h2>
+<h2 id="ban-can-gi">Bạn cần CleanMyMac để làm gì?</h2>
 <p>Đối chiếu nhu cầu của bạn với bảng dưới. Nếu nhu cầu nằm ở mấy dòng đầu, bạn không cần trả tiền.</p>
 <div class="tbl"><table>
 <tr><th>Nhu cầu</th><th>Tự làm bằng macOS</th><th>Tidymint (miễn phí)</th><th>CleanMyMac (trả phí)</th></tr>
@@ -102,39 +102,39 @@ dict(
     ("Jamf Threat Labs: mã độc trong app Mac lậu (01/2024)", "https://www.jamf.com/blog/jtl-malware-pirated-applications/"),
     ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/102445"),
   ],
-  related=[("Cách xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("Cách xoá ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="cleanmymac-alternative",
 ),
 
 dict(
   lang="vi", slug="xoa-ung-dung-macbook", topic="disk", date="2026-10-26", read="6 phút đọc",
-  title="Cách xóa ứng dụng trên MacBook sạch hoàn toàn | Tidymint",
-  desc="Kéo app vào Thùng rác chưa xóa hết: cài đặt, bộ nhớ đệm vẫn còn. Hướng dẫn gỡ app trên MacBook đúng cách, kể cả macOS 26 Tahoe, và cách dọn phần sót lại.",
-  crumb="Xóa ứng dụng trên MacBook",
-  h1="Cách xóa ứng dụng trên MacBook sạch hoàn toàn",
+  title="Cách xoá ứng dụng trên MacBook sạch hoàn toàn | Tidymint",
+  desc="Kéo app vào Thùng rác chưa xoá hết: cài đặt, bộ nhớ đệm vẫn còn. Hướng dẫn gỡ app trên MacBook đúng cách, kể cả macOS 26 Tahoe, và cách dọn phần sót lại.",
+  crumb="Xoá ứng dụng trên MacBook",
+  h1="Cách xoá ứng dụng trên MacBook sạch hoàn toàn",
   tldr="Cách chuẩn của Apple: thoát app, tìm app trong <b>Finder › Ứng dụng</b>, dùng trình gỡ cài đặt riêng nếu app có, nếu không thì kéo app vào <b>Thùng rác</b> rồi đổ Thùng rác. Nhưng cách này thường <b>để lại cài đặt, bộ nhớ đệm và dữ liệu</b> trong thư mục Thư viện. Muốn gỡ sạch, hãy dọn thêm các thư mục đó, hoặc dùng Tidymint (miễn phí, tiếng Việt) để tìm giúp.",
-  toc=[("cach-1-finder","Cách 1: Xóa bằng Finder (cách của Apple)"),("cach-2-trinh-go","Cách 2: Dùng trình gỡ cài đặt của app"),
+  toc=[("cach-1-finder","Cách 1: Xoá bằng Finder (cách của Apple)"),("cach-2-trinh-go","Cách 2: Dùng trình gỡ cài đặt của app"),
        ("macos-26","Lưu ý trên macOS 26 Tahoe"),("phan-sot-lai","Dọn phần sót lại cho sạch"),("cach-3-app","Cách 3: Gỡ sạch bằng Tidymint (miễn phí)"),
-       ("khong-xoa-duoc","App không xóa được thì làm sao"),("faq","Câu hỏi thường gặp")],
+       ("khong-xoa-duoc","App không xoá được thì làm sao"),("faq","Câu hỏi thường gặp")],
   body="""
-<h2 id="cach-1-finder">Cách 1: Xóa bằng Finder (cách của Apple)</h2>
+<h2 id="cach-1-finder">Cách 1: Xoá bằng Finder (cách của Apple)</h2>
 <ol class="steps">
 <li><b>Thoát app</b> đang mở (nhấn Cmd+Q). Nếu app có biểu tượng trên thanh menu, thoát cả ở đó.</li>
 <li>Mở <b>Finder</b>, chọn <b>Ứng dụng</b> (Applications) ở thanh bên.</li>
 <li>Kéo app vào <b>Thùng rác</b>, hoặc chọn app rồi vào <b>Tệp › Chuyển vào Thùng rác</b>. Nếu được hỏi, nhập mật khẩu máy.</li>
 <li><b>Đổ Thùng rác</b> (Finder › Đổ Thùng rác) để lấy lại dung lượng thật sự.</li>
 </ol>
-<p>Apple lưu ý: xóa app <b>không xóa tài liệu bạn đã tạo</b> bằng app đó, và <b>không hủy gói thuê bao</b> đã mua trong app. Thuê bao phải hủy riêng trong App Store hoặc trên trang của hãng.</p>
+<p>Apple lưu ý: xoá app <b>không xoá tài liệu bạn đã tạo</b> bằng app đó, và <b>không hủy gói thuê bao</b> đã mua trong app. Thuê bao phải hủy riêng trong App Store hoặc trên trang của hãng.</p>
 
 <h2 id="cach-2-trinh-go">Cách 2: Dùng trình gỡ cài đặt của app</h2>
 <p>Một số app lớn có trình gỡ riêng, ví dụ bộ Adobe, Microsoft Office, phần mềm diệt virus, driver máy in. Tìm file tên <b>Uninstall</b> hoặc <b>Uninstaller</b> trong thư mục của app, hoặc mục gỡ cài đặt trong phần Cài đặt của app.</p>
-<p>Apple khuyên đây là <b>cách tốt nhất</b> nếu app có, vì trình gỡ xóa được cả mục khởi động cùng máy, tiện ích mở rộng và dữ liệu nằm ở nơi khác.</p>
+<p>Apple khuyên đây là <b>cách tốt nhất</b> nếu app có, vì trình gỡ xoá được cả mục khởi động cùng máy, tiện ích mở rộng và dữ liệu nằm ở nơi khác.</p>
 
 <h2 id="macos-26">Lưu ý trên macOS 26 Tahoe</h2>
-<p>Trên các bản macOS cũ, bạn có thể vào Launchpad, giữ biểu tượng app đến khi rung rồi bấm dấu X. Từ <b>macOS 26 Tahoe</b>, Launchpad được gộp vào Spotlight và <b>không còn nút xóa app</b>. Vì vậy trên macOS 26, hãy dùng Finder (cách 1) hoặc trình gỡ cài đặt (cách 2). Không biết máy mình bản nào thì vào <b>menu Apple › Giới thiệu về máy Mac này</b>.</p>
+<p>Trên các bản macOS cũ, bạn có thể vào Launchpad, giữ biểu tượng app đến khi rung rồi bấm dấu X. Từ <b>macOS 26 Tahoe</b>, Launchpad được gộp vào Spotlight và <b>không còn nút xoá app</b>. Vì vậy trên macOS 26, hãy dùng Finder (cách 1) hoặc trình gỡ cài đặt (cách 2). Không biết máy mình bản nào thì vào <b>menu Apple › Giới thiệu về máy Mac này</b>.</p>
 
 <h2 id="phan-sot-lai">Dọn phần sót lại cho sạch</h2>
-<p>Kéo app vào Thùng rác chỉ xóa file app chính. Các file app tạo ra trong lúc dùng vẫn nằm lại trong thư mục <b>Thư viện</b> (Library) của bạn, có app để lại vài GB.</p>
+<p>Kéo app vào Thùng rác chỉ xoá file app chính. Các file app tạo ra trong lúc dùng vẫn nằm lại trong thư mục <b>Thư viện</b> (Library) của bạn, có app để lại vài GB.</p>
 <p>Để mở: trong Finder bấm <b>Đi › Đi tới thư mục</b> (Shift+Cmd+G), gõ <code>~/Library</code>. Phần sót lại thường nằm ở:</p>
 <div class="tbl"><table>
 <tr><th>Thư mục</th><th>Chứa gì</th></tr>
@@ -145,29 +145,29 @@ dict(
 <tr><td><code>~/Library/Saved Application State</code></td><td>Trạng thái cửa sổ đã lưu</td></tr>
 <tr><td><code>~/Library/LaunchAgents</code></td><td>Mục tự chạy cùng máy</td></tr>
 </table></div>
-<div class="warn"><p>Chỉ chuyển vào Thùng rác những thư mục <b>mang đúng tên app hoặc tên hãng</b> (ví dụ <code>com.spotify.client</code>). Không chắc thì để lại. Đừng xóa cả thư mục Library.</p></div>
+<div class="warn"><p>Chỉ chuyển vào Thùng rác những thư mục <b>mang đúng tên app hoặc tên hãng</b> (ví dụ <code>com.spotify.client</code>). Không chắc thì để lại. Đừng xoá cả thư mục Library.</p></div>
 
 <h2 id="cach-3-app">Cách 3: Gỡ sạch bằng Tidymint (miễn phí)</h2>
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1085" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xóa nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xóa từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, có nút Hoàn tác.</li>
-<li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xóa.</li>
+<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, có nút Hoàn tác.</li>
+<li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xoá.</li>
 </ul>
 {CTA}
 
-<h2 id="khong-xoa-duoc">App không xóa được thì làm sao</h2>
+<h2 id="khong-xoa-duoc">App không xoá được thì làm sao</h2>
 <ul>
 <li><b>Báo "đang được dùng"</b>: thoát hẳn app, kể cả biểu tượng trên thanh menu. Vẫn không được thì khởi động lại máy rồi thử lại.</li>
-<li><b>App của Apple</b> như Mail, Nhạc, Sách, Ghi chú, Bản đồ: là một phần của macOS nên không xóa được, và cũng không nên xóa.</li>
-<li><b>App vẫn tự chạy sau khi xóa</b>: còn mục khởi động trong <code>~/Library/LaunchAgents</code> hoặc <b>Cài đặt hệ thống › Cài đặt chung › Mục đăng nhập</b>. Tắt hoặc xóa mục đó.</li>
+<li><b>App của Apple</b> như Mail, Nhạc, Sách, Ghi chú, Bản đồ: là một phần của macOS nên không xoá được, và cũng không nên xoá.</li>
+<li><b>App vẫn tự chạy sau khi xoá</b>: còn mục khởi động trong <code>~/Library/LaunchAgents</code> hoặc <b>Cài đặt hệ thống › Cài đặt chung › Mục đăng nhập</b>. Tắt hoặc xoá mục đó.</li>
 </ul>
 """,
   faq=[
-    ("Kéo app vào Thùng rác đã xóa hết chưa?", "Chưa. Cách này chỉ xóa file app chính. Cài đặt, bộ nhớ đệm và dữ liệu của app vẫn nằm trong thư mục Thư viện (~/Library) cho đến khi bạn tự dọn hoặc dùng app gỡ cài đặt."),
-    ("Xóa app trên Launchpad được không?", "Trên macOS 15 trở về trước thì được với app tải từ App Store. Từ macOS 26 Tahoe, Launchpad gộp vào Spotlight và không còn nút xóa, nên hãy xóa trong Finder."),
-    ("Xóa app có mất tài liệu không?", "Không. Tài liệu bạn tạo bằng app vẫn giữ nguyên. Chỉ dữ liệu riêng của app (trong Thư viện) mới bị xóa nếu bạn dọn phần sót lại."),
-    ("Xóa app có hủy thuê bao không?", "Không. Thuê bao mua qua App Store phải hủy trong App Store › tài khoản › Đăng ký. Thuê bao mua trên web phải hủy trên trang của hãng."),
+    ("Kéo app vào Thùng rác đã xoá hết chưa?", "Chưa. Cách này chỉ xoá file app chính. Cài đặt, bộ nhớ đệm và dữ liệu của app vẫn nằm trong thư mục Thư viện (~/Library) cho đến khi bạn tự dọn hoặc dùng app gỡ cài đặt."),
+    ("Xoá app trên Launchpad được không?", "Trên macOS 15 trở về trước thì được với app tải từ App Store. Từ macOS 26 Tahoe, Launchpad gộp vào Spotlight và không còn nút xoá, nên hãy xoá trong Finder."),
+    ("Xoá app có mất tài liệu không?", "Không. Tài liệu bạn tạo bằng app vẫn giữ nguyên. Chỉ dữ liệu riêng của app (trong Thư viện) mới bị xoá nếu bạn dọn phần sót lại."),
+    ("Xoá app có hủy thuê bao không?", "Không. Thuê bao mua qua App Store phải hủy trong App Store › tài khoản › Đăng ký. Thuê bao mua trên web phải hủy trên trang của hãng."),
     ("Gỡ app bằng Tidymint có an toàn không?", "Tidymint chỉ chuyển app và phần sót lại vào Thùng rác, nên lỡ nhầm vẫn lấy lại được. App đang chạy được đánh dấu và không chọn sẵn."),
   ],
   sources=[
@@ -248,7 +248,7 @@ dict(
     ("Apple: Tìm hiểu dung lượng lưu trữ trên máy Mac (Dữ liệu hệ thống)", "https://support.apple.com/vi-vn/102624"),
     ("VOZ: Zalo ngốn nhiều dung lượng của máy quá (3/2024)", "https://voz.vn/t/zalo-ngon-nhieu-dung-luong-cua-may-qua.930107/"),
   ],
-  related=[("Xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("Xoá ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="",
 ),
 
@@ -379,7 +379,7 @@ dict(
   h1="Vì sao Mac tự đầy ổ dù bạn không tải gì, và cách chặn",
   tldr="Mac tự tăng vài GB trong khi bạn không làm gì thường là do một trong sáu chỗ: <b>snapshot Time Machine</b>, <b>bộ nhớ đệm app và trình duyệt</b>, <b>bản sao lưu iPhone/iPad</b>, <b>file đính kèm Mail và Tin nhắn</b>, <b>đồ lập trình</b> (Xcode, Docker, node_modules) hoặc <b>model AI tải về</b>. Bài này chỉ cách tìm xem máy bạn đang phình ở đâu và chặn nó quay lại, không xoá nhầm thứ cần giữ.",
   toc=[("vi-sao","Vì sao ổ tăng khi bạn không làm gì"),("tim","Truy tìm thủ phạm"),("snapshot","Snapshot Time Machine"),("cache","Bộ nhớ đệm tự tạo lại"),
-       ("sao-luu","Sao lưu iPhone, iPad"),("mail","Đính kèm Mail và Tin nhắn"),("dev","Đồ lập trình"),("ai","Model AI và app tạo ảnh"),("chan","Dọn dẹp đơn giản với Tidymint"),("faq","Câu hỏi thường gặp")],
+       ("sao-luu","Sao lưu iPhone, iPad"),("mail","Đính kèm Mail và Tin nhắn"),("dev","Đồ lập trình"),("ai","Model AI và app tạo ảnh"),("chan","Tìm thủ phạm nhanh với Tidymint"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="vi-sao">Vì sao ổ tăng khi bạn không làm gì</h2>
 <p>macOS và các app ghi file liên tục mà không hỏi: mỗi giờ một snapshot trước khi sao lưu, mỗi trang web một bộ nhớ đệm, mỗi ảnh bạn mở trong Tin nhắn một bản sao. Phần lớn rơi vào <b>Dữ liệu hệ thống</b> (máy cũ gọi là <b>Khác</b>), cái túi mà mục Dung lượng trong Cài đặt không giải thích được. Vì thế con số cứ leo lên trong khi thư mục Tài liệu vẫn y nguyên.</p>
@@ -434,7 +434,7 @@ dict(
 <li><b>Sửa:</b> <code>ollama list</code> rồi <code>ollama rm &lt;model&gt;</code> với model không dùng nữa; xoá mục cũ trong cache Hugging Face; chuyển ảnh đã tạo ra ổ ngoài. Đây là nhóm thư mục làm nhiều người bất ngờ nhất, nên Bản đồ ổ đĩa của Tidymint gọi tên chúng rõ ràng.</li>
 </ul>
 {CTA}
-<h2 id="chan">Dọn dẹp đơn giản với Tidymint</h2>
+<h2 id="chan">Tìm thủ phạm nhanh với Tidymint</h2>
 <p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ chỉ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
 <h3>Để ổ không đầy lại</h3>
 <ul>
@@ -457,7 +457,7 @@ dict(
     ("Apple: Giới thiệu về snapshot cục bộ của Time Machine", "https://support.apple.com/vi-vn/102154"),
     ("Apple: Định vị và quản lý bản sao lưu iPhone, iPad", "https://support.apple.com/vi-vn/108809"),
   ],
-  related=[("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Xoá ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="mac-storage-keeps-filling-up",
 ),
 
@@ -637,7 +637,7 @@ dict(
     ("Adobe: Nâng cấp mượt lên bản Creative Cloud mới (Remove Old Versions)", "https://helpx.adobe.com/x-productkb/global/ensure_smooth_update_creative_cloud.html"),
     ("Adobe Community: Adobe cache chiếm quá nhiều Dữ liệu hệ thống (350 GB)", "https://community.adobe.com/questions-712/adobe-cache-takes-up-too-much-space-in-my-macbook-s-system-data-1177582"),
   ],
-  related=[("Vì sao Mac tự đầy ổ dù không tải gì", "{HOME}mac-tu-day-o/"), ("Xóa ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("Vì sao Mac tự đầy ổ dù không tải gì", "{HOME}mac-tu-day-o/"), ("Xoá ứng dụng trên MacBook sạch hoàn toàn", "{HOME}xoa-ung-dung-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="adobe-storage-mac",
 ),
 dict(
@@ -1722,7 +1722,7 @@ GUIDES.append(dict(
 <p>Để biết chỗ nào đang chiếm dung lượng, app dọn dẹp phải nhìn được các thư mục macOS giấu đi: bộ nhớ đệm, nhật ký, dữ liệu của Zalo, Chrome, Mail. macOS khoá các thư mục này, chỉ mở khi bạn cấp quyền <b>Truy cập toàn bộ ổ đĩa</b> (Full Disk Access) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>.</p>
 <p>Theo Apple, quyền này cho app <b>truy cập mọi tệp trên máy</b>, kể cả dữ liệu của Mail, Tin nhắn, Safari và bản sao lưu Time Machine. Nói cách khác: <b>chọn app dọn máy cũng là chọn ai được nhìn vào máy mình</b>. Vì vậy câu hỏi \"app này có gửi gì đi không\" rất đáng hỏi.</p>
 
-<h2 id="chay-tren-may">Tidymint làm việc thế nào: mọi thứ diễn ra trên máy bạn</h2>
+<h2 id="chay-tren-may">Tidymint làm việc thế nào: mọi thứ chạy ngay trên máy bạn</h2>
 <p>Hình dung Tidymint như <b>người thợ dọn nhà làm việc ngay trong nhà bạn</b>: đi từng phòng, ghi lại thứ gì to, thứ gì cũ, đưa bạn tờ danh sách. Bạn đánh dấu thứ muốn bỏ, thợ mang ra Thùng rác. Thợ không chụp ảnh đồ đạc gửi về công ty, và về tay không.</p>
 <ol class="steps">
 <li><b>Quét:</b> Tidymint đọc <b>tên, kích thước, ngày</b> của các tệp trong những thư mục nó biết là hay đầy. Việc tính toán dùng chính bộ xử lý của máy bạn, không cần internet.</li>
