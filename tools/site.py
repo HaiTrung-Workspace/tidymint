@@ -265,7 +265,7 @@ T = {
   specs=[("Cần","macOS 14+"),("Chip","Apple, Intel"),("Giá","Miễn phí"),("Giấy phép","MIT"),("Bản mới nhất",'v<span class="ver">{v}</span>'),("Mã nguồn",'<a href="%s">GitHub</a>' % GH)],
   faq_tag="Hỏi đáp",
   shot_alt="Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm và ghi dung lượng", byapp_alt="Dọn theo ứng dụng: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng", lens_alt="Bản đồ bong bóng cho thấy thư mục nào chiếm ổ MacBook", dupes_alt="Tìm file trùng trên MacBook, đánh dấu bản giữ lại", cleanup_alt="Chi tiết dọn dẹp: bộ nhớ đệm và nhật ký xếp theo dung lượng", vs_more='So sánh chi tiết: <a href="cleanmymac-mien-phi/">CleanMyMac miễn phí? Lựa chọn hợp pháp</a> · Hướng dẫn: <a href="xoa-ung-dung-macbook/">cách xóa ứng dụng trên MacBook sạch hoàn toàn</a>',
-  vs_tag="Vì sao chọn Tidymint", vs_h="App dọn dẹp bạn tin được",
+  vs_tag="Vì sao chọn Tidymint", vs_h="Dọn thoải mái, không sợ xoá nhầm",
   vs_bad_h="App dọn dẹp trả phí thường gặp", vs_bad=["Trả tiền bản quyền hoặc thuê bao, lên đời bản lớn thường tốn thêm","Mã nguồn đóng: không biết app xoá những gì","Có app dùng cảnh báo hù doạ để giục mua","Bản crack là đường lây mã độc rất phổ biến"],
   vs_good_h="Tidymint", vs_good=["Miễn phí, không cần tài khoản, không thuê bao","Mã nguồn mở (MIT): ai cũng đọc được từng dòng","Không hù doạ, không có nút “giải phóng RAM” cho có","Chỉ chuyển vào Thùng rác, bạn tự đổ"],
   def_tag="Nên biết", def_h="“Dữ liệu hệ thống” trên Mac là gì?",
