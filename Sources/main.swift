@@ -817,8 +817,8 @@ enum AppRules {
             AppSection(id: "render", titleEN: "Rendering cache and proxies", titleVI: "Bản dựng sẵn và proxy",
                        paths: ["prerender", "agencycache", "RemuxCache"].map { "Movies/CapCut/User Data/Cache/\($0)" },
                        safety: .review,
-                       whyEN: "Pre-rendered previews, low-res proxies and converted copies of your clips. CapCut makes them again, but previews may lag until it does. CapCut Settings > Performance has its own delete buttons for these.",
-                       whyVI: "Bản dựng sẵn để xem trước, bản proxy độ phân giải thấp và bản chuyển định dạng của video. CapCut tạo lại, nhưng xem trước có thể giật cho tới khi tạo xong. Cài đặt › Performance của CapCut có nút xoá riêng cho các mục này."),
+                       whyEN: "Preview renders, low-res proxies and converted copies of your clips. CapCut makes them again; previews may lag for a while. CapCut also clears them in Settings > Performance.",
+                       whyVI: "Bản dựng sẵn, proxy và bản chuyển định dạng của video. CapCut tạo lại, xem trước có thể giật một lúc. Trong CapCut cũng xoá được ở Cài đặt › Performance."),
             AppSection(id: "projects", titleEN: "Projects", titleVI: "Dự án",
                        paths: ["Movies/CapCut/User Data/Projects"],
                        safety: .locked, whyEN: "Your edits. Tidymint never touches them.", whyVI: "Dự án bạn đang dựng. Tidymint không bao giờ đụng vào.", dbGuard: false),
@@ -4249,14 +4249,14 @@ struct AppsView: View {
                         HStack(spacing: 10) {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: a.url.path)).resizable().frame(width: 26, height: 26)
                             VStack(alignment: .leading, spacing: 1) {
+                                Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
                                 HStack(spacing: 6) {
-                                    Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
+                                    if let d = a.lastUsed {
+                                        Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
+                                    } else {
+                                        Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
+                                    }
                                     if let b = a.webAppBrowser { WebAppTag(browser: b) }
-                                }
-                                if let d = a.lastUsed {
-                                    Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10)))
-                                } else {
-                                    Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10)))
                                 }
                             }
                             Spacer()
@@ -5429,7 +5429,8 @@ struct InviteCard: View {
             ], running: en)
         let c = "Movies/CapCut/User Data/"
         let capcutReport = AppReport(rule: capcut, groups: [
-                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/recognize", 410, true), row(c + "Cache/audioWave", 95, true)]),
+                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/audioWave", 95, true)]),
+                AppGroup(id: "speech", section: capcut.sections.first { $0.id == "speech" }!, rows: [row(c + "Cache/recognize", 410, false)]),
                 AppGroup(id: "render", section: capcut.sections.first { $0.id == "render" }!, rows: [row(c + "Cache/prerender", 1200, false), row(c + "Cache/agencycache", 600, false)]),
                 AppGroup(id: "projects", section: capcut.sections.first { $0.id == "projects" }!, rows: [row(c + "Projects", 6200, false)]),
             ], running: false)
