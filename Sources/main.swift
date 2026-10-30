@@ -10,6 +10,10 @@ import UserNotifications
 import ServiceManagement
 import CryptoKit
 import QuickLookThumbnailing
+import Vision
+import PDFKit
+import Charts
+import ImageIO
 
 // MARK: - Theme
 
@@ -60,7 +64,10 @@ var systemTextScale: CGFloat { min(1.4, max(0.9, NSFont.preferredFont(forTextSty
 var uiScale: CGFloat { systemTextScale * (appTextSize == "small" ? 0.8 : (appTextSize == "large" ? 1.2 : 1.0)) }
 func fs(_ v: CGFloat) -> CGFloat { v * uiScale }
 /// Sponsor page on the website (not GitHub directly), so the destination can change without a new app release.
-var sponsorURL: URL { URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/"))! }
+/// Sponsor page with UTM so GA4 can tell clicks from the app (place: "button" or "menubar").
+func sponsorURL(_ place: String) -> URL {
+    URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/") + "?utm_source=tidymint&utm_medium=app&utm_campaign=sponsor&utm_content=\(place)")!
+}
 
 var appTheme: String = UserDefaults.standard.string(forKey: "theme").flatMap { id in palettes.contains { $0.id == id } ? id : nil } ?? "mint"
 
@@ -129,6 +136,96 @@ func shortDate(_ d: Date) -> String {
 /// Replacement for @State.
 final class Flag: ObservableObject { @Published var v = false }
 
+/// Tooltip drawn by the app itself. macOS help tags often never appear on SwiftUI views that also track the mouse
+/// (hover tiles, cursors), so every tooltip in Tidymint uses this: a small bubble near the pointer after half a second.
+/// The bubble lives in its own borderless panel above the window, so it is never clipped by the window edge,
+/// a scroll view or a neighbouring control, and it is kept inside the visible screen.
+final class TipPanel {
+    static let shared = TipPanel()
+    private var panel: NSPanel?
+    private var owner: ObjectIdentifier?
+    private var monitor: Any?
+    private let maxW: CGFloat = 280
+
+    func show(_ text: String, owner o: ObjectIdentifier) {
+        guard !text.isEmpty else { return }
+        let font = NSFont.systemFont(ofSize: fs(11))
+        let line = (text as NSString).size(withAttributes: [.font: font]).width
+        let w = min(ceil(line) + 2, maxW)
+        let host = NSHostingView(rootView: TipBubble(text: text, width: w))
+        let size = host.fittingSize
+        let p = panel ?? make()
+        p.contentView = host
+        let mouse = NSEvent.mouseLocation
+        var origin = NSPoint(x: mouse.x - 14, y: mouse.y - size.height - 14)
+        if let scr = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main {
+            let vf = scr.visibleFrame
+            origin.x = min(max(origin.x, vf.minX + 4), vf.maxX - size.width - 4)
+            if origin.y < vf.minY + 4 { origin.y = mouse.y + 18 }
+        }
+        p.setFrame(NSRect(origin: origin, size: size), display: true)
+        p.orderFrontRegardless()
+        owner = o
+    }
+    func hide(owner o: ObjectIdentifier? = nil) {
+        if let o, o != owner { return }
+        panel?.orderOut(nil); owner = nil
+    }
+    private func make() -> NSPanel {
+        let p = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = false
+        p.level = .popUpMenu; p.ignoresMouseEvents = true; p.isReleasedWhenClosed = false
+        p.collectionBehavior = [.canJoinAllSpaces, .transient, .ignoresCycle]
+        panel = p
+        // Like system tooltips: any click, scroll or key press dismisses the bubble.
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .scrollWheel, .keyDown]) { [weak self] e in
+            self?.hide(); return e
+        }
+        NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in self?.hide() }
+        return p
+    }
+}
+struct TipBubble: View {
+    let text: String; let width: CGFloat
+    var body: some View {
+        Text(text).font(.system(size: fs(11))).foregroundColor(Color(nsColor: .labelColor))
+            .multilineTextAlignment(.leading).frame(width: width, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .windowBackgroundColor)))
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: .separatorColor), lineWidth: 1))
+            .shadow(color: .black.opacity(0.25), radius: 5, y: 2)
+            .padding(8)   // room for the shadow inside the panel
+    }
+}
+final class TipState: ObservableObject {
+    private var item: DispatchWorkItem?
+    var text = ""
+    func hover(_ inside: Bool) {
+        item?.cancel(); item = nil
+        let me = ObjectIdentifier(self)
+        guard inside, !text.isEmpty else { TipPanel.shared.hide(owner: me); return }
+        let i = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            TipPanel.shared.show(self.text, owner: ObjectIdentifier(self))
+        }
+        item = i; DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: i)
+    }
+}
+struct Tip: ViewModifier {
+    let text: String
+    var trailing = false   // kept for call sites; the floating bubble places itself inside the screen
+    @StateObject private var st = TipState()
+    func body(content: Content) -> some View {
+        content
+            .onHover { inside in st.text = text; st.hover(inside) }
+            .onDisappear { st.hover(false) }
+    }
+}
+extension View {
+    func tip(_ text: String, trailing: Bool = false) -> some View { modifier(Tip(text: text, trailing: trailing)) }
+}
+
 /// macOS-style hover: soft highlight behind the row.
 struct HoverBG: ViewModifier {
     var radius: CGFloat = 8
@@ -150,6 +247,38 @@ struct HoverLift: ViewModifier {
             .onHover { v in withAnimation(.easeOut(duration: 0.12)) { h.v = v } }
     }
 }
+/// Soft tile behind a small control on hover, hand cursor: shows it is clickable without a permanent border.
+struct HoverTile: ViewModifier {
+    var enabled = true
+    @StateObject private var h = Flag()
+    func body(content: Content) -> some View {
+        content
+            .background(RoundedRectangle(cornerRadius: 6).fill(Theme.text.opacity(h.v && enabled ? 0.12 : 0)))
+            .contentShape(Rectangle())
+            .onHover { v in
+                withAnimation(.easeOut(duration: 0.12)) { h.v = v }
+                if enabled { (v ? NSCursor.pointingHand : NSCursor.arrow).set() }
+            }
+    }
+}
+extension View { func hoverTile(_ enabled: Bool = true) -> some View { modifier(HoverTile(enabled: enabled)) } }
+/// Icon-only buttons: the whole square takes the click (not only the icon's strokes), tile on hover, slight press.
+struct IconButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View { IconBody(configuration: configuration) }
+    struct IconBody: View {
+        let configuration: Configuration
+        @Environment(\.isEnabled) private var enabled
+        var body: some View {
+            configuration.label
+                .padding(.horizontal, 5).frame(minWidth: 26 * uiScale, minHeight: 24 * uiScale)
+                .hoverTile(enabled)
+                .scaleEffect(configuration.isPressed ? 0.92 : 1)
+                .opacity(enabled ? 1 : 0.35)
+        }
+    }
+}
+extension ButtonStyle where Self == IconButtonStyle { static var icon: IconButtonStyle { IconButtonStyle() } }
+
 /// Clickable text: link colour, underline + brighter + hand cursor on hover, so it reads as a link.
 struct TextLink: View {
     let title: String
@@ -253,7 +382,8 @@ struct CleanItem: Identifiable, Hashable {
     var noteColor: Color { !refStrong.isEmpty || hasDB ? Theme.danger : Theme.warn }
     var refHelp: String { (refStrong + refWeak).map { $0.replacingOccurrences(of: NSHomeDirectory(), with: "~") }.joined(separator: "\n") }
     var date: Date? = nil
-    var name: String { url.lastPathComponent }
+    var label: String? = nil       // friendlier name than the file name (e.g. "My iPhone · Oct 2, 2026")
+    var name: String { label ?? url.lastPathComponent }
     var shortPath: String { url.path.replacingOccurrences(of: NSHomeDirectory(), with: "~") }
 }
 
@@ -368,6 +498,8 @@ enum Scanner {
             case n.contains("Outlook"): k += ["Outlook"]
             case n.contains("WhatsApp"): k += ["whatsapp", "WhatsApp"]
             case n.contains("Firefox"): k += ["Firefox", "Mozilla"]
+            // Xcode and Simulator: their data lives under Developer/, which holds no bundle id to match.
+            case b == "com.apple.dt.Xcode" || b == "com.apple.iphonesimulator": k += ["/Developer/Xcode/", "/Developer/CoreSimulator/"]
             default: break
             }
             if !b.isEmpty { k.append(b) }
@@ -468,6 +600,14 @@ enum Scanner {
         cats.append(Category(id: "dev", titleEN: "Developer & Wallpaper Junk", titleVI: "Công cụ và hình nền", icon: "hammer",
                              descEN: "npm cache, downloaded aerial wallpapers", descVI: "Bộ nhớ đệm npm, hình nền động đã tải",
                              items: make(dev, running: run)))
+
+        let derived = lib.appendingPathComponent("Developer/Xcode/DerivedData")
+        if fm.fileExists(atPath: derived.path) {
+            cats.append(Category(id: "xcode", titleEN: "Xcode Build Data", titleVI: "Dữ liệu build Xcode", icon: "hammer.circle",
+                                 descEN: "DerivedData, one folder per project. Not selected by default", descVI: "DerivedData, mỗi dự án một thư mục. Mặc định không tick",
+                                 safety: .review, whyEN: "Xcode rebuilds it. The next build of that project takes longer.", whyVI: "Xcode tự tạo lại. Lần build sau của dự án đó sẽ lâu hơn.",
+                                 items: make(children(derived), running: run, defaultOn: false)))
+        }
 
         let projects = Prefs.projectFolders.map { URL(fileURLWithPath: $0) }
         step(4, projects.first.map { $0.path.replacingOccurrences(of: NSHomeDirectory(), with: "~") } ?? "")
@@ -656,13 +796,29 @@ enum AppRules {
         chromium(id: "edge", nameEN: "Microsoft Edge", nameVI: "Microsoft Edge", bundle: "com.microsoft.edgemac", support: "Microsoft Edge", caches: "Microsoft Edge", aiModel: true),
         // Unverified on a real Mac: folder names taken from the Chromium layout and public tooling that reads Cốc Cốc profiles.
         chromium(id: "coccoc", nameEN: "Cốc Cốc", nameVI: "Cốc Cốc", bundle: "com.coccoc.Coccoc", support: "Coccoc", caches: "Coccoc"),
-        // Unverified on a real Mac. Only scratch folders inside Cache: rendered media in there can be the last copy of a clip.
+        // Checked on a real Mac (App Store build, 10/2026): data in ~/Movies/CapCut/User Data, Settings > Draft and > Performance
+        // offer their own delete buttons for Cache, rendering cache (prerender), proxies (agencycache) and remux files.
+        // Other Cache subfolders can hold imported media, so they are left alone.
         AppRule(id: "capcut", nameEN: "CapCut", nameVI: "CapCut", bundleIDs: ["com.lemon.lvoverseas"], marker: "Movies/CapCut/User Data", sections: [
+            // Pre-selected only what is shown to be rebuilt (thumbnails, waveforms, analysis caches, logs).
+            // recognize (auto captions), ttsTemp (text-to-speech audio) and tmp are not verified: a project may point to them,
+            // so they are offered but not pre-selected. Source: research/nguon-chinh-thuc/capcut.md
             AppSection(id: "cache", titleEN: "Scratch files", titleVI: "File tạm khi dựng video",
-                       paths: ["recognize", "frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       paths: ["frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB"].map { "Movies/CapCut/User Data/Cache/\($0)" }
+                              + ["Movies/CapCut/User Data/Log"],
                        safety: .safe,
-                       whyEN: "Thumbnails, waveforms and analysis caches. CapCut rebuilds them when you open a project.",
-                       whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích. CapCut tự tạo lại khi mở dự án."),
+                       whyEN: "Thumbnails, waveforms, analysis caches and logs. CapCut rebuilds them when you open a project.",
+                       whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký. CapCut tự tạo lại khi mở dự án."),
+            AppSection(id: "speech", titleEN: "Captions and voice-over scratch", titleVI: "File tạm phụ đề và giọng đọc",
+                       paths: ["recognize", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       safety: .review,
+                       whyEN: "Working files for auto captions and text-to-speech. A project you are still editing may use them, so check before removing.",
+                       whyVI: "File làm việc của phụ đề tự động và giọng đọc. Dự án đang dựng có thể còn dùng, nên xem kỹ trước khi bỏ."),
+            AppSection(id: "render", titleEN: "Rendering cache and proxies", titleVI: "Bản dựng sẵn và proxy",
+                       paths: ["prerender", "agencycache", "RemuxCache"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       safety: .review,
+                       whyEN: "Preview renders, low-res proxies and converted copies of your clips. CapCut makes them again; previews may lag for a while. CapCut also clears them in Settings > Performance.",
+                       whyVI: "Bản dựng sẵn, proxy và bản chuyển định dạng của video. CapCut tạo lại, xem trước có thể giật một lúc. Trong CapCut cũng xoá được ở Cài đặt › Performance."),
             AppSection(id: "projects", titleEN: "Projects", titleVI: "Dự án",
                        paths: ["Movies/CapCut/User Data/Projects"],
                        safety: .locked, whyEN: "Your edits. Tidymint never touches them.", whyVI: "Dự án bạn đang dựng. Tidymint không bao giờ đụng vào.", dbGuard: false),
@@ -907,6 +1063,71 @@ struct AppEntry: Identifiable {
     var size: Int64
     var lastUsed: Date?
     var related: [CleanItem] = []
+    /// Chromium browsers "install" a website as a tiny launcher app (bundle id <browser>.app.<id>, e.g. Google Password
+    /// Manager, Docs). It only opens the site; the data stays in the browser profile and the account, which Tidymint never touches.
+    var webAppBrowser: String? {
+        let hosts = [("com.google.Chrome", "Chrome"), ("com.google.Chrome.beta", "Chrome"), ("com.microsoft.edgemac", "Edge"),
+                     ("com.brave.Browser", "Brave"), ("org.chromium.Chromium", "Chromium"), ("com.vivaldi.Vivaldi", "Vivaldi"),
+                     ("com.coccoc.Coccoc", "Cốc Cốc"), ("com.operasoftware.Opera", "Opera")]
+        guard let b = hosts.first(where: { bundleID.hasPrefix($0.0 + ".app.") })?.1 else { return nil }
+        // Only the real launcher shape counts: a single app_mode_loader binary, nothing else that could hold data.
+        let bin = url.appendingPathComponent("Contents/MacOS")
+        guard (try? FileManager.default.contentsOfDirectory(atPath: bin.path)) == ["app_mode_loader"] else { return nil }
+        return b
+    }
+    /// Installed for every user (owned by root, as the App Store and most .pkg installers do): moving it to the Trash needs an
+    /// administrator password, which macOS asks for in Finder. Tidymint never asks for or handles passwords.
+    var needsAdmin: Bool {
+        let owner = (try? FileManager.default.attributesOfItem(atPath: url.path)[.ownerAccountID] as? NSNumber)?.intValue
+        return owner == 0 || access(url.path, W_OK) != 0
+    }
+    var fromAppStore: Bool { FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/_MASReceipt").path) }
+}
+func adminNote(_ a: AppEntry) -> String {
+    t("\(a.name) was installed for every user of this Mac\(a.fromAppStore ? " by the App Store" : ""). When you uninstall it, Tidymint asks Finder to move it to the Trash and macOS asks for an administrator password in its own window. Tidymint never asks for or sees your password.\(a.fromAppStore ? "" : " If the app came with its own uninstaller, use that first: Apple says it also removes the helpers the app installed.")",
+      "\(a.name) được cài cho mọi tài khoản trên máy\(a.fromAppStore ? " qua App Store" : ""). Khi gỡ, Tidymint nhờ Finder chuyển app vào Thùng rác và macOS hỏi mật khẩu quản trị trong hộp thoại của macOS. Tidymint không hỏi và không thấy mật khẩu của bạn.\(a.fromAppStore ? "" : " Nếu app có trình gỡ cài đặt riêng, dùng trình đó trước: theo Apple, cách này gỡ cả các thành phần phụ app đã cài.")")
+}
+
+/// Finder does the moves that need an administrator password: macOS shows its own password window, Tidymint never sees it.
+/// Runs osascript as a child process so the wait for the password never blocks Tidymint's window.
+enum FinderOps {
+    enum Result { case ok(String), cancelled, notAllowed, failed(String) }
+    static func q(_ p: String) -> String { p.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") }
+    static func run(_ script: String) -> Result {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript"); p.arguments = ["-e", script]
+        let out = Pipe(), err = Pipe(); p.standardOutput = out; p.standardError = err
+        do { try p.run() } catch { return .failed(error.localizedDescription) }
+        let o = String(decoding: out.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        let e = String(decoding: err.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        p.waitUntilExit()
+        if p.terminationStatus == 0 { return .ok(o) }
+        if e.contains("-128") { return .cancelled }
+        if e.contains("-1743") { return .notAllowed }
+        return .failed(e.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+    /// Moves one item to the Trash through Finder. Returns the item's path in the Trash.
+    static func trash(_ path: String) -> Result {
+        run("with timeout of 600 seconds\ntell application \"Finder\"\nset r to delete (POSIX file \"\(q(path))\" as alias)\nreturn POSIX path of (r as alias)\nend tell\nend timeout")
+    }
+    /// Moves an item back into a folder through Finder (Undo for items that needed a password to leave).
+    static func move(_ path: String, into folder: String) -> Result {
+        run("with timeout of 600 seconds\ntell application \"Finder\"\nset r to move (POSIX file \"\(q(path))\" as alias) to (POSIX file \"\(q(folder))\" as alias)\nreturn POSIX path of (r as alias)\nend tell\nend timeout")
+    }
+}
+
+/// Small grey tag for a browser web app, with the reassurance as a tooltip.
+struct WebAppTag: View {
+    let browser: String
+    var body: some View {
+        Text(t("\(browser) web app", "Web app của \(browser)")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.sub)
+            .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(Theme.sub.opacity(0.15)))
+            .fixedSize()
+            .tip(webAppNote(browser))
+    }
+}
+func webAppNote(_ browser: String) -> String {
+    t("A shortcut \(browser) made when you installed a website as an app. It holds only an icon and a launcher. Passwords and site data are kept by \(browser) in your account or on this Mac, not here. Deleting the shortcut does not remove the app from \(browser), which recreates it the next time you open the app. To remove it completely: open the app › ⋮ menu › Uninstall.",
+      "Lối tắt do \(browser) tạo khi bạn cài một trang web thành app, chỉ chứa icon và lệnh mở trang. Mật khẩu và dữ liệu trang được \(browser) lưu trong tài khoản hoặc trên máy, không nằm ở đây. Xoá lối tắt không gỡ app khỏi \(browser), lần sau mở app \(browser) sẽ tạo lại. Muốn gỡ hẳn: mở app › menu ⋮ › Gỡ cài đặt.")
 }
 
 enum Apps {
@@ -1260,8 +1481,9 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var hoverNode: UUID? = nil
     @Published var lang: String = appLang
     static let advancedPages: Set<Page> = [.large, .dupes, .lens, .cloud, .startup, .stats, .ignore]
-    @Published var advancedOpen: Bool = UserDefaults.standard.bool(forKey: "nav-advanced")
-    func setAdvanced(_ on: Bool) { advancedOpen = on; UserDefaults.standard.set(on, forKey: "nav-advanced") }
+    /// Folded on every launch so the first screen stays simple; opens when the user asks or an advanced page is shown.
+    @Published var advancedOpen: Bool = false
+    func setAdvanced(_ on: Bool) { advancedOpen = on }
 
     func setLang(_ l: String) { appLang = l; UserDefaults.standard.set(l, forKey: "lang"); lang = l }
     @Published var textSize: String = appTextSize
@@ -1302,9 +1524,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var leftovers: [CleanItem] = []
     @Published var installers: [CleanItem] = []
     @Published var appsMsg = ""
+    @Published var appsMsgErr = false
 
     func scanApps() {
-        appsBusy = true; appsMsg = ""
+        appsBusy = true; appsMsg = ""; appsMsgErr = false
         Task.detached {
             let a = Apps.list(); let l = Apps.leftovers(); let i = Apps.installers()
             await MainActor.run { self.apps = a; self.leftovers = l; self.installers = i; self.appsBusy = false; self.markDone(.apps) }
@@ -1328,19 +1551,58 @@ enum Phase { case idle, scanning, summary, review, done }
         let extra = a.related.filter(\.selected)
         let total = a.size + extra.reduce(0) { $0 + $1.size }
         guard confirm(t("Uninstall \(a.name)?", "Gỡ \(a.name)?"),
-                      t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.",
-                        "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."),
+                      t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.", "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác.")
+                        + (a.needsAdmin ? t(" macOS will ask for an administrator password in its own window; Tidymint never sees it.", " macOS sẽ hỏi mật khẩu quản trị trong hộp thoại của macOS; Tidymint không thấy mật khẩu.") : ""),
                       t("Uninstall", "Gỡ")) else { return }
-        NSWorkspace.shared.recycle([a.url]) { _, err in
+        if a.needsAdmin { uninstallWithFinder(a, extra: extra, total: total); return }
+        NSWorkspace.shared.recycle([a.url]) { newURLs, err in
             Task { @MainActor in
-                let (ok, _) = self.trash(extra.map(\.url))
-                if err == nil {
-                    self.apps.removeAll { $0.id == id }; self.selApp = nil
-                    self.finished(.apps, ok + 1, total, 0)
-                    self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
-                } else {
-                    self.appsMsg = t("Could not move \(a.name) to the Trash: \(err!.localizedDescription)", "Không chuyển được \(a.name) vào Thùng rác: \(err!.localizedDescription)")
+                guard err == nil else {
+                    // The app itself could not go to the Trash: leave its related files where they are.
+                    self.log("Uninstall \(a.name) failed: \(err!.localizedDescription)")
+                    self.appsMsgErr = true
+                    self.appsMsg = t("Could not move \(a.name) to the Trash: macOS did not allow it. Nothing was moved. You can drag the app to the Trash in Finder.",
+                                     "Không chuyển được \(a.name) vào Thùng rác: macOS không cho phép. Chưa có gì bị chuyển đi. Bạn có thể kéo app vào Thùng rác trong Finder.")
+                    return
                 }
+                // Record the app in the Undo journal together with its related files, so Undo puts all of it back.
+                let appEntry = newURLs[a.url].map { [Journal.Entry(from: a.url.path, to: $0.path, size: a.size)] } ?? []
+                let (ok, _) = self.trash(extra.map(\.url), label: a.name, alsoUndo: appEntry)
+                self.apps.removeAll { $0.id == id }; self.selApp = nil
+                self.finished(.apps, ok + 1, total, 0)
+                self.appsMsgErr = false
+                self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
+                self.log(self.appsMsg); self.refreshTrash(); self.refreshDisk()
+            }
+        }
+    }
+    /// Apps owned by root: Finder moves the app (macOS asks for the password), then the related files go the usual way.
+    func uninstallWithFinder(_ a: AppEntry, extra: [CleanItem], total: Int64) {
+        appsBusy = true
+        Task.detached {
+            let r = FinderOps.trash(a.url.path)
+            await MainActor.run {
+                self.appsBusy = false
+                switch r {
+                case .ok(let to) where !FileManager.default.fileExists(atPath: a.url.path) && FileManager.default.fileExists(atPath: to):
+                    let appEntry = [Journal.Entry(from: a.url.path, to: to, size: a.size)]
+                    let (ok, _) = self.trash(extra.map(\.url), label: a.name, alsoUndo: appEntry)
+                    self.apps.removeAll { $0.id == a.id }; self.selApp = nil
+                    self.finished(.apps, ok + 1, total, 0)
+                    self.appsMsgErr = false
+                    self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
+                case .cancelled:
+                    self.appsMsgErr = true
+                    self.appsMsg = t("\(a.name) was not uninstalled: the password window was cancelled. Nothing was moved.", "Chưa gỡ \(a.name): hộp hỏi mật khẩu đã bị huỷ. Chưa có gì bị chuyển đi.")
+                case .notAllowed:
+                    self.appsMsgErr = true
+                    self.appsMsg = t("\(a.name) was not uninstalled: Tidymint is not allowed to ask Finder. Turn it on in System Settings > Privacy & Security > Automation > Tidymint > Finder. Nothing was moved.",
+                                     "Chưa gỡ \(a.name): Tidymint chưa được phép nhờ Finder. Bật trong Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Tự động hoá > Tidymint > Finder. Chưa có gì bị chuyển đi.")
+                default:
+                    self.appsMsgErr = true
+                    self.appsMsg = t("Could not move \(a.name) to the Trash. Nothing was moved. You can drag the app to the Trash in Finder.", "Không chuyển được \(a.name) vào Thùng rác. Chưa có gì bị chuyển đi. Bạn có thể kéo app vào Thùng rác trong Finder.")
+                }
+                if case .failed(let e) = r { self.log("Uninstall \(a.name) through Finder failed: \(e)") }
                 self.log(self.appsMsg); self.refreshTrash(); self.refreshDisk()
             }
         }
@@ -1521,7 +1783,6 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var launchBusy = false
     func scanLaunch() {
         launch = Startup.scan()
-        launchMsg = ""
         launchBusy = true
         let snapshot = launch
         Task.detached(priority: .utility) {
@@ -1548,7 +1809,7 @@ enum Phase { case idle, scanning, summary, review, done }
             p.standardOutput = FileHandle.nullDevice; p.standardError = FileHandle.nullDevice
             try? p.run(); p.waitUntilExit()
         }
-        let (ok, fail) = trash(sel.map(\.url))
+        let (ok, fail) = trash(sel.map(\.url), label: "startup")
         launchMsg = t("Removed \(ok) startup items.", "Đã gỡ \(ok) mục tự chạy.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
         log(launchMsg)
         launch.removeAll { lastOK.contains($0.url) }
@@ -1587,6 +1848,11 @@ enum Phase { case idle, scanning, summary, review, done }
     func notify(_ title: String, _ body: String) {
         let c = UNMutableNotificationContent(); c.title = title; c.body = body; c.sound = .default
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: UUID().uuidString, content: c, trigger: nil))
+    }
+    /// 0 fine, 1 getting low (under 1.25x the warning level), 2 low (under the warning level). 0 when the warning is off.
+    var diskLevel: Int {
+        guard freeGB > 0, lowSpaceGB > 0 else { return 0 }
+        return freeGB < lowSpaceGB ? 2 : (freeGB < lowSpaceGB * 1.25 ? 1 : 0)
     }
     func setLowSpace(_ v: Double) { lowSpaceGB = v; UserDefaults.standard.set(v, forKey: "lowSpaceGB") }
     func setRamAlert(_ v: Bool) { ramAlert = v; UserDefaults.standard.set(v, forKey: "ramAlert") }
@@ -1633,6 +1899,7 @@ enum Phase { case idle, scanning, summary, review, done }
         let v = try? URL(fileURLWithPath: NSHomeDirectory()).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeTotalCapacityKey])
         freeGB = Double(v?.volumeAvailableCapacityForImportantUsage ?? 0) / 1_000_000_000
         totalGB = Double(v?.volumeTotalCapacity ?? 0) / 1_000_000_000
+        if freeGB > 0 { DiskHistory.record(freeGB) }
     }
 
     func refreshTrash() {
@@ -1676,9 +1943,13 @@ enum Phase { case idle, scanning, summary, review, done }
 
     @Published var lastFreed: Int64 = 0
     @Published var lastCount = 0
-    struct DoneInfo { let page: Page; let count: Int; let size: Int64; let fail: Int }
+    struct DoneInfo { let page: Page; let count: Int; let size: Int64; let fail: Int; var session: Date? = nil }
     @Published var doneInfo: DoneInfo? = nil
-    func finished(_ p: Page, _ count: Int, _ size: Int64, _ fail: Int) { doneInfo = count > 0 ? DoneInfo(page: p, count: count, size: size, fail: fail) : nil }
+    /// What the last Undo put back, shown on the page it was started from (and on the Trash page) until the next clean.
+    @Published var undoNote: (page: Page, text: String)? = nil
+    func finished(_ p: Page, _ count: Int, _ size: Int64, _ fail: Int) { undoNote = nil; doneInfo = count > 0 ? DoneInfo(page: p, count: count, size: size, fail: fail, session: undoable?.date) : nil }
+    /// The banner's Undo only belongs to the clean it reports: a later clean elsewhere replaces the Undo journal.
+    var bannerCanUndo: Bool { guard let d = doneInfo, let u = undoable else { return false }; return d.session == nil || d.session == u.date }
     /// Undo from a list page: put the files back, then measure that page again so the list shows them.
     func undoFromBanner() {
         guard let d = doneInfo else { return }
@@ -1691,7 +1962,7 @@ enum Phase { case idle, scanning, summary, review, done }
         case .dupes: scanDupes()
         case .apps: scanApps()
         case .byapp: scanByApp()
-        case .lens: rescanLens()
+        case .lens: if sysOpen { scanSys() } else { rescanLens() }
         default: break
         }
     }
@@ -1702,6 +1973,31 @@ enum Phase { case idle, scanning, summary, review, done }
                                       t("Developer tools", "Công cụ lập trình"), t("Project drafts", "Nháp dự án"), t("Old downloads", "Downloads cũ")] }
     nonisolated func stepCallback() -> (Int, String) -> Void {
         { i, d in DispatchQueue.main.async { self.scanStep = i; self.scanDetail = d } }
+    }
+    // System Data explainer (a view inside Space Lens)
+    @Published var sysOpen = false
+    @Published var sysBusy = false
+    @Published var sysParts: [SysPart] = []
+    @Published var sysPurgeable: Int64 = 0
+    func openSys() { sysOpen = true; if sysParts.isEmpty { scanSys() } }
+    func scanSys() {
+        sysBusy = true
+        Task.detached {
+            let (parts, purge) = SysData.scan()
+            await MainActor.run { self.sysParts = parts; self.sysPurgeable = purge; self.sysBusy = false }
+        }
+    }
+    func trashSys() {
+        let picked = sysParts.flatMap { $0.items.filter(\.selected) }.filter { !Scanner.blocked($0.url.path) }
+        guard !picked.isEmpty else { return }
+        guard confirm(t("Move \(picked.count) items to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
+                      picked.prefix(8).map { "• \($0.name), \(fmt($0.size))" }.joined(separator: "\n") + (picked.count > 8 ? "\n…" : ""),
+                      t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
+        let (ok, fail) = trash(picked.map(\.url), label: "sysdata")
+        let freed = okSize(picked)
+        log("System Data: moved \(ok) items (\(fmt(freed))) to Trash")
+        finished(.lens, ok, freed, fail)
+        scanSys(); refreshTrash(); refreshDisk()
     }
     // Space Lens selection and history
     @Published var lensSel = Set<URL>()
@@ -1764,10 +2060,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var undoable: Journal.Session? = Journal.load()
     /// Move items to the Trash and remember where each one went, so the whole run can be undone.
     /// `strict` refuses paths outside the home folder or too close to its root (off only for a folder the user picked by hand).
-    func trash(_ urls: [URL], label: String = "", strict: Bool = true) -> (Int, Int) {
+    func trash(_ urls: [URL], label: String = "", strict: Bool = true, alsoUndo: [Journal.Entry] = []) -> (Int, Int) {
         var ok = 0, fail = 0
         lastOK = []; lastErr = ""
-        var moved: [Journal.Entry] = []
+        var moved: [Journal.Entry] = alsoUndo
         for u in urls {
             if strict && !Scanner.safeToTrash(u) {
                 fail += 1
@@ -1779,8 +2075,10 @@ enum Phase { case idle, scanning, summary, review, done }
             do { try FileManager.default.trashItem(at: u, resultingItemURL: &dest); ok += 1; lastOK.insert(u)
                  if let d = dest as URL? { moved.append(Journal.Entry(from: u.path, to: d.path, size: size)) } }
             catch {
-                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly
-                if FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
+                // iCloud Drive file: the standard Trash refused, move it into ~/.Trash directly.
+                // Only for iCloud Drive on the startup volume: anything else (external or network drive, other errors)
+                // is reported, never copied across drives. Source: research/nguon-chinh-thuc/macos-thung-rac.md
+                if isICloudDriveOnHomeVolume(u), FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) {
                     ok += 1; lastOK.insert(u)
                     moved.append(Journal.Entry(from: u.path, to: d.path, size: size))
                     continue
@@ -1805,11 +2103,14 @@ enum Phase { case idle, scanning, summary, review, done }
     /// Put everything from the last run back where it was (only items still sitting in the Trash).
     func undoLast() {
         guard let s = undoable else { return }
-        guard confirm(t("Undo the last clean?", "Hoàn tác lần dọn vừa rồi?"),
-                      t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ."),
+        let needsPassword = s.entries.contains { ((try? FileManager.default.attributesOfItem(atPath: $0.to)[.ownerAccountID] as? NSNumber)?.intValue) == 0 }
+        guard confirm(t("Undo the last clean\(sessionName(s))?", "Hoàn tác lần dọn vừa rồi\(sessionName(s))?"),
+                      t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ.")
+                        + (needsPassword ? t(" An app installed for every user goes back through Finder: macOS asks for an administrator password in its own window.", " App cài cho mọi tài khoản được Finder trả về: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS.") : ""),
                       t("Put Back", "Trả về chỗ cũ")) else { return }
         let r = Journal.restore(s)
-        lastResult = t("Put back \(r.ok) items.", "Đã trả về \(r.ok) mục.") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+        lastResult = t("Put back \(r.ok) items\(sessionName(s)).", "Đã trả về \(r.ok) mục\(sessionName(s)).") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+        undoNote = (page == .trash ? .trash : (doneInfo?.page ?? page), lastResult)
         log("Undo: put back \(r.ok) items, skipped \(r.skipped)")
         undoable = nil; Journal.clear()
         refreshTrash(); refreshDisk()
@@ -2052,6 +2353,17 @@ enum Phase { case idle, scanning, summary, review, done }
 }
 
 /// Move a file into ~/.Trash directly (used when the standard Trash refuses, e.g. iCloud Drive files).
+/// True for a file inside ~/Library/Mobile Documents (iCloud Drive) that sits on the same volume as the home folder.
+func isICloudDriveOnHomeVolume(_ u: URL) -> Bool {
+    let home = URL(fileURLWithPath: NSHomeDirectory())
+    let icloud = home.appendingPathComponent("Library/Mobile Documents").resolvingSymlinksInPath().path + "/"
+    guard u.resolvingSymlinksInPath().path.hasPrefix(icloud) else { return false }
+    let a = try? u.resourceValues(forKeys: [.volumeIdentifierKey]).volumeIdentifier as? NSObject
+    let b = try? home.resourceValues(forKeys: [.volumeIdentifierKey]).volumeIdentifier as? NSObject
+    guard let a, let b else { return false }
+    return a.isEqual(b)
+}
+
 func moveToUserTrash(_ u: URL) throws -> URL {
     let trash = URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent(".Trash")
     var dest = trash.appendingPathComponent(u.lastPathComponent)
@@ -2261,8 +2573,8 @@ func folderInfo(_ u: URL) -> String? {
         "Group Containers": ("Data shared between apps of one maker (Office, Messages...).", "Dữ liệu dùng chung giữa các app cùng hãng (Office, Tin nhắn...)."),
         "Mobile Documents": ("iCloud Drive files kept on this Mac.", "File iCloud Drive đang lưu trên máy."),
         "CloudStorage": ("Google Drive / OneDrive / Dropbox files on this Mac. Use Cloud Cleanup.", "File Google Drive / OneDrive / Dropbox trên máy. Dọn ở mục Dữ liệu đám mây."),
-        "Developer": ("Xcode data, simulators and build files. Often large, mostly safe to clear.", "Dữ liệu Xcode, máy ảo, file build. Thường nặng, phần lớn xoá được."),
-        "DerivedData": ("Xcode build files. Safe to clear.", "File build của Xcode. Xoá được."),
+        "Developer": ("Xcode data, simulators, build files and archives. Build files can go; keep the archives of apps you released.", "Dữ liệu Xcode, máy ảo, file build và bản archive. File build xoá được; giữ archive của bản đã phát hành."),
+        "DerivedData": ("Xcode build files. Xcode makes them again; the next build is slower. Quit Xcode first.", "File build của Xcode. Xcode tự tạo lại, lần build sau lâu hơn. Đóng Xcode trước."),
         "CoreSimulator": ("iPhone simulators. Delete old ones in Xcode.", "Máy ảo iPhone. Xoá bản cũ trong Xcode."),
         "Logs": ("Log files. Safe to clear.", "File nhật ký. Xoá được."),
         "Mail": ("Mail messages and attachments. Manage in the Mail app.", "Thư và tệp đính kèm. Dọn trong app Mail."),
@@ -2280,12 +2592,22 @@ func folderInfo(_ u: URL) -> String? {
         ".Trash": ("The Trash.", "Thùng rác."),
         "Photos Library.photoslibrary": ("Photos library. Do not delete here, manage in Photos.", "Thư viện Ảnh. Đừng xoá ở đây, dọn trong app Ảnh."),
         "Saved Application State": ("Window positions of apps. Safe to clear.", "Vị trí cửa sổ app. Xoá được."),
-        "iOS DeviceSupport": ("Debug files for each iPhone you plugged in. Safe to clear.", "File gỡ lỗi cho từng iPhone từng cắm. Xoá được."),
+        "iOS DeviceSupport": ("System symbols copied from each iPhone you plugged in, used to read crash reports. Old versions can go; Xcode copies them again only from a device still on that version.", "Ký hiệu hệ thống chép từ từng iPhone từng cắm, dùng để đọc báo cáo lỗi. Bản cũ xoá được; Xcode chỉ chép lại từ máy còn chạy đúng bản đó."),
         "Draw Things": ("Draw Things AI models. Large; remove unused models inside the app.", "Model AI của Draw Things. Rất nặng, gỡ model không dùng ngay trong app."),
         "huggingface": ("Downloaded AI models (Hugging Face). Re-downloadable.", "Model AI tải từ Hugging Face. Tải lại được."),
         ".ollama": ("Ollama AI models. Remove unused ones with 'ollama rm'.", "Model AI của Ollama. Gỡ model không dùng bằng 'ollama rm'."),
-        "LM Studio": ("LM Studio AI models. Manage them inside the app.", "Model AI của LM Studio. Quản lý trong app.")
+        "LM Studio": ("LM Studio AI models. Manage them inside the app.", "Model AI của LM Studio. Quản lý trong app."),
+        "CapCut": ("CapCut data. Clear caches in CapCut Settings; never delete Projects.", "Dữ liệu CapCut. Xoá bộ nhớ đệm trong Cài đặt của CapCut, đừng xoá Projects."),
+        "com.lveditor.draft": ("CapCut projects. Do not delete here; remove old projects inside CapCut.", "Dự án CapCut. Đừng xoá ở đây, xoá dự án cũ ngay trong CapCut."),
+        "prerender": ("Rendering cache (CapCut). Clear in CapCut Settings > Performance.", "Bản dựng sẵn của CapCut. Xoá trong Cài đặt › Performance của CapCut."),
+        "agencycache": ("Proxy copies of your clips (CapCut). Clear in CapCut Settings > Performance.", "Bản proxy video của CapCut. Xoá trong Cài đặt › Performance của CapCut."),
+        "Homebrew": ("Homebrew downloads. Run 'brew cleanup' to clear what is no longer needed.", "File tải của Homebrew. Chạy 'brew cleanup' để dọn phần không cần."),
+        "com.docker.docker": ("Docker data. Shrink it with 'docker system prune'; don't delete files by hand.", "Dữ liệu Docker. Thu gọn bằng 'docker system prune', đừng xoá tay."),
+        "Docker.raw": ("Docker's disk image. Shrink it with 'docker system prune'; deleting it wipes all containers and images.", "Ổ đĩa ảo của Docker. Thu gọn bằng 'docker system prune'; xoá file này là mất hết container và image.")
     ]
+    if p.hasSuffix("/Developer/Xcode/Archives") {
+        return t("Xcode archives. Keep the ones you shipped: you need them to read crash reports.", "Bản archive Xcode. Giữ các bản đã phát hành: cần để đọc báo cáo lỗi.")
+    }
     if let v = m[n] {
         if Scanner.limited && (n == "Pictures" || n == "Music") {
             return t(v.0, v.1) + t(" Library not counted: needs Full Disk Access.", " Chưa tính thư viện: cần quyền Truy cập toàn bộ ổ đĩa.")
@@ -2349,6 +2671,45 @@ enum Stats {
     }
 }
 
+/// Free space once per day (the last reading of the day), kept on this Mac for the Statistics chart. Nothing is sent anywhere.
+enum DiskHistory {
+    static var path: String { Stats.dir + "/disk-history.json" }
+    static let key: DateFormatter = { let d = DateFormatter(); d.dateFormat = "yyyy-MM-dd"; d.locale = Locale(identifier: "en_US_POSIX"); return d }()
+    static func load() -> [String: Double] {
+        guard let d = FileManager.default.contents(atPath: path), let m = try? JSONDecoder().decode([String: Double].self, from: d) else { return [:] }
+        return m
+    }
+    static func record(_ gb: Double) {
+        var m = load()
+        m[key.string(from: Date())] = (gb * 10).rounded() / 10
+        if m.count > 400 { for k in m.keys.sorted().prefix(m.count - 400) { m.removeValue(forKey: k) } }
+        _ = Stats.path
+        if let d = try? JSONEncoder().encode(m) { try? d.write(to: URL(fileURLWithPath: path)) }
+    }
+    struct Day: Identifiable { let date: Date; let free: Double; let freed: Int64; var id: Date { date } }
+    /// One point per day for the last `days` days: the daily record, or the last value from the activity log for days before it existed.
+    static func series(days: Int, log: [LogEntry]) -> [Day] {
+        let cal = Calendar.current
+        var free: [String: Double] = [:]
+        var cleaned: [String: Int64] = [:]
+        for e in log {   // the log is in time order, so the last reading of each day wins
+            let k = key.string(from: e.date)
+            if let f = e.freeGB { free[k] = f }
+            cleaned[k, default: 0] += e.freed
+        }
+        for (k, v) in load() { free[k] = v }   // the daily record is preferred where it exists
+        let today = cal.startOfDay(for: Date())
+        return (0..<days).reversed().compactMap { back in
+            guard let d = cal.date(byAdding: .day, value: -back, to: today) else { return nil }
+            let k = key.string(from: d)
+            guard let f = free[k] else { return nil }
+            return Day(date: d, free: f, freed: cleaned[k] ?? 0)
+        }
+    }
+}
+
+final class RangePick: ObservableObject { @Published var days = 30; @Published var sel: Date? = nil }
+
 /// Undo journal: where the last clean moved each item. One session only, stored as JSON next to the activity log.
 enum Journal {
     struct Entry: Codable { let from: String; let to: String; let size: Int64 }
@@ -2374,7 +2735,12 @@ enum Journal {
         for e in s.entries {
             guard fm.fileExists(atPath: e.to), !fm.fileExists(atPath: e.from) else { skipped += 1; continue }
             try? fm.createDirectory(atPath: (e.from as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
-            do { try fm.moveItem(atPath: e.to, toPath: e.from); ok += 1 } catch { skipped += 1 }
+            do { try fm.moveItem(atPath: e.to, toPath: e.from); ok += 1 } catch {
+                // An app owned by root needs a password to go back too: Finder moves it and macOS asks. Same name only.
+                let folder = (e.from as NSString).deletingLastPathComponent
+                if (e.to as NSString).lastPathComponent == (e.from as NSString).lastPathComponent,
+                   case .ok = FinderOps.move(e.to, into: folder), fm.fileExists(atPath: e.from) { ok += 1 } else { skipped += 1 }
+            }
         }
         return (ok, skipped)
     }
@@ -2391,7 +2757,7 @@ struct SafetyBadge: View {
         }
         .foregroundColor(level.color).padding(.horizontal, 7).padding(.vertical, 2)
         .background(Capsule().fill(level.color.opacity(0.15)))
-        .help(why)
+        .tip(why)
     }
 }
 
@@ -2401,6 +2767,9 @@ struct CheckBox: View {
         Image(systemName: state == 2 ? "checkmark.square.fill" : (state == 1 ? "minus.square.fill" : "square"))
             .font(.system(size: fs(17), weight: .medium))
             .foregroundStyle(state == 0 ? AnyShapeStyle(Theme.ink.opacity(0.5)) : AnyShapeStyle(Theme.accent))
+            // The whole square takes the click, not only the outline; hand cursor, no hover colour (lists stay calm).
+            .contentShape(Rectangle())
+            .onHover { ($0 ? NSCursor.pointingHand : NSCursor.arrow).set() }
     }
 }
 
@@ -2538,7 +2907,7 @@ struct ItemRow: View {
                     if !item.note.isEmpty {
                         Text(item.note).font(.system(size: fs(10), weight: .semibold)).foregroundColor(item.noteColor)
                             .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(item.noteColor.opacity(0.15)))
-                            .help(item.refHelp)
+                            .tip(item.refHelp)
                     }
                 }
             }
@@ -2565,7 +2934,9 @@ struct DoneBanner: View {
     @ObservedObject var vm: VM
     let page: Page
     var body: some View {
-        if let d = vm.doneInfo, d.page == page {
+        if vm.doneInfo?.page != page, let n = vm.undoNote, n.page == page {
+            UndoNote(vm: vm, text: n.text)
+        } else if let d = vm.doneInfo, d.page == page {
             HStack(spacing: 14) {
                 Image(systemName: "checkmark.circle.fill").font(.system(size: fs(30))).foregroundColor(Theme.green)
                 VStack(alignment: .leading, spacing: 3) {
@@ -2576,14 +2947,31 @@ struct DoneBanner: View {
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 8)
-                if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
-                GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.doneInfo = nil; vm.page = .trash }
+                if vm.bannerCanUndo { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
+                GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.page = .trash }
                 Button { vm.doneInfo = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub).help(t("Close", "Đóng"))
+                    .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
             }
             .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.green.opacity(0.12)))
             .padding(.horizontal, 24).padding(.bottom, 10)
         }
+    }
+}
+
+/// One line after an Undo: what came back. Closed by hand or by the next clean.
+struct UndoNote: View {
+    @ObservedObject var vm: VM
+    let text: String
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.uturn.backward.circle.fill").foregroundColor(Theme.green)
+            Text(text).font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button { vm.undoNote = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
+                .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
+        }
+        .padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.green.opacity(0.10)))
+        .padding(.horizontal, 24).padding(.bottom, 10)
     }
 }
 
@@ -2637,6 +3025,319 @@ struct JunkCard: View {
             .background(RoundedRectangle(cornerRadius: 16).fill(hover.v ? Theme.cardHi : Theme.card))
             .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.accentSolid.opacity(picked ? 0.35 : 0), lineWidth: 1))
         }.buttonStyle(.plain).onHover { hover.v = $0 }
+    }
+}
+
+// MARK: - System Data explainer (inside Space Lens)
+
+/// One piece of what macOS lumps into "System Data", with what can be done about it.
+struct SysPart: Identifiable {
+    enum Kind { case clean, elsewhere, system }
+    enum Action { case none, url(URL), page(Page) }
+    let id: String
+    let icon: String
+    let title: String
+    let note: String
+    var size: Int64              // -1 = macOS does not report it
+    var kind: Kind
+    var items: [CleanItem] = []
+    var detail = ""
+    var actionTitle = ""
+    var action: Action = .none
+    var selectedSize: Int64 { items.filter(\.selected).reduce(0) { $0 + $1.size } }
+    var state: Int { let n = items.filter(\.selected).count; return n == 0 ? 0 : (n == items.count ? 2 : 1) }
+}
+
+enum SysData {
+    static let fm = FileManager.default
+    static var lib: URL { Scanner.lib }
+    static func dir(_ rel: String) -> URL { lib.appendingPathComponent(rel) }
+    static func sz(_ u: URL) -> Int64 { fm.fileExists(atPath: u.path) ? Scanner.size(u) : 0 }
+    static func modDate(_ u: URL) -> Date? { try? u.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate }
+
+    static func item(_ u: URL, on: Bool, label: String? = nil, minSize: Int64 = 1_000_000) -> CleanItem? {
+        guard !Scanner.skip(u.path) else { return nil }
+        let s = Scanner.size(u)
+        guard s >= minSize else { return nil }
+        var it = CleanItem(url: u, size: s, selected: on)
+        it.label = label
+        return it
+    }
+
+    /// Time Machine snapshots kept on the startup disk ("com.apple.TimeMachine.2026-10-28-101500.local").
+    static func snapshots() -> [String] {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/bin/tmutil"); p.arguments = ["listlocalsnapshots", "/"]
+        let pipe = Pipe(); p.standardOutput = pipe; p.standardError = FileHandle.nullDevice
+        do { try p.run() } catch { return [] }
+        let d = pipe.fileHandleForReading.readDataToEndOfFile(); p.waitUntilExit()
+        return String(decoding: d, as: UTF8.self).split(separator: "\n").map(String.init).filter { $0.contains("com.apple.TimeMachine.") }
+    }
+    static func snapshotDate(_ s: String) -> Date? {
+        guard let r = s.range(of: #"\d{4}-\d{2}-\d{2}-\d{6}"#, options: .regularExpression) else { return nil }
+        let f = DateFormatter(); f.locale = Locale(identifier: "en_US_POSIX"); f.dateFormat = "yyyy-MM-dd-HHmmss"
+        return f.date(from: String(s[r]))
+    }
+
+    /// Chromium code-sign clones in the user's boot-cleaned temp folder (sibling "X" of the "T" temp folder).
+    static func browserClones() -> (count: Int, size: Int64) {
+        var buf = [CChar](repeating: 0, count: 1024)
+        guard confstr(_CS_DARWIN_USER_TEMP_DIR, &buf, buf.count) > 0 else { return (0, 0) }
+        let x = URL(fileURLWithPath: String(cString: buf)).deletingLastPathComponent().appendingPathComponent("X")
+        var n = 0; var total: Int64 = 0
+        for d in Scanner.children(x, hidden: true) where d.lastPathComponent.hasSuffix(".code_sign_clone") {
+            let kids = Scanner.children(d, hidden: true)
+            n += kids.count
+            total += Scanner.size(d)
+        }
+        return (n, total)
+    }
+
+    /// Space macOS counts as free for big jobs (updates, installs) but is still held by purgeable data such as snapshots.
+    static func purgeable() -> Int64 {
+        let v = try? Scanner.home.resourceValues(forKeys: [.volumeAvailableCapacityKey, .volumeAvailableCapacityForImportantUsageKey])
+        let important = Int64(v?.volumeAvailableCapacityForImportantUsage ?? 0), plain = Int64(v?.volumeAvailableCapacity ?? 0)
+        return max(0, important - plain)
+    }
+
+    static func scan() -> ([SysPart], Int64) {
+        var clean: [SysPart] = [], other: [SysPart] = []
+
+        // iPhone / iPad backups made through Finder
+        let bk = dir("Application Support/MobileSync/Backup")
+        let backups: [CleanItem] = Scanner.children(bk).compactMap { d in
+            let info = NSDictionary(contentsOf: d.appendingPathComponent("Info.plist"))
+            let name = (info?["Device Name"] as? String) ?? (info?["Display Name"] as? String) ?? d.lastPathComponent
+            let date = (info?["Last Backup Date"] as? Date) ?? modDate(d)
+            return item(d, on: false, label: name + (date.map { " · " + shortDate($0) } ?? ""))
+        }.sorted { $0.size > $1.size }
+        if !backups.isEmpty {
+            clean.append(SysPart(id: "backups", icon: "iphone", title: t("iPhone and iPad backups", "Bản sao lưu iPhone, iPad"),
+                                 note: t("Made by Finder when the phone was plugged in. Keep the newest one of each device you still use. Remove an old device's backup only if you are sure you no longer need what is in it: it may be the only copy. Apple's way: Finder > select the device > Manage Backups.",
+                                         "Finder tạo khi cắm điện thoại vào máy. Giữ bản mới nhất của máy còn dùng. Bản của máy cũ chỉ bỏ khi chắc không cần dữ liệu trong đó: có thể đó là bản duy nhất. Cách của Apple: Finder > chọn máy > Quản lý bản sao lưu."),
+                                 size: backups.reduce(0) { $0 + $1.size }, kind: .clean, items: backups))
+        }
+
+        // iOS update files (downloaded again when needed)
+        let ipsw: [CleanItem] = ["iTunes/iPhone Software Updates", "iTunes/iPad Software Updates", "iTunes/iPod Software Updates"].flatMap { r in
+            Scanner.children(dir(r)).filter { $0.pathExtension.lowercased() == "ipsw" }.compactMap { item($0, on: true) }
+        }
+        if !ipsw.isEmpty {
+            clean.append(SysPart(id: "ipsw", icon: "arrow.down.circle", title: t("iOS update files", "File cập nhật iOS"),
+                                 note: t("Firmware downloaded to update or restore a device. Downloaded again when needed.", "Bản cài iOS tải về để cập nhật hay khôi phục máy. Cần thì tải lại."),
+                                 size: ipsw.reduce(0) { $0 + $1.size }, kind: .clean, items: ipsw))
+        }
+
+        // Xcode leftovers
+        var xc: [CleanItem] = []
+        if let i = item(dir("Developer/Xcode/DerivedData"), on: false, label: t("Build files (DerivedData)", "File build (DerivedData)")) { xc.append(i) }
+        if let i = item(dir("Developer/CoreSimulator/Caches"), on: false, label: t("Simulator caches", "Bộ nhớ đệm máy ảo")) { xc.append(i) }
+        for r in ["iOS DeviceSupport", "watchOS DeviceSupport", "tvOS DeviceSupport", "visionOS DeviceSupport"] {
+            xc += Scanner.children(dir("Developer/Xcode/" + r)).compactMap { item($0, on: false, label: r.replacingOccurrences(of: "DeviceSupport", with: "") + $0.lastPathComponent) }
+        }
+        if !xc.isEmpty {
+            clean.append(SysPart(id: "xcode", icon: "hammer", title: t("Xcode leftovers", "Rác của Xcode"),
+                                 note: t("Build files rebuild on their own, the next build is slower; quit Xcode first. Device support files are copied again only from a device still on that system version.",
+                                         "File build tự tạo lại, lần build sau lâu hơn; đóng Xcode trước. File hỗ trợ thiết bị chỉ được chép lại từ máy còn chạy đúng bản hệ điều hành đó."),
+                                 size: xc.reduce(0) { $0 + $1.size }, kind: .clean, items: xc.sorted { $0.size > $1.size }))
+        }
+
+        // Archives: never offered here. Apple asks developers to keep the archive of every release (crash reports, re-distribution).
+        // Source: research/nguon-chinh-thuc/xcode.md
+        let archives = sz(dir("Developer/Xcode/Archives"))
+        if archives >= 50_000_000 {
+            other.append(SysPart(id: "archives", icon: "archivebox", title: t("Xcode archives", "Bản archive của Xcode"),
+                                 note: t("Builds you archived in Xcode. Keep the archive of every version you released: it is needed to read crash reports and to distribute that build again. Remove old ones in Xcode's Organizer.",
+                                         "Các bản build đã archive trong Xcode. Giữ archive của mọi bản đã phát hành: cần để đọc báo cáo lỗi và phát hành lại bản đó. Xoá bản cũ trong cửa sổ Organizer của Xcode."),
+                                 size: archives, kind: .elsewhere))
+        }
+
+        // Things that are cleaned elsewhere
+        let cache = sz(dir("Caches")) + sz(dir("Logs"))
+        if cache >= 50_000_000 {
+            other.append(SysPart(id: "caches", icon: "internaldrive", title: t("Caches and logs", "Bộ nhớ đệm và nhật ký"),
+                                 note: t("Part of System Data too. Clean them on the Clean Now page, where each item says what happens after.",
+                                         "Cũng nằm trong System Data. Dọn ở trang Dọn ngay, mỗi mục ghi rõ dọn xong thì sao."),
+                                 size: cache, kind: .elsewhere, actionTitle: Page.smart.label, action: .page(.smart)))
+        }
+        let sims = sz(dir("Developer/CoreSimulator/Devices"))
+        if sims >= 50_000_000 {
+            other.append(SysPart(id: "sims", icon: "ipad.and.iphone", title: t("iPhone simulators", "Máy ảo iPhone"),
+                                 note: t("Delete old ones in Xcode, or run xcrun simctl delete unavailable, so Xcode keeps track of them. Don't delete the folder by hand.",
+                                         "Xoá máy ảo cũ trong Xcode, hoặc chạy lệnh xcrun simctl delete unavailable, để Xcode không bị lẫn. Đừng xoá tay thư mục."),
+                                 size: sims, kind: .elsewhere))
+        }
+        let docker = sz(dir("Containers/com.docker.docker/Data/vms"))
+        if docker >= 50_000_000 {
+            other.append(SysPart(id: "docker", icon: "shippingbox", title: t("Docker disk", "Ổ ảo của Docker"),
+                                 note: t("One big file holding every image and container. Shrink it from Docker Desktop (Troubleshoot > Clean up data, which removes every container and image) or with docker system prune.",
+                                         "Một file lớn chứa mọi image, container. Thu nhỏ trong Docker Desktop (Troubleshoot > Clean up data, xoá hết container và image) hoặc lệnh docker system prune."),
+                                 size: docker, kind: .elsewhere))
+        }
+        let msg = sz(dir("Messages/Attachments"))
+        if msg >= 50_000_000 {
+            other.append(SysPart(id: "messages", icon: "message", title: t("Messages attachments", "Ảnh, file trong Tin nhắn"),
+                                 note: t("Photos and files from iMessage chats. Remove them in Messages or in System Settings > General > Storage > Messages, not by deleting the folder. Note: changing Keep messages deletes whole older conversations, not only the files.",
+                                         "Ảnh, file trong các cuộc trò chuyện iMessage. Xoá trong app Tin nhắn hoặc Cài đặt hệ thống > Cài đặt chung > Dung lượng > Tin nhắn, đừng xoá tay thư mục. Lưu ý: đổi mục Giữ tin nhắn sẽ xoá cả các cuộc trò chuyện cũ, không chỉ file."),
+                                 size: msg, kind: .elsewhere))
+        }
+
+        // Things macOS manages itself
+        // Chromium browsers clone their app into the per-user folder macOS empties at boot (/private/var/folders/.../X),
+        // one clone per launch; clones left by a browser that did not quit cleanly stay until restart.
+        // Source: research/nguon-chinh-thuc/chrome-va-web-app.md (Chromium code_sign_clone_manager.mm). Never offered for removal.
+        let clones = browserClones()
+        if clones.size >= 500_000_000 {
+            other.append(SysPart(id: "browserclones", icon: "globe", title: t("Browser temporary copies", "Bản sao tạm của trình duyệt"),
+                                 note: t("Chrome, and browsers built on it such as Edge and Brave, put a copy of themselves here when they open, so the browser can check its signature while an update waits to install. A copy can be left behind, for example when the browser is closed abruptly. macOS empties this folder when the Mac restarts. Tidymint leaves it alone: the open browser is still using one copy. The size is an upper limit: the copies share data, so they may take less.",
+                                         "Chrome và các trình duyệt cùng lõi như Edge, Brave đặt một bản sao của chính nó ở đây khi mở, để kiểm chữ ký khi có bản cập nhật chờ cài. Bản sao có thể bị sót lại, ví dụ khi trình duyệt bị tắt ngang. macOS tự xoá thư mục này khi khởi động lại máy. Tidymint không đụng tới: trình duyệt đang mở vẫn dùng một bản. Con số là mức tối đa: các bản sao dùng chung dữ liệu nên có thể chiếm ít hơn."),
+                                 size: clones.size, kind: .system, detail: t("\(clones.count) copies", "\(clones.count) bản")))
+        }
+        let snaps = snapshots()
+        let tmURL = URL(string: "x-apple.systempreferences:com.apple.Time-Machine-Settings.extension")!
+        let last = snaps.compactMap(snapshotDate).max()
+        other.append(SysPart(id: "snapshots", icon: "clock.arrow.circlepath", title: t("Time Machine snapshots on this Mac", "Bản sao lưu Time Machine nằm trên máy"),
+                             note: snaps.isEmpty
+                                ? t("None right now. When automatic Time Machine backups are on, macOS keeps hourly snapshots on this Mac and removes them by itself.",
+                                    "Hiện không có. Khi bật sao lưu Time Machine tự động, macOS giữ bản chụp theo giờ trên máy và tự xoá.")
+                                : t("Time Machine takes these every hour while automatic backups are on. Hourly ones are kept for 24 hours, a few for longer, and macOS removes them sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
+                                    "Time Machine chụp mỗi giờ khi bật sao lưu tự động. Bản theo giờ giữ 24 giờ, vài bản giữ lâu hơn, và macOS xoá sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
+                             size: -1, kind: snaps.isEmpty ? .system : .elsewhere,
+                             detail: snaps.isEmpty ? "" : t("\(snaps.count) snapshots", "\(snaps.count) bản") + (last.map { t(", newest ", ", mới nhất ") + shortDate($0) } ?? ""),
+                             actionTitle: t("Time Machine Settings", "Mở cài đặt Time Machine"), action: .url(tmURL)))
+
+        var vm: Int64 = 0
+        for u in Scanner.children(URL(fileURLWithPath: "/private/var/vm"), hidden: true) {
+            vm += Int64((try? u.resourceValues(forKeys: [.totalFileAllocatedSizeKey]).totalFileAllocatedSize) ?? 0)
+        }
+        if vm > 0 {
+            other.append(SysPart(id: "vm", icon: "memorychip", title: t("Swap and sleep files", "Bộ nhớ ảo và file ngủ"),
+                                 note: t("Used when memory runs short and when the Mac sleeps. macOS creates and removes them. Do not delete.",
+                                         "Dùng khi thiếu RAM và khi máy ngủ. macOS tự tạo, tự xoá. Không nên xoá."),
+                                 size: vm, kind: .system))
+        }
+        return (clean.sorted { $0.size > $1.size } + other, purgeable())
+    }
+}
+
+final class OpenSet: ObservableObject { @Published var v = Set<String>() }
+
+struct SysPartCard: View {
+    @Binding var part: SysPart
+    @ObservedObject var vm: VM
+    @ObservedObject var open: OpenSet
+    var badge: (String, Color) {
+        switch part.kind {
+        case .clean: return (t("Can clean here", "Dọn được ở đây"), Theme.green)
+        case .elsewhere: return (t("Handled elsewhere", "Dọn ở chỗ khác"), Theme.warn)
+        case .system: return (t("Leave to macOS", "Để macOS lo"), Theme.sub)
+        }
+    }
+    var body: some View {
+        let isOpen = open.v.contains(part.id)
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                if part.kind == .clean {
+                    Button { let on = part.state != 2; for i in part.items.indices { part.items[i].selected = on } } label: { CheckBox(state: part.state) }
+                        .buttonStyle(.plain).padding(.top, 8)
+                }
+                Image(systemName: part.icon).font(.system(size: fs(15))).foregroundStyle(Theme.accent)
+                    .frame(width: 32, height: 32).background(Circle().fill(Theme.accent.opacity(0.14)))
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Text(part.title).font(.system(size: fs(14), weight: .semibold)).foregroundColor(Theme.text)
+                        Text(badge.0).font(.system(size: fs(10), weight: .semibold)).foregroundColor(badge.1)
+                            .padding(.horizontal, 7).padding(.vertical, 2).background(Capsule().fill(badge.1.opacity(0.15)))
+                    }
+                    Text(part.note).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                    HStack(spacing: 14) {
+                        if part.kind == .clean {
+                            TextLink(isOpen ? t("Hide items", "Ẩn danh sách") : t("Show \(part.items.count) items", "Xem \(part.items.count) mục"), size: fs(12), weight: .semibold) {
+                                if isOpen { open.v.remove(part.id) } else { open.v.insert(part.id) }
+                            }
+                        }
+                        if !part.actionTitle.isEmpty {
+                            TextLink(part.actionTitle, size: fs(12), weight: .semibold) {
+                                switch part.action {
+                                case .url(let u): NSWorkspace.shared.open(u)
+                                case .page(let p): vm.page = p
+                                case .none: break
+                                }
+                            }
+                        }
+                    }.padding(.top, 2)
+                }
+                Spacer(minLength: 8)
+                if part.size >= 0 || !part.detail.isEmpty { VStack(alignment: .trailing, spacing: 2) {
+                    Text(part.size < 0 ? part.detail : fmt(part.size))
+                        .font(.system(size: fs(part.size < 0 ? 13 : 17), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
+                    if part.size < 0 && !part.detail.isEmpty {
+                        Text(t("size not measured", "chưa đo được dung lượng")).font(.system(size: fs(10))).foregroundColor(Theme.sub)
+                    }
+                } }
+            }.padding(14)
+            if isOpen && part.kind == .clean {
+                VStack(spacing: 2) {
+                    ForEach($part.items) { $it in ItemRow(item: $it, vm: vm) }
+                }.padding(.horizontal, 8).padding(.bottom, 8)
+            }
+        }
+        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+    }
+}
+
+struct SysDataView: View {
+    @ObservedObject var vm: VM
+    @StateObject private var open = OpenSet()
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 10) {
+                Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon).foregroundColor(Theme.text).tip(t("Back", "Lùi"))
+                Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
+                Spacer()
+                if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
+            }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
+            Text(t("System Data is what macOS cannot file under another category: mostly logs, caches and temporary files. Below are the things that most often fill a Mac, including a few macOS lists under other categories (iOS Files, Messages, Developer). The ones with a checkbox can be cleaned here, the rest say where to handle them or to leave them alone.",
+                   "Dữ liệu hệ thống là phần macOS không xếp được vào nhóm nào khác: chủ yếu nhật ký, bộ nhớ đệm, file tạm. Dưới đây là những thứ hay làm đầy ổ mà Tidymint đo được, kể cả vài thứ macOS xếp ở nhóm khác (File iOS, Tin nhắn, Nhà phát triển). Phần có ô chọn thì dọn được ở đây, phần còn lại ghi rõ dọn ở đâu hoặc nên để yên."))
+                .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 12)
+            DoneBanner(vm: vm, page: .lens)
+            if vm.sysBusy && vm.sysParts.isEmpty {
+                Scanning(text: t("Looking inside System Data...", "Đang xem System Data gồm những gì...")).frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    VStack(spacing: 10) {
+                        if vm.sysPurgeable >= 1_000_000_000 {
+                            HStack(spacing: 10) {
+                                Image(systemName: "info.circle").foregroundColor(Theme.link)
+                                Text(t("About \(fmt(vm.sysPurgeable)) is held by data macOS can free on its own, such as caches. It is released when an update or a big file needs the room.",
+                                       "Khoảng \(fmt(vm.sysPurgeable)) đang bị giữ bởi dữ liệu macOS tự giải phóng được, ví dụ bộ nhớ đệm. Khi cài bản cập nhật hay chép file lớn cần chỗ, macOS sẽ tự nhả ra."))
+                                    .font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
+                                Spacer(minLength: 0)
+                            }.padding(14).background(RoundedRectangle(cornerRadius: 14).fill(Theme.link.opacity(0.10)))
+                        }
+                        ForEach($vm.sysParts) { $p in SysPartCard(part: $p, vm: vm, open: open) }
+                        Text(t("The rest is data macOS manages itself: logs, caches and temporary files of the system. Tidymint does not touch it.",
+                               "Phần còn lại là dữ liệu macOS tự quản: nhật ký, bộ nhớ đệm, file tạm của hệ thống. Tidymint không đụng tới."))
+                            .font(.system(size: fs(11))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
+                    }.padding(.horizontal, 24).padding(.bottom, 16)
+                }
+            }
+            HStack {
+                let sel = vm.sysParts.flatMap { $0.items.filter(\.selected) }
+                if sel.isEmpty {
+                    Text(t("Tick items to move them to the Trash.", "Tick mục muốn chuyển vào Thùng rác.")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                    Spacer()
+                } else {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(selLabel(sel.count, sel.reduce(0) { $0 + $1.size })).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
+                        Text(t("Moved to the Trash, not deleted yet.", "Chỉ chuyển vào Thùng rác, chưa xoá hẳn.")).foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                    }
+                    Spacer()
+                    PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.trashSys() })
+                }
+            }.padding(.horizontal, 24).padding(.vertical, 12).background(Theme.shade.opacity(0.25))
+        }
     }
 }
 
@@ -2744,6 +3445,9 @@ struct SmartView: View {
                     Text(t("Not selected: \(fmt(vm.junkTotal - vm.junkSelected)) that only you can decide on. Tick it under Review every item.", "Chưa tick: \(fmt(vm.junkTotal - vm.junkSelected)) là phần bạn tự quyết. Muốn dọn thì tick ở Xem từng mục."))
                         .font(.system(size: fs(11))).foregroundColor(Theme.sub)
                 }
+                TextLink(t("Disk still full of \"System Data\"? See what is in it", "Ổ vẫn đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(12), weight: .semibold) {
+                    vm.page = .lens; vm.openSys()
+                }.padding(.top, 2)
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { vm.refreshTrash() }
@@ -2813,7 +3517,7 @@ struct ReviewView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
@@ -2821,7 +3525,7 @@ struct ReviewView: View {
                     Button(t("Select All", "Chọn tất cả")) { vm.setAll(true) }
                     Button(t("Deselect All", "Bỏ chọn tất cả")) { vm.setAll(false) }
                     Button(t("Smart Selection", "Chọn thông minh")) { vm.scanJunk(thenReview: true) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
 
             ScrollView {
@@ -2953,7 +3657,7 @@ struct AppDetail: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
                     Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
@@ -3058,7 +3762,7 @@ struct LargeView: View {
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).frame(width: 240)
-                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 8)
+                    Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
                 if vm.large.isEmpty {
@@ -3091,7 +3795,9 @@ struct LargeView: View {
 struct LensView: View {
     @ObservedObject var vm: VM
     var body: some View {
-        if vm.lensPath.isEmpty {
+        if vm.sysOpen {
+            SysDataView(vm: vm)
+        } else if vm.lensPath.isEmpty {
             VStack(spacing: 28) {
                 Header(title: t("Space Lens", "Bản đồ ổ đĩa"), sub: t("See what takes up space, folder by folder.\nClick a bubble to look inside.", "Xem thư mục nào chiếm chỗ.\nBấm vào bong bóng để xem bên trong."))
                 BigScanButton(label: t("Scan", "Quét")) { vm.openLens(Scanner.home) }
@@ -3099,22 +3805,24 @@ struct LensView: View {
                     GhostButton(title: "Library") { vm.openLens(Scanner.lib) }
                     GhostButton(title: "Documents") { vm.openLens(Scanner.home.appendingPathComponent("Documents")) }
                 }
+                TextLink(t("Disk full of \"System Data\"? See what is in it", "Ổ đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(13), weight: .semibold) { vm.openSys() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             VStack(spacing: 0) {
                 // breadcrumb
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.plain)
-                            .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).help(t("Back", "Lùi"))
-                        Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.plain)
-                            .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).help(t("Forward", "Tiến"))
+                        Button { vm.lensBack() } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon)
+                            .foregroundColor(vm.lensPath.count > 1 ? Theme.text : Theme.sub.opacity(0.4)).disabled(vm.lensPath.count <= 1).tip(t("Back", "Lùi"))
+                        Button { vm.lensForward() } label: { Image(systemName: "chevron.right") }.buttonStyle(.icon)
+                            .foregroundColor(vm.lensFwd.isEmpty ? Theme.sub.opacity(0.4) : Theme.text).disabled(vm.lensFwd.isEmpty).tip(t("Forward", "Tiến"))
                             .padding(.trailing, 8)
-                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                        Button { vm.stopLens(); vm.lensPath = []; vm.lensNodes = []; vm.lensSel = []; vm.lensFwd = [] } label: { Image(systemName: "house") }.buttonStyle(.icon).tip(t("Go to your home folder", "Về thư mục người dùng")).foregroundColor(Theme.text)
                         ForEach(Array(vm.lensPath.enumerated()), id: \.offset) { i, u in
                             Image(systemName: "chevron.right").font(.system(size: fs(10))).foregroundColor(Theme.sub)
-                            Button(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent) { vm.lensUp(to: i) }
-                                .buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
+                            Button { vm.lensUp(to: i) } label: {
+                                Text(i == 0 && u.path == NSHomeDirectory() ? t("Home", "Nhà") : u.lastPathComponent).padding(.horizontal, 4).padding(.vertical, 2).hoverTile()
+                            }.buttonStyle(.plain).foregroundColor(i == vm.lensPath.count - 1 ? Theme.text : Theme.sub)
                         }
                     }
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -3141,14 +3849,14 @@ struct LensView: View {
                                         let blocked = Scanner.blocked(n.url.path)
                                         Button { if vm.lensSel.contains(n.url) { vm.lensSel.remove(n.url) } else { vm.lensSel.insert(n.url) } } label: {
                                             CheckBox(state: vm.lensSel.contains(n.url) ? 2 : 0).opacity(blocked ? 0.25 : 1)
-                                        }.buttonStyle(.plain).disabled(blocked).help(blocked ? t("Protected", "Được bảo vệ") : "")
+                                        }.buttonStyle(.plain).disabled(blocked).tip(blocked ? t("Protected", "Được bảo vệ") : "")
                                         FileThumb(url: n.url, side: 22 * uiScale)
                                         VStack(alignment: .leading, spacing: 1) {
                                             Text(n.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
                                             if n.otherCount == 0, let info = folderInfo(n.url) {
                                                 Text(info).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
                                             }
-                                        }.help(n.otherCount == 0 ? (folderInfo(n.url) ?? "") : "")
+                                        }.tip(n.otherCount == 0 ? (folderInfo(n.url) ?? "") : "")
                                         Spacer()
                                         Text(fmt(n.size)).foregroundColor(Theme.sub).font(.system(size: fs(12)).monospacedDigit())
                                     }
@@ -3190,7 +3898,7 @@ struct LensView: View {
                                     .onTapGesture { if b.node.isDir && b.node.otherCount == 0 { vm.openLens(b.node.url) } }
                                     .onHover { h in vm.hoverNode = h ? b.node.id : nil }
                                     .contextMenu { if b.node.otherCount == 0 { nodeMenu(b.node) } }
-                                    .help(b.node.otherCount > 0
+                                    .tip(b.node.otherCount > 0
                                           ? t("\(b.node.otherCount) small items (under 1% each), \(fmt(b.node.size)). See the list on the left.",
                                               "\(b.node.otherCount) mục nhỏ (mỗi mục dưới 1%), \(fmt(b.node.size)). Xem ở danh sách bên trái.")
                                           : "\(b.node.name): \(fmt(b.node.size))" + (folderInfo(b.node.url).map { "\n" + $0 } ?? ""))
@@ -3230,6 +3938,13 @@ struct LensView: View {
     }
 }
 
+/// " (CapCut)" for an uninstall, " (Clean Now)" and so on for the other pages; empty when unknown.
+func sessionName(_ s: Journal.Session) -> String {
+    let names = ["cleanup": Page.smart.label, "large": Page.large.label, "lens": Page.lens.label, "sysdata": "System Data", "startup": Page.startup.label]
+    let n = names[s.label] ?? s.label
+    return n.isEmpty ? "" : " (\(n))"
+}
+
 struct TrashView: View {
     @ObservedObject var vm: VM
     var body: some View {
@@ -3242,11 +3957,14 @@ struct TrashView: View {
                 PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
             }
             Text(t("Emptying cannot be undone. Take a quick look first.", "Dọn sạch rồi thì không lấy lại được. Liếc qua một lượt trước đã.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
+            if let n = vm.undoNote { Text(n.text).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.green) }
             if let s = vm.undoable {
                 VStack(spacing: 8) {
-                    Text(t("Last clean: \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi: \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
-                        .font(.system(size: fs(12))).foregroundColor(Theme.sub)
+                    Text(t("Last clean\(sessionName(s)): \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi\(sessionName(s)): \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
+                        .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     GhostButton(title: t("Undo last clean", "Hoàn tác lần dọn vừa rồi")) { vm.undoLast() }
+                    Text(t("Undo puts back only these items. The Trash total above also counts what was there before.", "Hoàn tác chỉ trả về đúng các mục này. Con số Thùng rác ở trên tính cả những thứ đã có từ trước."))
+                        .font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 }.padding(.top, 10)
             }
         }
@@ -3385,7 +4103,7 @@ struct NavBadge: View {
             // A new result not seen yet: a small dot. Startup Items with something worth a look: warning colour.
             let warn = p == .startup && vm.launchAttention > 0
             Circle().fill(selected ? Color.white : (warn ? Theme.warn : Theme.accentSolid)).frame(width: 8, height: 8)
-                .help(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
+                .tip(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
         }
     }
 }
@@ -3402,13 +4120,13 @@ struct LangSwitch: View {
                         .foregroundColor(Theme.ink.opacity(vm.lang == l ? 1 : 0.55))
                         .frame(width: 22, height: 16)
                         .background(RoundedRectangle(cornerRadius: 4).fill(vm.lang == l ? Theme.ink.opacity(0.22) : .clear))
-                        .contentShape(Rectangle())
+                        .hoverTile(vm.lang != l)
                 }.buttonStyle(.plain)
             }
         }
         .padding(2)
         .background(RoundedRectangle(cornerRadius: 6).stroke(Theme.ink.opacity(0.2), lineWidth: 1))
-        .help(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
+        .tip(vm.lang == "vi" ? "Ngôn ngữ" : "Language")
     }
 }
 
@@ -3449,7 +4167,7 @@ struct Sidebar: View {
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: fs(9), weight: .bold)).foregroundColor(Theme.sub)
                         .rotationEffect(.degrees(vm.advancedOpen ? 90 : 0)).padding(.trailing, 10)
-                }.contentShape(Rectangle())
+                }.padding(.vertical, 2).hoverTile()
             }.buttonStyle(.plain)
             if vm.advancedOpen {
                 NavItem(p: .lens, vm: vm)
@@ -3615,11 +4333,11 @@ struct AppsView: View {
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
                 }.pickerStyle(.segmented).frame(width: 360)
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
-                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
+                Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
-                Text(vm.appsMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
+                Text(vm.appsMsg).font(.system(size: fs(12))).foregroundColor(vm.appsMsgErr ? Theme.warn : Theme.green).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
             }
             if vm.appsBusy && vm.apps.isEmpty {
                 Scanning(text: t("Looking at your apps...", "Đang xem các app...")).frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -3642,7 +4360,7 @@ struct AppsView: View {
                     }
                 } label: {
                     Text(filterName(vm.appsFilter) + " (\(vm.appsMatching(vm.appsFilter).count))").font(.system(size: fs(12), weight: .semibold))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
                 Spacer()
                 Menu {
                     Button(t("Size", "Dung lượng")) { vm.appsSort = 0 }
@@ -3650,7 +4368,7 @@ struct AppsView: View {
                     Button(t("Last opened", "Lâu không mở")) { vm.appsSort = 2 }
                 } label: {
                     Text(t("Sort: ", "Xếp: ") + [t("Size", "Dung lượng"), t("Name", "Tên"), t("Last opened", "Lâu không mở")][vm.appsSort]).font(.system(size: fs(12)))
-                }.menuStyle(.borderlessButton).fixedSize()
+                }.menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
             }.padding(.horizontal, 18).padding(.vertical, 10)
             ScrollView {
                 LazyVStack(spacing: 2) {
@@ -3659,10 +4377,13 @@ struct AppsView: View {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: a.url.path)).resizable().frame(width: 26, height: 26)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
-                                if let d = a.lastUsed {
-                                    Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10)))
-                                } else {
-                                    Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10)))
+                                HStack(spacing: 6) {
+                                    if let d = a.lastUsed {
+                                        Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
+                                    } else {
+                                        Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
+                                    }
+                                    if let b = a.webAppBrowser { WebAppTag(browser: b) }
                                 }
                             }
                             Spacer()
@@ -3687,6 +4408,18 @@ struct AppsView: View {
                             Text(vm.apps[i].bundleID).font(.system(size: fs(11))).foregroundColor(Theme.sub)
                         }
                     }.padding(20)
+                    if vm.apps[i].needsAdmin {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "lock").foregroundColor(Theme.warn)
+                            Text(adminNote(vm.apps[i])).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                        }.padding(.horizontal, 20).padding(.bottom, 12).padding(.top, -8)
+                    }
+                    if let b = vm.apps[i].webAppBrowser {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "info.circle").foregroundColor(Theme.sub)
+                            Text(webAppNote(b)).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                        }.padding(.horizontal, 20).padding(.bottom, 12).padding(.top, -8)
+                    }
                     ScrollView {
                         LazyVStack(spacing: 2) {
                             HStack(spacing: 12) {
@@ -3707,7 +4440,7 @@ struct AppsView: View {
                         let tot = vm.apps[i].size + vm.apps[i].related.filter(\.selected).reduce(0) { $0 + $1.size }
                         Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
                         Spacer()
-                        PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) })
+                        PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) }).disabled(vm.appsBusy)
                     }.padding(.horizontal, 20).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
                 }
             } else {
@@ -3768,8 +4501,8 @@ struct DupesView: View {
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
-                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text)
-                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text).padding(.leading, 6)
+                }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
+                Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .dupes)
             if !vm.dupMsg.isEmpty {
@@ -3859,7 +4592,7 @@ struct CloudView: View {
                 }
                 Spacer()
                 if vm.cloudBusy { ProgressView().controlSize(.small).tint(Theme.text) }
-                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.scanCloud() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
             if !vm.cloudMsg.isEmpty {
                 Text(vm.cloudMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8)
@@ -3932,7 +4665,7 @@ struct SettingsView: View {
                                 Text(appLang == "vi" ? pl.nameVI.components(separatedBy: " (").first ?? pl.nameVI : pl.nameEN)
                                     .font(.system(size: fs(10))).foregroundColor(vm.theme == pl.id ? Theme.text : Theme.sub)
                             }
-                        }.buttonStyle(.plain).hoverLift().help(appLang == "vi" ? pl.nameVI : pl.nameEN)
+                        }.buttonStyle(.plain).hoverLift().tip(appLang == "vi" ? pl.nameVI : pl.nameEN)
                     }
                 }
             }
@@ -3983,7 +4716,7 @@ struct SettingsView: View {
                         if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }, width: Pill.rowWidth) }
                         else { GhostButton(title: t("Check now", "Kiểm tra ngay"), action: { vm.checkUpdates(force: true) }, width: Pill.rowWidth) }
                     }
-                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL) }, width: Pill.rowWidth)
+                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, width: Pill.rowWidth)
                 }
             }
             settingRow(t("Open at login", "Mở cùng máy"),
@@ -4089,7 +4822,7 @@ struct MenuView: View {
             }.padding(.horizontal, -8)
             Divider()
             VStack(spacing: 1) {
-                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL) }
+                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL("menubar")) }
                 MenuRow(title: t("Quit", "Thoát")) { NSApp.terminate(nil) }
             }.padding(.horizontal, -8)
         }
@@ -4101,36 +4834,91 @@ struct MenuView: View {
 /// Menu bar icon: a hard drive with the free space (e.g. "75GB") inside the upper part,
 /// a divider line and an activity light at the bottom. The shaded part shows free space
 /// like a battery level; red when the disk is nearly full.
-func menuBarImage(free: Double, total: Double, low: Bool) -> NSImage {
-    // 75GB, 123GB, then 1.2TB from 1000 GB up, so the icon never grows past 3 digits.
+/// The mint leaf outline (Creative Fabrica leaf approved 28/10, same as docs/logo.svg), in app-icon coordinates
+/// (y down, x 570.6...762, y 168...465.1). Used by the app icon and the menu bar icon.
+let leafOutline: [CGFloat] = [
+            708.0,168.0, 705.5,168.5, 701.7,169.6, 696.6,171.9, 691.9,174.8, 686.9,178.9, 682.4,183.6, 678.3,189.0, 674.5,195.0, 671.6,201.1,
+            671.1,201.1, 670.6,200.8, 669.4,199.5, 668.8,198.4, 667.4,195.2, 666.3,191.6, 662.5,193.4, 657.8,196.8, 655.5,198.8, 652.6,202.0,
+            649.8,205.5, 647.6,209.0, 643.7,216.6, 642.1,220.7, 640.9,224.9, 640.7,224.8, 636.0,213.7, 629.8,218.8, 625.3,223.2, 621.7,227.4,
+            616.7,234.4, 614.0,239.2, 611.5,244.5, 609.5,250.1, 608.1,255.1, 607.4,258.7, 607.2,261.3, 606.9,261.3, 601.4,248.4, 601.1,248.6,
+            599.5,251.0, 597.2,254.8, 595.2,258.9, 592.7,265.0, 590.9,270.8, 589.5,276.5, 588.4,283.4, 587.7,291.8, 587.7,298.1, 587.9,300.1,
+            587.5,300.1, 575.6,291.7, 575.4,291.9, 575.1,305.3, 575.2,309.8, 575.9,318.6, 576.6,324.5, 578.2,334.5, 580.0,343.1, 581.1,347.2,
+            579.0,347.3, 576.5,346.9, 574.2,346.2, 570.8,344.6, 570.6,344.7, 572.3,353.1, 574.6,361.4, 576.2,366.1, 578.6,372.5, 581.6,378.8,
+            586.6,387.7, 592.0,395.5, 597.7,402.3, 604.3,408.9, 611.1,414.5, 619.3,420.2, 619.7,426.6, 620.4,433.1, 620.6,433.7, 621.3,439.0,
+            622.6,445.6, 625.6,455.7, 627.2,460.0, 629.4,465.1, 629.5,464.9, 629.3,464.3, 628.6,459.1, 628.2,452.1, 628.2,446.0, 628.6,438.6,
+            630.2,427.2, 631.6,420.7, 633.8,412.0, 636.3,404.2, 638.8,397.4, 642.0,389.7, 646.8,379.4, 654.7,364.0, 668.8,338.8, 676.5,324.4,
+            683.5,309.9, 688.7,297.2, 691.0,290.8, 693.7,281.6, 695.3,274.9, 696.6,267.4, 697.6,259.9, 697.9,252.6, 697.8,244.7, 697.3,239.6,
+            697.1,239.0, 697.2,237.8, 697.4,238.1, 698.3,243.8, 699.0,251.7, 699.0,261.7, 698.8,263.0, 698.8,265.4, 698.1,271.9, 696.5,281.5,
+            695.2,287.7, 692.7,296.9, 688.4,309.7, 682.7,323.6, 676.4,337.6, 665.7,359.3, 659.4,372.8, 655.3,382.1, 651.2,392.3, 648.0,401.5,
+            645.5,410.0, 643.0,421.0, 641.7,430.3, 646.5,431.5, 653.2,432.4, 664.0,432.4, 668.5,432.0, 674.1,431.1, 679.3,430.0, 685.0,428.4,
+            690.4,426.6, 695.6,424.5, 705.6,419.8, 705.6,419.4, 704.6,419.2, 701.5,417.4, 698.8,415.0, 699.0,414.6, 701.9,414.5, 706.1,413.9,
+            712.3,412.0, 716.1,410.5, 720.2,408.4, 727.4,403.9, 733.8,398.7, 737.9,394.7, 738.8,393.6, 736.9,394.7, 734.4,395.6, 731.7,396.1,
+            728.9,396.1, 724.5,395.2, 721.6,394.0, 720.9,393.5, 726.9,390.5, 732.0,386.9, 737.8,381.3, 742.4,375.5, 746.5,369.3, 751.1,360.8,
+            754.5,352.9, 757.2,344.6, 756.9,344.6, 755.2,345.7, 752.2,347.1, 750.1,347.5, 749.0,347.5, 747.2,346.9, 746.3,346.0, 745.7,344.5,
+            748.3,342.0, 751.1,338.1, 752.9,334.7, 755.1,329.4, 757.4,322.6, 759.7,314.0, 762.0,301.4, 761.9,301.3, 760.9,302.0, 759.2,302.4,
+            754.9,302.4, 749.2,301.4, 748.7,301.1, 750.8,298.5, 753.1,294.0, 754.9,288.0, 756.0,281.4, 756.5,276.4, 756.6,265.4, 756.3,257.8,
+            755.4,249.4, 753.4,251.4, 750.8,253.0, 747.7,253.9, 746.0,254.0, 745.7,253.8, 746.0,250.4, 745.8,245.0, 744.7,235.6, 742.0,221.8,
+            738.1,207.1, 737.8,207.1, 735.5,210.2, 732.4,213.3, 729.9,215.3, 729.3,215.3, 729.3,213.7, 728.8,210.8, 727.7,206.7, 725.7,201.0,
+            723.4,195.8, 716.8,182.8, 711.6,173.8
+]
+
+/// The leaf scaled to height `h`, y-up, left edge at x0, bottom (stem) at y0.
+func leafPath(x0: CGFloat, y0: CGFloat, h: CGFloat) -> NSBezierPath {
+    let minX: CGFloat = 570.6, minY: CGFloat = 168.0, maxY: CGFloat = 465.1
+    let k = h / (maxY - minY), p = NSBezierPath()
+    for i in stride(from: 0, to: leafOutline.count, by: 2) {
+        let pt = NSPoint(x: x0 + (leafOutline[i] - minX) * k, y: y0 + (maxY - leafOutline[i + 1]) * k)
+        if i == 0 { p.move(to: pt) } else { p.line(to: pt) }
+    }
+    p.close(); return p
+}
+
+/// Share of the leaf's area below each height (0...1, 200 steps from the stem up), measured once by drawing it.
+/// Filling by area, not height, keeps 70% and 90% visibly different (the tip is narrow).
+let leafAreaBelow: [CGFloat] = {
+    let n = 200
+    guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: n, pixelsHigh: n, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true,
+                                     isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return [] }
+    NSGraphicsContext.saveGraphicsState(); NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+    NSColor.black.setFill(); leafPath(x0: 0, y0: 0, h: CGFloat(n)).fill()
+    NSGraphicsContext.restoreGraphicsState()
+    var rows = [CGFloat](repeating: 0, count: n)          // rows[0] = bottom row
+    for y in 0..<n { for x in 0..<n where (rep.colorAt(x: x, y: n - 1 - y)?.alphaComponent ?? 0) > 0.5 { rows[y] += 1 } }
+    let total = max(1, rows.reduce(0, +)); var acc: CGFloat = 0
+    return rows.map { acc += $0; return acc / total }
+}()
+/// Height (0...1) to fill so the filled part covers `area` of the leaf.
+func leafFillHeight(_ area: CGFloat) -> CGFloat {
+    guard area > 0 else { return 0 }
+    guard let i = leafAreaBelow.firstIndex(where: { $0 >= area }) else { return 1 }
+    return CGFloat(i + 1) / CGFloat(max(1, leafAreaBelow.count))
+}
+
+func menuBarImage(free: Double, total: Double, level: Int) -> NSImage {
+    // The mint leaf, filled (by area) as far as the disk is used, then the free space.
+    // 75GB, 123GB, then 1.2TB from 1000 GB up, so the label never grows past 3 digits.
     let text = free >= 999.5 ? String(format: "%.1fTB", free / 1000) : String(format: "%.0fGB", free)
+    // level 0 normal (template, follows the menu bar), 1 getting low (Theme.warn), 2 low (Theme.danger).
+    // Same hex values as the app palette, picked by the system appearance (the menu bar is not the app's theme).
     let dark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-    let ink: NSColor = low ? (dark ? .white : .black) : .black
-    let font = NSFont.systemFont(ofSize: 9, weight: .bold)
-    let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: ink]
+    func hex(_ v: Int) -> NSColor { NSColor(srgbRed: CGFloat((v >> 16) & 255) / 255, green: CGFloat((v >> 8) & 255) / 255, blue: CGFloat(v & 255) / 255, alpha: 1) }
+    let ink: NSColor = level >= 2 ? hex(dark ? 0xff6b6b : 0xb91c1c) : (level == 1 ? hex(dark ? 0xffc56b : 0xa15c00) : .black)
+    let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium), .foregroundColor: ink]
     let ts = (text as NSString).size(withAttributes: attrs)
-    let bw: CGFloat = max(30, ceil(ts.width) + 7), bh: CGFloat = 16
-    let W = bw + 1, H: CGFloat = 18
-    let img = NSImage(size: NSSize(width: W, height: H), flipped: true) { _ in
-        let body = NSRect(x: 0.5, y: 1, width: bw, height: bh)
-        let outline = NSBezierPath(roundedRect: body, xRadius: 3.5, yRadius: 3.5)
-        ink.withAlphaComponent(0.75).setStroke(); outline.lineWidth = 1.1; outline.stroke()
-        // upper compartment with the free-space fill
-        let upper = NSRect(x: body.minX + 1.6, y: body.minY + 1.6, width: body.width - 3.2, height: 10)
-        let frac = total > 0 ? max(0.06, min(1, free / total)) : 0
-        (low ? NSColor.systemRed.withAlphaComponent(0.85) : ink.withAlphaComponent(0.28)).setFill()
-        NSBezierPath(roundedRect: NSRect(x: upper.minX, y: upper.minY, width: upper.width * frac, height: upper.height), xRadius: 2, yRadius: 2).fill()
-        // divider and activity light
-        let y = body.minY + 12.3
-        let line = NSBezierPath(); line.move(to: NSPoint(x: body.minX, y: y)); line.line(to: NSPoint(x: body.maxX, y: y))
-        line.lineWidth = 1; line.stroke()
-        ink.setFill()
-        NSBezierPath(ovalIn: NSRect(x: body.maxX - 5.2, y: y + 0.9, width: 2, height: 2)).fill()
-        // label
-        (text as NSString).draw(at: NSPoint(x: body.midX - ts.width / 2, y: upper.midY - ts.height / 2), withAttributes: attrs)
+    let gw: CGFloat = 12.5, gap: CGFloat = 3, H: CGFloat = 18
+    let W = ceil(gw + gap + ts.width) + 1
+    let used = total > 0 ? CGFloat(max(0, min(1, 1 - free / total))) : 0
+    let img = NSImage(size: NSSize(width: W, height: H), flipped: false) { _ in
+        // Mint leaf: faint whole leaf, solid part = share of the disk in use (by area).
+        let leaf = leafPath(x0: 1, y0: 0.5, h: 17)
+        NSGraphicsContext.saveGraphicsState(); leaf.addClip()
+        ink.withAlphaComponent(0.3).setFill(); NSRect(x: 0, y: 0, width: gw, height: H).fill()
+        ink.setFill(); NSRect(x: 0, y: 0.5, width: gw, height: 17 * leafFillHeight(used)).fill()
+        NSGraphicsContext.restoreGraphicsState()
+        (text as NSString).draw(at: NSPoint(x: gw + gap, y: (H - ts.height) / 2), withAttributes: attrs)
         return true
     }
-    img.isTemplate = !low
+    img.isTemplate = level == 0   // normal: follows the menu bar's colour like Apple's icons
     return img
 }
 
@@ -4151,7 +4939,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // Developer helper: `Tidymint --export-menubar <freeGB> <out.png>` writes the menu bar icon at 8x and quits.
         if let i = a.firstIndex(of: "--export-menubar"), i + 2 < a.count, let f = Double(a[i + 1]) {
-            let im = menuBarImage(free: f, total: 245, low: false)
+            let im = menuBarImage(free: f, total: 245, level: a.count > i + 3 ? Int(a[i + 3]) ?? 0 : 0)
             let px = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(im.size.width * 8), pixelsHigh: Int(im.size.height * 8),
                                       bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
             px.size = im.size
@@ -4186,6 +4974,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             sharedVM.page = pg
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
+            if pg == .lens && a.contains("--sysdata") { sharedVM.openSys() }
             if pg == .smart && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .summary; sharedVM.lastFreed = sharedVM.junkSelected; sharedVM.lastCount = 38 }
             if a.contains("--done") { sharedVM.lastResult = t("Moved 128 items (6.2 GB) to the Trash.", "Đã chuyển 128 mục (6,2 GB) vào Thùng rác.") }
         }
@@ -4211,6 +5000,7 @@ func cachedIcon(_ p: Palette) -> NSImage {
     if let i = iconCache[p.id] { return i }
     let i = makeAppIcon(p); iconCache[p.id] = i; return i
 }
+
 
 func makeAppIcon(_ p: Palette) -> NSImage {
     let img = NSImage(size: NSSize(width: 1024, height: 1024), flipped: true) { _ in
@@ -4256,72 +5046,14 @@ func makeAppIcon(_ p: Palette) -> NSImage {
         NSBezierPath(ovalIn: NSRect(x: 707, y: 560, width: 30, height: 30)).fill()
         NSColor.black.setFill()
         NSBezierPath(ovalIn: NSRect(x: 715, y: 568, width: 14, height: 14)).fill()
-        // Mint leaf above the Mac mini: serrated edge, dark veins, short stem (geometry in tools/leaf.py)
+        // Mint leaf above the Mac mini (Creative Fabrica leaf approved 28/10, same outline as docs/logo.svg):
+        // the open vein is part of the outline, so the leaf takes the palette colour with no extra strokes.
+        let lp = leafOutline
         let leaf = NSBezierPath()
-        leaf.move(to: NSPoint(x: 693.0, y: 427.6))
-        leaf.quad(to: NSPoint(x: 708.0, y: 410.4), control: NSPoint(x: 707.1, y: 417.1))
-        leaf.quad(to: NSPoint(x: 718.4, y: 394.6), control: NSPoint(x: 723.4, y: 399.6))
-        leaf.line(to: NSPoint(x: 733.7, y: 377.3))
-        leaf.quad(to: NSPoint(x: 732.2, y: 364.9), control: NSPoint(x: 739.5, y: 369.2))
-        leaf.line(to: NSPoint(x: 743.2, y: 348.9))
-        leaf.quad(to: NSPoint(x: 737.6, y: 337.7), control: NSPoint(x: 747.0, y: 341.4))
-        leaf.line(to: NSPoint(x: 744.6, y: 322.8))
-        leaf.quad(to: NSPoint(x: 735.1, y: 312.7), control: NSPoint(x: 746.4, y: 315.9))
-        leaf.line(to: NSPoint(x: 738.6, y: 298.9))
-        leaf.quad(to: NSPoint(x: 725.8, y: 289.7), control: NSPoint(x: 738.8, y: 292.4))
-        leaf.line(to: NSPoint(x: 726.3, y: 276.7))
-        leaf.quad(to: NSPoint(x: 710.8, y: 268.3), control: NSPoint(x: 725.1, y: 270.6))
-        leaf.line(to: NSPoint(x: 708.9, y: 256.0))
-        leaf.quad(to: NSPoint(x: 691.6, y: 248.1), control: NSPoint(x: 706.8, y: 250.2))
-        leaf.line(to: NSPoint(x: 688.1, y: 236.2))
-        leaf.quad(to: NSPoint(x: 669.6, y: 228.7), control: NSPoint(x: 685.4, y: 230.6))
-        leaf.line(to: NSPoint(x: 665.4, y: 217.1))
-        leaf.quad(to: NSPoint(x: 646.5, y: 209.6), control: NSPoint(x: 658.9, y: 212.5))
-        leaf.quad(to: NSPoint(x: 635.2, y: 200.0), control: NSPoint(x: 647.4, y: 202.9))
-        leaf.quad(to: NSPoint(x: 624.9, y: 190.1), control: NSPoint(x: 636.6, y: 193.2))
-        leaf.quad(to: NSPoint(x: 624.9, y: 190.1), control: NSPoint(x: 652.4, y: 310.7))
-        leaf.quad(to: NSPoint(x: 621.4, y: 204.0), control: NSPoint(x: 616.6, y: 198.9))
-        leaf.quad(to: NSPoint(x: 616.9, y: 218.1), control: NSPoint(x: 608.9, y: 214.0))
-        leaf.line(to: NSPoint(x: 604.9, y: 234.4))
-        leaf.quad(to: NSPoint(x: 607.5, y: 246.5), control: NSPoint(x: 599.6, y: 242.4))
-        leaf.line(to: NSPoint(x: 595.8, y: 262.7))
-        leaf.quad(to: NSPoint(x: 599.1, y: 274.6), control: NSPoint(x: 590.9, y: 270.6))
-        leaf.line(to: NSPoint(x: 588.5, y: 290.5))
-        leaf.quad(to: NSPoint(x: 593.5, y: 301.9), control: NSPoint(x: 584.4, y: 298.1))
-        leaf.line(to: NSPoint(x: 584.8, y: 317.3))
-        leaf.quad(to: NSPoint(x: 592.1, y: 328.0), control: NSPoint(x: 581.9, y: 324.5))
-        leaf.line(to: NSPoint(x: 586.1, y: 342.6))
-        leaf.quad(to: NSPoint(x: 596.4, y: 352.5), control: NSPoint(x: 584.7, y: 349.4))
-        leaf.line(to: NSPoint(x: 593.8, y: 366.1))
-        leaf.quad(to: NSPoint(x: 607.6, y: 375.0), control: NSPoint(x: 594.1, y: 372.4))
-        leaf.line(to: NSPoint(x: 608.7, y: 387.5))
-        leaf.quad(to: NSPoint(x: 626.5, y: 395.2), control: NSPoint(x: 611.1, y: 393.2))
-        leaf.line(to: NSPoint(x: 631.8, y: 406.6))
-        leaf.quad(to: NSPoint(x: 653.9, y: 413.1), control: NSPoint(x: 640.0, y: 410.6))
-        leaf.quad(to: NSPoint(x: 671.2, y: 421.0), control: NSPoint(x: 656.0, y: 418.9))
-        leaf.quad(to: NSPoint(x: 693.0, y: 427.6), control: NSPoint(x: 675.5, y: 426.1))
+        leaf.move(to: NSPoint(x: lp[0], y: lp[1]))
+        for i in stride(from: 2, to: lp.count, by: 2) { leaf.line(to: NSPoint(x: lp[i], y: lp[i + 1])) }
         leaf.close()
-        NSGraphicsContext.saveGraphicsState()
-        let lg = NSShadow(); lg.shadowOffset = NSSize(width: 6, height: 14); lg.shadowBlurRadius = 20
-        lg.shadowColor = NSColor.black.withAlphaComponent(0.38); lg.set()
         NSColor(hex: p.leaf).setFill(); leaf.fill()
-        NSGraphicsContext.restoreGraphicsState()
-        NSGradient(colors: [NSColor.white.withAlphaComponent(0.32), NSColor.white.withAlphaComponent(0)], atLocations: [0, 1], colorSpace: .sRGB)?
-            .draw(in: leaf, angle: -60)
-        let v = NSBezierPath(); v.lineWidth = 6; v.lineCapStyle = .round
-        v.move(to: NSPoint(x: 689.9, y: 416.6)); v.curve(to: NSPoint(x: 629.1, y: 204.7), controlPoint1: NSPoint(x: 673.1, y: 358.2), controlPoint2: NSPoint(x: 652.1, y: 285.1))
-        v.move(to: NSPoint(x: 682.5, y: 391.0)); v.curve(to: NSPoint(x: 700.3, y: 338.5), controlPoint1: NSPoint(x: 692.5, y: 374.3), controlPoint2: NSPoint(x: 700.4, y: 356.3))
-        v.move(to: NSPoint(x: 682.5, y: 391.0)); v.curve(to: NSPoint(x: 639.6, y: 355.9), controlPoint1: NSPoint(x: 665.2, y: 382.2), controlPoint2: NSPoint(x: 648.9, y: 371.0))
-        v.move(to: NSPoint(x: 670.0, y: 347.2)); v.curve(to: NSPoint(x: 703.5, y: 290.2), controlPoint1: NSPoint(x: 687.0, y: 328.5), controlPoint2: NSPoint(x: 701.3, y: 308.6))
-        v.move(to: NSPoint(x: 670.0, y: 347.2)); v.curve(to: NSPoint(x: 611.3, y: 316.6), controlPoint1: NSPoint(x: 645.6, y: 340.4), controlPoint2: NSPoint(x: 622.9, y: 331.0))
-        v.move(to: NSPoint(x: 657.4, y: 303.4)); v.curve(to: NSPoint(x: 689.4, y: 246.7), controlPoint1: NSPoint(x: 673.8, y: 284.8), controlPoint2: NSPoint(x: 687.5, y: 265.1))
-        v.move(to: NSPoint(x: 657.4, y: 303.4)); v.curve(to: NSPoint(x: 600.2, y: 272.3), controlPoint1: NSPoint(x: 633.6, y: 296.3), controlPoint2: NSPoint(x: 611.6, y: 286.9))
-        v.move(to: NSPoint(x: 644.8, y: 259.5)); v.curve(to: NSPoint(x: 663.0, y: 206.9), controlPoint1: NSPoint(x: 655.0, y: 242.8), controlPoint2: NSPoint(x: 663.1, y: 224.6))
-        v.move(to: NSPoint(x: 644.8, y: 259.5)); v.curve(to: NSPoint(x: 601.5, y: 224.5), controlPoint1: NSPoint(x: 627.3, y: 250.7), controlPoint2: NSPoint(x: 610.8, y: 239.6))
-        dark.withAlphaComponent(0.8).setStroke(); v.stroke()
-        let st = NSBezierPath(); st.lineWidth = 9; st.lineCapStyle = .round
-        st.move(to: NSPoint(x: 693.0, y: 427.6)); st.curve(to: NSPoint(x: 696.5, y: 450.3), controlPoint1: NSPoint(x: 694.7, y: 437.0), controlPoint2: NSPoint(x: 695.9, y: 444.5))
-        NSColor(hex: p.leaf).setStroke(); st.stroke()
         return true
     }
     return img
@@ -4356,7 +5088,7 @@ struct DiskCleanupApp: App {
         MenuBarExtra {
             MenuView(vm: vm).id(vm.theme)
         } label: {
-            Image(nsImage: menuBarImage(free: vm.freeGB, total: vm.totalGB, low: vm.freeGB > 0 && vm.freeGB < vm.lowSpaceGB))
+            Image(nsImage: menuBarImage(free: vm.freeGB, total: vm.totalGB, level: vm.diskLevel))
         }
         .menuBarExtraStyle(.window)
     }
@@ -4390,7 +5122,7 @@ struct StartupView: View {
                     ForEach([0, 1, 2], id: \.self) { sc in
                         let rows = vm.launch.indices.filter { vm.launch[$0].scope == sc }
                         if !rows.isEmpty {
-                            Text(sc == 0 ? t("YOUR ACCOUNT (can remove here)", "CỦA TÀI KHOẢN CHÚ (gỡ được ở đây)")
+                            Text(sc == 0 ? t("YOUR ACCOUNT (can remove here)", "CỦA TÀI KHOẢN CỦA BẠN (gỡ được ở đây)")
                                  : sc == 1 ? t("ALL USERS · AGENTS (needs admin, remove via the app or Settings)", "CẢ MÁY · AGENT (cần quyền admin, gỡ bằng app gốc hoặc Cài đặt)")
                                  : t("ALL USERS · SYSTEM SERVICES (needs admin)", "CẢ MÁY · DỊCH VỤ HỆ THỐNG (cần quyền admin)"))
                                 .font(.system(size: fs(10), weight: .semibold)).tracking(0.6).foregroundColor(Theme.sub).padding(.top, 10).padding(.leading, 4)
@@ -4429,8 +5161,8 @@ struct LaunchRow: View {
                     Text(e.owner).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium)).lineLimit(1)
                     if e.orphan { badge(t("App removed", "App đã gỡ"), Theme.danger) }
                     if e.running == true { badge(t("Running", "Đang chạy"), Theme.green) }
-                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).help(e.sign.help) }
-                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).help(f.help) }
+                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).tip(e.sign.help) }
+                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).tip(f.help) }
                 }
                 Text(e.label).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
             }
@@ -4440,7 +5172,7 @@ struct LaunchRow: View {
         .padding(.horizontal, 12).padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
         .hoverBG(10, Theme.ink.opacity(0.06))
-        .help(e.program)
+        .tip(e.program)
     }
     func badge(_ s: String, _ c: Color) -> some View {
         Text(s).font(.system(size: fs(10), weight: .semibold)).foregroundColor(c)
@@ -4457,7 +5189,6 @@ struct StatsView: View {
         let log = Stats.load()
         let freed = log.reduce(0) { $0 + $1.freed }
         let runs = log.filter { $0.freed > 0 }.count
-        let points = log.compactMap { e in e.freeGB.map { (e.date, $0) } }
         let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
         VStack(alignment: .leading, spacing: 16) {
             Text(t("Statistics", "Thống kê")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
@@ -4467,22 +5198,7 @@ struct StatsView: View {
                 statCard(t("Free now", "Đang trống"), String(format: "%.0f GB", vm.freeGB))
                 statCard(t("Trash now", "Thùng rác"), fmt(vm.trashSize))
             }
-            VStack(alignment: .leading, spacing: 8) {
-                Text(t("Free space over time (GB)", "Dung lượng trống theo thời gian (GB)")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
-                GeometryReader { g in
-                    let vals = points.suffix(30).map { $0.1 }
-                    let mx = max(vals.max() ?? 1, 1)
-                    HStack(alignment: .bottom, spacing: 4) {
-                        ForEach(Array(vals.enumerated()), id: \.offset) { _, v in
-                            VStack(spacing: 2) {
-                                Text(String(format: "%.0f", v)).font(.system(size: fs(9))).foregroundColor(Theme.sub)
-                                RoundedRectangle(cornerRadius: 3).fill(Theme.accent)
-                                    .frame(height: max(4, CGFloat(v / mx) * (g.size.height - 16)))
-                            }.frame(maxWidth: 28)
-                        }
-                    }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                }.frame(height: 120)
-            }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            FreeSpaceChart(vm: vm, log: log)
             HStack {
                 Text(t("Recent activity", "Hoạt động gần đây")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
                 Spacer()
@@ -4611,8 +5327,9 @@ struct ConCaoHint: View {
                 Text("Dọn xong rồi, thưởng mình một ly?").foregroundColor(Theme.sub)
                 TextLink("Gợi ý ở Cồn Cào →", url: ConCao.url("done"), size: 13)
                 Spacer()
-                Button("Đừng hiện nữa") { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true }
-                    .buttonStyle(.plain).foregroundColor(Theme.sub)
+                Button { UserDefaults.standard.set(true, forKey: ConCao.offKey); h.hidden = true } label: {
+                    Text("Đừng hiện nữa").padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain).foregroundColor(Theme.sub)
             }
             .font(.system(size: fs(12)))
             .padding(.horizontal, 14).padding(.vertical, 10)
@@ -4637,6 +5354,9 @@ struct FieldBox<C: View>: View {
 }
 
 struct ContactView: View {
+    static let social: [(String, String)] = [("Facebook", "https://www.facebook.com/tidymintapp"), ("Instagram", "https://www.instagram.com/tidymint.app/"),
+                                             ("X", "https://x.com/tidymintapp"), ("LinkedIn", "https://www.linkedin.com/company/tidymint/"),
+                                             ("GitHub", "https://github.com/HaiTrung-Workspace/tidymint")]
     @ObservedObject var vm: VM
     @StateObject private var f = FormState()
     var body: some View {
@@ -4651,6 +5371,15 @@ struct ContactView: View {
                         Text(t("Or email", "Hoặc gửi email tới")).foregroundColor(Theme.sub)
                         TextLink("hello@tidymint.app", url: URL(string: "mailto:hello@tidymint.app")!)
                     }.font(.system(size: fs(12)))
+                    // Brand accounts and public bug reports. Plain links: nothing is loaded until the person clicks.
+                    HStack(spacing: 4) {
+                        Text(t("Follow Tidymint:", "Theo dõi Tidymint:")).foregroundColor(Theme.sub)
+                        ForEach(Array(ContactView.social.enumerated()), id: \.offset) { i, s in
+                            if i > 0 { Text("·").foregroundColor(Theme.sub.opacity(0.6)) }
+                            TextLink(s.0, url: URL(string: s.1)!)
+                        }
+                    }.font(.system(size: fs(12)))
+                    TextLink(t("Report a bug on GitHub", "Báo lỗi trên GitHub"), url: URL(string: "https://github.com/HaiTrung-Workspace/tidymint/issues")!)
                 }.padding(.top, 34)
                 HStack(spacing: 8) {
                     ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in
@@ -4814,11 +5543,33 @@ struct InviteCard: View {
             ], running: en)
         let c = "Movies/CapCut/User Data/"
         let capcutReport = AppReport(rule: capcut, groups: [
-                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/recognize", 410, true), row(c + "Cache/audioWave", 95, true)]),
-                AppGroup(id: "projects", section: capcut.sections[1], rows: [row(c + "Projects", 6200, false)]),
+                AppGroup(id: "cache", section: capcut.sections[0], rows: [row(c + "Cache/frameThumbnail", 860, true), row(c + "Cache/audioWave", 95, true)]),
+                AppGroup(id: "speech", section: capcut.sections.first { $0.id == "speech" }!, rows: [row(c + "Cache/recognize", 410, false)]),
+                AppGroup(id: "render", section: capcut.sections.first { $0.id == "render" }!, rows: [row(c + "Cache/prerender", 1200, false), row(c + "Cache/agencycache", 600, false)]),
+                AppGroup(id: "projects", section: capcut.sections.first { $0.id == "projects" }!, rows: [row(c + "Projects", 6200, false)]),
             ], running: false)
+        // More apps so the list looks like a real, lived-in Mac. Sizes are sample values (MB per section, 0 = empty).
+        func extra(_ id: String, _ sizes: [Double], running: Bool = false) -> AppReport? {
+            guard let r = AppRules.all.first(where: { $0.id == id }) else { return nil }
+            var gs: [AppGroup] = []
+            for (i, sec) in r.sections.enumerated() where i < sizes.count && sizes[i] > 0 {
+                let mbv = sizes[i]
+                let rows: [AppRow] = sec.byAge
+                    ? ageRows(id + sec.id, [(0, mbv * 0.2, 120), (2, mbv * 0.3, 260), (6, mbv * 0.5, 410)])
+                    : [row((sec.paths.first ?? "Library").replacingOccurrences(of: "*", with: "Default"), mbv, sec.safety == .safe)]
+                gs.append(AppGroup(id: sec.id, section: sec, rows: rows))
+            }
+            return AppReport(rule: r, groups: gs, running: running)
+        }
+        let more: [String: AppReport] = [
+            "telegram": extra("telegram", [380, 2400, 640]), "whatsapp": extra("whatsapp", [150, 1800, 420]),
+            "slack": extra("slack", [920, 210], running: true), "vscode": extra("vscode", [1100, 2300, 640, 380]),
+            "edge": extra("edge", [900, 0, 60]),
+        ].compactMapValues { $0 }
+        func pick(_ ids: [String]) -> [AppReport] { ids.compactMap { more[$0] } }
         // English screenshots lead with apps a US reader knows; Vietnamese ones lead with Zalo.
-        vm.appReports = en ? [chromeReport, capcutReport, zaloReport] : [zaloReport, chromeReport, capcutReport]
+        vm.appReports = en ? [chromeReport, capcutReport] + pick(["vscode", "slack", "telegram", "whatsapp", "edge"]) + [zaloReport]
+                           : [zaloReport, chromeReport, capcutReport] + pick(["telegram", "vscode", "slack", "edge", "whatsapp"])
         vm.appScanned = true
         if detail {
             if en { vm.appSel = "chrome" } else { vm.appSel = "zalo"; vm.selectOlder("zalo", months: 6) }
@@ -4878,19 +5629,99 @@ struct InviteCard: View {
         vm.lensNodes = [("Library", 48.3), ("Documents", 31.2), ("Movies", 18.4), (".ollama", 12.6), ("Downloads", 9.1),
                         ("Pictures", 7.4), ("Developer", 6.2), ("Projects", 5.8), ("Desktop", 2.3), ("Music", 1.1), (".npm", 0.9), (".cache", 0.6)]
             .map { Node(url: u($0.0), size: gb($0.1), isDir: true) }
-        let z = AppEntry(url: URL(fileURLWithPath: "/Applications/Zoom.app"), name: "Zoom", bundleID: "us.zoom.xos", size: mb(412),
-                         lastUsed: Date().addingTimeInterval(-90 * 86400),
-                         related: [item("Library/Application Support/zoom.us", mb(186), true),
-                                   item("Library/Caches/us.zoom.xos", mb(64), true),
-                                   item("Library/Preferences/us.zoom.xos.plist", 24_000, true),
-                                   item("Library/Logs/zoom.us", mb(12), true),
-                                   item("Library/Saved Application State/us.zoom.xos.savedState", 410_000, true)])
-        vm.apps = [z,
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Figma.app"), name: "Figma", bundleID: "com.figma.Desktop", size: mb(520), lastUsed: Date()),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Docker.app"), name: "Docker", bundleID: "com.docker.docker", size: gb(2.1), lastUsed: Date().addingTimeInterval(-200 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Draw Things.app"), name: "Draw Things", bundleID: "com.liuliu.draw-things", size: mb(310), lastUsed: Date().addingTimeInterval(-3 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Ollama.app"), name: "Ollama", bundleID: "com.electron.ollama", size: mb(380), lastUsed: Date().addingTimeInterval(-12 * 86400)),
-                   AppEntry(url: URL(fileURLWithPath: "/Applications/Spotify.app"), name: "Spotify", bundleID: "com.spotify.client", size: mb(290), lastUsed: Date())]
-        vm.selApp = z.id
+        // Apps that are installed on the capture Mac, so Finder supplies real icons (a missing .app shows a blank page icon).
+        func app(_ n: String, _ bid: String, _ size: Int64, _ days: Double, _ rel: [CleanItem] = []) -> AppEntry {
+            AppEntry(url: URL(fileURLWithPath: "/Applications/\(n).app"), name: n, bundleID: bid, size: size,
+                     lastUsed: Date().addingTimeInterval(-days * 86400), related: rel)
+        }
+        let slack = app("Slack", "com.tinyspeck.slackmacgap", mb(535), 75,
+                        [item("Library/Application Support/Slack", mb(640), true),
+                         item("Library/Caches/com.tinyspeck.slackmacgap", mb(118), true),
+                         item("Library/Preferences/com.tinyspeck.slackmacgap.plist", 36_000, true),
+                         item("Library/Logs/Slack", mb(14), true),
+                         item("Library/Saved Application State/com.tinyspeck.slackmacgap.savedState", 380_000, true)])
+        let zalo = app("Zalo", "com.vng.zalo", mb(762), 0,
+                       [item("Library/Application Support/ZaloData", gb(2.9), true),
+                        item("Library/Caches/com.vng.zalo", mb(103), true),
+                        item("Library/Preferences/com.vng.zalo.plist", 28_000, true),
+                        item("Library/Saved Application State/com.vng.zalo.savedState", 290_000, true)])
+        let rest = [app("Microsoft Outlook", "com.microsoft.Outlook", gb(2.4), 40),
+                    app("CapCut", "com.lemon.lvoverseas", gb(1.9), 9),
+                    app("Google Chrome", "com.google.Chrome", gb(1.5), 0),
+                    app("Visual Studio Code", "com.microsoft.VSCode", gb(1.4), 2),
+                    app("Microsoft Edge", "com.microsoft.edgemac", gb(1.1), 120),
+                    app("WhatsApp", "net.whatsapp.WhatsApp", mb(734), 6),
+                    app("Claude", "com.anthropic.claudefordesktop", mb(619), 0),
+                    app("Telegram", "ru.keepcoder.Telegram", mb(346), 4),
+                    app("Rectangle", "com.knollsoft.Rectangle", mb(11), 1)]
+        let pickApp = appLang == "en" ? slack : zalo
+        vm.apps = [pickApp] + rest + [appLang == "en" ? zalo : slack]
+        vm.selApp = pickApp.id
+    }
+}
+
+// MARK: - Free space chart (Stats page)
+
+/// Free space per day: a line with a soft fill, a green dot on days with a cleanup, 7/30/90-day ranges, hover for the day's numbers.
+struct FreeSpaceChart: View {
+    @ObservedObject var vm: VM
+    let log: [LogEntry]
+    @StateObject private var pick = RangePick()
+    var body: some View {
+        let data = DiskHistory.series(days: pick.days, log: log)
+        let dm: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM"; return f }()
+        let top = max(vm.totalGB, (data.map(\.free).max() ?? 1) * 1.1)
+        let sel = pick.sel.flatMap { s in data.min { abs($0.date.timeIntervalSince(s)) < abs($1.date.timeIntervalSince(s)) } }
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(t("Free space per day (GB)", "Dung lượng trống mỗi ngày (GB)")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
+                Spacer()
+                if let d = sel {
+                    Text(dm.string(from: d.date) + ": " + t("free ", "trống ") + String(format: "%.0f GB", d.free)
+                         + (d.freed > 0 ? t(", cleaned ", ", đã dọn ") + fmt(d.freed) : ""))
+                        .font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.text)
+                }
+                Picker("", selection: $pick.days) {
+                    Text(t("7 days", "7 ngày")).tag(7); Text(t("30 days", "30 ngày")).tag(30); Text(t("90 days", "90 ngày")).tag(90)
+                }.pickerStyle(.segmented).frame(width: 220)
+            }
+            if data.count < 2 {
+                Text(t("Not enough days yet. Tidymint notes the free space once a day while it is open.",
+                       "Chưa đủ số ngày. Tidymint ghi dung lượng trống mỗi ngày một lần khi app đang mở."))
+                    .font(.system(size: fs(12))).foregroundColor(Theme.sub).frame(height: 140)
+            } else {
+                Chart {
+                    ForEach(data) { d in
+                        AreaMark(x: .value("Day", d.date, unit: .day), y: .value("GB", d.free))
+                            .foregroundStyle(LinearGradient(colors: [Theme.accentSolid.opacity(0.35), Theme.accentSolid.opacity(0.02)], startPoint: .top, endPoint: .bottom))
+                        LineMark(x: .value("Day", d.date, unit: .day), y: .value("GB", d.free))
+                            .foregroundStyle(Theme.accentSolid).lineStyle(StrokeStyle(lineWidth: 2))
+                        if d.freed > 0 {
+                            PointMark(x: .value("Day", d.date, unit: .day), y: .value("GB", d.free)).foregroundStyle(Theme.green).symbolSize(40)
+                        }
+                    }
+                    if let d = sel {
+                        RuleMark(x: .value("Day", d.date, unit: .day)).foregroundStyle(Theme.ink.opacity(0.3))
+                    }
+                }
+                .chartYScale(domain: 0...top)
+                // The axis always spans the whole range, so the line sits on the right dates even when early days are missing.
+                .chartXScale(domain: (Calendar.current.date(byAdding: .day, value: -(pick.days - 1), to: Calendar.current.startOfDay(for: Date())) ?? Date())...Calendar.current.startOfDay(for: Date()).addingTimeInterval(86400))
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .day, count: pick.days <= 7 ? 1 : (pick.days <= 30 ? 7 : 14))) { v in
+                        AxisGridLine().foregroundStyle(Theme.ink.opacity(0.08))
+                        AxisValueLabel { if let d = v.as(Date.self) { Text(dm.string(from: d)).font(.system(size: fs(10))).foregroundColor(Theme.sub) } }
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { v in
+                        AxisGridLine().foregroundStyle(Theme.ink.opacity(0.08))
+                        AxisValueLabel { if let g = v.as(Double.self) { Text(String(format: "%.0f", g)).font(.system(size: fs(10))).foregroundColor(Theme.sub) } }
+                    }
+                }
+                .chartXSelection(value: $pick.sel)
+                .frame(height: 150)
+            }
+        }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
     }
 }

@@ -2,6 +2,21 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.3.6 (2026-10-30)
+
+- New: "What is in System Data" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, leftover browser copies, and where to handle the rest
+- New: Statistics shows a chart of free space per day (7, 30 or 90 days)
+- Clean Now lists Xcode build data per project, never pre-selected
+- Clean by App: CapCut rendering cache and proxies, now checked on a real Mac
+- Space Lens explains more folders: CapCut, Docker, Homebrew, Xcode archives
+- New app icon; Advanced in the sidebar starts folded
+- New menu bar icon: a mint leaf that fills as your disk fills, turns amber when free space gets close to your warning level and red below it
+- Safer Uninstaller: Undo puts the app back too, not only its files; browser web apps are marked and explained
+- Safer cleaning: a file the Trash refuses on an external or network drive is reported, never moved
+- Uninstaller now removes apps installed for every user, such as App Store apps: Finder moves them to the Trash and macOS asks for your password, which Tidymint never sees; error messages say what to do next
+- Xcode archives are never offered for removal; simulator caches and CapCut caption and voice-over files are no longer pre-selected
+- New Contact page, and tooltips on small buttons
+
 ## 0.3.5 (2026-10-28)
 
 - Clean Now shows results as cards, and the scan shows which step it is on
