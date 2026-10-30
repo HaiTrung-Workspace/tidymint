@@ -90,7 +90,7 @@ dict(
   faq=[
     ("CleanMyMac dùng thử được bao lâu?", "7 ngày với đầy đủ tính năng, áp dụng cho bản mua trên trang MacPaw, App Store và Setapp. Hết hạn thì phải mua mới dùng tiếp."),
     ("Dùng CleanMyMac crack có sao không?", "Rủi ro cao. App dọn dẹp cần quyền đọc toàn bộ ổ đĩa và mật khẩu quản trị, nên bản crack bị cài mã độc có thể đọc dữ liệu hoặc điều khiển máy từ xa. Jamf Threat Labs từng phát hiện app Mac lậu bị cài cửa hậu (01/2024)."),
-    ("Tidymint có miễn phí mãi không?", "Có. Tidymint là mã nguồn mở theo giấy phép MIT, không có bản trả phí, không cần tài khoản. Mã nguồn công khai trên GitHub."),
+    ("Tidymint có miễn phí trọn đời không?", "Có. Tidymint là mã nguồn mở theo giấy phép MIT, không có bản trả phí, không cần tài khoản. Mã nguồn công khai trên GitHub."),
     ("Mac có cần app dọn dẹp không?", "Không bắt buộc. macOS tự quản lý khá tốt. App dọn dẹp hữu ích khi ổ gần đầy, nhất là máy 256 GB, hoặc khi mục Dữ liệu hệ thống phình to mà bạn không biết vì sao."),
     ("Gỡ CleanMyMac đang cài thế nào cho sạch?", "Thoát CleanMyMac (cả biểu tượng trên thanh menu), rồi dùng tính năng Gỡ app của Tidymint hoặc AppCleaner để xoá app cùng các file đi kèm."),
   ],
