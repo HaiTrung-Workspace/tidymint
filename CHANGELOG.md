@@ -12,7 +12,7 @@ All notable changes to Tidymint. Dates are release dates.
 - New app icon; Advanced in the sidebar starts folded
 - Safer Uninstaller: Undo puts the app back too, not only its files; browser web apps are marked and explained
 - Safer cleaning: a file the Trash refuses on an external or network drive is reported, never moved
-- Uninstaller explains apps that need an administrator password, such as App Store apps, and opens them in Finder; error messages say what to do next
+- Uninstaller now removes apps installed for every user, such as App Store apps: Finder moves them to the Trash and macOS asks for your password, which Tidymint never sees; error messages say what to do next
 - Xcode archives are never offered for removal; simulator caches and CapCut caption and voice-over files are no longer pre-selected
 - New Contact page, and tooltips on small buttons
 

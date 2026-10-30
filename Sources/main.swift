@@ -1084,8 +1084,35 @@ struct AppEntry: Identifiable {
     var fromAppStore: Bool { FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/_MASReceipt").path) }
 }
 func adminNote(_ a: AppEntry) -> String {
-    t("\(a.name) was installed for every user of this Mac\(a.fromAppStore ? " by the App Store" : ""), so macOS asks for an administrator password to remove it. Tidymint never asks for or sees your password. Click Show in Finder, drag the app to the Trash and enter your password when macOS asks. Its related files stay where they are: after that, scan again and check the Leftovers tab.\(a.fromAppStore ? "" : " If the app came with its own uninstaller, use that first: Apple says it also removes the helpers the app installed.")",
-      "\(a.name) được cài cho mọi tài khoản trên máy\(a.fromAppStore ? " qua App Store" : ""), nên macOS cần mật khẩu quản trị để gỡ. Tidymint không hỏi và không thấy mật khẩu của bạn. Bấm Mở trong Finder, kéo app vào Thùng rác và nhập mật khẩu khi macOS hỏi. Các file đi kèm giữ nguyên chỗ cũ: gỡ app xong, bấm Quét lại rồi xem tab File sót.\(a.fromAppStore ? "" : " Nếu app có trình gỡ cài đặt riêng, dùng trình đó trước: theo Apple, cách này gỡ cả các thành phần phụ app đã cài.")")
+    t("\(a.name) was installed for every user of this Mac\(a.fromAppStore ? " by the App Store" : ""). When you uninstall it, Tidymint asks Finder to move it to the Trash and macOS asks for an administrator password in its own window. Tidymint never asks for or sees your password.\(a.fromAppStore ? "" : " If the app came with its own uninstaller, use that first: Apple says it also removes the helpers the app installed.")",
+      "\(a.name) được cài cho mọi tài khoản trên máy\(a.fromAppStore ? " qua App Store" : ""). Khi gỡ, Tidymint nhờ Finder chuyển app vào Thùng rác và macOS hỏi mật khẩu quản trị trong hộp thoại của macOS. Tidymint không hỏi và không thấy mật khẩu của bạn.\(a.fromAppStore ? "" : " Nếu app có trình gỡ cài đặt riêng, dùng trình đó trước: theo Apple, cách này gỡ cả các thành phần phụ app đã cài.")")
+}
+
+/// Finder does the moves that need an administrator password: macOS shows its own password window, Tidymint never sees it.
+/// Runs osascript as a child process so the wait for the password never blocks Tidymint's window.
+enum FinderOps {
+    enum Result { case ok(String), cancelled, notAllowed, failed(String) }
+    static func q(_ p: String) -> String { p.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") }
+    static func run(_ script: String) -> Result {
+        let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/bin/osascript"); p.arguments = ["-e", script]
+        let out = Pipe(), err = Pipe(); p.standardOutput = out; p.standardError = err
+        do { try p.run() } catch { return .failed(error.localizedDescription) }
+        let o = String(decoding: out.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        let e = String(decoding: err.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
+        p.waitUntilExit()
+        if p.terminationStatus == 0 { return .ok(o) }
+        if e.contains("-128") { return .cancelled }
+        if e.contains("-1743") { return .notAllowed }
+        return .failed(e.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+    /// Moves one item to the Trash through Finder. Returns the item's path in the Trash.
+    static func trash(_ path: String) -> Result {
+        run("with timeout of 600 seconds\ntell application \"Finder\"\nset r to delete (POSIX file \"\(q(path))\" as alias)\nreturn POSIX path of (r as alias)\nend tell\nend timeout")
+    }
+    /// Moves an item back into a folder through Finder (Undo for items that needed a password to leave).
+    static func move(_ path: String, into folder: String) -> Result {
+        run("with timeout of 600 seconds\ntell application \"Finder\"\nset r to move (POSIX file \"\(q(path))\" as alias) to (POSIX file \"\(q(folder))\" as alias)\nreturn POSIX path of (r as alias)\nend tell\nend timeout")
+    }
 }
 
 /// Small grey tag for a browser web app, with the reassurance as a tooltip.
@@ -1524,21 +1551,21 @@ enum Phase { case idle, scanning, summary, review, done }
         if NSWorkspace.shared.runningApplications.contains(where: { $0.bundleIdentifier == a.bundleID }) {
             _ = confirm(t("Quit \(a.name) first", "Tắt \(a.name) trước"), t("The app is running. Quit it, then try again.", "App đang mở. Tắt app rồi bấm lại."), "OK"); return
         }
-        if a.needsAdmin { reveal(a.url); return }
         let extra = a.related.filter(\.selected)
         let total = a.size + extra.reduce(0) { $0 + $1.size }
         guard confirm(t("Uninstall \(a.name)?", "Gỡ \(a.name)?"),
-                      t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.",
-                        "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."),
+                      t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.", "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác.")
+                        + (a.needsAdmin ? t(" macOS will ask for an administrator password in its own window; Tidymint never sees it.", " macOS sẽ hỏi mật khẩu quản trị trong hộp thoại của macOS; Tidymint không thấy mật khẩu.") : ""),
                       t("Uninstall", "Gỡ")) else { return }
+        if a.needsAdmin { uninstallWithFinder(a, extra: extra, total: total); return }
         NSWorkspace.shared.recycle([a.url]) { newURLs, err in
             Task { @MainActor in
                 guard err == nil else {
                     // The app itself could not go to the Trash: leave its related files where they are.
                     self.log("Uninstall \(a.name) failed: \(err!.localizedDescription)")
                     self.appsMsgErr = true
-                    self.appsMsg = t("Could not move \(a.name) to the Trash: macOS did not allow it. Nothing was moved. If the app was installed from the App Store, click Show in Finder and drag it to the Trash; macOS will ask for your password.",
-                                     "Không chuyển được \(a.name) vào Thùng rác: macOS không cho phép. Chưa có gì bị chuyển đi. Nếu app cài từ App Store, bấm Mở trong Finder rồi kéo app vào Thùng rác, macOS sẽ hỏi mật khẩu.")
+                    self.appsMsg = t("Could not move \(a.name) to the Trash: macOS did not allow it. Nothing was moved. You can drag the app to the Trash in Finder.",
+                                     "Không chuyển được \(a.name) vào Thùng rác: macOS không cho phép. Chưa có gì bị chuyển đi. Bạn có thể kéo app vào Thùng rác trong Finder.")
                     return
                 }
                 // Record the app in the Undo journal together with its related files, so Undo puts all of it back.
@@ -1548,6 +1575,37 @@ enum Phase { case idle, scanning, summary, review, done }
                 self.finished(.apps, ok + 1, total, 0)
                 self.appsMsgErr = false
                 self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
+                self.log(self.appsMsg); self.refreshTrash(); self.refreshDisk()
+            }
+        }
+    }
+    /// Apps owned by root: Finder moves the app (macOS asks for the password), then the related files go the usual way.
+    func uninstallWithFinder(_ a: AppEntry, extra: [CleanItem], total: Int64) {
+        appsBusy = true
+        Task.detached {
+            let r = FinderOps.trash(a.url.path)
+            await MainActor.run {
+                self.appsBusy = false
+                switch r {
+                case .ok(let to) where !FileManager.default.fileExists(atPath: a.url.path) && FileManager.default.fileExists(atPath: to):
+                    let appEntry = [Journal.Entry(from: a.url.path, to: to, size: a.size)]
+                    let (ok, _) = self.trash(extra.map(\.url), label: a.name, alsoUndo: appEntry)
+                    self.apps.removeAll { $0.id == a.id }; self.selApp = nil
+                    self.finished(.apps, ok + 1, total, 0)
+                    self.appsMsgErr = false
+                    self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
+                case .cancelled:
+                    self.appsMsgErr = true
+                    self.appsMsg = t("\(a.name) was not uninstalled: the password window was cancelled. Nothing was moved.", "Chưa gỡ \(a.name): hộp hỏi mật khẩu đã bị huỷ. Chưa có gì bị chuyển đi.")
+                case .notAllowed:
+                    self.appsMsgErr = true
+                    self.appsMsg = t("\(a.name) was not uninstalled: Tidymint is not allowed to ask Finder. Turn it on in System Settings > Privacy & Security > Automation > Tidymint > Finder. Nothing was moved.",
+                                     "Chưa gỡ \(a.name): Tidymint chưa được phép nhờ Finder. Bật trong Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Tự động hoá > Tidymint > Finder. Chưa có gì bị chuyển đi.")
+                default:
+                    self.appsMsgErr = true
+                    self.appsMsg = t("Could not move \(a.name) to the Trash. Nothing was moved. You can drag the app to the Trash in Finder.", "Không chuyển được \(a.name) vào Thùng rác. Chưa có gì bị chuyển đi. Bạn có thể kéo app vào Thùng rác trong Finder.")
+                }
+                if case .failed(let e) = r { self.log("Uninstall \(a.name) through Finder failed: \(e)") }
                 self.log(self.appsMsg); self.refreshTrash(); self.refreshDisk()
             }
         }
@@ -2669,7 +2727,12 @@ enum Journal {
         for e in s.entries {
             guard fm.fileExists(atPath: e.to), !fm.fileExists(atPath: e.from) else { skipped += 1; continue }
             try? fm.createDirectory(atPath: (e.from as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
-            do { try fm.moveItem(atPath: e.to, toPath: e.from); ok += 1 } catch { skipped += 1 }
+            do { try fm.moveItem(atPath: e.to, toPath: e.from); ok += 1 } catch {
+                // An app owned by root needs a password to go back too: Finder moves it and macOS asks. Same name only.
+                let folder = (e.from as NSString).deletingLastPathComponent
+                if (e.to as NSString).lastPathComponent == (e.from as NSString).lastPathComponent,
+                   case .ok = FinderOps.move(e.to, into: folder), fm.fileExists(atPath: e.from) { ok += 1 } else { skipped += 1 }
+            }
         }
         return (ok, skipped)
     }
@@ -4348,13 +4411,9 @@ struct AppsView: View {
                     }
                     HStack {
                         let tot = vm.apps[i].size + vm.apps[i].related.filter(\.selected).reduce(0) { $0 + $1.size }
-                        if vm.apps[i].needsAdmin {
-                            Text(t("Needs an administrator password", "Cần mật khẩu quản trị")).foregroundColor(Theme.warn).font(.system(size: fs(15), weight: .semibold))
-                        } else {
-                            Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
-                        }
+                        Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
                         Spacer()
-                        PrimaryButton(title: vm.apps[i].needsAdmin ? t("Show in Finder", "Mở trong Finder") : t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) })
+                        PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) }).disabled(vm.appsBusy)
                     }.padding(.horizontal, 20).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
                 }
             } else {
