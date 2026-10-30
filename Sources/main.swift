@@ -137,38 +137,89 @@ func shortDate(_ d: Date) -> String {
 final class Flag: ObservableObject { @Published var v = false }
 
 /// Tooltip drawn by the app itself. macOS help tags often never appear on SwiftUI views that also track the mouse
-/// (hover tiles, cursors), so every tooltip in Tidymint uses this: a small bubble under the control after half a second.
+/// (hover tiles, cursors), so every tooltip in Tidymint uses this: a small bubble near the pointer after half a second.
+/// The bubble lives in its own borderless panel above the window, so it is never clipped by the window edge,
+/// a scroll view or a neighbouring control, and it is kept inside the visible screen.
+final class TipPanel {
+    static let shared = TipPanel()
+    private var panel: NSPanel?
+    private var owner: ObjectIdentifier?
+    private var monitor: Any?
+    private let maxW: CGFloat = 280
+
+    func show(_ text: String, owner o: ObjectIdentifier) {
+        guard !text.isEmpty else { return }
+        let font = NSFont.systemFont(ofSize: fs(11))
+        let line = (text as NSString).size(withAttributes: [.font: font]).width
+        let w = min(ceil(line) + 2, maxW)
+        let host = NSHostingView(rootView: TipBubble(text: text, width: w))
+        let size = host.fittingSize
+        let p = panel ?? make()
+        p.contentView = host
+        let mouse = NSEvent.mouseLocation
+        var origin = NSPoint(x: mouse.x - 14, y: mouse.y - size.height - 14)
+        if let scr = NSScreen.screens.first(where: { NSMouseInRect(mouse, $0.frame, false) }) ?? NSScreen.main {
+            let vf = scr.visibleFrame
+            origin.x = min(max(origin.x, vf.minX + 4), vf.maxX - size.width - 4)
+            if origin.y < vf.minY + 4 { origin.y = mouse.y + 18 }
+        }
+        p.setFrame(NSRect(origin: origin, size: size), display: true)
+        p.orderFrontRegardless()
+        owner = o
+    }
+    func hide(owner o: ObjectIdentifier? = nil) {
+        if let o, o != owner { return }
+        panel?.orderOut(nil); owner = nil
+    }
+    private func make() -> NSPanel {
+        let p = NSPanel(contentRect: .zero, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: true)
+        p.isOpaque = false; p.backgroundColor = .clear; p.hasShadow = false
+        p.level = .popUpMenu; p.ignoresMouseEvents = true; p.isReleasedWhenClosed = false
+        p.collectionBehavior = [.canJoinAllSpaces, .transient, .ignoresCycle]
+        panel = p
+        // Like system tooltips: any click, scroll or key press dismisses the bubble.
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown, .scrollWheel, .keyDown]) { [weak self] e in
+            self?.hide(); return e
+        }
+        NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in self?.hide() }
+        return p
+    }
+}
+struct TipBubble: View {
+    let text: String; let width: CGFloat
+    var body: some View {
+        Text(text).font(.system(size: fs(11))).foregroundColor(Color(nsColor: .labelColor))
+            .multilineTextAlignment(.leading).frame(width: width, alignment: .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .windowBackgroundColor)))
+            .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: .separatorColor), lineWidth: 1))
+            .shadow(color: .black.opacity(0.25), radius: 5, y: 2)
+            .padding(8)   // room for the shadow inside the panel
+    }
+}
 final class TipState: ObservableObject {
-    @Published var shown = false
     private var item: DispatchWorkItem?
+    var text = ""
     func hover(_ inside: Bool) {
         item?.cancel(); item = nil
-        guard inside else { shown = false; return }
-        let i = DispatchWorkItem { [weak self] in withAnimation(.easeOut(duration: 0.12)) { self?.shown = true } }
+        let me = ObjectIdentifier(self)
+        guard inside, !text.isEmpty else { TipPanel.shared.hide(owner: me); return }
+        let i = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            TipPanel.shared.show(self.text, owner: ObjectIdentifier(self))
+        }
         item = i; DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: i)
     }
 }
 struct Tip: ViewModifier {
     let text: String
-    var trailing = false   // controls near the right edge: the bubble grows to the left so the window does not cut it
+    var trailing = false   // kept for call sites; the floating bubble places itself inside the screen
     @StateObject private var st = TipState()
     func body(content: Content) -> some View {
         content
-            .onHover { st.hover($0 && !text.isEmpty) }
-            .overlay(alignment: trailing ? .bottomTrailing : .bottom) {
-                if st.shown {
-                    Text(text).font(.system(size: fs(11))).foregroundColor(Color(nsColor: .labelColor))
-                        .multilineTextAlignment(.leading).frame(maxWidth: 280, alignment: .leading).fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal, 8).padding(.vertical, 5)
-                        .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .windowBackgroundColor)))
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: .separatorColor), lineWidth: 1))
-                        .shadow(color: .black.opacity(0.25), radius: 6, y: 2)
-                        .fixedSize()
-                        .alignmentGuide(.bottom) { $0[.top] - 6 }
-                        .allowsHitTesting(false).transition(.opacity)
-                }
-            }
-            .zIndex(st.shown ? 100 : 0)
+            .onHover { inside in st.text = text; st.hover(inside) }
+            .onDisappear { st.hover(false) }
     }
 }
 extension View {
