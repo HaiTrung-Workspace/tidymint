@@ -424,7 +424,7 @@ dict(
 
 <h2 id="dev">Đồ lập trình</h2>
 <ul>
-<li><b>Là gì:</b> <code>DerivedData</code> của Xcode, máy ảo iOS và file hỗ trợ thiết bị cũ (<code>~/Library/Developer</code>, hay 30–100 GB); file ổ đĩa duy nhất của Docker Desktop chỉ có phình không co; <code>node_modules</code> trong mọi dự án; bộ nhớ đệm Homebrew, npm, pip.</li>
+<li><b>Là gì:</b> <code>DerivedData</code> của Xcode, máy ảo iOS và file hỗ trợ thiết bị cũ (<code>~/Library/Developer</code>, có thể lên hàng chục GB); file ổ đĩa duy nhất của Docker Desktop chỉ có phình không co; <code>node_modules</code> trong mọi dự án; bộ nhớ đệm Homebrew, npm, pip.</li>
 <li><b>Sửa:</b> Xcode › Settings › Locations › DerivedData, xoá thư mục; <code>xcrun simctl delete unavailable</code>; Docker › Settings › Resources › Disk image size, rồi <code>docker system prune</code>; <code>npm cache clean --force</code>, <code>brew cleanup</code>. <code>node_modules</code> của dự án vài tháng không mở thì bỏ được, <code>npm install</code> là có lại.</li>
 </ul>
 
@@ -435,7 +435,7 @@ dict(
 </ul>
 {CTA}
 <h2 id="chan">Tìm thủ phạm nhanh với Tidymint</h2>
-<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> xử lý Zalo, Chrome, CapCut theo tháng. Mọi thứ chỉ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
+<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, CapCut giữ gì, ảnh và video Zalo xếp theo tháng. Mọi thứ chỉ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
 <h3>Để ổ không đầy lại</h3>
 <ul>
 <li><b>Khởi động lại mỗi tuần.</b> macOS dọn file tạm và phần "có thể xoá" khi khởi động lại.</li>
@@ -513,7 +513,7 @@ dict(
 
 <h2 id="dev">Developer tools</h2>
 <ul>
-<li><b>What it is:</b> Xcode's <code>DerivedData</code>, iOS simulators and old device support files (<code>~/Library/Developer</code>, often 30 to 100 GB); Docker Desktop's single disk image that only ever grows; <code>node_modules</code> folders in every project; Homebrew, npm and pip caches.</li>
+<li><b>What it is:</b> Xcode's <code>DerivedData</code>, iOS simulators and old device support files (<code>~/Library/Developer</code>, can reach tens of GB); Docker Desktop's single disk image that only ever grows; <code>node_modules</code> folders in every project; Homebrew, npm and pip caches.</li>
 <li><b>Fix:</b> Xcode › Settings › Locations › DerivedData, delete the folder; <code>xcrun simctl delete unavailable</code>; Docker › Settings › Resources › Disk image size, then <code>docker system prune</code>; <code>npm cache clean --force</code>, <code>brew cleanup</code>. Old <code>node_modules</code> in projects you have not opened for months can go; <code>npm install</code> brings them back.</li>
 </ul>
 
@@ -524,7 +524,7 @@ dict(
 </ul>
 {CTA}
 <h2 id="stop">Free up the space with Tidymint</h2>
-<p>The six places above are exactly what Tidymint scans: <b>Clean Now</b> groups caches, logs and old installers with a safety label on each group and cleans only when you click; <b>Space Lens</b> draws snapshots, iPhone backups, Xcode, Docker and Ollama folders as bubbles with plain-language notes; <b>Clean by App</b> handles Zalo, Chrome and CapCut month by month. Everything goes to the Trash, with Undo. Free and open source.</p>
+<p>The six places above are exactly what Tidymint scans: <b>Clean Now</b> groups caches, logs and old installers with a safety label on each group and cleans only when you click; <b>Space Lens</b> draws snapshots, iPhone backups, Xcode, Docker and Ollama folders as bubbles with plain-language notes; <b>Clean by App</b> shows what Zalo, Chrome and CapCut keep, with Zalo media sorted by month. Everything goes to the Trash, with Undo. Free and open source.</p>
 <h3>Keep it from coming back</h3>
 <ul>
 <li><b>Restart once a week.</b> macOS purges temporary files and purgeable space on restart.</li>
@@ -1251,7 +1251,7 @@ docker system df</pre>
 <ul>
 <li><b>DerivedData</b> (<code>~/Library/Developer/Xcode/DerivedData</code>): build products and indexes. Everything in it is safe to delete; the next build takes longer because Xcode starts from scratch. You can remove one project's folder instead of all of it.</li>
 <li><b>Unavailable simulators</b>: run <code>xcrun simctl delete unavailable</code> to remove simulators for runtimes you no longer have.</li>
-<li><b>iOS DeviceSupport</b> (<code>~/Library/Developer/Xcode/iOS DeviceSupport</code>): debug symbols for each iPhone or iOS version you have connected. Old versions can go; Xcode prepares them again when you connect that device.</li>
+<li><b>iOS DeviceSupport</b> (<code>~/Library/Developer/Xcode/iOS DeviceSupport</code>): debug symbols for each iPhone or iOS version you have connected. Old versions can go, but Xcode copies them again only from a device still running that version, and you need them to read crash reports from it.</li>
 <li><b>Archives</b> (<code>~/Library/Developer/Xcode/Archives</code>): see <a href="#keep">What to keep</a>.</li>
 </ul>
 
@@ -1305,7 +1305,7 @@ docker system df</pre>
     ("Does docker system prune delete my volumes?", "No. Volumes are kept unless you add --volumes. By default it removes stopped containers, unused networks, dangling images and unused build cache."),
     ("Can I delete node_modules?", "Yes, in projects you are not working on. Running npm install in the project brings the folder back."),
     ("Should I clear the npm cache?", "Only to reclaim space. npm's documentation says the cache is self-healing, so clearing it rarely fixes anything."),
-    ("Does Tidymint delete Xcode or Docker data?", "Tidymint explains those folders in Space Lens and clears the npm cache and user caches you select. It does not run Docker or Xcode commands, and everything goes to the Trash first."),
+    ("Does Tidymint delete Xcode or Docker data?", "Only what you choose. Clean Now lists Xcode build data (DerivedData) per project, never pre-selected. System Data lists Xcode build files, simulator caches and old device support files, none pre-selected. Xcode archives are never offered: keep them for crash reports. Tidymint does not run Docker or Xcode commands, and everything goes to the Trash first."),
   ],
   sources=[
     ("Docker docs: docker system prune", "https://docs.docker.com/reference/cli/docker/system/prune/"),
@@ -1314,6 +1314,8 @@ docker system df</pre>
     ("Homebrew FAQ", "https://docs.brew.sh/FAQ"),
     ("pip docs: pip cache", "https://pip.pypa.io/en/stable/cli/pip_cache/"),
     ("Ollama FAQ: where models are stored", "https://docs.ollama.com/faq"),
+    ("Apple Developer: Acquiring operating system symbol information", "https://developer.apple.com/documentation/xcode/acquiring-operating-system-symbol-information"),
+    ("Apple Developer: Building your app to include debugging information", "https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information"),
     ("Kodeco: Understanding and managing Xcode space", "https://www.kodeco.com/19998365-understanding-and-managing-xcode-space"),
   ],
   related=[("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Remove duplicate files safely", "{HOME}remove-duplicate-files-mac/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/")],
@@ -1341,7 +1343,7 @@ docker system df</pre>
 <ul>
 <li><b>DerivedData</b> (<code>~/Library/Developer/Xcode/DerivedData</code>): sản phẩm build và chỉ mục. Xoá hết được an toàn; lần build sau lâu hơn vì Xcode build lại từ đầu. Có thể chỉ xoá thư mục của một dự án.</li>
 <li><b>Máy giả lập không dùng được nữa</b>: chạy <code>xcrun simctl delete unavailable</code> để xoá máy giả lập của các bản runtime đã gỡ.</li>
-<li><b>iOS DeviceSupport</b> (<code>~/Library/Developer/Xcode/iOS DeviceSupport</code>): file gỡ lỗi cho từng iPhone, từng bản iOS bạn từng cắm vào. Bản cũ xoá được; cắm lại máy đó thì Xcode chuẩn bị lại.</li>
+<li><b>iOS DeviceSupport</b> (<code>~/Library/Developer/Xcode/iOS DeviceSupport</code>): file gỡ lỗi cho từng iPhone, từng bản iOS bạn từng cắm vào. Bản cũ xoá được, nhưng Xcode chỉ chép lại từ máy còn chạy đúng bản đó, và cần chúng để đọc báo cáo lỗi của bản đó.</li>
 <li><b>Archives</b> (<code>~/Library/Developer/Xcode/Archives</code>): xem mục <a href="#giu">Những thứ nên giữ</a>.</li>
 </ul>
 
@@ -1395,7 +1397,7 @@ docker system df</pre>
     ("docker system prune có xoá volume không?", "Không. Volume được giữ trừ khi thêm --volumes. Mặc định lệnh xoá container đã dừng, network không dùng, image lơ lửng và bộ nhớ build không dùng."),
     ("Xoá node_modules được không?", "Được, với dự án bạn không làm nữa. Chạy npm install trong dự án là có lại."),
     ("Có nên xoá bộ nhớ đệm npm không?", "Chỉ khi cần lấy lại chỗ. Tài liệu npm nói bộ nhớ đệm tự sửa lỗi, xoá đi hiếm khi chữa được gì."),
-    ("Tidymint có xoá dữ liệu Xcode, Docker không?", "Tidymint giải thích các thư mục đó trong Bản đồ ổ đĩa, và dọn bộ nhớ đệm npm cùng bộ nhớ đệm bạn chọn. Tidymint không chạy lệnh Docker hay Xcode, mọi thứ vào Thùng rác trước."),
+    ("Tidymint có xoá dữ liệu Xcode, Docker không?", "Chỉ những gì bạn chọn. Dọn ngay liệt kê dữ liệu build Xcode (DerivedData) theo từng dự án, không chọn sẵn. Dữ liệu hệ thống liệt kê file build, bộ nhớ đệm máy ảo và file hỗ trợ thiết bị cũ, đều không chọn sẵn. Bản archive Xcode không bao giờ được đưa ra để xoá: giữ lại để đọc báo cáo lỗi. Tidymint không chạy lệnh Docker hay Xcode, mọi thứ vào Thùng rác trước."),
   ],
   sources=[
     ("Docker: docker system prune", "https://docs.docker.com/reference/cli/docker/system/prune/"),
@@ -1404,6 +1406,8 @@ docker system df</pre>
     ("Homebrew FAQ", "https://docs.brew.sh/FAQ"),
     ("pip: pip cache", "https://pip.pypa.io/en/stable/cli/pip_cache/"),
     ("Ollama FAQ: nơi lưu mô hình", "https://docs.ollama.com/faq"),
+    ("Apple Developer: lấy ký hiệu hệ điều hành để đọc báo cáo lỗi", "https://developer.apple.com/documentation/xcode/acquiring-operating-system-symbol-information"),
+    ("Apple Developer: build app kèm thông tin gỡ lỗi (giữ archive)", "https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information"),
     ("Kodeco: hiểu và quản lý dung lượng Xcode", "https://www.kodeco.com/19998365-understanding-and-managing-xcode-space"),
   ],
   related=[("Dữ liệu hệ thống trên Mac là gì", "{HOME}du-lieu-he-thong-mac/"), ("Xoá file trùng an toàn", "{HOME}xoa-file-trung-mac/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/")],
@@ -1614,7 +1618,7 @@ dict(
   desc="CapCut trên Mac cất bộ nhớ đệm và dự án trong Movies/CapCut. Thư mục nào phình to, phần nào xoá được an toàn, phần nào là bản dựng của bạn không được đụng.",
   crumb="CapCut chiếm dung lượng Mac",
   h1="CapCut chiếm dung lượng Mac: dọn sao cho không mất dự án",
-  tldr="CapCut trên Mac cất mọi thứ trong <code>~/Movies/CapCut/User Data</code>. Phần phình nhanh nhất là <b>Cache</b>: ảnh thu nhỏ, sóng âm, bản dựng sẵn, proxy. Phần này <b>xoá được</b>, CapCut tự tạo lại. Thư mục <b>Projects</b> là các bản dựng của bạn, <b>không được xoá</b>. Cách dọn: dùng nút thùng rác trong <b>Cài đặt › Draft</b> và <b>Performance</b> của CapCut, bật tự xoá, hoặc để Tidymint chọn sẵn đúng phần tạm.",
+  tldr="CapCut trên Mac cất mọi thứ trong <code>~/Movies/CapCut/User Data</code>. Phần phình nhanh nhất là <b>Cache</b>. Phần lớn trong đó là file tạm CapCut tự tạo lại (ảnh thu nhỏ, sóng âm, bản dựng sẵn, proxy), nhưng có thư mục chứa hiệu ứng, nhạc đã tải và cả file bạn nhập vào dự án. <b>Chỉ xoá đúng thư mục tạm.</b> Thư mục <b>Projects</b> là các bản dựng của bạn, <b>không được xoá</b>. Cách dọn: dùng nút thùng rác trong <b>Cài đặt › Draft</b> và <b>Performance</b> của CapCut, bật tự xoá, hoặc để Tidymint chọn sẵn đúng phần tạm.",
   toc=[("o-dau","CapCut trên Mac lưu dữ liệu ở đâu?"),("cong-dong","Người dùng CapCut đang gặp gì?"),("ben-trong","Bên trong có gì, phần nào xoá được?"),
        ("trong-capcut","Dọn bằng chính CapCut"),("don-tay","Dọn bộ nhớ đệm CapCut bằng tay"),("khong-xoa","Những thứ không được xoá"),("tidymint","Dọn CapCut bằng Tidymint"),("faq","Câu hỏi thường gặp")],
   body="""
@@ -1628,7 +1632,7 @@ dict(
 <ul>
 <li><b>Bộ nhớ đệm lên hàng chục GB.</b> Một hướng dẫn chuyên về CapCut ghi người dựng thường xuyên hay thấy bộ nhớ đệm khoảng <b>15–30 GB</b>. Trong một diễn đàn CapCut, người trả lời cảnh báo nếu không dọn, bộ nhớ đệm có thể lên tới <b>hàng trăm GB</b>.</li>
 <li><b>Không chuyển được sang ổ ngoài.</b> Một người dùng Mac báo CapCut từ chối lưu vào ổ cứng ngoài với lỗi <i>"External device is not supported. Select a local path."</i>, nên mọi thứ dồn vào ổ trong của máy.</li>
-<li><b>File proxy.</b> CapCut tạo bản sao độ phân giải thấp (thường 720p hoặc 540p) của video gốc để dựng mượt hơn. Mỗi video lớn kéo theo một bản proxy.</li>
+<li><b>File proxy.</b> CapCut tạo bản sao độ phân giải thấp của video gốc để dựng mượt hơn. Mỗi video lớn kéo theo một bản proxy.</li>
 <li><b>Sợ xoá nhầm dự án.</b> Câu hỏi hay gặp nhất là "xoá bộ nhớ đệm có mất dự án không". Câu trả lời: không, nếu chỉ xoá bộ nhớ đệm. Dự án nằm ở chỗ khác (xem bảng dưới).</li>
 <li><b>Ngại bật tự xoá.</b> Một blog Việt khuyên cân nhắc trước khi bật tự xoá theo thời gian, sợ ảnh hưởng dự án đang làm dở. Trên bản Mac chúng tôi kiểm, tuỳ chọn tự xoá nằm ở mục <b>Cache</b> và chỉ áp cho bộ nhớ đệm.</li>
 </ul>
@@ -1643,7 +1647,7 @@ dict(
 <tr><td><code>Cache/ttsTemp</code></td><td>File tạm của giọng đọc chữ thành tiếng</td><td class="y">Được</td></tr>
 <tr><td><code>Cache/prerender</code></td><td>Bản dựng sẵn để xem trước mượt hơn (Rendering cache)</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
 <tr><td><code>Cache/agencycache</code></td><td>File proxy, bản sao độ phân giải thấp của video gốc</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
-<tr><td><code>Cache/RemuxCache</code></td><td>File đổi sang MOV để phát mượt (Auto remux)</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
+<tr><td><code>Cache/RemuxCache</code></td><td>File CapCut chuyển định dạng để phát mượt (Auto remux)</td><td class="y">Được, xoá bằng nút trong CapCut</td></tr>
 <tr><td>Các thư mục khác trong <code>Cache</code></td><td>Hiệu ứng, mẫu, nhạc tải về, file đã nhập</td><td>Để yên nếu không chắc</td></tr>
 <tr><td><code>Projects/com.lveditor.draft</code></td><td><b>Các dự án (bản nháp) bạn đang dựng</b></td><td class="n">Không</td></tr>
 </table></div>
@@ -1657,12 +1661,12 @@ dict(
 <tr><td><b>Draft</b></td><td><b>Cache</b>: Don't delete / Auto delete cache from 30 days ago</td><td>Mặc định là không tự xoá. Chọn dòng dưới để CapCut tự xoá bộ nhớ đệm cũ hơn số ngày bạn đặt</td></tr>
 <tr><td><b>Performance</b></td><td><b>Rendering cache size</b> + nút thùng rác</td><td>Xoá bản dựng sẵn để xem trước</td></tr>
 <tr><td><b>Performance</b></td><td><b>Auto clear</b>: 10 GB</td><td>Bản dựng sẵn cũ tự xoá khi vượt mức này. Máy ổ nhỏ có thể hạ xuống</td></tr>
-<tr><td><b>Performance</b></td><td><b>Proxy size</b>, <b>File size</b> (Auto remux) + nút thùng rác</td><td>Xoá file proxy và file đã đổi sang MOV</td></tr>
+<tr><td><b>Performance</b></td><td><b>Proxy size</b>, <b>File size</b> (Auto remux) + nút thùng rác</td><td>Xoá file proxy và file đã chuyển định dạng</td></tr>
 </table></div>
 <p>Các nút này chỉ xoá bộ nhớ đệm, không đụng tới dự án. Tab <b>Draft</b> còn có dòng <b>Save to</b> cho biết dự án đang lưu ở đâu.</p>
 
 <h2 id="don-tay">Dọn bộ nhớ đệm CapCut bằng tay</h2>
-<p>Nút <b>Cache size</b> xoá gần như cả bộ nhớ đệm. Nếu chỉ muốn bỏ phần tạo lại nhanh mà giữ hiệu ứng, mẫu, nhạc đã tải:</p>
+<p>Nút <b>Cache size</b> xoá bộ nhớ đệm của CapCut. Nếu chỉ muốn bỏ phần tạo lại nhanh mà giữ hiệu ứng, mẫu, nhạc đã tải:</p>
 <ol class="steps">
 <li><b>Thoát hẳn CapCut</b> (Cmd+Q).</li>
 <li>Trong Finder bấm <b>Shift+Cmd+G</b>, mở <code>~/Movies/CapCut/User Data/Cache</code>.</li>
@@ -1682,20 +1686,21 @@ dict(
 <figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
 <ul>
-<li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích) được chọn sẵn, ghi rõ dung lượng;</li>
+<li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký) được chọn sẵn, ghi rõ dung lượng;</li>
+<li>nhóm <b>File tạm phụ đề và giọng đọc</b> và nhóm <b>Bản dựng sẵn và proxy</b> hiện ra để bạn tự chọn, không chọn sẵn, vì dự án đang dựng có thể còn dùng;</li>
 <li>nhóm <b>Dự án</b> hiện ra để bạn thấy nó nặng bao nhiêu, nhưng <b>bị khoá</b>, Tidymint không bao giờ đụng vào;</li>
-<li>Tidymint không đụng tới các thư mục khác trong <code>Cache</code>, để tránh xoá nhầm bản sao video của bạn. Bản dựng sẵn và proxy thì dùng nút trong tab Performance của CapCut.</li>
+<li>Tidymint không đụng tới các thư mục khác trong <code>Cache</code>, ví dụ <code>ImportMedias</code> nơi có thể chứa file bạn nhập vào dự án.</li>
 </ul>
 <p>Mọi thứ luôn vào Thùng rác trước, có thể hoàn tác.</p>
 {CTA}
 """,
   faq=[
     ("CapCut lưu file ở đâu trên Mac?", "Trong ~/Movies/CapCut/User Data. Thư mục Cache chứa bộ nhớ đệm, thư mục Projects chứa các dự án bạn đang dựng."),
-    ("Xoá Cache của CapCut có mất dự án không?", "Không. Nút Cache size trong Cài đặt › Draft và các nút xoá trong tab Performance chỉ xoá bộ nhớ đệm. Dự án nằm ở thư mục Projects, riêng biệt với Cache."),
+    ("Xoá Cache của CapCut có mất dự án không?", "Dự án nằm riêng ở thư mục Projects, không nằm trong Cache. Nhưng dự án có thể trỏ tới file trong Cache (ví dụ file nhập vào nằm ở Cache/ImportMedias), và CapCut chưa có trang chính thức nói rõ xoá Cache an toàn tới đâu. Nên xuất bản sao dự án quan trọng trước, và chỉ xoá các thư mục tạm."),
     ("Có nên bật tự xoá bộ nhớ đệm trong CapCut không?", "Nên, nếu ổ máy nhỏ. Trong Cài đặt › Draft, mục Cache chọn Auto delete cache from 30 days ago. Trong tab Performance, Auto clear giới hạn bản dựng sẵn ở 10 GB, có thể hạ xuống."),
     ("Vì sao CapCut chiếm nhiều dung lượng vậy?", "Mỗi lần dựng, CapCut tạo ảnh thu nhỏ khung hình, sóng âm, dữ liệu phân tích và tải hiệu ứng, mẫu, nhạc về máy. Dựng càng nhiều, Cache càng lớn."),
     ("Dọn xong CapCut có chậm không?", "Lần mở dự án đầu tiên sau khi dọn có thể chậm hơn một chút vì CapCut tạo lại ảnh thu nhỏ và sóng âm. Sau đó trở lại bình thường."),
-    ("Tidymint dọn CapCut có an toàn không?", "Tidymint chỉ chọn sẵn các thư mục tạm, khoá thư mục Dự án và chuyển mọi thứ vào Thùng rác, nên lỡ tay vẫn lấy lại được."),
+    ("Tidymint dọn CapCut có an toàn không?", "Tidymint chỉ chọn sẵn các thư mục tạm CapCut tự tạo lại. Phụ đề, giọng đọc, bản dựng sẵn và proxy hiện ra để bạn tự chọn. Thư mục Dự án bị khoá. Mọi thứ vào Thùng rác trước, lỡ tay vẫn lấy lại được."),
   ],
   sources=[
     ("Ultimate Systems Blog: thư mục và bộ nhớ đệm của CapCut trên Mac, PC", "https://blog.usro.net/2025/08/capcut-folders-cache-mac-and-pc-paths/"),
