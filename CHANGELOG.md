@@ -2,7 +2,7 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
-## 0.3.6 (2026-11-01)
+## 0.3.6 (2026-10-30)
 
 - New: "What is in System Data" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, and where to handle the rest
 - New: Statistics shows a chart of free space per day (7, 30 or 90 days)
