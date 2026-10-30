@@ -4179,7 +4179,7 @@ struct Sidebar: View {
             // Not cleaning: tools that organize files get their own group, always open.
             if featureOrganize {
             HStack(alignment: .top, spacing: 1) {
-                SectionTitle(text: t("ORGANIZE (NEW)", "SẮP XẾP (MỚI)")).padding(.trailing, -12)
+                SectionTitle(text: t("ORGANIZE (PREVIEW)", "SẮP XẾP (BẢN THỬ)")).padding(.trailing, -12)
                 Image(systemName: "sparkle").font(.system(size: fs(8), weight: .bold)).foregroundColor(Theme.accentSolid)
                     .padding(.top, 9)
             }
@@ -4714,7 +4714,7 @@ struct SettingsView: View {
                     PrimaryButton(title: t("Open Settings", "Mở Cài đặt"), action: { NSWorkspace.shared.open(VM.fdaSettings) }, width: Pill.rowWidth)
                 }
             }
-            settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
+            settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)") + (featureOrganize ? t(" · Organize preview on", " · đang bật bản thử Sắp xếp") : ""),
                        vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
                                             : t("Checks GitHub once a day for a new version; nothing about your Mac is sent.\n\nTidymint is free and will stay free. Sponsorships go toward the Apple Developer account ($99/year): with it, Apple verifies the app, new users just open it and it runs, no trip to Settings > Security, and each update reaches you faster.",
                                                 "Kiểm tra bản mới mỗi ngày một lần trên GitHub, không gửi thông tin gì về máy.\n\nTidymint miễn phí và sẽ luôn miễn phí. Mỗi khoản ủng hộ góp vào tài khoản Apple Developer (99 USD/năm): có nó, app được Apple xác nhận, người mới cài chỉ cần mở là chạy, không phải qua bước Cài đặt > Bảo mật, và mỗi bản cập nhật tới tay bạn nhanh hơn.")) {
