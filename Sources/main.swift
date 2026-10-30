@@ -7617,14 +7617,19 @@ struct FreeSpaceChart: View {
         let dm: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM"; return f }()
         let top = max(vm.totalGB, (data.map(\.free).max() ?? 1) * 1.1)
         let sel = pick.sel.flatMap { s in data.min { abs($0.date.timeIntervalSince(s)) < abs($1.date.timeIntervalSince(s)) } }
+        // Built step by step: one long + chain is too slow for some Swift versions to type-check.
+        let selText: String? = sel.map { d in
+            var s = dm.string(from: d.date) + ": " + t("free ", "trống ")
+            s += String(format: "%.0f GB", d.free)
+            if d.freed > 0 { s += t(", cleaned ", ", đã dọn ") + fmt(d.freed) }
+            return s
+        }
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(t("Free space per day (GB)", "Dung lượng trống mỗi ngày (GB)")).font(.system(size: fs(12), weight: .semibold)).foregroundColor(Theme.sub)
                 Spacer()
-                if let d = sel {
-                    Text(dm.string(from: d.date) + ": " + t("free ", "trống ") + String(format: "%.0f GB", d.free)
-                         + (d.freed > 0 ? t(", cleaned ", ", đã dọn ") + fmt(d.freed) : ""))
-                        .font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.text)
+                if let s = selText {
+                    Text(s).font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.text)
                 }
                 Picker("", selection: $pick.days) {
                     Text(t("7 days", "7 ngày")).tag(7); Text(t("30 days", "30 ngày")).tag(30); Text(t("90 days", "90 ngày")).tag(90)
