@@ -123,7 +123,7 @@ def guide(g):
     hub = g.get("hub", False)
     head_extra = g.get("lead", "") if hub else ('<p class="meta">%s: %s · %s</p><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
         '<div class="toc" role="navigation" aria-label="%s"><b>%s</b><ol>%s</ol></div>') % (l["updated"], "{DSTR}", g["read"], l["tldr"], g["tldr"], l["toc"], l["toc"], toc)
-    tail = cta if hub else '<h2 id="faq">%s</h2>%s%s<h2>%s</h2><ul class="src">%s</ul>' % (l["faq"], faq, cta, l["src"], srcs)
+    tail = cta if hub else '<h2 id="faq">%s</h2>%s<div class="mqs">%s</div>%s<h2>%s</h2><ul class="src">%s</ul>' % (l["faq"], faq, S.marquee(t), cta, l["src"], srcs)
     if hub:
         ld = [ld[2], {"@context":"https://schema.org","@type":"CollectionPage","name":g["h1"],"description":g["desc"],"url":url,"inLanguage":k}]
     hreflang = '<link rel="alternate" hreflang="%s" href="%s">' % (k, url)
