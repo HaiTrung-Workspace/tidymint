@@ -34,7 +34,7 @@ cat > "$APP/Contents/Info.plist" <<PL
 <key>CFBundleVersion</key><string>$VERSION</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
-<key>NSAppleEventsUsageDescription</key><string>Tidymint asks Finder to empty the Trash when you click Empty Trash.</string>
+<key>NSAppleEventsUsageDescription</key><string>Tidymint asks Finder to empty the Trash when you click Empty Trash, and to move apps installed for every user to the Trash when you uninstall them. macOS asks for the password, never Tidymint.</string>
 </dict></plist>
 PL
 
