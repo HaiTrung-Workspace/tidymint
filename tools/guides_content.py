@@ -149,7 +149,7 @@ dict(
 
 <h2 id="cach-3-app">Cách 3: Gỡ sạch bằng Tidymint (miễn phí)</h2>
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
-<figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zoom cùng các file sót lại trong Library" width="1600" height="1013" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
+<figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1085" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
 <li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xóa nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xóa từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, có nút Hoàn tác.</li>
 <li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xóa.</li>
@@ -1135,7 +1135,7 @@ dict(
 
 <h2 id="app">Way 3: Uninstall with Tidymint (free)</h2>
 <p>Checking every folder by hand takes time and it's easy to pick the wrong one. Tidymint finds the leftovers for you:</p>
-<figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Zoom together with its leftover files in Library" width="1600" height="1013" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
+<figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Slack together with its leftover files in Library" width="1600" height="1085" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
 <ul>
 <li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Everything always goes to the Trash first, with Undo.</li>
 <li><b>AppCleaner</b> (free) and <b>Pearcleaner</b> (free, source available): drop an app on the window and they list its related files for you to remove.</li>
