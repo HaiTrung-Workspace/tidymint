@@ -1786,7 +1786,6 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var launchBusy = false
     func scanLaunch() {
         launch = Startup.scan()
-        launchMsg = ""
         launchBusy = true
         let snapshot = launch
         Task.detached(priority: .utility) {
@@ -1813,7 +1812,7 @@ enum Phase { case idle, scanning, summary, review, done }
             p.standardOutput = FileHandle.nullDevice; p.standardError = FileHandle.nullDevice
             try? p.run(); p.waitUntilExit()
         }
-        let (ok, fail) = trash(sel.map(\.url))
+        let (ok, fail) = trash(sel.map(\.url), label: "startup")
         launchMsg = t("Removed \(ok) startup items.", "Đã gỡ \(ok) mục tự chạy.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
         log(launchMsg)
         launch.removeAll { lastOK.contains($0.url) }
@@ -1944,7 +1943,9 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var lastCount = 0
     struct DoneInfo { let page: Page; let count: Int; let size: Int64; let fail: Int; var session: Date? = nil }
     @Published var doneInfo: DoneInfo? = nil
-    func finished(_ p: Page, _ count: Int, _ size: Int64, _ fail: Int) { doneInfo = count > 0 ? DoneInfo(page: p, count: count, size: size, fail: fail, session: undoable?.date) : nil }
+    /// What the last Undo put back, shown on the page it was started from (and on the Trash page) until the next clean.
+    @Published var undoNote: (page: Page, text: String)? = nil
+    func finished(_ p: Page, _ count: Int, _ size: Int64, _ fail: Int) { undoNote = nil; doneInfo = count > 0 ? DoneInfo(page: p, count: count, size: size, fail: fail, session: undoable?.date) : nil }
     /// The banner's Undo only belongs to the clean it reports: a later clean elsewhere replaces the Undo journal.
     var bannerCanUndo: Bool { guard let d = doneInfo, let u = undoable else { return false }; return d.session == nil || d.session == u.date }
     /// Undo from a list page: put the files back, then measure that page again so the list shows them.
@@ -1976,7 +1977,7 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var sysBusy = false
     @Published var sysParts: [SysPart] = []
     @Published var sysPurgeable: Int64 = 0
-    func openSys() { if doneInfo?.page == .lens { doneInfo = nil }; sysOpen = true; if sysParts.isEmpty { scanSys() } }
+    func openSys() { sysOpen = true; if sysParts.isEmpty { scanSys() } }
     func scanSys() {
         sysBusy = true
         Task.detached {
@@ -2106,7 +2107,8 @@ enum Phase { case idle, scanning, summary, review, done }
                         + (needsPassword ? t(" An app installed for every user goes back through Finder: macOS asks for an administrator password in its own window.", " App cài cho mọi tài khoản được Finder trả về: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS.") : ""),
                       t("Put Back", "Trả về chỗ cũ")) else { return }
         let r = Journal.restore(s)
-        lastResult = t("Put back \(r.ok) items.", "Đã trả về \(r.ok) mục.") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+        lastResult = t("Put back \(r.ok) items\(sessionName(s)).", "Đã trả về \(r.ok) mục\(sessionName(s)).") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+        undoNote = (page == .trash ? .trash : (doneInfo?.page ?? page), lastResult)
         log("Undo: put back \(r.ok) items, skipped \(r.skipped)")
         undoable = nil; Journal.clear()
         refreshTrash(); refreshDisk()
@@ -2930,7 +2932,9 @@ struct DoneBanner: View {
     @ObservedObject var vm: VM
     let page: Page
     var body: some View {
-        if let d = vm.doneInfo, d.page == page {
+        if vm.doneInfo?.page != page, let n = vm.undoNote, n.page == page {
+            UndoNote(vm: vm, text: n.text)
+        } else if let d = vm.doneInfo, d.page == page {
             HStack(spacing: 14) {
                 Image(systemName: "checkmark.circle.fill").font(.system(size: fs(30))).foregroundColor(Theme.green)
                 VStack(alignment: .leading, spacing: 3) {
@@ -2949,6 +2953,23 @@ struct DoneBanner: View {
             .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.green.opacity(0.12)))
             .padding(.horizontal, 24).padding(.bottom, 10)
         }
+    }
+}
+
+/// One line after an Undo: what came back. Closed by hand or by the next clean.
+struct UndoNote: View {
+    @ObservedObject var vm: VM
+    let text: String
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.uturn.backward.circle.fill").foregroundColor(Theme.green)
+            Text(text).font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+            Button { vm.undoNote = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
+                .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
+        }
+        .padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.green.opacity(0.10)))
+        .padding(.horizontal, 24).padding(.bottom, 10)
     }
 }
 
@@ -3917,7 +3938,7 @@ struct LensView: View {
 
 /// " (CapCut)" for an uninstall, " (Clean Now)" and so on for the other pages; empty when unknown.
 func sessionName(_ s: Journal.Session) -> String {
-    let names = ["cleanup": Page.smart.label, "large": Page.large.label, "lens": Page.lens.label, "sysdata": "System Data"]
+    let names = ["cleanup": Page.smart.label, "large": Page.large.label, "lens": Page.lens.label, "sysdata": "System Data", "startup": Page.startup.label]
     let n = names[s.label] ?? s.label
     return n.isEmpty ? "" : " (\(n))"
 }
@@ -3934,6 +3955,7 @@ struct TrashView: View {
                 PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
             }
             Text(t("Emptying cannot be undone. Take a quick look first.", "Dọn sạch rồi thì không lấy lại được. Liếc qua một lượt trước đã.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
+            if let n = vm.undoNote { Text(n.text).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.green) }
             if let s = vm.undoable {
                 VStack(spacing: 8) {
                     Text(t("Last clean\(sessionName(s)): \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi\(sessionName(s)): \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
@@ -5127,7 +5149,7 @@ struct StartupView: View {
                     ForEach([0, 1, 2], id: \.self) { sc in
                         let rows = vm.launch.indices.filter { vm.launch[$0].scope == sc }
                         if !rows.isEmpty {
-                            Text(sc == 0 ? t("YOUR ACCOUNT (can remove here)", "CỦA TÀI KHOẢN CHÚ (gỡ được ở đây)")
+                            Text(sc == 0 ? t("YOUR ACCOUNT (can remove here)", "CỦA TÀI KHOẢN CỦA BẠN (gỡ được ở đây)")
                                  : sc == 1 ? t("ALL USERS · AGENTS (needs admin, remove via the app or Settings)", "CẢ MÁY · AGENT (cần quyền admin, gỡ bằng app gốc hoặc Cài đặt)")
                                  : t("ALL USERS · SYSTEM SERVICES (needs admin)", "CẢ MÁY · DỊCH VỤ HỆ THỐNG (cần quyền admin)"))
                                 .font(.system(size: fs(10), weight: .semibold)).tracking(0.6).foregroundColor(Theme.sub).padding(.top, 10).padding(.leading, 4)
