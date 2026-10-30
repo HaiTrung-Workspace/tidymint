@@ -1084,8 +1084,8 @@ struct AppEntry: Identifiable {
     var fromAppStore: Bool { FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/_MASReceipt").path) }
 }
 func adminNote(_ a: AppEntry) -> String {
-    t("\(a.name) was installed for every user of this Mac\(a.fromAppStore ? " by the App Store" : ""), so macOS asks for an administrator password to remove it. Tidymint never asks for or sees your password. Click Show in Finder, drag the app to the Trash and enter your password when macOS asks. Its related files stay where they are: after that, scan again and check the Leftovers tab.",
-      "\(a.name) được cài cho mọi tài khoản trên máy\(a.fromAppStore ? " qua App Store" : ""), nên macOS cần mật khẩu quản trị để gỡ. Tidymint không hỏi và không thấy mật khẩu của bạn. Bấm Mở trong Finder, kéo app vào Thùng rác và nhập mật khẩu khi macOS hỏi. Các file đi kèm giữ nguyên chỗ cũ: gỡ app xong, bấm Quét lại rồi xem tab File sót.")
+    t("\(a.name) was installed for every user of this Mac\(a.fromAppStore ? " by the App Store" : ""), so macOS asks for an administrator password to remove it. Tidymint never asks for or sees your password. Click Show in Finder, drag the app to the Trash and enter your password when macOS asks. Its related files stay where they are: after that, scan again and check the Leftovers tab.\(a.fromAppStore ? "" : " If the app came with its own uninstaller, use that first: Apple says it also removes the helpers the app installed.")",
+      "\(a.name) được cài cho mọi tài khoản trên máy\(a.fromAppStore ? " qua App Store" : ""), nên macOS cần mật khẩu quản trị để gỡ. Tidymint không hỏi và không thấy mật khẩu của bạn. Bấm Mở trong Finder, kéo app vào Thùng rác và nhập mật khẩu khi macOS hỏi. Các file đi kèm giữ nguyên chỗ cũ: gỡ app xong, bấm Quét lại rồi xem tab File sót.\(a.fromAppStore ? "" : " Nếu app có trình gỡ cài đặt riêng, dùng trình đó trước: theo Apple, cách này gỡ cả các thành phần phụ app đã cài.")")
 }
 
 /// Small grey tag for a browser web app, with the reassurance as a tooltip.
@@ -4348,7 +4348,11 @@ struct AppsView: View {
                     }
                     HStack {
                         let tot = vm.apps[i].size + vm.apps[i].related.filter(\.selected).reduce(0) { $0 + $1.size }
-                        Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
+                        if vm.apps[i].needsAdmin {
+                            Text(t("Needs an administrator password", "Cần mật khẩu quản trị")).foregroundColor(Theme.warn).font(.system(size: fs(15), weight: .semibold))
+                        } else {
+                            Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
+                        }
                         Spacer()
                         PrimaryButton(title: vm.apps[i].needsAdmin ? t("Show in Finder", "Mở trong Finder") : t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) })
                     }.padding(.horizontal, 20).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
