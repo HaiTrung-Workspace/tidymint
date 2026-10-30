@@ -108,7 +108,7 @@ def guide(g):
         cta = ('<div class="mvt"><h3>%s</h3><div class="tbl"><table><tr><th></th><th>%s</th><th>Tidymint</th></tr>%s</table></div></div>'
                % (vh, vrows[0], "".join('<tr><td><b>%s</b></td><td data-l="%s">%s</td><td class="y" data-l="Tidymint">%s</td></tr>' % (r[0], vrows[0], r[1], r[2]) for r in vrows[1:]))) + cta
     body = g["body"].replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
-    fcols = "".join('<div><h4>%s</h4>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
+    fcols = "".join('<div><h3>%s</h3>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
     strip = lambda s: html.unescape(__import__("re").sub("<[^>]+>", "", s))
     ld = [
       {"@context":"https://schema.org","@type":"Article","headline":g["h1"],"description":g["desc"],"inLanguage":k,
@@ -183,7 +183,7 @@ gtag('js',new Date());gtag('config','{S.GA_ID}');
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
 </div>
 <button class="up" id="up" type="button" aria-label="{t["top"]}" title="{t["top"]}">↑</button>
-<div class="ck" id="ck" role="dialog" aria-live="polite"><p>{t["ck_text"]} <a href="{S.GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
+<div class="ck" id="ck" role="dialog" aria-live="polite" aria-label="Cookies"><p>{t["ck_text"]} <a href="{S.GH}/blob/main/PRIVACY.md">{t["ck_more"]}</a></p><div class="row"><button class="yes" id="ckY" type="button">{t["ck_yes"]}</button><button id="ckN" type="button">{t["ck_no"]}</button></div></div>
 <script>
 (function(){{var b=document.getElementById('mbtn'),n=document.querySelector('.topnav');function close(){{n.classList.remove('open');b.setAttribute('aria-expanded',false);b.textContent='☰'}}b.addEventListener('click',function(e){{e.stopPropagation();var o=n.classList.toggle('open');b.setAttribute('aria-expanded',o);b.textContent=o?'✕':'☰'}});n.querySelectorAll('.links a').forEach(function(a){{a.addEventListener('click',close)}});document.addEventListener('click',function(e){{if(n.classList.contains('open')&&!n.contains(e.target))close()}});document.addEventListener('keydown',function(e){{if(e.key==='Escape'&&n.classList.contains('open')){{close();b.focus()}}}})}})();
 document.querySelectorAll('.lang a').forEach(a=>a.addEventListener('click',()=>{{try{{localStorage.setItem('tm-lang',a.dataset.l)}}catch(e){{}}}}));
