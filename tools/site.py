@@ -225,7 +225,8 @@ T = {
   inst_small='Steps from Apple: <a href="https://support.apple.com/102445">Safely open apps on your Mac</a>. Source code and build steps are on <a href="%s">GitHub</a>.' % GH,
   sign_h="Get updates", sign_p="Mac tips and new releases, at most one email a month.", sign_ph="name@example.com", sign_btn="Subscribe",
   consent="Get the latest updates. Unsubscribe any time.",
-  end_h="Clean up your Mac now", end_btn2="Guide", end_p="Free, open source, and everything always goes to the Trash first.",
+  end_h='Keep your Mac in <span class="mt">mint condition.</span>', end_btn2="Guide", end_p="Free, open source, and everything always goes to the Trash first.",
+  tagline="Keep your Mac in mint condition.",
   f_blurb="Free, open-source Mac cleaner. Provided as is, without warranty. Official site: tidymint.app, downloads only from GitHub.",
   f_cols=[("Product",[("#features","Features"),("#how","How it works"),("#install","Install"),("changelog/","Changelog"),(GH+"/releases","Releases"),("sponsor/","Sponsor")]),
           ("Guides",[("install/","Install step by step"),("mac-storage-keeps-filling-up/","Mac keeps filling up"),("clear-system-data-mac/","Clear System Data"),("adobe-storage-mac/","Adobe taking up space"),("free-up-space-mac/","Free up space on Mac"),("cleanmymac-alternative/","CleanMyMac alternative"),(GH+"/issues","Report a bug")]),
@@ -293,7 +294,8 @@ T = {
   inst_small='Các bước mở app chưa công chứng theo hướng dẫn chính thức của Apple: <a href="https://support.apple.com/102445">Mở app an toàn trên máy Mac</a>. Mã nguồn công khai trên <a href="%s">GitHub</a>.' % GH,
   sign_h="Nhận tin khi có bản mới", sign_p="Mẹo giữ máy gọn và thông báo phiên bản mới, mỗi tháng tối đa một thư.", sign_ph="ten@example.com", sign_btn="Đăng ký",
   consent="Nhận thông tin cập nhật mới nhất. Huỷ bất kỳ lúc nào.",
-  end_h="Dọn máy ngay", end_btn2="Hướng dẫn", end_p="Miễn phí, mã nguồn mở, mọi thứ luôn vào Thùng rác trước.",
+  end_h='Giữ MacBook luôn <span class="mt">như mới.</span>', end_btn2="Hướng dẫn", end_p="Miễn phí, mã nguồn mở, mọi thứ luôn vào Thùng rác trước.",
+  tagline="Keep your Mac in mint condition.",
   f_blurb="Ứng dụng dọn dẹp MacBook miễn phí, mã nguồn mở. Cung cấp nguyên trạng, không bảo hành. Trang chính thức duy nhất: tidymint.app, tải chỉ từ GitHub.",
   f_cols=[("Sản phẩm",[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("#cai-dat","Cài đặt"),("lich-su-cap-nhat/","Lịch sử cập nhật"),(GH+"/releases","Các phiên bản"),("ung-ho/","Ủng hộ dự án")]),
           ("Hướng dẫn",[("cai-dat/","Cài đặt từng bước"),("mac-tu-day-o/","Mac tự đầy ổ"),("zalo-chiem-dung-luong-macbook/","Zalo chiếm dung lượng"),("adobe-chiem-dung-luong-mac/","Adobe chiếm dung lượng"),("cleanmymac-mien-phi/","CleanMyMac miễn phí?"),("xoa-ung-dung-macbook/","Xóa ứng dụng trên MacBook"),(GH,"Mã nguồn"),(GH+"/issues","Báo lỗi")]),
@@ -473,7 +475,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 
 <div class="topbar"><a href="#top" id="toTop">↑ {t["top"]}</a></div>
 <div class="fcols">
-  <div><a class="brand" href="./"><img src="{img}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a><p>{t["f_blurb"]}</p>{social(t["follow"])}<div class="badges"><a class="osa" href="https://www.opensourcealternatives.to" target="_blank" rel="noopener"><img src="{img}badge-osa.svg" alt="As seen on Open Source Alternatives" width="270" height="20" loading="lazy"></a><a class="osa" href="https://macnative.io/apps/tidymint?utm_source=macnative-badge&amp;utm_medium=referral" target="_blank" rel="noopener"><img src="https://macnative.io/badge?kind=listed&amp;theme=dark&amp;slug=tidymint&amp;small=1" alt="Listed on MacNative" width="168" height="44" loading="lazy"></a></div></div>
+  <div><a class="brand" href="./"><img src="{img}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a><p class="tagline">{t["tagline"]}</p><p>{t["f_blurb"]}</p>{social(t["follow"])}<div class="badges"><a class="osa" href="https://www.opensourcealternatives.to" target="_blank" rel="noopener"><img src="{img}badge-osa.svg" alt="As seen on Open Source Alternatives" width="270" height="20" loading="lazy"></a><a class="osa" href="https://macnative.io/apps/tidymint?utm_source=macnative-badge&amp;utm_medium=referral" target="_blank" rel="noopener"><img src="https://macnative.io/badge?kind=listed&amp;theme=dark&amp;slug=tidymint&amp;small=1" alt="Listed on MacNative" width="168" height="44" loading="lazy"></a></div></div>
   {fcols}
 </div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
