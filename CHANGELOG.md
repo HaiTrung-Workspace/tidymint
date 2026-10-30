@@ -10,6 +10,10 @@ All notable changes to Tidymint. Dates are release dates.
 - Clean by App: CapCut rendering cache and proxies, now checked on a real Mac
 - Space Lens explains more folders: CapCut, Docker, Homebrew, Xcode archives
 - New app icon; Advanced in the sidebar starts folded
+- Safer Uninstaller: Undo puts the app back too, not only its files; browser web apps are marked and explained
+- Safer cleaning: a file the Trash refuses on an external or network drive is reported, never moved
+- Xcode archives are never offered for removal; simulator caches and CapCut caption and voice-over files are no longer pre-selected
+- New Contact page, and tooltips on small buttons
 
 ## 0.3.5 (2026-10-28)
 
