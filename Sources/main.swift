@@ -800,17 +800,25 @@ enum AppRules {
         // offer their own delete buttons for Cache, rendering cache (prerender), proxies (agencycache) and remux files.
         // Other Cache subfolders can hold imported media, so they are left alone.
         AppRule(id: "capcut", nameEN: "CapCut", nameVI: "CapCut", bundleIDs: ["com.lemon.lvoverseas"], marker: "Movies/CapCut/User Data", sections: [
+            // Pre-selected only what is shown to be rebuilt (thumbnails, waveforms, analysis caches, logs).
+            // recognize (auto captions), ttsTemp (text-to-speech audio) and tmp are not verified: a project may point to them,
+            // so they are offered but not pre-selected. Source: research/nguon-chinh-thuc/capcut.md
             AppSection(id: "cache", titleEN: "Scratch files", titleVI: "File tạm khi dựng video",
-                       paths: ["recognize", "frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" }
+                       paths: ["frameThumbnail", "audioWave", "AlgorithmCache", "ILASDKDB"].map { "Movies/CapCut/User Data/Cache/\($0)" }
                               + ["Movies/CapCut/User Data/Log"],
                        safety: .safe,
                        whyEN: "Thumbnails, waveforms, analysis caches and logs. CapCut rebuilds them when you open a project.",
                        whyVI: "Ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký. CapCut tự tạo lại khi mở dự án."),
+            AppSection(id: "speech", titleEN: "Captions and voice-over scratch", titleVI: "File tạm phụ đề và giọng đọc",
+                       paths: ["recognize", "ttsTemp", "tmp"].map { "Movies/CapCut/User Data/Cache/\($0)" },
+                       safety: .review,
+                       whyEN: "Working files for auto captions and text-to-speech. A project you are still editing may use them, so check before removing.",
+                       whyVI: "File làm việc của phụ đề tự động và giọng đọc. Dự án đang dựng có thể còn dùng, nên xem kỹ trước khi bỏ."),
             AppSection(id: "render", titleEN: "Rendering cache and proxies", titleVI: "Bản dựng sẵn và proxy",
                        paths: ["prerender", "agencycache", "RemuxCache"].map { "Movies/CapCut/User Data/Cache/\($0)" },
                        safety: .review,
-                       whyEN: "Pre-rendered previews and low-res copies of your clips. CapCut makes them again, but previews may lag until it does. Same as the delete buttons in CapCut Settings > Performance.",
-                       whyVI: "Bản dựng sẵn để xem trước và bản sao độ phân giải thấp của video. CapCut tạo lại, nhưng xem trước có thể giật cho tới khi tạo xong. Giống nút xoá trong Cài đặt › Performance của CapCut."),
+                       whyEN: "Pre-rendered previews, low-res proxies and converted copies of your clips. CapCut makes them again, but previews may lag until it does. CapCut Settings > Performance has its own delete buttons for these.",
+                       whyVI: "Bản dựng sẵn để xem trước, bản proxy độ phân giải thấp và bản chuyển định dạng của video. CapCut tạo lại, nhưng xem trước có thể giật cho tới khi tạo xong. Cài đặt › Performance của CapCut có nút xoá riêng cho các mục này."),
             AppSection(id: "projects", titleEN: "Projects", titleVI: "Dự án",
                        paths: ["Movies/CapCut/User Data/Projects"],
                        safety: .locked, whyEN: "Your edits. Tidymint never touches them.", whyVI: "Dự án bạn đang dựng. Tidymint không bao giờ đụng vào.", dbGuard: false),
