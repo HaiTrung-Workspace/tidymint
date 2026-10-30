@@ -2,7 +2,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.3.6", date="2026-10-30", status="released",
-         en=["New: \"What is in System Data\" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, and where to handle the rest",
+         en=["New: \"What is in System Data\" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, leftover browser copies, and where to handle the rest",
              "New: Statistics shows a chart of free space per day (7, 30 or 90 days)",
              "Clean Now lists Xcode build data per project, never pre-selected",
              "Clean by App: CapCut rendering cache and proxies, now checked on a real Mac",
@@ -10,9 +10,10 @@ RELEASES = [
              "New app icon; Advanced in the sidebar starts folded",
              "Safer Uninstaller: Undo puts the app back too, not only its files; browser web apps are marked and explained",
              "Safer cleaning: a file the Trash refuses on an external or network drive is reported, never moved",
+             "Uninstaller explains apps that need an administrator password, such as App Store apps, and opens them in Finder; error messages say what to do next",
              "Xcode archives are never offered for removal; simulator caches and CapCut caption and voice-over files are no longer pre-selected",
              "New Contact page, and tooltips on small buttons"],
-         vi=["Mới: \"System Data gồm những gì\" trong Bản đồ ổ đĩa, chỉ ra bản sao lưu iPhone, file cập nhật iOS, rác Xcode dọn được, và chỗ xử lý phần còn lại",
+         vi=["Mới: \"System Data gồm những gì\" trong Bản đồ ổ đĩa, chỉ ra bản sao lưu iPhone, file cập nhật iOS, rác Xcode dọn được, bản sao tạm của trình duyệt, và chỗ xử lý phần còn lại",
              "Mới: Thống kê có biểu đồ dung lượng trống theo ngày (7, 30, 90 ngày)",
              "Dọn ngay liệt kê dữ liệu build Xcode theo từng dự án, không chọn sẵn",
              "Dọn theo ứng dụng: thêm bản dựng sẵn và proxy của CapCut, đã kiểm trên Mac thật",
@@ -20,6 +21,7 @@ RELEASES = [
              "Icon app mới; nhóm Nâng cao ở menu trái mặc định thu gọn",
              "Gỡ app an toàn hơn: Hoàn tác trả lại cả app, không chỉ file phụ; web app của trình duyệt có nhãn và giải thích",
              "Dọn an toàn hơn: file trên ổ ngoài hay ổ mạng mà Thùng rác từ chối thì báo lỗi, không bị chuyển đi",
+             "Gỡ app: app cần mật khẩu quản trị, như app cài từ App Store, được ghi rõ và mở sẵn trong Finder; báo lỗi ghi rõ bước tiếp theo",
              "Bản archive Xcode không bao giờ được đưa ra để xoá; bộ nhớ đệm máy ảo và file phụ đề, giọng đọc của CapCut không còn chọn sẵn",
              "Thêm trang Liên hệ, và chú thích khi rê chuột lên các nút nhỏ"]),
     dict(ver="0.3.5", date="2026-10-28", status="released",

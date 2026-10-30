@@ -1075,6 +1075,17 @@ struct AppEntry: Identifiable {
         guard (try? FileManager.default.contentsOfDirectory(atPath: bin.path)) == ["app_mode_loader"] else { return nil }
         return b
     }
+    /// Installed for every user (owned by root, as the App Store and most .pkg installers do): moving it to the Trash needs an
+    /// administrator password, which macOS asks for in Finder. Tidymint never asks for or handles passwords.
+    var needsAdmin: Bool {
+        let owner = (try? FileManager.default.attributesOfItem(atPath: url.path)[.ownerAccountID] as? NSNumber)?.intValue
+        return owner == 0 || access(url.path, W_OK) != 0
+    }
+    var fromAppStore: Bool { FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/_MASReceipt").path) }
+}
+func adminNote(_ a: AppEntry) -> String {
+    t("\(a.name) was installed for every user of this Mac\(a.fromAppStore ? " by the App Store" : ""), so macOS asks for an administrator password to remove it. Tidymint never asks for or sees your password. Click Show in Finder, drag the app to the Trash and enter your password when macOS asks. Its related files stay where they are: after that, scan again and check the Leftovers tab.",
+      "\(a.name) được cài cho mọi tài khoản trên máy\(a.fromAppStore ? " qua App Store" : ""), nên macOS cần mật khẩu quản trị để gỡ. Tidymint không hỏi và không thấy mật khẩu của bạn. Bấm Mở trong Finder, kéo app vào Thùng rác và nhập mật khẩu khi macOS hỏi. Các file đi kèm giữ nguyên chỗ cũ: gỡ app xong, bấm Quét lại rồi xem tab File sót.")
 }
 
 /// Small grey tag for a browser web app, with the reassurance as a tooltip.
@@ -1489,9 +1500,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var leftovers: [CleanItem] = []
     @Published var installers: [CleanItem] = []
     @Published var appsMsg = ""
+    @Published var appsMsgErr = false
 
     func scanApps() {
-        appsBusy = true; appsMsg = ""
+        appsBusy = true; appsMsg = ""; appsMsgErr = false
         Task.detached {
             let a = Apps.list(); let l = Apps.leftovers(); let i = Apps.installers()
             await MainActor.run { self.apps = a; self.leftovers = l; self.installers = i; self.appsBusy = false; self.markDone(.apps) }
@@ -1512,6 +1524,7 @@ enum Phase { case idle, scanning, summary, review, done }
         if NSWorkspace.shared.runningApplications.contains(where: { $0.bundleIdentifier == a.bundleID }) {
             _ = confirm(t("Quit \(a.name) first", "Tắt \(a.name) trước"), t("The app is running. Quit it, then try again.", "App đang mở. Tắt app rồi bấm lại."), "OK"); return
         }
+        if a.needsAdmin { reveal(a.url); return }
         let extra = a.related.filter(\.selected)
         let total = a.size + extra.reduce(0) { $0 + $1.size }
         guard confirm(t("Uninstall \(a.name)?", "Gỡ \(a.name)?"),
@@ -1522,19 +1535,19 @@ enum Phase { case idle, scanning, summary, review, done }
             Task { @MainActor in
                 guard err == nil else {
                     // The app itself could not go to the Trash: leave its related files where they are.
-                    self.appsMsg = t("Could not move \(a.name) to the Trash: \(err!.localizedDescription)", "Không chuyển được \(a.name) vào Thùng rác: \(err!.localizedDescription)")
-                    self.log(self.appsMsg); return
+                    self.log("Uninstall \(a.name) failed: \(err!.localizedDescription)")
+                    self.appsMsgErr = true
+                    self.appsMsg = t("Could not move \(a.name) to the Trash: macOS did not allow it. Nothing was moved. If the app was installed from the App Store, click Show in Finder and drag it to the Trash; macOS will ask for your password.",
+                                     "Không chuyển được \(a.name) vào Thùng rác: macOS không cho phép. Chưa có gì bị chuyển đi. Nếu app cài từ App Store, bấm Mở trong Finder rồi kéo app vào Thùng rác, macOS sẽ hỏi mật khẩu.")
+                    return
                 }
                 // Record the app in the Undo journal together with its related files, so Undo puts all of it back.
                 let appEntry = newURLs[a.url].map { [Journal.Entry(from: a.url.path, to: $0.path, size: a.size)] } ?? []
                 let (ok, _) = self.trash(extra.map(\.url), label: a.name, alsoUndo: appEntry)
-                if err == nil {
-                    self.apps.removeAll { $0.id == id }; self.selApp = nil
-                    self.finished(.apps, ok + 1, total, 0)
-                    self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
-                } else {
-                    self.appsMsg = t("Could not move \(a.name) to the Trash: \(err!.localizedDescription)", "Không chuyển được \(a.name) vào Thùng rác: \(err!.localizedDescription)")
-                }
+                self.apps.removeAll { $0.id == id }; self.selApp = nil
+                self.finished(.apps, ok + 1, total, 0)
+                self.appsMsgErr = false
+                self.appsMsg = t("Uninstalled \(a.name) and \(ok) related items (\(fmt(total))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(total))).")
                 self.log(self.appsMsg); self.refreshTrash(); self.refreshDisk()
             }
         }
@@ -2975,6 +2988,20 @@ enum SysData {
         return f.date(from: String(s[r]))
     }
 
+    /// Chromium code-sign clones in the user's boot-cleaned temp folder (sibling "X" of the "T" temp folder).
+    static func browserClones() -> (count: Int, size: Int64) {
+        var buf = [CChar](repeating: 0, count: 1024)
+        guard confstr(_CS_DARWIN_USER_TEMP_DIR, &buf, buf.count) > 0 else { return (0, 0) }
+        let x = URL(fileURLWithPath: String(cString: buf)).deletingLastPathComponent().appendingPathComponent("X")
+        var n = 0; var total: Int64 = 0
+        for d in Scanner.children(x, hidden: true) where d.lastPathComponent.hasSuffix(".code_sign_clone") {
+            let kids = Scanner.children(d, hidden: true)
+            n += kids.count
+            total += Scanner.size(d)
+        }
+        return (n, total)
+    }
+
     /// Space macOS counts as free for big jobs (updates, installs) but is still held by purgeable data such as snapshots.
     static func purgeable() -> Int64 {
         let v = try? Scanner.home.resourceValues(forKeys: [.volumeAvailableCapacityKey, .volumeAvailableCapacityForImportantUsageKey])
@@ -3065,6 +3092,16 @@ enum SysData {
         }
 
         // Things macOS manages itself
+        // Chromium browsers clone their app into the per-user folder macOS empties at boot (/private/var/folders/.../X),
+        // one clone per launch; clones left by a browser that did not quit cleanly stay until restart.
+        // Source: research/nguon-chinh-thuc/chrome-va-web-app.md (Chromium code_sign_clone_manager.mm). Never offered for removal.
+        let clones = browserClones()
+        if clones.size >= 500_000_000 {
+            other.append(SysPart(id: "browserclones", icon: "globe", title: t("Browser temporary copies", "Bản sao tạm của trình duyệt"),
+                                 note: t("Chrome, and browsers built on it such as Edge and Brave, put a copy of themselves here when they open, so the browser can check its signature while an update waits to install. A copy can be left behind, for example when the browser is closed abruptly. macOS empties this folder when the Mac restarts. Tidymint leaves it alone: the open browser is still using one copy. The size is an upper limit: the copies share data, so they may take less.",
+                                         "Chrome và các trình duyệt cùng lõi như Edge, Brave đặt một bản sao của chính nó ở đây khi mở, để kiểm chữ ký khi có bản cập nhật chờ cài. Bản sao có thể bị sót lại, ví dụ khi trình duyệt bị tắt ngang. macOS tự xoá thư mục này khi khởi động lại máy. Tidymint không đụng tới: trình duyệt đang mở vẫn dùng một bản. Con số là mức tối đa: các bản sao dùng chung dữ liệu nên có thể chiếm ít hơn."),
+                                 size: clones.size, kind: .system, detail: t("\(clones.count) copies", "\(clones.count) bản")))
+        }
         let snaps = snapshots()
         let tmURL = URL(string: "x-apple.systempreferences:com.apple.Time-Machine-Settings.extension")!
         let last = snaps.compactMap(snapshotDate).max()
@@ -4210,7 +4247,7 @@ struct AppsView: View {
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
             if !vm.appsMsg.isEmpty {
-                Text(vm.appsMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
+                Text(vm.appsMsg).font(.system(size: fs(12))).foregroundColor(vm.appsMsgErr ? Theme.warn : Theme.green).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
             }
             if vm.appsBusy && vm.apps.isEmpty {
                 Scanning(text: t("Looking at your apps...", "Đang xem các app...")).frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -4281,6 +4318,12 @@ struct AppsView: View {
                             Text(vm.apps[i].bundleID).font(.system(size: fs(11))).foregroundColor(Theme.sub)
                         }
                     }.padding(20)
+                    if vm.apps[i].needsAdmin {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "lock").foregroundColor(Theme.warn)
+                            Text(adminNote(vm.apps[i])).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
+                        }.padding(.horizontal, 20).padding(.bottom, 12).padding(.top, -8)
+                    }
                     if let b = vm.apps[i].webAppBrowser {
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "info.circle").foregroundColor(Theme.sub)
@@ -4307,7 +4350,7 @@ struct AppsView: View {
                         let tot = vm.apps[i].size + vm.apps[i].related.filter(\.selected).reduce(0) { $0 + $1.size }
                         Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
                         Spacer()
-                        PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) })
+                        PrimaryButton(title: vm.apps[i].needsAdmin ? t("Show in Finder", "Mở trong Finder") : t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) })
                     }.padding(.horizontal, 20).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
                 }
             } else {
