@@ -419,7 +419,7 @@ dict(
 <h2 id="mail">Đính kèm Mail và Tin nhắn</h2>
 <ul>
 <li><b>Là gì:</b> Mail tải mọi file đính kèm của mọi tài khoản vào <code>~/Library/Mail</code>; Tin nhắn giữ mọi ảnh, video ai gửi cho bạn trong <code>~/Library/Messages/Attachments</code>. Cả hai lớn dần từng ngày và không bao giờ tự co lại.</li>
-<li><b>Sửa:</b> Mail › Cài đặt › Tài khoản › tài khoản của bạn › Tải tệp đính kèm: chọn <b>Gần đây</b> hoặc <b>Không</b>, rồi Hộp thư › Xoá các mục đã xoá. Với Tin nhắn, trong mục Dung lượng mở <b>Tin nhắn</b> và xoá các đính kèm lớn ở đó, hoặc đặt Cài đặt › Cài đặt chung › Giữ tin nhắn trong một năm. App dọn máy phải để yên hai thư mục này, Tidymint làm đúng vậy.</li>
+<li><b>Sửa:</b> Mail › Cài đặt › Tài khoản › tài khoản của bạn › Tải tệp đính kèm: chọn <b>Gần đây</b> hoặc <b>Không</b>, rồi Hộp thư › Xoá các mục đã xoá. Với Tin nhắn, trong mục Dung lượng mở <b>Tin nhắn</b> và xoá các đính kèm lớn ở đó, hoặc đặt Cài đặt › Cài đặt chung › Giữ tin nhắn trong một năm (lưu ý: tuỳ chọn này xoá luôn các cuộc trò chuyện cũ hơn một năm, không chỉ file). App dọn máy phải để yên hai thư mục này, Tidymint làm đúng vậy.</li>
 </ul>
 
 <h2 id="dev">Đồ lập trình</h2>
@@ -508,7 +508,7 @@ dict(
 <h2 id="mail">Mail and Messages attachments</h2>
 <ul>
 <li><b>What it is:</b> Mail downloads every attachment of every account into <code>~/Library/Mail</code>; Messages keeps every photo and video anyone sent you in <code>~/Library/Messages/Attachments</code>. Both grow by the day and never shrink on their own.</li>
-<li><b>Fix:</b> Mail › Settings › Accounts › your account › Download Attachments: set to <b>Recent</b> or <b>None</b>, then Mailbox › Erase Deleted Items. For Messages, in Storage settings open <b>Messages</b> and delete large attachments from there, or set Settings › General › Keep Messages to one year. Cleaner apps should leave these folders alone, and Tidymint does.</li>
+<li><b>Fix:</b> Mail › Settings › Accounts › your account › Download Attachments: set to <b>Recent</b> or <b>None</b>, then Mailbox › Erase Deleted Items. For Messages, in Storage settings open <b>Messages</b> and delete large attachments from there, or set Settings › General › Keep Messages to one year (note: this deletes whole conversations older than a year, not only the files). Cleaner apps should leave these folders alone, and Tidymint does.</li>
 </ul>
 
 <h2 id="dev">Developer tools</h2>
