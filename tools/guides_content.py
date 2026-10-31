@@ -151,7 +151,7 @@ dict(
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1085" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. Mọi thứ chỉ chuyển vào Thùng rác, có nút Hoàn tác.</li>
+<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. App cài từ App Store hay cài cho mọi tài khoản cũng gỡ được: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS, Tidymint không thấy mật khẩu. Mọi thứ chỉ chuyển vào Thùng rác; đổi ý thì bấm Hoàn tác, app và file đi kèm quay về chỗ cũ.</li>
 <li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xoá.</li>
 </ul>
 {CTA}
@@ -392,14 +392,14 @@ dict(
 <li>Trong Finder bấm <b>Shift+Cmd+G</b>, gõ <code>~/Library</code>, Enter. Chuyển sang xem dạng danh sách, sắp theo dung lượng (Hiển thị › Hiện tuỳ chọn hiển thị › Tính toán tất cả kích cỡ). <code>Caches</code>, <code>Application Support</code> và <code>Containers</code> thường đứng đầu.</li>
 <li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
 </ol>
-<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp; app miễn phí, mã nguồn mở.</p>
+<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp, và trang <b>Thống kê</b> vẽ biểu đồ dung lượng trống theo từng ngày (7, 30 hay 90 ngày), nên bạn thấy ngay ổ bắt đầu tụt từ hôm nào mà không phải ghi số ra giấy. App miễn phí, mã nguồn mở.</p>
 <figure class="fig-app"><img src="../lens.jpg" alt="Bản đồ ổ đĩa của Tidymint: mỗi thư mục là một bong bóng, to nhỏ theo dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Bản đồ ổ đĩa trong Tidymint: bong bóng càng to, thư mục càng nặng.</figcaption></figure>
 
 <h2 id="snapshot">Snapshot Time Machine</h2>
 <ul>
-<li><b>Là gì:</b> khi ổ Time Machine không cắm, macOS giữ snapshot mỗi giờ ngay trên ổ trong máy và chỉ dọn bớt khi sắp hết chỗ. Máy dùng nhiều có thể giữ 20–80 GB, Finder không hiện.</li>
+<li><b>Là gì:</b> khi bật sao lưu tự động, Time Machine chụp snapshot ổ khởi động khoảng mỗi giờ, mỗi bản giữ tối đa 24 giờ, giữ thêm một bản của lần sao lưu thành công gần nhất và một bản trước mỗi lần cập nhật macOS. macOS tự xoá khi cần chỗ, Finder không hiện.</li>
 <li><b>Nhận ra:</b> <code>tmutil listlocalsnapshots /</code> ra nhiều ngày, hoặc mục Dung lượng ghi "Time Machine" hay "Sao lưu" là một khoản lớn.</li>
-<li><b>Sửa:</b> cắm ổ sao lưu cho chạy xong một lượt, hoặc gõ <code>tmutil thinlocalsnapshots / 999999999999 4</code> để bỏ ngay. Chúng sẽ quay lại theo thiết kế, nên máy nào lúc nào cũng chật thì cân nhắc tắt Time Machine và sao lưu cách khác.</li>
+<li><b>Sửa:</b> thường không cần làm gì, vì macOS tự giải phóng chỗ này khi cần. Muốn bỏ ngay theo cách Apple hướng dẫn: tắt Sao lưu tự động trong cài đặt Time Machine, đợi vài phút rồi bật lại. Người quen Terminal có thể gõ <code>tmutil thinlocalsnapshots / 999999999999 4</code>.</li>
 </ul>
 
 <h2 id="cache">Bộ nhớ đệm tự tạo lại</h2>
@@ -482,13 +482,13 @@ dict(
 <li>In Finder press <b>Shift+Cmd+G</b>, type <code>~/Library</code> and press Enter. Switch to list view, sort by size (View › Show View Options › Calculate all sizes). <code>Caches</code>, <code>Application Support</code> and <code>Containers</code> are usually the top three.</li>
 <li>In Terminal, <code>tmutil listlocalsnapshots /</code> lists Time Machine snapshots. More than two or three means they are holding space.</li>
 </ol>
-<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones; it is free and open source.</p>
+<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones, and its <b>Statistics</b> page charts free space day by day (7, 30 or 90 days), so you can see the day the drop started instead of writing numbers down. It is free and open source.</p>
 
 <h2 id="snapshots">Time Machine local snapshots</h2>
 <ul>
-<li><b>What it is:</b> when a Time Machine disk is not connected, macOS keeps hourly snapshots on the internal drive and thins them out when space gets tight. On a busy Mac they can hold 20 to 80 GB and they are invisible in Finder.</li>
+<li><b>What it is:</b> when automatic backups are on, Time Machine takes a local snapshot of your startup disk about every hour and keeps each for up to 24 hours, plus one of your last successful backup and one before each macOS update. macOS removes them when it needs the space, and Finder does not show them.</li>
 <li><b>How to tell:</b> <code>tmutil listlocalsnapshots /</code> shows several dates, or Storage settings lists "Time Machine" or "Backups" as a big item.</li>
-<li><b>Fix:</b> plug in the backup drive and let a backup finish, or run <code>tmutil thinlocalsnapshots / 999999999999 4</code> to drop them now. They come back by design, so if your Mac is always tight on space, consider turning Time Machine off and using another backup method.</li>
+<li><b>Fix:</b> usually nothing, because macOS frees this space on its own when needed. To clear them now the way Apple describes: turn off Back Up Automatically in Time Machine settings, wait a few minutes, then turn it back on. Terminal users can also run <code>tmutil thinlocalsnapshots / 999999999999 4</code>.</li>
 </ul>
 
 <h2 id="caches">Caches that rebuild themselves</h2>
@@ -797,7 +797,14 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 <p>Also be careful with "one click" cleaners that delete permanently. If something goes wrong, there is no undo.</p>
 
 <h2 id="faster">The faster way: let Tidymint find it</h2>
-<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you: Clean Now finds user and app caches, logs, npm cache, old downloads and project drafts and shows them by group before you press Clean; Clean by App lists what Chrome, Edge, Zalo and CapCut keep; Space Lens draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>. Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
+<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you:</p>
+<figure class="fig-app"><img src="../sysdata.jpg" alt="Tidymint's What is in System Data page: caches and logs, browser temporary copies at 7.6 GB, Time Machine snapshots, each with a note" width="1600" height="1085" loading="lazy"><figcaption>What is in System Data: each part shows its size and where to handle it, or that macOS takes care of it.</figcaption></figure>
+<ul>
+<li><b>See what is in System Data.</b> In Space Lens, click <b>Disk full of "System Data"? See what is in it</b>. Tidymint lists the hidden space it can measure: iPhone and iPad backups, iOS update files, Xcode build files and simulator caches, Messages attachments, Docker, Time Machine snapshots. Each part has a plain note. Backups, update files and Xcode files can go to the Trash right there (backups are never pre-selected); for the rest it tells you where to handle it.</li>
+<li><b>Browser temporary copies.</b> Chrome, and browsers built on it such as Edge and Brave, put a copy of themselves in a temporary folder when they open. A copy can be left behind, for example when the browser does not quit normally. macOS empties that folder when you restart, so Tidymint shows the size and leaves it to macOS. On our test Mac these copies took 7.6 GB.</li>
+<li><b>Clean Now</b> finds user and app caches, logs, npm cache, old downloads and project drafts and shows them by group before you press Clean. <b>Clean by App</b> lists what Chrome, Edge, Zalo and CapCut keep. <b>Space Lens</b> draws a bubble map of what fills your disk, with plain-language notes for folders like <code>.ollama</code>.</li>
+</ul>
+<p>Everything you select <b>goes to the Trash first</b>, so you can check before you empty it.</p>
 {CTA}
 """,
   faq=[
@@ -805,7 +812,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
     ("Why is my System Data so large?", "The usual causes are local Time Machine snapshots, app and browser caches, old iPhone backups, Xcode and Docker data, and downloaded AI models. On developer and AI machines it can pass 100 GB."),
     ("Will System Data shrink on its own?", "Partly. macOS removes local snapshots and some caches when space runs low, and a restart clears temporary files. It will not remove developer files, models or old backups for you."),
     ("Does restarting clear System Data?", "It clears temporary files and swap, which can free a few gigabytes. Larger items like snapshots and caches need the other steps."),
-    ("Can Tidymint delete System Data?", "Tidymint finds the safe parts, such as caches, logs and old downloads, explains each folder, and moves only what you select to the Trash. It never touches Apple system folders."),
+    ("Can Tidymint delete System Data?", "Not in one go, and nothing can safely. Tidymint shows what System Data is made of and lets you move iPhone backups, iOS update files and Xcode files to the Trash; caches, logs and old downloads go through Clean Now. It never touches Apple system folders."),
   ],
   sources=[
     ("Apple: Free up storage space on Mac", "https://support.apple.com/ht206996"),
@@ -1008,8 +1015,10 @@ dict(
 
 <h2 id="nhanh-hon">Cách nhanh hơn: để Tidymint tìm giúp</h2>
 <p>Bước 2, 4, 6, 7 đều phải lục thư mục ẩn. <a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, tìm giúp bạn:</p>
-<figure class="fig-app"><img src="../smart.jpg" alt="Trang Dọn ngay của Tidymint sau khi quét: bộ nhớ đệm, nhật ký, file tải về cũ chia nhóm kèm dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Dọn ngay: mọi thứ chia nhóm, ghi rõ dung lượng, bạn xem trước rồi mới chọn dọn.</figcaption></figure>
+<figure class="fig-app"><img src="../sysdata.jpg" alt="Trang System Data gồm những gì của Tidymint: bộ nhớ đệm và nhật ký, bản sao tạm của trình duyệt 7,6 GB, bản chụp Time Machine, mỗi mục có ghi chú" width="1600" height="1085" loading="lazy"><figcaption>System Data gồm những gì: mỗi phần ghi rõ dung lượng, dọn ở đâu hay để macOS lo.</figcaption></figure>
 <ul>
+<li><b>Xem Dữ liệu hệ thống gồm những gì.</b> Trong Bản đồ ổ đĩa, bấm <b>Ổ đầy vì "System Data"? Xem nó gồm những gì</b>. Tidymint liệt kê phần ẩn đo được: bản sao lưu iPhone, iPad, file cập nhật iOS, file build và bộ nhớ đệm máy ảo của Xcode, ảnh và file trong Tin nhắn, Docker, bản chụp Time Machine. Mỗi phần có ghi chú dễ hiểu. Bản sao lưu, file cập nhật và file Xcode chuyển được vào Thùng rác ngay tại đó (bản sao lưu không bao giờ chọn sẵn); phần còn lại ghi rõ xử lý ở đâu.</li>
+<li><b>Bản sao tạm của trình duyệt.</b> Chrome và các trình duyệt cùng lõi như Edge, Brave đặt một bản sao của chính nó vào thư mục tạm mỗi khi mở. Bản sao có thể bị sót lại, ví dụ khi trình duyệt không thoát bình thường. macOS dọn thư mục này khi khởi động lại máy, nên Tidymint chỉ báo dung lượng và để macOS lo. Trên máy thử của chúng tôi, phần này chiếm 7,6 GB.</li>
 <li><b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, bộ nhớ npm, file tải về cũ, nháp trong thư mục dự án, chia nhóm trước khi bạn bấm Dọn.</li>
 <li><b>Dọn theo ứng dụng</b> cho thấy Chrome, Cốc Cốc, Zalo, CapCut đang giữ bao nhiêu.</li>
 <li><b>Bản đồ ổ đĩa</b> vẽ bong bóng cho cả ổ, kèm ghi chú dễ hiểu cho các thư mục như <code>.ollama</code>.</li>
@@ -1022,7 +1031,7 @@ dict(
     ("Vì sao Dữ liệu hệ thống to vậy?", "Thường do bộ nhớ đệm của app và trình duyệt, bản sao lưu iPhone cũ, dữ liệu Xcode, Docker và mô hình AI tải về. Trên máy lập trình hay làm AI, con số có thể vượt 100 GB."),
     ("Dữ liệu hệ thống có tự giảm không?", "Một phần. macOS tự xoá bản chụp Time Machine và một số bộ nhớ đệm khi thiếu chỗ, khởi động lại thì xoá file tạm. Dữ liệu lập trình, mô hình AI và bản sao lưu iPhone cũ thì máy không tự xoá."),
     ("Có nên xoá bản chụp Time Machine không?", "Thường là không cần. Mỗi bản chỉ giữ tối đa 24 giờ, macOS tự xoá khi cần chỗ và Apple tính phần này là dung lượng còn trống."),
-    ("Tidymint có xoá Dữ liệu hệ thống không?", "Tidymint tìm phần an toàn như bộ nhớ đệm, nhật ký, file tải về cũ, giải thích từng thư mục, và chỉ chuyển những gì bạn chọn vào Thùng rác. Tidymint không bao giờ đụng tới thư mục hệ thống của Apple."),
+    ("Tidymint có xoá Dữ liệu hệ thống không?", "Không xoá gộp một lần, vì không có cách nào làm vậy an toàn. Tidymint cho xem Dữ liệu hệ thống gồm những gì, và cho chuyển bản sao lưu iPhone, file cập nhật iOS, file Xcode vào Thùng rác; bộ nhớ đệm, nhật ký, file tải về cũ thì dọn ở Dọn ngay. Tidymint không bao giờ đụng tới thư mục hệ thống của Apple."),
   ],
   sources=[
     ("Apple: Giải phóng dung lượng lưu trữ trên Mac", "https://support.apple.com/ht206996"),
@@ -1137,7 +1146,7 @@ dict(
 <p>Checking every folder by hand takes time and it's easy to pick the wrong one. Tidymint finds the leftovers for you:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Slack together with its leftover files in Library" width="1600" height="1085" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Everything always goes to the Trash first, with Undo.</li>
+<li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Apps from the App Store or installed for every user can be removed too: macOS asks for an administrator password in its own window, and Tidymint never sees it. Everything always goes to the Trash first, and Undo puts the app and its files back where they were.</li>
 <li><b>AppCleaner</b> (free) and <b>Pearcleaner</b> (free, source available): drop an app on the window and they list its related files for you to remove.</li>
 </ul>
 {CTA}

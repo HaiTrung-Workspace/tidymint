@@ -245,13 +245,13 @@ summary{user-select:none}
 <li>In Finder press <b>Shift+Cmd+G</b>, type <code>~/Library</code> and press Enter. Switch to list view, sort by size (View › Show View Options › Calculate all sizes). <code>Caches</code>, <code>Application Support</code> and <code>Containers</code> are usually the top three.</li>
 <li>In Terminal, <code>tmutil listlocalsnapshots /</code> lists Time Machine snapshots. More than two or three means they are holding space.</li>
 </ol>
-<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones; it is free and open source.</p>
+<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones, and its <b>Statistics</b> page charts free space day by day (7, 30 or 90 days), so you can see the day the drop started instead of writing numbers down. It is free and open source.</p>
 
 <h2 id="snapshots">Time Machine local snapshots</h2>
 <ul>
-<li><b>What it is:</b> when a Time Machine disk is not connected, macOS keeps hourly snapshots on the internal drive and thins them out when space gets tight. On a busy Mac they can hold 20 to 80 GB and they are invisible in Finder.</li>
+<li><b>What it is:</b> when automatic backups are on, Time Machine takes a local snapshot of your startup disk about every hour and keeps each for up to 24 hours, plus one of your last successful backup and one before each macOS update. macOS removes them when it needs the space, and Finder does not show them.</li>
 <li><b>How to tell:</b> <code>tmutil listlocalsnapshots /</code> shows several dates, or Storage settings lists "Time Machine" or "Backups" as a big item.</li>
-<li><b>Fix:</b> plug in the backup drive and let a backup finish, or run <code>tmutil thinlocalsnapshots / 999999999999 4</code> to drop them now. They come back by design, so if your Mac is always tight on space, consider turning Time Machine off and using another backup method.</li>
+<li><b>Fix:</b> usually nothing, because macOS frees this space on its own when needed. To clear them now the way Apple describes: turn off Back Up Automatically in Time Machine settings, wait a few minutes, then turn it back on. Terminal users can also run <code>tmutil thinlocalsnapshots / 999999999999 4</code>.</li>
 </ul>
 
 <h2 id="caches">Caches that rebuild themselves</h2>
