@@ -1079,7 +1079,7 @@ dict(
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm được phần lớn danh sách trên:</p>
 <ul>
 <li><b>Dọn ngay</b>: bộ nhớ đệm, nhật ký, file tải về cũ, chia nhóm trước khi bạn bấm Dọn.</li>
-<li><b>Dọn theo ứng dụng</b>: Chrome, Cốc Cốc, Zalo, CapCut, tin nhắn và đăng nhập app không bao giờ bị đụng tới.</li>
+<li><b>Dọn theo ứng dụng</b>: Chrome, Cốc Cốc, Zalo, CapCut; tin nhắn và đăng nhập app thì tuyệt đối không đọc hay đụng tới.</li>
 <li><b>File lớn</b> (không bao giờ chọn sẵn) và <b>File trùng</b> (luôn giữ một bản).</li>
 <li><b>Gỡ app</b> tìm cả phần sót lại, kể cả của app đã xoá từ lâu.</li>
 <li><b>Bản đồ ổ đĩa</b> cho thấy dung lượng đi đâu.</li>
@@ -1724,7 +1724,7 @@ dict(
 GUIDES.append(dict(
   lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-10-30", read="6 phút đọc",
   title="Tidymint có gửi dữ liệu của bạn đi không? | Tidymint",
-  desc="App dọn máy được đọc cả ổ đĩa. Tidymint chạy hoàn toàn trên máy: không tài khoản, không thu thập dữ liệu, dọn không cần mạng. Giải thích dễ hiểu.",
+  desc="App dọn máy được đọc cả ổ đĩa. Tidymint chạy ngay trên máy: không cần mạng, không tài khoản, không theo dõi. Giải thích dễ hiểu.",
   crumb="Quyền riêng tư",
   h1="Tidymint làm gì với dữ liệu của bạn? Câu trả lời ngắn: không gì cả",
   tldr="Tidymint quét và dọn <b>ngay trên máy bạn</b>, giống người thợ dọn nhà làm việc trong nhà bạn rồi về tay không. App không có tài khoản, không quảng cáo, không gắn công cụ đo lường, và <b>tắt mạng vẫn quét, dọn bình thường</b>. App chỉ lên mạng trong hai trường hợp: <b>kiểm tra bản mới</b> (đọc một con số phiên bản, mỗi ngày tối đa một lần) và khi <b>bạn tự bấm gửi góp ý</b>. Mã nguồn công khai, ai cũng kiểm được.",
@@ -1783,7 +1783,7 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="en", slug="tidymint-privacy", topic="start", date="2026-10-30", read="6 min read",
   title="Does Tidymint Send Your Data Anywhere? | Tidymint",
-  desc="A Mac cleaner can read your whole disk. Tidymint runs entirely on your Mac: no account, no data collected, and cleaning works offline. Here's how.",
+  desc="A Mac cleaner can read your whole disk. Tidymint runs entirely on your Mac: works offline, no account, no tracking. Here's how.",
   crumb="Privacy",
   h1="What Does Tidymint Do With Your Data? Short Answer: Nothing",
   tldr="Tidymint scans and cleans <b>right on your Mac</b>, like a cleaner who works inside your home and leaves empty-handed. There is no account, no ads and no analytics, and <b>scanning and cleaning work with Wi-Fi off</b>. The app goes online in only two cases: <b>checking for a new version</b> (it reads a version number, at most once a day) and when <b>you choose to send feedback</b>. The code is public, so anyone can check.",
