@@ -85,7 +85,7 @@ dict(
 <li><span class="n">3</span><h4>Cho phép mở</h4><p>Vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b>, bấm <b>Vẫn mở</b> rồi <b>Mở</b>. Không thấy nút thì nhấp đúp app lần nữa rồi quay lại.</p></li>
 <li><span class="n">4</span><h4>Truy cập toàn bộ ổ đĩa <span class="opt">không bắt buộc</span></h4><p>Bật Tidymint trong mục <b>Truy cập toàn bộ ổ đĩa</b> để app đo được mọi thư mục.</p></li>
 </ol>
-<p>Hướng dẫn có hình chi tiết ở <a href="{HOME}#cai-dat">trang chủ</a>. Ứng dụng cần macOS 14 trở lên, chạy được trên cả máy chip Apple và Intel.</p>
+<p>Hướng dẫn có hình chi tiết ở <a href="{HOME}#cai-dat">trang chủ</a>. Ứng dụng cần macOS 14 trở lên, chạy được trên cả máy chip Apple silicon và chip Intel.</p>
 """,
   faq=[
     ("CleanMyMac dùng thử được bao lâu?", "7 ngày với đầy đủ tính năng, áp dụng cho bản mua trên trang MacPaw, App Store và Setapp. Hết hạn thì phải mua mới dùng tiếp."),
