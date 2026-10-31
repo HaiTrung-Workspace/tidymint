@@ -245,14 +245,14 @@ summary{user-select:none}
 <li>Trong Finder bấm <b>Shift+Cmd+G</b>, gõ <code>~/Library</code>, Enter. Chuyển sang xem dạng danh sách, sắp theo dung lượng (Hiển thị › Hiện tuỳ chọn hiển thị › Tính toán tất cả kích cỡ). <code>Caches</code>, <code>Application Support</code> và <code>Containers</code> thường đứng đầu.</li>
 <li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
 </ol>
-<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp; app miễn phí, mã nguồn mở.</p>
+<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp, và trang <b>Thống kê</b> vẽ biểu đồ dung lượng trống theo từng ngày (7, 30 hay 90 ngày), nên bạn thấy ngay ổ bắt đầu tụt từ hôm nào mà không phải ghi số ra giấy. App miễn phí, mã nguồn mở.</p>
 <figure class="fig-app"><img src="../lens.jpg?v=e2e8baba" alt="Bản đồ ổ đĩa của Tidymint: mỗi thư mục là một bong bóng, to nhỏ theo dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Bản đồ ổ đĩa trong Tidymint: bong bóng càng to, thư mục càng nặng.</figcaption></figure>
 
 <h2 id="snapshot">Snapshot Time Machine</h2>
 <ul>
-<li><b>Là gì:</b> khi ổ Time Machine không cắm, macOS giữ snapshot mỗi giờ ngay trên ổ trong máy và chỉ dọn bớt khi sắp hết chỗ. Máy dùng nhiều có thể giữ 20–80 GB, Finder không hiện.</li>
+<li><b>Là gì:</b> khi bật sao lưu tự động, Time Machine chụp snapshot ổ khởi động khoảng mỗi giờ, mỗi bản giữ tối đa 24 giờ, giữ thêm một bản của lần sao lưu thành công gần nhất và một bản trước mỗi lần cập nhật macOS. macOS tự xoá khi cần chỗ, Finder không hiện.</li>
 <li><b>Nhận ra:</b> <code>tmutil listlocalsnapshots /</code> ra nhiều ngày, hoặc mục Dung lượng ghi "Time Machine" hay "Sao lưu" là một khoản lớn.</li>
-<li><b>Sửa:</b> cắm ổ sao lưu cho chạy xong một lượt, hoặc gõ <code>tmutil thinlocalsnapshots / 999999999999 4</code> để bỏ ngay. Chúng sẽ quay lại theo thiết kế, nên máy nào lúc nào cũng chật thì cân nhắc tắt Time Machine và sao lưu cách khác.</li>
+<li><b>Sửa:</b> thường không cần làm gì, vì macOS tự giải phóng chỗ này khi cần. Muốn bỏ ngay theo cách Apple hướng dẫn: tắt Sao lưu tự động trong cài đặt Time Machine, đợi vài phút rồi bật lại. Người quen Terminal có thể gõ <code>tmutil thinlocalsnapshots / 999999999999 4</code>.</li>
 </ul>
 
 <h2 id="cache">Bộ nhớ đệm tự tạo lại</h2>

@@ -16,6 +16,10 @@
 - Duplicates are found by content (SHA-256); before deleting, it checks whether scripts in the user's project folders still reference a file.
 - Clean by App: caches pre-selected, photos and files listed by month for the user to pick, messages and logins locked; refuses to clean while the app is running.
 - Startup Items: shows who signed each login item (Apple, a developer, unsigned) and flags unusual locations. Facts only, not antivirus.
+- System Data: a page shows what the hidden "System Data" space is made of (iPhone/iPad backups, iOS update files, Xcode build files and simulator caches, Messages attachments, Docker, Time Machine snapshots, browser temporary copies that macOS clears on restart). Backups, update files and Xcode files can be moved to the Trash there; backups are never pre-selected. It does not "clear System Data" in one go.
+- Uninstaller: removes apps with their leftovers, including App Store apps and apps installed for every user (macOS asks for the administrator password in its own window; Tidymint never sees it). Undo puts the app and its files back.
+- Statistics: free space per day (7, 30, 90 days), stored only on the Mac.
+- Menu bar: a mint leaf that fills as the disk fills and shows free space; turns amber when free space nears the user's warning level and red below it.
 - Not notarized by Apple yet: first launch needs System Settings > Privacy & Security > Open Anyway.
 - Contact: hello@tidymint.app
 
