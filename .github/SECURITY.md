@@ -4,7 +4,9 @@ Tidymint is a free, open-source Mac cleaner maintained by one person. Security r
 
 ## Reporting a vulnerability
 
-Please report privately by email: **hello@tidymint.app** (subject line "Security").
+Please report privately, either:
+- through GitHub: **Security** tab › **Report a vulnerability** ([open a private report](https://github.com/HaiTrung-Workspace/tidymint/security/advisories/new)), or
+- by email: **hello@tidymint.app** (subject line "Security").
 
 Include, if you can:
 - the Tidymint version and macOS version,

@@ -1,0 +1,6 @@
+Contact: mailto:hello@tidymint.app
+Contact: https://github.com/HaiTrung-Workspace/tidymint/security/advisories/new
+Expires: 2027-10-31T17:00:00.000Z
+Preferred-Languages: en, vi
+Canonical: https://tidymint.app/.well-known/security.txt
+Policy: https://github.com/HaiTrung-Workspace/tidymint/security/policy
