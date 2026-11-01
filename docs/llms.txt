@@ -28,6 +28,7 @@
 - (Vietnamese) Cài đặt từng bước có ảnh: https://tidymint.app/vi/cai-dat/
 - Does Tidymint send your data anywhere (privacy, runs on your Mac): https://tidymint.app/tidymint-privacy/
 - (Vietnamese) Tidymint có gửi dữ liệu đi không (quyền riêng tư, chạy trên máy): https://tidymint.app/vi/quyen-rieng-tu-tidymint/
+- (Vietnamese) Tidymint có an toàn không: bằng chứng, ai đã kiểm, quy trình phát hành, cách tự kiểm file tải về: https://tidymint.app/vi/an-toan/
 - How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/
 - (Vietnamese) Dữ liệu hệ thống trên Mac là gì, dọn sao an toàn: https://tidymint.app/vi/du-lieu-he-thong-mac/
 - Time Machine local snapshots and your free space: https://tidymint.app/time-machine-local-snapshots-mac/

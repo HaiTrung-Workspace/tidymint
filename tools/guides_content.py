@@ -1838,3 +1838,83 @@ GUIDES.append(dict(
   related=[("Install Tidymint on Mac, step by step", "{HOME}install/"), ("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/"), ("Tidymint home", "{HOME}")],
   alt="quyen-rieng-tu-tidymint",
 ))
+
+GUIDES.append(dict(
+  lang="vi", slug="an-toan", topic="start", date="2026-11-01", read="7 phút đọc",
+  title="Tidymint có an toàn không? Bằng chứng và cách tự kiểm",
+  desc="Tidymint chỉ chuyển vào Thùng rác, không gửi dữ liệu đi, mã nguồn công khai. Xem ai đã kiểm, mỗi bản mới qua bước nào, và cách bạn tự kiểm tra.",
+  crumb="An toàn và minh bạch",
+  h1="Tidymint có an toàn không? Đây là bằng chứng, và cách bạn tự kiểm",
+  tldr="Các app dọn máy được đọc cả ổ đĩa, nên bạn - người dùng ứng dụng có quyền và đồng thời cũng cần hiểu, nắm rõ mọi thông tin và cách hoạt động của chúng. Bài viết này gom mọi thứ Tidymint đã, đang và sẽ tiếp tục thực hiện để bạn yên tâm sử dụng: <b>5 lời hứa</b> kèm cách tự kiểm tra, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 66 phần mềm diệt virus cùng quét và không phần mềm nào phát hiện vấn đề), <b>các bước mỗi bản cập nhật mới đều phải đi qua</b>. Không cần rành công nghệ để biết, Tidymint sẽ giải thích và hướng dẫn bạn chi tiết.",
+  toc=[("loi-hua", "5 lời hứa của Tidymint, và cách kiểm tra"), ("ai-da-kiem", "Những ai đã kiểm tra Tidymint"), ("quy-trinh", "Một bản mới phải qua những bước nào"), ("tu-kiem-file", "Cách bạn tự kiểm file vừa tải về"), ("chua-co", "Tidymint chưa có gì?"), ("nhat-ky", "Nhật ký minh bạch"), ("bao-loi", "Thấy lỗi bảo mật?"), ("faq", "Câu hỏi thường gặp")],
+  body="""
+<h2 id="loi-hua">5 lời hứa của Tidymint, và cách kiểm tra</h2>
+<p>Không chỉ nghe lời nói, hãy nhìn vào hành động.</p>
+<div class="tbl"><table>
+<tr><th>Lời hứa</th><th>Tidymint làm thế nào</th><th>Bạn tự kiểm thế nào</th></tr>
+<tr><td><b>Dọn nhầm vẫn lấy lại được</b></td><td>Không xoá thẳng thứ gì: mọi dữ liệu chỉ vào Thùng rác của macOS. Nút Hoàn tác trả lần dọn gần nhất về đúng chỗ cũ (trừ khi bạn đã xoá trong đó, tất nhiên rồi). Đổ Thùng rác, Tidymint luôn xác nhận lại trước.</td><td>Dọn thử một mục nhỏ, kiểm tra Thùng rác trong Finder. Bấm Hoàn tác: mọi thứ về chỗ cũ.</td></tr>
+<tr><td><b>Không đụng đồ riêng tư</b></td><td>Thư viện Ảnh, Mail, mật khẩu (Keychain), iCloud Drive và thư mục đám mây không bao giờ được đưa ra dọn. Trong Dọn theo ứng dụng, tin nhắn và đăng nhập bị khoá, Tidymint tuyệt đối không đọc hay đụng tới.</td><td>Danh sách thư mục cấm nằm công khai trong mã nguồn (biến <code>neverBase</code>). Mục bị khoá hiện biểu tượng ổ khoá trong app.</td></tr>
+<tr><td><b>Không gửi dữ liệu đi</b></td><td>Quét và dọn chạy ngay trên máy, tắt mạng vẫn chạy. Tidymint chỉ lên mạng để kiểm tra bản mới (đọc một số phiên bản, mỗi ngày tối đa một lần). Dữ liệu duy nhất chuyển ra khỏi máy là những góp ý của bạn.</td><td>Tắt Wi-Fi rồi quét thử. Chi tiết và cách xem lưu lượng mạng: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</td></tr>
+<tr><td><b>Không chạy ngầm quyền quản trị</b></td><td>Tidymint không cài tiến trình chạy ngầm với quyền cao nhất của máy. Khi gỡ app cài cho mọi tài khoản (ví dụ app từ App Store), chính macOS hỏi mật khẩu trong cửa sổ của hệ thống, Tidymint không thấy mật khẩu.</td><td>Trang đánh giá độc lập <a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a> ghi Tidymint ở mục chạy quyền cao: <b>Never</b> (không bao giờ).</td></tr>
+<tr><td><b>Miễn phí trọn đời, mã nguồn mở</b></td><td>Không tài khoản, không quảng cáo, không bản trả phí. Toàn bộ mã công khai theo giấy phép MIT.</td><td>Mã nguồn công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. Bạn không đọc code cũng không sao: ai rành đọc được, có gì bất thường cộng đồng sẽ thấy.</td></tr>
+</table></div>
+
+<h2 id="ai-da-kiem">Những ai đã kiểm tra Tidymint</h2>
+<p>Đây là những nơi độc lập, không do Tidymint điều hành. Bấm vào để xem tận nơi.</p>
+<div class="tbl"><table>
+<tr><th>Nơi</th><th>Họ làm gì</th><th>Kết quả</th></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2">VirusTotal</a></td><td>Dịch vụ của Google, cho 66 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.3.6: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 01/11/2026)</td></tr>
+<tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>Trang độc lập chấm các app dọn dẹp theo từng tiêu chí</td><td>Không theo dõi: None. Chạy quyền cao: Never. Mã công khai: Yes. Chưa ký Apple: ghi đỏ, đúng sự thật (xem mục Tidymint chưa có gì?)</td></tr>
+<tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>Danh sách app Mac chọn lọc trên GitHub, người duyệt xem từng đề cử</td><td>Đã nhận Tidymint (26/10/2026)</td></tr>
+<tr><td>Danh bạ phần mềm</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a></td><td>Đã duyệt và đăng Tidymint (26/10 tới 01/11/2026)</td></tr>
+</table></div>
+
+<h2 id="quy-trinh">Một bản Tidymint mới phải qua những bước nào</h2>
+<ol class="steps">
+<li><b>Soát từng dòng mã</b> so với bản trước, ghi lại mọi điều thay đổi so với bản cũ.</li>
+<li><b>Không để người dùng "thử nghiệm" tính năng chưa hoàn thiện.</b></li>
+<li><b>Mỗi tính năng mới đều được sử dụng trên máy Mac thật</b> của chính người làm ra nó, nhất là các lời hứa an toàn: Thùng rác, Hoàn tác, mục bị khoá.</li>
+<li><b>File cài do GitHub tự đóng gói</b> từ chính mã nguồn công khai, không đóng gói trên máy tính cá nhân. Thứ bạn tải về được làm ra từ đúng mã mà ai cũng đọc được, và quá trình đóng gói được GitHub ghi lại công khai.</li>
+<li><b>Mỗi file cài có một "dấu vân tay"</b> (mã SHA-256) ghi trên trang phát hành. File bị sửa dù chỉ một chút thì dấu vân tay đổi hẳn. So dấu vân tay của file bạn tải với dòng ghi trên trang (cách làm ở mục dưới) là biết file có đúng bản gốc không.</li>
+<li><b>Quét VirusTotal</b> và đưa link kết quả lên trang phát hành (đã áp dụng từ bản 0.3.6).</li>
+<li><b>Ghi chú thay đổi bằng lời dễ hiểu</b> trên trang <a href="{HOME}lich-su-cap-nhat/">Lịch sử cập nhật</a>. Nhãn của mỗi bản đã phát hành được khoá trên GitHub, không xoá hay dời được.</li>
+</ol>
+
+<h2 id="tu-kiem-file">Cách bạn tự kiểm file vừa tải về (3 bước)</h2>
+<ol class="steps">
+<li><b>Chỉ tải Tidymint từ duy nhất hai nguồn</b>: <a href="{HOME}">tidymint.app</a> hoặc <a href="https://github.com/HaiTrung-Workspace/tidymint/releases">trang phát hành trên GitHub</a>. Trang web khác đều không phải của chúng tôi.</li>
+<li><b>So mã kiểm tra</b>: bấm <b>Cmd + Space</b>, gõ <b>Terminal</b>, nhấn Enter. Dán dòng dưới rồi nhấn Enter:<br><code>shasum -a 256 ~/Downloads/Tidymint.zip</code><br>Máy in ra một dãy 64 ký tự. So với dòng <b>SHA-256</b> trên trang phát hành: khớp từng ký tự là file không bị ai sửa.</li>
+<li><b>Xem kết quả quét virus</b>: mở link VirusTotal trên trang phát hành, hoặc tự kéo file vào <a href="https://www.virustotal.com/">virustotal.com</a> để tự kiểm chứng.</li>
+</ol>
+
+<h2 id="chua-co">Tidymint chưa có gì?</h2>
+<ul>
+<li><b>Chưa có chữ ký của Apple.</b> Muốn ký, nhà phát triển phải đóng 99 USD mỗi năm cho Apple. Vì chưa ký, lần đầu mở app macOS hiện cảnh báo và bạn phải bấm <b>Vẫn mở</b> (Open Anyway) trong Cài đặt. Cảnh báo này nói app chưa được Apple xác nhận, không có nghĩa app có mã độc. Hướng dẫn có ảnh: <a href="{HOME}cai-dat/">Cài Tidymint từng bước</a>. Tiền ủng hộ trên <a href="https://github.com/sponsors/HaiTrung-Workspace">GitHub Sponsors</a> dành trước hết cho việc này.</li>
+<li><b>Tidymint do một người làm</b>, thông tin tác giả công khai trên GitHub. Email báo lỗi được trả lời trong 24 giờ.</li>
+<li><b>Hoàn tác có giới hạn.</b> Chỉ trả lần dọn gần nhất, và chỉ khi đồ còn trong Thùng rác. Đã đổ Thùng rác thì không lấy lại được.</li>
+</ul>
+
+<h2 id="nhat-ky">Nhật ký minh bạch</h2>
+<p>Mỗi bước làm Tidymint đáng tin hơn đều được ghi ở đây, mới nhất trên cùng.</p>
+<ul>
+<li><b>01/11/2026</b>: VirusTotal quét bản 0.3.6, 0/66. Thêm chính sách bảo mật, nút báo lỗi kín trên GitHub, tệp security.txt. SaaSHub duyệt Tidymint. AreWeCleanYet có trang đánh giá Tidymint.</li>
+<li><b>31/10/2026</b>: Open Source Alternatives duyệt Tidymint.</li>
+<li><b>30/10/2026</b>: Phát hành 0.3.6, bản đầu tiên do máy GitHub dựng từ mã công khai. Khoá nhánh chính và nhãn phiên bản trên GitHub. MacNative duyệt Tidymint.</li>
+<li><b>26/10/2026</b>: awesome-mac nhận Tidymint. AlternativeTo đăng Tidymint.</li>
+</ul>
+
+<h2 id="bao-loi">Thấy lỗi bảo mật? Báo cho chúng tôi</h2>
+<p>Gửi email tới <b>hello@tidymint.app</b> (tiêu đề "Security"), hoặc bấm <b>Report a vulnerability</b> trong thẻ Security của <a href="https://github.com/HaiTrung-Workspace/tidymint/security">kho GitHub</a>. Bạn sẽ nhận phản hồi trong 24 giờ.</p>
+""",
+  faq=[("App miễn phí thì kiếm tiền từ đâu?", "Tidymint không bán dữ liệu và không chạy quảng cáo. Chi phí do người làm tự bỏ ra, cộng tiền ủng hộ tự nguyện qua GitHub Sponsors. Mã công khai, nên nếu app lén gửi gì đi thì ai cũng thấy."),
+       ("Phần mềm diệt virus trên máy tôi báo Tidymint thì sao?", "Hãy gửi email cho chúng tôi kèm tên phần mềm và ảnh chụp thông báo. Bạn cũng có thể so mã SHA-256 và xem kết quả VirusTotal như hướng dẫn ở trên để biết file có đúng là bản chính thức không."),
+       ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
+       ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu.")],
+  sources=[("VirusTotal: kết quả quét Tidymint.zip 0.3.6", "https://www.virustotal.com/gui/file/81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2"),
+           ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
+           ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
+           ("Apple: Mở app an toàn trên máy Mac (Vẫn mở)", "https://support.apple.com/vi-vn/102445"),
+           ("Mã nguồn Tidymint trên GitHub (giấy phép MIT)", "https://github.com/HaiTrung-Workspace/tidymint")],
+  related=[("Tidymint có gửi dữ liệu của bạn đi không?", "{HOME}quyen-rieng-tu-tidymint/"), ("Cài Tidymint trên Mac: từng bước có ảnh", "{HOME}cai-dat/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt=None,
+))
