@@ -1916,5 +1916,85 @@ GUIDES.append(dict(
            ("Apple: Mở app an toàn trên máy Mac (Vẫn mở)", "https://support.apple.com/vi-vn/102445"),
            ("Mã nguồn Tidymint trên GitHub (giấy phép MIT)", "https://github.com/HaiTrung-Workspace/tidymint")],
   related=[("Tidymint có gửi dữ liệu của bạn đi không?", "{HOME}quyen-rieng-tu-tidymint/"), ("Cài Tidymint trên Mac: từng bước có ảnh", "{HOME}cai-dat/"), ("Trang chủ Tidymint", "{HOME}")],
-  alt=None,
+  alt="safety",
+))
+
+GUIDES.append(dict(
+  lang="en", slug="safety", topic="start", date="2026-11-01", read="6 min read",
+  title="Is Tidymint safe? The evidence, and how to check it",
+  desc="Tidymint only moves files to the Trash, sends no data, and its code is public. See who has checked it, what every update goes through, and how to verify it.",
+  crumb="Safety and transparency",
+  h1="Is Tidymint safe? Here is the evidence, and how you can check it yourself",
+  tldr="Mac cleaners can read your whole disk, so you have the right, and the need, to understand exactly what they do and how they work. This page gathers everything Tidymint has done, is doing and will keep doing so you can use it with peace of mind: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 66 antivirus engines scanned it and none found a problem), and <b>the steps every new update goes through</b>. You don't need to be technical: Tidymint explains and walks you through each part.",
+  toc=[("promises", "Tidymint's 5 promises, and how to check them"), ("checked-by", "Who has checked Tidymint"), ("release-steps", "What every new version goes through"), ("verify-download", "How to check the file you downloaded"), ("not-yet", "What Tidymint doesn't have yet"), ("log", "Transparency log"), ("report", "Found a security issue?"), ("faq", "FAQ")],
+  body="""
+<h2 id="promises">Tidymint's 5 promises, and how to check them</h2>
+<p>Don't just listen to what we say. Look at what we do.</p>
+<div class="tbl"><table>
+<tr><th>Promise</th><th>How Tidymint does it</th><th>How you can check</th></tr>
+<tr><td><b>A wrong clean can be undone</b></td><td>Nothing is deleted outright: everything only goes to the macOS Trash. The Undo button puts the most recent clean back where it was (unless you've already deleted it from the Trash, of course). Before emptying the Trash, Tidymint always asks you to confirm.</td><td>Clean one small item, then look in the Trash in Finder. Press Undo: everything goes back.</td></tr>
+<tr><td><b>Your private data is off limits</b></td><td>Your Photos library, Mail, passwords (Keychain), iCloud Drive and cloud folders are never offered for cleaning. In Clean by App, messages and logins are locked: Tidymint never reads or touches them.</td><td>The list of protected folders is public in the source code (<code>neverBase</code>). Locked items show a lock icon in the app.</td></tr>
+<tr><td><b>No data leaves your Mac</b></td><td>Scanning and cleaning run on your Mac and work offline. Tidymint only goes online to check for a new version (it reads a version number, at most once a day). The only data that leaves your Mac is feedback you choose to send.</td><td>Turn off Wi-Fi and run a scan. Details, and how to watch network traffic: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></td></tr>
+<tr><td><b>No hidden admin-level process</b></td><td>Tidymint installs no background process with full system privileges. When you remove an app installed for every user (an App Store app, for example), macOS itself asks for your password in its own window. Tidymint never sees it.</td><td>The independent review site <a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a> lists Tidymint as runs elevated: <b>Never</b>.</td></tr>
+<tr><td><b>Free forever, open source</b></td><td>No account, no ads, no paid tier. All the code is public under the MIT license.</td><td>The source code is public on <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. You don't need to read code yourself: people who can read it can, and anything unusual would be noticed.</td></tr>
+</table></div>
+
+<h2 id="checked-by">Who has checked Tidymint</h2>
+<p>These are independent places, not run by Tidymint. Click through and see for yourself.</p>
+<div class="tbl"><table>
+<tr><th>Where</th><th>What they do</th><th>Result</th></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2">VirusTotal</a></td><td>A Google service that runs a file through 66 antivirus engines at once</td><td>Tidymint 0.3.6 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 1 Nov 2026)</td></tr>
+<tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>An independent site that rates disk cleaners on a set of checks</td><td>Telemetry: None. Runs elevated: Never. Source published: Yes. Release signing: marked red, which is accurate (see What Tidymint doesn't have yet)</td></tr>
+<tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>A curated list of Mac apps on GitHub, where maintainers review each submission</td><td>Accepted Tidymint (26 Oct 2026)</td></tr>
+<tr><td>Software directories</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a></td><td>Reviewed and listed Tidymint (26 Oct to 1 Nov 2026)</td></tr>
+</table></div>
+
+<h2 id="release-steps">What every new version goes through</h2>
+<ol class="steps">
+<li><b>Every line of code is reviewed</b> against the previous version, and every change from the old version is written down.</li>
+<li><b>You are never asked to "test" unfinished features.</b></li>
+<li><b>Every new feature is used on a real Mac</b> by the person who built it, above all the safety promises: Trash, Undo, locked items.</li>
+<li><b>GitHub packages the installer itself</b>, straight from the public source code, not on anyone's personal computer. What you download is built from the same code anyone can read, and GitHub keeps a public record of the build.</li>
+<li><b>Every installer has a "fingerprint"</b> (a SHA-256 checksum) listed on the release page. If the file is changed even slightly, the fingerprint changes completely. Compare the fingerprint of your download with the one on the page (how-to below) to know it's the original.</li>
+<li><b>A VirusTotal scan</b> is linked on the release page (since version 0.3.6).</li>
+<li><b>Changes are explained in plain words</b> on the <a href="{HOME}changelog/">Changelog</a>. Each release tag is locked on GitHub and can't be deleted or moved.</li>
+</ol>
+
+<h2 id="verify-download">How to check the file you downloaded (3 steps)</h2>
+<ol class="steps">
+<li><b>Download Tidymint from only two places</b>: <a href="{HOME}">tidymint.app</a> or the <a href="https://github.com/HaiTrung-Workspace/tidymint/releases">releases page on GitHub</a>. Any other site is not ours.</li>
+<li><b>Compare the fingerprint</b>: press <b>Cmd + Space</b>, type <b>Terminal</b>, press Return. Paste the line below and press Return:<br><code>shasum -a 256 ~/Downloads/Tidymint.zip</code><br>You'll see a 64-character string. Compare it with the <b>SHA-256</b> line on the release page: if every character matches, the file hasn't been changed.</li>
+<li><b>See the virus scan</b>: open the VirusTotal link on the release page, or drop the file on <a href="https://www.virustotal.com/">virustotal.com</a> to check it yourself.</li>
+</ol>
+
+<h2 id="not-yet">What Tidymint doesn't have yet</h2>
+<ul>
+<li><b>No Apple signature yet.</b> To sign apps, a developer pays Apple 99 USD a year. Because Tidymint isn't signed yet, macOS shows a warning the first time you open it, and you click <b>Open Anyway</b> in System Settings. The warning means Apple hasn't verified the developer; it doesn't mean the app contains malware. Step-by-step guide: <a href="{HOME}install/">Install Tidymint</a>. Sponsorships on <a href="https://github.com/sponsors/HaiTrung-Workspace">GitHub Sponsors</a> go to this first.</li>
+<li><b>Tidymint is made by one person</b>, whose details are public on GitHub. Emailed reports get a reply within 24 hours.</li>
+<li><b>Undo has limits.</b> It restores the most recent clean only, and only while the items are still in the Trash. Once you empty the Trash, they're gone.</li>
+</ul>
+
+<h2 id="log">Transparency log</h2>
+<p>Every step that makes Tidymint more trustworthy is recorded here, newest first.</p>
+<ul>
+<li><b>1 Nov 2026</b>: VirusTotal scanned version 0.3.6: 0/66. Added a security policy, private vulnerability reporting on GitHub, and a security.txt file. SaaSHub approved Tidymint. AreWeCleanYet published a review page for Tidymint.</li>
+<li><b>31 Oct 2026</b>: Open Source Alternatives approved Tidymint.</li>
+<li><b>30 Oct 2026</b>: Released 0.3.6, the first version built by GitHub from the public source. Locked the main branch and release tags on GitHub. MacNative approved Tidymint.</li>
+<li><b>26 Oct 2026</b>: awesome-mac accepted Tidymint. AlternativeTo listed Tidymint.</li>
+</ul>
+
+<h2 id="report">Found a security issue? Tell us</h2>
+<p>Email <b>hello@tidymint.app</b> (subject "Security"), or click <b>Report a vulnerability</b> on the Security tab of the <a href="https://github.com/HaiTrung-Workspace/tidymint/security">GitHub repository</a>. You'll get a reply within 24 hours.</p>
+""",
+  faq=[("If it's free, how does Tidymint make money?", "Tidymint doesn't sell data and shows no ads. Costs are covered by the maker, plus voluntary support through GitHub Sponsors. The code is public, so if the app secretly sent anything out, anyone could see it."),
+       ("My antivirus flags Tidymint. What now?", "Email us with the name of the antivirus and a screenshot of the warning. You can also compare the SHA-256 and check the VirusTotal result as shown above, to confirm the file is the official one."),
+       ("Why does macOS say it can't verify the developer?", "Because Tidymint isn't signed by Apple yet (see What Tidymint doesn't have yet). Open it once with Open Anyway in System Settings; after that it opens normally."),
+       ("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. Contents are read only when finding duplicates and when checking scripts in project folders you add yourself, all on your Mac, sent nowhere.")],
+  sources=[("VirusTotal: scan of Tidymint.zip 0.3.6", "https://www.virustotal.com/gui/file/81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2"),
+           ("AreWeCleanYet: Tidymint review page", "https://arewecleanyet.org/apps/tidymint/"),
+           ("Tidymint security policy (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
+           ("Apple: Safely open apps on your Mac (Open Anyway)", "https://support.apple.com/102445"),
+           ("Tidymint source code on GitHub (MIT license)", "https://github.com/HaiTrung-Workspace/tidymint")],
+  related=[("Does Tidymint send your data anywhere?", "{HOME}tidymint-privacy/"), ("Install Tidymint on Mac, step by step", "{HOME}install/"), ("Tidymint home", "{HOME}")],
+  alt="an-toan",
 ))
