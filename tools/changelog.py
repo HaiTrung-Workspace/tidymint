@@ -1,7 +1,9 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
+# Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.3.7", date="2026-11-03", status="released",
+         vt=dict(score="0/65", date="2026-11-03", sha="9594ed59660ef8fa52a8478686e8be5db9b9447c0516d60480743219574505c1"),
          en=["New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range",
              "Photos and videos saved without a file extension (Zalo, Telegram, WhatsApp) now show real thumbnails and open large",
              "App index files (Zalo, Telegram) are kept out of the photo grid and the month counts; Telegram stickers and unfinished downloads are labelled",
@@ -15,6 +17,7 @@ RELEASES = [
              "An toàn hơn: Dọn theo ứng dụng không bao giờ đưa ra các file cơ sở dữ liệu của Telegram (không có đuôi file, trước đây có thể lẫn vào danh sách media)",
              "Trang Thùng rác ghi tên app của lần Dọn theo ứng dụng gần nhất"]),
     dict(ver="0.3.6", date="2026-10-30", status="released",
+         vt=dict(score="0/66", date="2026-11-01", sha="81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2"),
          en=["New: \"What is in System Data\" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, leftover browser copies, and where to handle the rest",
              "New: Statistics shows a chart of free space per day (7, 30 or 90 days)",
              "Clean Now lists Xcode build data per project, never pre-selected",
