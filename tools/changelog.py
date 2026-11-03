@@ -1,6 +1,19 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.3.7", date="2026-11-03", status="released",
+         en=["New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range",
+             "Photos and videos saved without a file extension (Zalo, Telegram, WhatsApp) now show real thumbnails and open large",
+             "App index files (Zalo, Telegram) are kept out of the photo grid and the month counts; Telegram stickers and unfinished downloads are labelled",
+             "Uses much less memory: less at launch, no more spikes when Duplicates reads large files, and memory goes back to macOS when the window closes",
+             "Safer: Clean by App never offers Telegram's own database files, which have no file extension and could be listed with the media before",
+             "The Trash page names the app of the last Clean by App session"],
+         vi=["Mới: Dọn theo ứng dụng mở từng tháng thành lưới ảnh, video chia theo tuần. Tick từng file, cả tuần hay cả tháng, kéo chuột quét vùng để chọn nhiều, giữ Shift để chọn một dải",
+             "Ảnh, video lưu không có đuôi file (Zalo, Telegram, WhatsApp) giờ hiện ảnh thật và xem to được",
+             "Tệp chỉ mục của app (Zalo, Telegram) không còn lẫn vào lưới ảnh và số file của tháng; sticker và file tải dở của Telegram có nhãn riêng",
+             "Nhẹ hơn nhiều: lúc mở tốn ít bộ nhớ hơn, hết vọt bộ nhớ khi File trùng đọc file lớn, và trả bộ nhớ cho macOS khi đóng cửa sổ",
+             "An toàn hơn: Dọn theo ứng dụng không bao giờ đưa ra các file cơ sở dữ liệu của Telegram (không có đuôi file, trước đây có thể lẫn vào danh sách media)",
+             "Trang Thùng rác ghi tên app của lần Dọn theo ứng dụng gần nhất"]),
     dict(ver="0.3.6", date="2026-10-30", status="released",
          en=["New: \"What is in System Data\" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, leftover browser copies, and where to handle the rest",
              "New: Statistics shows a chart of free space per day (7, 30 or 90 days)",
