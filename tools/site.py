@@ -149,7 +149,7 @@ HOME_CSS = """
 .endcard .ttl img{width:48px;height:48px;margin:0}
 .endcard h2{font-size:clamp(26px,3vw,34px);line-height:1.15;margin:0}
 .endcard p{margin:0 0 24px;max-width:none}
-.endcard .cta,.endcard form{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin:0}
+.dlhint{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--sub)}.dlhint a{color:inherit;text-decoration:underline}.endcard .cta,.endcard form{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin:0}
 .endcard .btn.lg,.endcard form .btn,.endcard input{height:56px;box-sizing:border-box}
 .endcard form{flex-wrap:nowrap}
 .endcard form .btn{padding:0 26px}
@@ -324,6 +324,7 @@ def marquee(t):
 
 def page(k):
     t = T[k]; i = IDS[k]; img = t["img"]; shot = t["shot"]
+    dlhint = json.dumps({"en": "Downloading Tidymint.zip. macOS will block the first launch: <a href=\"install/\">here's how to open it (1 min) →</a>", "vi": "Đang tải Tidymint.zip. Lần mở đầu macOS sẽ chặn: <a href=\"cai-dat/\">xem cách mở (1 phút) →</a>"}[k])
     url = "https://tidymint.app/" + t["path"]
     ld = [
       {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Tidymint","operatingSystem":"macOS 14 or later",
@@ -514,7 +515,7 @@ function set(v){{try{{localStorage.setItem('tm-consent',v)}}catch(e){{}};gtag('c
 document.getElementById('ckY').onclick=function(){{set('yes')}};document.getElementById('ckN').onclick=function(){{set('no')}};
 document.getElementById('ckOpen').onclick=function(){{show(true)}};
 if(!tmC)show(true);
-document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang}})}})}});
+document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang}});var p=a.closest('.cta')||a.parentNode;if(!p.parentNode.querySelector('.dlhint')){{var d=document.createElement('p');d.className='dlhint';d.setAttribute('role','status');d.innerHTML={dlhint};p.insertAdjacentElement('afterend',d)}}}})}});
 document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','sponsor_click',{{link_url:a.href,page_lang:document.documentElement.lang,link_location:a.closest('footer')?'footer':'page'}})}})}});}})();
 fetch("{img}version.txt",{{cache:"no-store"}}).then(function(r){{return r.ok?r.text():null}}).then(function(v){{v=(v||"").trim();if(/^\\d+(\\.\\d+)+$/.test(v))document.querySelectorAll(".ver").forEach(function(e){{e.textContent=v}})}}).catch(function(){{}});
 const ENDPOINT = "{ENDPOINT}";
