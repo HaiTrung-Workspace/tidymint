@@ -2,6 +2,15 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.3.7 (2026-11-04)
+
+- New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range
+- Photos and videos saved without a file extension (Zalo, Telegram, WhatsApp) now show real thumbnails and open large
+- App index files (Zalo, Telegram) are kept out of the photo grid and the month counts; Telegram stickers and unfinished downloads are labelled
+- Uses much less memory: about half at launch, no more spikes when Duplicates reads large files, and memory goes back to macOS when the window closes
+- Safer: Clean by App never offers Telegram's own database files, which have no file extension and could be listed with the media before
+- The Trash page names the app of the last Clean by App session
+
 ## 0.3.6 (2026-10-30)
 
 - New: "What is in System Data" in Space Lens shows iPhone backups, iOS update files and Xcode leftovers you can clean, leftover browser copies, and where to handle the rest

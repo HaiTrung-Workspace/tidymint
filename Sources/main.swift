@@ -10,10 +10,12 @@ import UserNotifications
 import ServiceManagement
 import CryptoKit
 import QuickLookThumbnailing
+import QuickLook
 import Vision
 import PDFKit
 import Charts
 import ImageIO
+import AVFoundation
 
 // MARK: - Theme
 
@@ -518,7 +520,12 @@ enum Scanner {
 
     /// Chat and app databases with their journals. A folder holding one is never offered as a whole.
     static let dbExts: Set<String> = ["db", "sqlite", "sqlite3", "db-wal", "db-shm", "sqlite-wal", "sqlite-shm", "wal", "shm", "realm"]
-    static func isDatabase(_ u: URL) -> Bool { dbExts.contains(u.pathExtension.lowercased()) }
+    /// Also catches databases named without an extension, like Telegram's "db_sqlite", "db_sqlite-wal", "db_sqlite-shm", "db_sqlite-guard".
+    static func isDatabase(_ u: URL) -> Bool {
+        if dbExts.contains(u.pathExtension.lowercased()) { return true }
+        let n = u.lastPathComponent.lowercased()
+        return n.range(of: #"(sqlite3?|realm|\.db)(-wal|-shm|-journal|-guard)?$"#, options: .regularExpression) != nil
+    }
     /// True when the item is a database file or a folder with a database among its direct children.
     static func holdsDatabase(_ u: URL) -> Bool {
         if isDatabase(u) { return true }
@@ -918,6 +925,19 @@ struct AppRow: Identifiable {
     let urls: [URL]
     let month: Date?          // for by-age rows: the first day of that month
     var selected: Bool
+    /// Month rows: the files picked one by one in the month viewer (nil = the whole row, companion files included).
+    var picked: Set<String>? = nil
+    var pickedSize: Int64 = 0
+    var pickedCount = 0          // photos picked (a photo may have several copies on disk)
+    var selSize: Int64 { !selected ? 0 : (picked == nil ? size : pickedSize) }
+    var checkState: Int { !selected ? 0 : (picked == nil ? 2 : 1) }
+    var selURLs: [URL] { !selected ? [] : (picked.map { p in urls.filter { p.contains($0.path) } } ?? urls) }
+    /// Under the title in the list: "84 files", plus what was picked one by one in the month viewer.
+    var subLine: String {
+        guard checkState == 1 else { return sub }
+        let n = pickedCount, z = fmt(pickedSize)
+        return sub + t(" · \(n) picked (\(z))", " · đã chọn \(n) (\(z))")
+    }
 }
 struct AppGroup: Identifiable {
     let id: String
@@ -925,8 +945,11 @@ struct AppGroup: Identifiable {
     var rows: [AppRow]
     var expanded = false
     var total: Int64 { rows.reduce(0) { $0 + $1.size } }
-    var selected: Int64 { rows.filter(\.selected).reduce(0) { $0 + $1.size } }
-    var state: Int { let n = rows.filter(\.selected).count; return n == 0 ? 0 : (n == rows.count ? 2 : 1) }
+    var selected: Int64 { rows.reduce(0) { $0 + $1.selSize } }
+    var state: Int {
+        if rows.allSatisfy({ $0.checkState == 2 }) { return 2 }
+        return rows.contains(where: { $0.checkState > 0 }) ? 1 : 0
+    }
 }
 struct AppReport: Identifiable {
     let rule: AppRule
@@ -955,7 +978,8 @@ extension AppRules {
         if !s.byAge {
             return items(s).map { AppRow(id: $0.url.path, title: $0.name, sub: short($0.url), size: $0.size, count: 1, urls: [$0.url], month: nil, selected: $0.selected) }
         }
-        var bucket: [Date: (size: Int64, urls: [URL])] = [:]
+        var bucket: [Date: (size: Int64, urls: [URL], index: Int)] = [:]   // index = app index files (Zalo .rescache), not counted as files
+        var copies: [Date: Set<String>] = [:]   // Zalo photo keys seen per month: copies of one photo count once
         let keys: Set<URLResourceKey> = [.totalFileAllocatedSizeKey, .isRegularFileKey, .contentModificationDateKey]
         for tpl in s.paths {
             for folder in expand(tpl) where !Scanner.skip(folder.path) {
@@ -964,15 +988,22 @@ extension AppRules {
                 for case let f as URL in en {
                     guard let v = try? f.resourceValues(forKeys: keys), v.isRegularFile == true, !Scanner.isDatabase(f) else { continue }
                     let m = monthStart(v.contentModificationDate ?? Date())
-                    bucket[m, default: (0, [])].size += Int64(v.totalFileAllocatedSize ?? 0)
-                    bucket[m, default: (0, [])].urls.append(f)
+                    bucket[m, default: (0, [], 0)].size += Int64(v.totalFileAllocatedSize ?? 0)
+                    bucket[m, default: (0, [], 0)].urls.append(f)
+                    if MonthItem.isCompanion(f) { bucket[m, default: (0, [], 0)].index += 1 }
+                    else if let k = MonthItem.variantKey(f) {
+                        if copies[m, default: []].contains(k) { bucket[m, default: (0, [], 0)].index += 1 } else { copies[m, default: []].insert(k) }
+                    }
                 }
             }
         }
         return bucket.keys.sorted(by: >).map { m in
             let b = bucket[m]!
+            let n = b.urls.count - b.index
+            let sub = n > 0 ? t("\(n) files", "\(n) file")
+                            : t("only \(b.index) index files of the app", "chỉ còn \(b.index) tệp chỉ mục của app")
             return AppRow(id: s.id + "|" + ISO8601DateFormatter().string(from: m), title: monthLabel(m),
-                          sub: t("\(b.urls.count) files", "\(b.urls.count) file"), size: b.size, count: b.urls.count, urls: b.urls, month: m, selected: false)
+                          sub: sub, size: b.size, count: n, urls: b.urls, month: m, selected: false)
         }.filter { $0.size > 0 }
     }
 
@@ -1261,8 +1292,13 @@ enum Dupes {
         while true {
             let want = limit.map { min(1 << 20, $0 - read) } ?? (1 << 20)
             if want <= 0 { break }
-            guard let d = try? h.read(upToCount: want), !d.isEmpty else { break }
-            hasher.update(data: d); read += d.count
+            // Each 1 MB chunk is released right away; without the pool a large video piled up in memory until the end (1.5 GB peak seen).
+            let n: Int = autoreleasepool {
+                guard let d = try? h.read(upToCount: want), !d.isEmpty else { return 0 }
+                hasher.update(data: d); return d.count
+            }
+            if n == 0 { break }
+            read += n
         }
         return hasher.finalize().map { String(format: "%02x", $0) }.joined()
     }
@@ -1494,7 +1530,7 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var theme: String = appTheme
     func setTheme(_ id: String) {
         appTheme = id; UserDefaults.standard.set(id, forKey: "theme"); theme = id
-        NSApp.applicationIconImage = makeAppIcon(Theme.p)
+        NSApp.applicationIconImage = dockIcon(Theme.p)
     }
     @Published var projects: [String] = Prefs.projectFolders
     func addProjectFolder() {
@@ -2147,6 +2183,84 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var appSel: String? = nil
     @Published var appMsg = ""
     @Published var appAge = 0      // months; 0 = no age filter applied
+    /// Month viewer: the by-month row being looked at (nil = closed), its photos/videos/files newest first,
+    /// companion files that are not media (Zalo's .rescache indexes), the focused file, the files ticked here, Quick Look.
+    @Published var monthRef: MonthRef? = nil
+    @Published var monthItems: [MonthItem] = []
+    @Published var monthExtras: [URL] = []
+    @Published var monthExtrasSize: Int64 = 0
+    @Published var monthPick = Set<String>()
+    @Published var monthFocus: String? = nil
+    @Published var monthLoading = false
+    @Published var monthCollapsed = Set<Int>()   // weeks folded in the month viewer
+    var monthAnchor: String? = nil               // last file clicked, for Shift-click ranges
+    @Published var qlURL: URL? = nil
+    func openMonth(_ app: String, _ g: String, _ row: String) {
+        guard let r = appReports.first(where: { $0.id == app }), let grp = r.groups.first(where: { $0.id == g }),
+              let rw = grp.rows.first(where: { $0.id == row }), rw.month != nil else { return }
+        monthItems = []; monthExtras = []; monthExtrasSize = 0; monthFocus = nil; qlURL = nil; monthLoading = true; monthCollapsed = []; monthAnchor = nil
+        monthRef = MonthRef(app: app, group: g, row: row)
+        let urls = rw.urls, sel = rw.selected, picked = rw.picked
+        Task.detached(priority: .userInitiated) {
+            let keys: Set<URLResourceKey> = [.totalFileAllocatedSizeKey, .contentModificationDateKey]
+            var items: [MonthItem] = [], extras: [URL] = [], extraSize: Int64 = 0
+            var groups: [String: [(URL, Int64, Date)]] = [:]
+            for u in urls {
+                let v = try? u.resourceValues(forKeys: keys)
+                let sz = Int64(v?.totalFileAllocatedSize ?? 0), d = v?.contentModificationDate ?? .distantPast
+                if MonthItem.isCompanion(u) { extras.append(u); extraSize += sz; continue }
+                if let k = MonthItem.variantKey(u) { groups[k, default: []].append((u, sz, d)); continue }
+                items.append(MonthItem(url: u, size: sz, date: d, kind: FileKind.of(u), tgSticker: MonthItem.isTelegramSticker(u)))
+            }
+            // One cell per photo: show the largest copy, carry the others along.
+            for (_, g) in groups {
+                let best = g.max { $0.1 < $1.1 }!
+                items.append(MonthItem(url: best.0, size: g.reduce(0) { $0 + $1.1 }, date: g.map(\.2).max() ?? best.2, kind: FileKind.of(best.0),
+                                       variants: g.filter { $0.0 != best.0 }.map(\.0), tgSticker: MonthItem.isTelegramSticker(best.0)))
+            }
+            items.sort { $0.date > $1.date }
+            let pick: Set<String> = !sel ? [] : (picked.map { p in Set(items.filter { p.contains($0.id) }.map(\.id)) } ?? Set(items.map(\.id)))
+            await MainActor.run {
+                guard self.monthRef == MonthRef(app: app, group: g, row: row) else { return }
+                self.monthItems = items; self.monthExtras = extras; self.monthExtrasSize = extraSize
+                self.monthPick = pick; self.monthLoading = false
+            }
+        }
+    }
+    func closeMonth() { qlURL = nil; monthRef = nil; monthItems = []; monthExtras = []; monthPick = []; monthFocus = nil; PreviewLinks.clear() }
+    /// Quick Look the given file (or the focused one, or the first).
+    func previewMonth(_ path: String? = nil) {
+        guard let p = path ?? monthFocus ?? monthItems.first?.id, let it = monthItems.first(where: { $0.id == p }) else { return }
+        monthFocus = p; qlURL = it.previewURL
+    }
+    /// A click on a file: toggles it, or with Shift ticks every file between the last click and this one.
+    func clickMonth(_ id: String, shift: Bool) {
+        monthFocus = id
+        if shift, let a = monthAnchor, let i = monthItems.firstIndex(where: { $0.id == a }), let j = monthItems.firstIndex(where: { $0.id == id }) {
+            setMonthPick(monthItems[min(i, j)...max(i, j)].map(\.id), on: true)
+        } else {
+            setMonthPick([id], on: !monthPick.contains(id))
+        }
+        monthAnchor = id
+    }
+    /// Tick or untick files in the month viewer, then write the choice back to the month row.
+    func setMonthPick(_ ids: [String], on: Bool) {
+        if on { monthPick.formUnion(ids) } else { monthPick.subtract(ids) }
+        guard let ref = monthRef, let i = appReports.firstIndex(where: { $0.id == ref.app }),
+              let j = appReports[i].groups.firstIndex(where: { $0.id == ref.group }),
+              let k = appReports[i].groups[j].rows.firstIndex(where: { $0.id == ref.row }) else { return }
+        if monthPick.isEmpty {
+            appReports[i].groups[j].rows[k].selected = false; appReports[i].groups[j].rows[k].picked = nil
+        } else if monthPick.count == monthItems.count {
+            appReports[i].groups[j].rows[k].selected = true; appReports[i].groups[j].rows[k].picked = nil   // whole month, companions too
+        } else {
+            appReports[i].groups[j].rows[k].selected = true
+            let chosen = monthItems.filter { monthPick.contains($0.id) }
+            appReports[i].groups[j].rows[k].picked = Set(chosen.flatMap(\.allPaths))
+            appReports[i].groups[j].rows[k].pickedSize = chosen.reduce(0) { $0 + $1.size }
+            appReports[i].groups[j].rows[k].pickedCount = chosen.count
+        }
+    }
     func scanByApp() {
         appBusy = true; appMsg = ""
         Task.detached(priority: .userInitiated) {
@@ -2164,7 +2278,7 @@ enum Phase { case idle, scanning, summary, review, done }
         guard let i = appReports.firstIndex(where: { $0.id == app }), let j = appReports[i].groups.firstIndex(where: { $0.id == g }) else { return }
         guard appReports[i].groups[j].section.safety != .locked else { return }
         let on = appReports[i].groups[j].state != 2
-        for k in appReports[i].groups[j].rows.indices { appReports[i].groups[j].rows[k].selected = on }
+        for k in appReports[i].groups[j].rows.indices { appReports[i].groups[j].rows[k].selected = on; appReports[i].groups[j].rows[k].picked = nil }
     }
     /// Tick every by-age row older than `months` (0 clears them), leaving "safe" groups as they are.
     func selectOlder(_ app: String, months: Int) {
@@ -2175,6 +2289,7 @@ enum Phase { case idle, scanning, summary, review, done }
             for k in appReports[i].groups[j].rows.indices {
                 let m = appReports[i].groups[j].rows[k].month ?? Date()
                 appReports[i].groups[j].rows[k].selected = months > 0 && m < cutoff
+                appReports[i].groups[j].rows[k].picked = nil
             }
         }
     }
@@ -2185,7 +2300,8 @@ enum Phase { case idle, scanning, summary, review, done }
     func toggleAppRow(_ app: String, _ g: String, _ row: String) {
         guard let i = appReports.firstIndex(where: { $0.id == app }), let j = appReports[i].groups.firstIndex(where: { $0.id == g }),
               let k = appReports[i].groups[j].rows.firstIndex(where: { $0.id == row }) else { return }
-        appReports[i].groups[j].rows[k].selected.toggle()
+        let on = appReports[i].groups[j].rows[k].checkState != 2
+        appReports[i].groups[j].rows[k].selected = on; appReports[i].groups[j].rows[k].picked = nil
     }
     func cleanApp(_ id: String) {
         guard let i = appReports.firstIndex(where: { $0.id == id }) else { return }
@@ -2195,8 +2311,8 @@ enum Phase { case idle, scanning, summary, review, done }
             _ = confirm(t("Quit \(r.rule.name) first", "Tắt \(r.rule.name) trước"), t("The app is open and may be writing these files. Quit it, then clean.", "App đang mở, có thể đang ghi vào các file này. Tắt app rồi dọn."), "OK"); return
         }
         let rows = r.groups.filter { $0.section.safety != .locked }.flatMap { $0.rows.filter(\.selected) }
-        let urls = rows.flatMap(\.urls)
-        let size = rows.reduce(0) { $0 + $1.size }
+        let urls = rows.flatMap(\.selURLs)
+        let size = rows.reduce(0) { $0 + $1.selSize }
         let risky = r.groups.contains { $0.section.safety == .review && $0.rows.contains(where: \.selected) }
         let body = risky
             ? t("\(urls.count) items (\(fmt(size))) go to the Trash. Photos, videos and files you ticked are removed from this Mac; put them back from the Trash if you change your mind.",
@@ -2332,6 +2448,27 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
     func stopLens() { lensToken = UUID(); lensBusy = false; lensCurrent = "" }
+    // Main window lifecycle (SwiftUI tears the view down when the window closes).
+    private var trimLater: DispatchWorkItem?
+    func windowShown() { trimLater?.cancel(); trimLater = nil }
+    func windowGone() {
+        trimLater?.cancel()
+        trimMemory(deep: false)
+        let w = DispatchWorkItem { [weak self] in MainActor.assumeIsolated { self?.trimMemory(deep: true) } }
+        trimLater = w
+        DispatchQueue.main.asyncAfter(deadline: .now() + 900, execute: w)
+    }
+    /// Called when the main window closes: give memory back while Tidymint sits in the menu bar.
+    /// Thumbnails go at once (cheap to rebuild). After 15 minutes closed, idle Space Lens and Duplicates results go too;
+    /// both pages then show their normal start state. Smart Clean and Large Files keep their results.
+    func trimMemory(deep: Bool) {
+        ThumbStore.cache.removeAllObjects()
+        if deep {
+            if !lensBusy { stopLens(); lensPath = []; lensNodes = []; lensSel = []; lensFwd = []; sizeCache = [:] }
+            if !dupBusy { dupes = []; dupMsg = "" }
+        }
+        malloc_zone_pressure_relief(nil, 0)   // hand freed pages back to macOS so the footprint really drops
+    }
     func rescanLens() { if let u = lensPath.last { sizeCache = sizeCache.filter { !$0.key.hasPrefix(u.path) } }; loadLens() }
     func trashNode(_ n: Node) {
         guard confirm(t("Move to Trash?", "Chuyển vào Thùng rác?"), "\(n.name), \(fmt(n.size))", t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
@@ -2856,24 +2993,110 @@ struct Scanning: View {
     }
 }
 
-/// Real thumbnail for photos and videos (Quick Look), the Finder icon for everything else. Cached per path.
+/// What a file really is, read from its first bytes when the name has no useful extension
+/// (Zalo, Messenger and others save photos and videos without one).
+enum FileKind {
+    case image, video, pdf, other
+    static let imageExt: Set<String> = ["jpg", "jpeg", "png", "heic", "heif", "gif", "webp", "tiff", "tif", "bmp", "raw", "dng", "cr2", "nef", "arw", "psd", "jxl", "avif"]
+    static let videoExt: Set<String> = ["mov", "mp4", "m4v", "avi", "mkv", "webm", "3gp"]
+    private static var memo: [String: FileKind] = [:]
+    private static let lock = NSLock()
+    static func of(_ url: URL) -> FileKind {
+        let e = url.pathExtension.lowercased()
+        if imageExt.contains(e) { return .image }
+        if videoExt.contains(e) { return .video }
+        if e == "pdf" { return .pdf }
+        if ["txt", "json", "plist", "db", "sqlite", "log", "ttf", "otf", "zip", "dmg", "pkg", "app", "html", "js", "css", "meta", "rescache"].contains(e) { return .other }
+        // Anything else (no extension, or WhatsApp's .thumb / .mmsthumb / .videothumb) is read to see what it really is.
+        lock.lock(); if let k = memo[url.path] { lock.unlock(); return k }; lock.unlock()
+        let k = sniff(url)
+        lock.lock(); memo[url.path] = k; lock.unlock()
+        return k
+    }
+    static func sniff(_ url: URL) -> FileKind {
+        guard let h = try? FileHandle(forReadingFrom: url) else { return .other }
+        defer { try? h.close() }
+        guard let d = try? h.read(upToCount: 16), d.count >= 4 else { return .other }
+        let b = [UInt8](d)
+        func ascii(_ r: Range<Int>) -> String { r.upperBound <= b.count ? String(bytes: b[r], encoding: .ascii) ?? "" : "" }
+        if b[0] == 0xFF && b[1] == 0xD8 { return .image }                                   // JPEG
+        if b[0] == 0x89 && ascii(1..<4) == "PNG" { return .image }
+        if ascii(0..<4) == "GIF8" || ascii(0..<4) == "8BPS" { return .image }               // GIF, PSD
+        if ascii(0..<4) == "RIFF" && ascii(8..<12) == "WEBP" { return .image }
+        if ascii(0..<4) == "RIFF" && ascii(8..<12) == "AVI " { return .video }
+        if (b[0] == 0x49 && b[1] == 0x49) || (b[0] == 0x4D && b[1] == 0x4D) { return .image }  // TIFF
+        if b[0] == 0xFF && b[1] == 0x0A { return .image }                                   // JPEG XL codestream
+        if ascii(4..<8) == "JXL " { return .image }                                         // JPEG XL container
+        if ascii(0..<4) == "%PDF" { return .pdf }
+        if b[0] == 0x1A && b[1] == 0x45 && b[2] == 0xDF && b[3] == 0xA3 { return .video }   // Matroska / WebM
+        if ascii(4..<8) == "ftyp" {
+            let brand = ascii(8..<12)
+            if ["heic", "heix", "heim", "heis", "mif1", "msf1", "avif", "avis"].contains(brand) { return .image }
+            return .video                                                                   // mp4, m4v, mov (qt), 3gp
+        }
+        return .other
+    }
+}
+
+/// Real thumbnail for photos and videos, the Finder icon for everything else. Cached per path and size.
+/// Photos go through ImageIO, which reads the content, so files without an extension still get a picture.
 final class ThumbStore: ObservableObject {
     @Published var image: NSImage?
-    static let cache = NSCache<NSString, NSImage>()
-    static let media: Set<String> = ["jpg", "jpeg", "png", "heic", "heif", "gif", "webp", "tiff", "tif", "bmp", "raw", "dng", "cr2", "nef", "arw",
-                                     "psd", "mov", "mp4", "m4v", "avi", "mkv", "webm", "pdf"]
+    @Published var real = false   // true once a real thumbnail replaced the Finder icon
+    // Bounded so a long scroll through thousands of photos cannot pile up decoded thumbnails.
+    static let cache: NSCache<NSString, NSImage> = { let c = NSCache<NSString, NSImage>(); c.countLimit = 300; c.totalCostLimit = 24 << 20; return c }()
+    static func cost(_ img: NSImage) -> Int {
+        let px = img.representations.map { $0.pixelsWide * $0.pixelsHigh }.max() ?? 0
+        return max(1, px) * 4
+    }
+    static let work: OperationQueue = { let q = OperationQueue(); q.maxConcurrentOperationCount = 4; q.qualityOfService = .userInitiated; return q }()
+    static var media: Set<String> { FileKind.imageExt.union(FileKind.videoExt).union(["pdf"]) }
     func load(_ url: URL, side: CGFloat) {
-        let key = url.path as NSString
-        if let c = ThumbStore.cache.object(forKey: key) { image = c; return }
+        let key = "\(url.path)|\(Int(side))" as NSString
+        if let c = ThumbStore.cache.object(forKey: key) { image = c; real = true; return }
         image = NSWorkspace.shared.icon(forFile: url.path)
-        guard ThumbStore.media.contains(url.pathExtension.lowercased()), FileManager.default.fileExists(atPath: url.path) else { return }
-        let req = QLThumbnailGenerator.Request(fileAt: url, size: CGSize(width: side, height: side),
-                                               scale: NSScreen.main?.backingScaleFactor ?? 2, representationTypes: .thumbnail)
-        QLThumbnailGenerator.shared.generateBestRepresentation(for: req) { rep, _ in
-            guard let img = rep?.nsImage else { return }
-            ThumbStore.cache.setObject(img, forKey: key)
-            DispatchQueue.main.async { self.image = img }
+        let scale = NSScreen.main?.backingScaleFactor ?? 2
+        ThumbStore.work.addOperation { [weak self] in
+            let kind = FileKind.of(url)
+            guard kind != .other, FileManager.default.fileExists(atPath: url.path) else { return }
+            if kind == .image, let img = ThumbStore.imageThumb(url, px: side * scale) {
+                ThumbStore.cache.setObject(img, forKey: key, cost: ThumbStore.cost(img))
+                DispatchQueue.main.async { self?.image = img; self?.real = true }
+                return
+            }
+            if kind == .video && url.pathExtension.isEmpty, let img = ThumbStore.videoThumb(url, px: side * scale) {
+                ThumbStore.cache.setObject(img, forKey: key, cost: ThumbStore.cost(img))
+                DispatchQueue.main.async { self?.image = img; self?.real = true }
+                return
+            }
+            let req = QLThumbnailGenerator.Request(fileAt: url, size: CGSize(width: side, height: side), scale: scale, representationTypes: .thumbnail)
+            QLThumbnailGenerator.shared.generateBestRepresentation(for: req) { rep, _ in
+                guard let img = rep?.nsImage else { return }
+                ThumbStore.cache.setObject(img, forKey: key, cost: ThumbStore.cost(img))
+                DispatchQueue.main.async { self?.image = img; self?.real = true }
+            }
         }
+    }
+    static func imageThumb(_ url: URL, px: CGFloat) -> NSImage? {
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, [kCGImageSourceShouldCache: false] as CFDictionary) else { return nil }
+        let opts: [CFString: Any] = [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceCreateThumbnailWithTransform: true,
+                                     kCGImageSourceThumbnailMaxPixelSize: Int(px), kCGImageSourceShouldCacheImmediately: true]
+        guard let cg = CGImageSourceCreateThumbnailAtIndex(src, 0, opts as CFDictionary) else { return nil }
+        return NSImage(cgImage: cg, size: NSSize(width: CGFloat(cg.width) / 2, height: CGFloat(cg.height) / 2))
+    }
+    /// A video saved without an extension: AVFoundation goes by the extension, so read it through a short-lived hard link
+    /// named .mp4 in Tidymint's temporary folder (a second name for the same file, removed right after; the video is untouched).
+    static func videoThumb(_ url: URL, px: CGFloat) -> NSImage? {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("tidymint-thumb", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let link = dir.appendingPathComponent(UUID().uuidString + ".mp4")
+        guard (try? FileManager.default.linkItem(at: url, to: link)) != nil else { return nil }
+        defer { try? FileManager.default.removeItem(at: link) }
+        let gen = AVAssetImageGenerator(asset: AVURLAsset(url: link))
+        gen.appliesPreferredTrackTransform = true
+        gen.maximumSize = CGSize(width: px, height: px)
+        guard let cg = try? gen.copyCGImage(at: CMTime(seconds: 0.5, preferredTimescale: 600), actualTime: nil) else { return nil }
+        return NSImage(cgImage: cg, size: NSSize(width: CGFloat(cg.width) / 2, height: CGFloat(cg.height) / 2))
     }
 }
 
@@ -3655,9 +3878,12 @@ struct AppDetail: View {
     let report: AppReport
     var hasAge: Bool { report.groups.contains { $0.section.byAge } }
     var body: some View {
+        if let ref = vm.monthRef, ref.app == report.id { MonthViewer(vm: vm, report: report, ref: ref) } else { list }
+    }
+    var list: some View {
         VStack(spacing: 0) {
             HStack {
-                Button { vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Button { vm.closeMonth(); vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
                     Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
@@ -3709,19 +3935,24 @@ struct AppDetail: View {
                                 Divider().background(Theme.ink.opacity(0.1))
                                 ForEach(g.rows) { row in
                                     HStack(spacing: 12) {
-                                        Button { vm.toggleAppRow(report.id, g.id, row.id) } label: { CheckBox(state: row.selected ? 2 : 0) }.buttonStyle(.plain)
+                                        Button { vm.toggleAppRow(report.id, g.id, row.id) } label: { CheckBox(state: row.checkState) }.buttonStyle(.plain)
                                         if let u = row.urls.first, row.month == nil {
                                             Image(nsImage: NSWorkspace.shared.icon(forFile: u.path)).resizable().frame(width: 22, height: 22)
                                         } else { Image(systemName: "calendar").foregroundColor(Theme.sub).frame(width: 22) }
                                         VStack(alignment: .leading, spacing: 2) {
                                             Text(row.title).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
-                                            Text(row.sub).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
+                                            RowSubLine(row: row)
                                         }
                                         Spacer()
                                         Text(fmt(row.size)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
+                                        if row.month != nil { Image(systemName: "chevron.right").foregroundColor(Theme.sub).font(.system(size: fs(12))) }
                                     }
                                     .padding(.vertical, 6).padding(.horizontal, 12).hoverBG(8, Theme.ink.opacity(0.07)).contentShape(Rectangle())
-                                    .contextMenu { Button(t("Reveal in Finder", "Mở trong Finder")) { if let u = row.urls.first { vm.reveal(u) } } }
+                                    .onTapGesture { if row.month != nil { vm.openMonth(report.id, g.id, row.id) } }
+                                    .contextMenu {
+                                        if row.month != nil { Button(t("View files", "Xem các file")) { vm.openMonth(report.id, g.id, row.id) } }
+                                        Button(t("Reveal in Finder", "Mở trong Finder")) { if let u = row.urls.first { vm.reveal(u) } }
+                                    }
                                 }.padding(.leading, 26)
                             }
                         }
@@ -3740,6 +3971,357 @@ struct AppDetail: View {
             }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
         }
         .onAppear { vm.refreshAppRunning() }
+    }
+}
+
+
+// MARK: - Month viewer (Clean by app)
+
+struct MonthRef: Equatable { let app: String, group: String, row: String }
+/// One file inside a by-month row.
+struct MonthItem: Identifiable {
+    let url: URL; let size: Int64; let date: Date; let kind: FileKind
+    /// Other copies of the same photo (Zalo keeps _t thumbnail, _n, _h and a .jxl of each); ticked and cleaned together.
+    var variants: [URL] = []
+    /// Telegram keeps animated stickers as gzip files named telegram-cloud-document-…, set once when the month opens.
+    var tgSticker = false
+    var id: String { url.path }
+    var allPaths: [String] { [url.path] + variants.map(\.path) }
+    var count: Int { 1 + variants.count }
+    /// Zalo photo names: <13-digit time>_<id>_<g or not><id>_ then n, h, t, or a 32-hex hash with .jxl.
+    /// Only this exact shape is grouped, so ordinary names like IMG_2024_01_05.jpg are never merged.
+    static let zaloVariant = try! NSRegularExpression(pattern: "^(\\d{13}_\\d+_g?\\d+)_(n|h|t|[0-9a-f]{32}\\.jxl)$")
+    /// Telegram: a file, its "_partial" twin while it downloads, and "_partial.meta" are one item.
+    static let telegramVariant = try! NSRegularExpression(pattern: "^(telegram-.+?)(_partial(\\.meta)?)?$")
+    static func isTelegramSticker(_ u: URL) -> Bool {
+        guard u.lastPathComponent.hasPrefix("telegram-cloud-document"), FileKind.of(u) == .other,
+              let h = try? FileHandle(forReadingFrom: u) else { return false }
+        defer { try? h.close() }
+        guard let d = try? h.read(upToCount: 2), d.count == 2 else { return false }
+        return d[d.startIndex] == 0x1F && d[d.startIndex + 1] == 0x8B   // gzip = Lottie sticker (.tgs)
+    }
+    static func variantKey(_ u: URL) -> String? {
+        let n = u.lastPathComponent
+        if n.hasPrefix("telegram-"), let m = telegramVariant.firstMatch(in: n, range: NSRange(n.startIndex..., in: n)),
+           let r = Range(m.range(at: 1), in: n) { return String(n[r]) }
+        guard let m = zaloVariant.firstMatch(in: n, range: NSRange(n.startIndex..., in: n)), let r = Range(m.range(at: 1), in: n) else { return nil }
+        return String(n[r])   // copies sit in different folders (Cache/ and picture/), the name alone is unique
+    }
+    /// Extensions that mark an app's own index files (Zalo's .rescache), never shown as photos.
+    static let companionExt: Set<String> = ["rescache", "ds_store"]
+    /// Zalo names them just ".rescache" (a hidden file with no extension), one per chat folder.
+    static func isCompanion(_ u: URL) -> Bool {
+        let n = u.lastPathComponent.lowercased()
+        if n.hasPrefix("telegram-") && n.hasSuffix(".meta") { return true }   // Telegram's download bookkeeping
+        return companionExt.contains { n == "." + $0 || n.hasSuffix("." + $0) }
+    }
+    var isVideo: Bool { kind == .video }
+    var isMedia: Bool { kind != .other }
+    var showsInGrid: Bool { isMedia || badge != nil }
+    /// Files with no picture to show get a plain label instead of a blank page icon.
+    var badge: (en: String, vi: String, icon: String)? {
+        let n = url.lastPathComponent
+        if tgSticker || n.contains("animated-sticker") || n.hasSuffix(".tgs") { return ("Animated sticker", "Sticker động", "face.smiling") }
+        if !isMedia && n.contains(":sticker") { return ("Sticker", "Sticker", "face.smiling") }
+        if !isMedia && n.hasSuffix("_partial") { return ("Partial download", "Tải dở", "arrow.down.circle") }
+        return nil
+    }
+    /// Days 1-7 are week 0, 8-14 week 1, and so on (29-31 is week 4).
+    var week: Int { (Calendar.current.component(.day, from: date) - 1) / 7 }
+    /// Quick Look picks the viewer from the extension, so a photo or video saved without one is shown through a link that has one.
+    var previewURL: URL { url.pathExtension.isEmpty && isMedia ? PreviewLinks.link(url, ext: kind == .video ? "mp4" : (kind == .pdf ? "pdf" : "jpg")) : url }
+}
+
+/// Drag-to-select in the month viewer: the box being drawn, whether it ticks or unticks, the ticks before it started,
+/// and where each visible file sits (not published, it changes on every scroll).
+final class SelectBox: ObservableObject {
+    @Published var band: CGRect? = nil
+    var on = true
+    var base = Set<String>()
+    var frames: [String: CGRect] = [:]
+}
+
+/// Frames of the month viewer's visible cells, for drag-to-select.
+struct CellFrames: PreferenceKey {
+    static var defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) { value.merge(nextValue()) { $1 } }
+}
+
+/// Quick Look ignores symbolic links, so an extensionless photo is shown through a hard link with a proper extension,
+/// in Tidymint's own temporary folder. A hard link is a second name for the same file: removing it never removes the photo,
+/// and it takes no extra space. The links go when the month viewer closes (and at launch, in case the app quit early),
+/// so a photo moved to the Trash afterwards really frees its space when the Trash is emptied.
+enum PreviewLinks {
+    static let dir = FileManager.default.temporaryDirectory.appendingPathComponent("tidymint-preview", isDirectory: true)
+    static var made: [String: URL] = [:]
+    static func link(_ u: URL, ext: String) -> URL {
+        if let l = made[u.path] { return l }
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let l = dir.appendingPathComponent("\(made.count + 1)-\(u.lastPathComponent).\(ext)")
+        guard (try? FileManager.default.linkItem(at: u, to: l)) != nil else { return u }
+        made[u.path] = l; return l
+    }
+    /// Removes only names inside Tidymint's own preview folder.
+    static func clear() {
+        for l in made.values where l.deletingLastPathComponent().standardizedFileURL == dir.standardizedFileURL { try? FileManager.default.removeItem(at: l) }
+        made = [:]
+        if let left = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
+            for l in left { try? FileManager.default.removeItem(at: l) }
+        }
+    }
+}
+
+/// The grey line under a Clean by App row; mint when files were picked one by one in the month viewer.
+struct RowSubLine: View {
+    let row: AppRow
+    var body: some View {
+        let c: Color = row.checkState == 1 ? Theme.accentSolid : Theme.sub
+        return Text(row.subLine).foregroundColor(c).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
+    }
+}
+
+/// Key presses for one page (Space = Quick Look, Esc = back). Local monitor, removed when the page goes away.
+final class KeyTap: ObservableObject {
+    private var mon: Any?
+    func start(_ handle: @escaping (NSEvent) -> Bool) {
+        stop(); mon = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { handle($0) ? nil : $0 }
+    }
+    func stop() { if let m = mon { NSEvent.removeMonitor(m) }; mon = nil }
+    deinit { stop() }
+}
+
+/// The files of one month, split by week, as a grid of thumbnails. Click ticks a file, a week header ticks the week;
+/// double-click or Space shows the file large (Quick Look). Ticks go back to the month row in the list.
+struct MonthViewer: View {
+    @ObservedObject var vm: VM
+    let report: AppReport
+    let ref: MonthRef
+    @StateObject private var keys = KeyTap()
+    @StateObject private var box = SelectBox()
+    var group: AppGroup? { report.groups.first { $0.id == ref.group } }
+    var row: AppRow? { group?.rows.first { $0.id == ref.row } }
+    /// Photos, videos and labelled items go in the week grid; files with nothing to show go in a separate list at the end.
+    var weeks: [(Int, [MonthItem])] { Dictionary(grouping: vm.monthItems.filter(\.showsInGrid), by: \.week).sorted { $0.key > $1.key } }
+    var others: [MonthItem] { vm.monthItems.filter { !$0.showsInGrid } }
+    func weekLabel(_ w: Int) -> String {
+        guard let m = row?.month else { return "" }
+        let c = Calendar.current
+        let last = c.range(of: .day, in: .month, for: m)?.count ?? 30
+        let from = w * 7 + 1, to = min(w * 7 + 7, last), mo = c.component(.month, from: m)
+        if appLang == "vi" { return "Tuần \(w + 1) · \(from)–\(to)/\(mo)" }
+        let f = DateFormatter(); f.locale = Locale(identifier: "en_US"); f.dateFormat = "MMM"
+        return "Week \(w + 1) · \(f.string(from: m)) \(from)–\(to)"
+    }
+    func state(_ ids: [String]) -> Int {
+        let n = ids.filter { vm.monthPick.contains($0) }.count
+        return n == 0 ? 0 : (n == ids.count ? 2 : 1)
+    }
+    var pickSize: Int64 { vm.monthItems.filter { vm.monthPick.contains($0.id) }.reduce(0) { $0 + $1.size } }
+    var body: some View {
+        let all = vm.monthItems.map(\.id)
+        VStack(spacing: 0) {
+            HStack {
+                Button { vm.closeMonth() } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
+                Spacer()
+                VStack(spacing: 2) {
+                    HStack(spacing: 8) {
+                        Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 20, height: 20)
+                        Text("\(report.rule.name) · \(group?.section.title ?? "") · \(row?.title ?? "")").font(.system(size: fs(15), weight: .semibold)).foregroundColor(Theme.text).lineLimit(1)
+                    }
+                    Text(t("\(vm.monthItems.count) files · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))", "\(vm.monthItems.count) file · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))"))
+                        .font(.system(size: fs(12)).monospacedDigit()).foregroundColor(Theme.sub)
+                }
+                Spacer()
+                Button { vm.setMonthPick(all, on: state(all) != 2) } label: {
+                    HStack(spacing: 6) { CheckBox(state: state(all)); Text(t("Select all", "Chọn tất cả")).foregroundColor(Theme.text).font(.system(size: fs(13))) }
+                        .padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
+                }.buttonStyle(.plain).disabled(all.isEmpty)
+            }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
+            Text(t("Click to tick, drag a box to tick many, Shift-click for a range. Double-click or Space to see a file large.", "Bấm để tick, kéo chuột quét vùng để tick nhiều, giữ Shift để chọn một dải. Bấm đúp hoặc phím cách để xem to."))
+                .font(.system(size: fs(11))).foregroundColor(Theme.sub).padding(.bottom, 10)
+            if vm.monthLoading {
+                Scanning(text: t("Reading files...", "Đang đọc file...")).frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 14) {
+                        ForEach(weeks, id: \.0) { w, items in
+                            let ids = items.map(\.id)
+                            let folded = vm.monthCollapsed.contains(w)
+                            HStack(spacing: 10) {
+                                Button { vm.setMonthPick(ids, on: state(ids) != 2) } label: { CheckBox(state: state(ids)) }.buttonStyle(.plain)
+                                Button {
+                                    withAnimation(.easeOut(duration: 0.15)) { if folded { vm.monthCollapsed.remove(w) } else { vm.monthCollapsed.insert(w) } }
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "chevron.down").rotationEffect(.degrees(folded ? -90 : 0)).foregroundColor(Theme.sub).font(.system(size: fs(11), weight: .semibold))
+                                        Text(weekLabel(w)).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
+                                    }.contentShape(Rectangle())
+                                }.buttonStyle(.plain).tip(folded ? t("Show this week", "Mở tuần này") : t("Fold this week", "Thu gọn tuần này"))
+                                Spacer()
+                                Text(t("\(items.count) files · \(fmt(items.reduce(0) { $0 + $1.size }))", "\(items.count) file · \(fmt(items.reduce(0) { $0 + $1.size }))"))
+                                    .font(.system(size: fs(12)).monospacedDigit()).foregroundColor(Theme.sub)
+                            }.padding(.top, 4)
+                            if !folded {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 120 * max(uiScale, 1), maximum: 170 * max(uiScale, 1)), spacing: 10)], spacing: 12) {
+                                ForEach(items) { it in
+                                    MonthCell(item: it, focused: vm.monthFocus == it.id, picked: vm.monthPick.contains(it.id))
+                                        .background(GeometryReader { g in Color.clear.preference(key: CellFrames.self, value: [it.id: g.frame(in: .named("monthgrid"))]) })
+                                        .onTapGesture(count: 2) { vm.previewMonth(it.id) }
+                                        .onTapGesture { vm.clickMonth(it.id, shift: NSEvent.modifierFlags.contains(.shift)) }
+                                        .contextMenu {
+                                            Button(t("Show large", "Xem to")) { vm.previewMonth(it.id) }
+                                            Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(it.url) }
+                                        }
+                                }
+                            }
+                            }
+                        }
+                        if !others.isEmpty {
+                            let ids = others.map(\.id)
+                            let open = vm.monthCollapsed.contains(99)   // folded until asked: these have no picture to judge by
+                            HStack(spacing: 10) {
+                                Button { vm.setMonthPick(ids, on: state(ids) != 2) } label: { CheckBox(state: state(ids)) }.buttonStyle(.plain)
+                                Button {
+                                    withAnimation(.easeOut(duration: 0.15)) { if open { vm.monthCollapsed.remove(99) } else { vm.monthCollapsed.insert(99) } }
+                                } label: {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "chevron.down").rotationEffect(.degrees(open ? 0 : -90)).foregroundColor(Theme.sub).font(.system(size: fs(11), weight: .semibold))
+                                        Text(t("Other files, no preview", "File khác, không xem trước được")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
+                                    }.contentShape(Rectangle())
+                                }.buttonStyle(.plain)
+                                Spacer()
+                                Text(t("\(others.count) files · \(fmt(others.reduce(0) { $0 + $1.size }))", "\(others.count) file · \(fmt(others.reduce(0) { $0 + $1.size }))"))
+                                    .font(.system(size: fs(12)).monospacedDigit()).foregroundColor(Theme.sub)
+                            }.padding(.top, 8)
+                            if open {
+                                ForEach(others) { it in
+                                    HStack(spacing: 10) {
+                                        CheckBox(state: vm.monthPick.contains(it.id) ? 2 : 0)
+                                        Image(nsImage: NSWorkspace.shared.icon(forFile: it.url.path)).resizable().frame(width: 20, height: 20)
+                                        Text(it.url.lastPathComponent).font(.system(size: fs(12))).foregroundColor(Theme.text).lineLimit(1).truncationMode(.middle)
+                                        Spacer()
+                                        Text("\(MonthCell.df.string(from: it.date)) · \(fmt(it.size))").font(.system(size: fs(11)).monospacedDigit()).foregroundColor(Theme.sub)
+                                    }
+                                    .padding(.vertical, 4).padding(.horizontal, 8).hoverBG(6, Theme.ink.opacity(0.06)).contentShape(Rectangle())
+                                    .onTapGesture { vm.clickMonth(it.id, shift: NSEvent.modifierFlags.contains(.shift)) }
+                                    .contextMenu {
+                                        Button(t("Show large", "Xem to")) { vm.previewMonth(it.id) }
+                                        Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(it.url) }
+                                    }
+                                }
+                            }
+                        }
+                        if !vm.monthExtras.isEmpty {
+                            Text(t("Also in this month: \(vm.monthExtras.count) index files of \(report.rule.name) (\(fmt(vm.monthExtrasSize))), not photos or videos. They go only when the whole month is ticked.",
+                                   "Trong tháng còn \(vm.monthExtras.count) tệp chỉ mục của \(report.rule.name) (\(fmt(vm.monthExtrasSize))), không phải ảnh hay video. Chỉ dọn khi tick cả tháng."))
+                                .font(.system(size: fs(11))).foregroundColor(Theme.sub).padding(.top, 6)
+                        }
+                    }.padding(.horizontal, 24).padding(.bottom, 16)
+                    .coordinateSpace(name: "monthgrid")
+                    .onPreferenceChange(CellFrames.self) { box.frames = $0 }
+                    .overlay(alignment: .topLeading) {
+                        if let r = box.band {
+                            Rectangle().fill(Theme.accentSolid.opacity(0.12))
+                                .overlay(Rectangle().stroke(Theme.accentSolid.opacity(0.8), lineWidth: 1))
+                                .frame(width: r.width, height: r.height).offset(x: r.minX, y: r.minY).allowsHitTesting(false)
+                        }
+                    }
+                    .gesture(DragGesture(minimumDistance: 8, coordinateSpace: .named("monthgrid"))
+                        .onChanged { d in
+                            if box.band == nil {
+                                // Starting on a ticked file unticks what the box covers; anywhere else ticks it.
+                                let start = box.frames.first { $0.value.contains(d.startLocation) }?.key
+                                box.on = !(start.map { vm.monthPick.contains($0) } ?? false)
+                                box.base = vm.monthPick
+                            }
+                            let r = CGRect(x: min(d.startLocation.x, d.location.x), y: min(d.startLocation.y, d.location.y),
+                                           width: abs(d.location.x - d.startLocation.x), height: abs(d.location.y - d.startLocation.y))
+                            box.band = r
+                            let hit = Set(box.frames.filter { $0.value.intersects(r) }.map(\.key))
+                            let target = box.on ? box.base.union(hit) : box.base.subtracting(hit)
+                            let add = target.subtracting(vm.monthPick), drop = vm.monthPick.subtracting(target)
+                            if !add.isEmpty { vm.setMonthPick(Array(add), on: true) }
+                            if !drop.isEmpty { vm.setMonthPick(Array(drop), on: false) }
+                        }
+                        .onEnded { _ in box.band = nil })
+                }
+            }
+            HStack {
+                Text(vm.monthPick.isEmpty ? t("Nothing ticked", "Chưa tick gì")
+                     : t("\(vm.monthPick.count) ticked · \(fmt(pickSize))", "Đã tick \(vm.monthPick.count) · \(fmt(pickSize))"))
+                    .foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold).monospacedDigit())
+                Spacer()
+                Text(t("Ticked files are cleaned with the rest when you press Move to Trash.", "File đã tick được dọn cùng khi bấm Chuyển vào Thùng rác."))
+                    .foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                GhostButton(title: t("Done", "Xong"), action: { vm.closeMonth() })
+            }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.ink.opacity(0.03))
+        }
+        .quickLookPreview(Binding(get: { vm.qlURL }, set: { vm.qlURL = $0 }), in: vm.monthItems.map(\.previewURL))
+        .onAppear {
+            keys.start { e in
+                MainActor.assumeIsolated {
+                    guard vm.monthRef != nil, vm.qlURL == nil else { return false }
+                    switch e.keyCode {
+                    case 49: vm.previewMonth(); return true      // Space
+                    case 53: vm.closeMonth(); return true        // Esc
+                    default: return false
+                    }
+                }
+            }
+        }
+        .onDisappear { keys.stop() }
+    }
+}
+
+struct MonthCell: View {
+    let item: MonthItem; let focused: Bool; let picked: Bool
+    static let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
+    var body: some View {
+        VStack(spacing: 4) {
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 8).fill(Theme.ink.opacity(0.06))
+                if let b = item.badge {
+                    VStack(spacing: 6) {
+                        Image(systemName: b.icon).font(.system(size: 30)).foregroundColor(Theme.sub)
+                        Text(t(b.en, b.vi)).font(.system(size: fs(12), weight: .medium)).foregroundColor(Theme.sub)
+                    }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    GridThumb(url: item.url, side: 170)
+                }
+                if item.isVideo {
+                    Image(systemName: "play.circle.fill").font(.system(size: 28)).foregroundStyle(.white, .black.opacity(0.45))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                Image(systemName: picked ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(picked ? AnyShapeStyle(Theme.accentSolid) : AnyShapeStyle(Color.white.opacity(0.9)))
+                    .background(Circle().fill(Color.black.opacity(picked ? 0 : 0.35)).padding(2))
+                    .padding(6)
+            }
+            .frame(height: 120 * max(uiScale, 1)).clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(picked ? Theme.accentSolid : Theme.sub.opacity(0.6), lineWidth: picked ? 2.5 : (focused ? 1.5 : 0)))
+            Text(item.isMedia || item.badge != nil ? "\(MonthCell.df.string(from: item.date)) · \(fmt(item.size))" : item.url.lastPathComponent)
+                .font(.system(size: fs(11)).monospacedDigit())
+                .foregroundColor(Theme.sub).lineLimit(1).truncationMode(.middle)
+        }.contentShape(Rectangle())
+    }
+}
+
+/// A thumbnail that fills its cell; falls back to the centred Finder icon until (or unless) Quick Look has one.
+struct GridThumb: View {
+    let url: URL; let side: CGFloat
+    @StateObject private var store = ThumbStore()
+    var body: some View {
+        GeometryReader { g in
+            if let img = store.image {
+                if store.real {
+                    Image(nsImage: img).resizable().aspectRatio(contentMode: .fill).frame(width: g.size.width, height: g.size.height).clipped()
+                } else {
+                    Image(nsImage: img).resizable().aspectRatio(contentMode: .fit).frame(width: 56, height: 56).position(x: g.size.width / 2, y: g.size.height / 2)
+                }
+            }
+        }
+        .onAppear { store.load(url, side: side) }
     }
 }
 
@@ -3941,7 +4523,11 @@ struct LensView: View {
 /// " (CapCut)" for an uninstall, " (Clean Now)" and so on for the other pages; empty when unknown.
 func sessionName(_ s: Journal.Session) -> String {
     let names = ["cleanup": Page.smart.label, "large": Page.large.label, "lens": Page.lens.label, "sysdata": "System Data", "startup": Page.startup.label]
-    let n = names[s.label] ?? s.label
+    var n = names[s.label] ?? s.label
+    if s.label.hasPrefix("app:") {   // Clean by App: "app:zalo" reads "Zalo"
+        let id = String(s.label.dropFirst(4))
+        n = AppRules.all.first { $0.id == id }?.name ?? id
+    }
     return n.isEmpty ? "" : " (\(n))"
 }
 
@@ -4269,7 +4855,8 @@ struct RootView: View {
         .id(vm.theme + vm.textSize)
         .preferredColorScheme(Theme.p.light ? .light : .dark)
         .ignoresSafeArea()
-        .onAppear { vm.checkUpdates() }
+        .onAppear { vm.checkUpdates(); vm.windowShown() }
+        .onDisappear { vm.windowGone() }
     }
 }
 
@@ -4797,7 +5384,7 @@ struct MenuView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 22, height: 22)
+                Image(nsImage: cachedIcon(Theme.p)).resizable().frame(width: 22, height: 22)
                 (Text("Tidy") + Text("mint").foregroundColor(Theme.brandMint)).font(.system(size: fs(13), weight: .bold))
                 Spacer()
             }
@@ -4956,8 +5543,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { if !other.isTerminated { other.forceTerminate() } }
             }
         }
-        NSApp.applicationIconImage = makeAppIcon(Theme.p)
+        NSApp.applicationIconImage = dockIcon(Theme.p)
         if !a.contains("--demo") { sharedVM.checkFullDiskAccess() }
+        PreviewLinks.clear()   // leftovers from a run that quit with the month viewer open
         // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
         // `--page <name> --window <W>x<H>` opens a page at a fixed size.
         if let i = a.firstIndex(of: "--export-icon"), i + 1 < a.count {
@@ -4996,10 +5584,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// Front view of a Mac mini (2024): two USB-C ports on the left; on the right,
 /// the white status light sits just left of the headphone jack. 1024 x 1024 canvas, macOS icon grid (824 px rounded square).
 private var iconCache: [String: NSImage] = [:]
+/// Small icon for the sidebar and menu (bitmap, 64 px). The drawn icon is 1024 pt, and showing it directly kept
+/// a 2048 px bitmap (16 MB) alive for each place it appears.
 func cachedIcon(_ p: Palette) -> NSImage {
     if let i = iconCache[p.id] { return i }
-    let i = makeAppIcon(p); iconCache[p.id] = i; return i
+    let i = rasterIcon(makeAppIcon(p), px: 64); iconCache[p.id] = i; return i
 }
+/// Draws `img` once into a px x px bitmap; the result is px/2 points (Retina).
+func rasterIcon(_ img: NSImage, px: Int) -> NSImage {
+    guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: px, pixelsHigh: px, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true,
+                                     isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return img }
+    let pt = CGFloat(px) / 2
+    rep.size = NSSize(width: pt, height: pt)
+    NSGraphicsContext.saveGraphicsState(); NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+    img.draw(in: NSRect(x: 0, y: 0, width: pt, height: pt)); NSGraphicsContext.restoreGraphicsState()
+    let out = NSImage(size: rep.size); out.addRepresentation(rep); return out
+}
+/// Dock icon: a 512 px bitmap (1 MB) instead of the 1024 pt drawing.
+func dockIcon(_ p: Palette) -> NSImage { rasterIcon(makeAppIcon(p), px: 512) }
 
 
 func makeAppIcon(_ p: Palette) -> NSImage {
