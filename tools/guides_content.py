@@ -614,6 +614,7 @@ dict(
 <li>Camera Raw: giữ Maximum Size ở 5–10 GB trừ khi chỉnh RAW mỗi ngày.</li>
 <li>Creative Cloud: khi cập nhật, để nguyên ô Remove old versions.</li>
 <li>Máy dựng video nhiều: chuyển Media Cache sang ổ SSD ngoài (cùng mục Media Cache, nút Browse; Adobe cũng khuyên dùng SSD riêng), ổ trong chỉ còn app.</li>
+<li>RAM của Photoshop: theo Adobe, Photoshop mặc định giữ 70% RAM khả dụng cho riêng nó, nên trên máy 16 GB thấy Photoshop chiếm khoảng 8 GB dù đang rảnh là bình thường. Hay mở thêm app nặng thì vào <b>Photoshop › Settings › Performance</b>, ô <b>Let Photoshop Use</b>, giảm từng nấc 5% (cách Adobe khuyên), giữ trong khoảng <b>Ideal Range</b> Photoshop gợi ý, rồi mở lại app. Đánh đổi: RAM nhẹ đi thì khi làm file lớn Photoshop ghi tạm ra ổ (scratch disk) nhiều hơn, ổ trong có thể đầy nhanh hơn; trỏ <b>Scratch Disks</b> sang ổ còn nhiều chỗ để bù. Đọc thêm: <a href="{HOME}giai-phong-ram-mac/">có nên dùng app giải phóng RAM</a>.</li>
 </ol>
 
 <h2 id="tidymint">Tìm nhanh với Tidymint</h2>
@@ -625,6 +626,7 @@ dict(
     ("Sao xoá cache rồi mà Adobe vẫn chiếm 10 GB?", "Đó là phần cài đặt: app, thư viện dùng chung, Camera Raw, plug-in. Chỉ giảm khi gỡ app hoặc gỡ bản cũ."),
     ("Thư mục CameraRaw 2 GB trong /Library/Application Support có xoá được không?", "Không nên. Đó là hồ sơ ống kính và model AI của Camera Raw, không phải bộ nhớ đệm. Xoá thì Photoshop tải lại hoặc lỗi khi mở ảnh RAW."),
     ("Xoá Media Cache bằng Finder hay trong Premiere?", "Trong Premiere an toàn hơn vì app biết file nào dự án đang mở còn dùng. Xoá bằng Finder chỉ nên làm khi đã thoát mọi app Adobe."),
+    ("Dời Photoshop hay file tạm sang ổ ngoài có giảm RAM không?", "Không. Photoshop dùng bao nhiêu RAM do ô Let Photoshop Use trong Settings › Performance quyết định, cài ở ổ nào cũng vậy. Ổ ngoài chỉ nhận phần Photoshop ghi tạm (scratch disk) khi thiếu RAM, giúp ổ trong đỡ đầy."),
     ("Tidymint có dọn Adobe tự động không?", "Chưa có luật riêng cho Adobe. Bản đồ ổ đĩa và Gỡ app giúp tìm và gỡ bản cũ; phần bộ nhớ đệm bạn dọn theo bài này."),
   ],
   sources=[
@@ -632,6 +634,7 @@ dict(
     ("Adobe: Xoá file media cache thủ công (đường dẫn trên macOS)", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/delete-media-cache-files-manually.html"),
     ("Adobe: Tự động quản lý file Media Cache", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/automatically-manage-your-media-cache-files.html"),
     ("Adobe: Tối ưu hiệu năng Lightroom Classic (Camera Raw cache mặc định 5 GB)", "https://helpx.adobe.com/lightroom-classic/desktop/technical-support/performance-guidelines/optimize-performance-lightroom.html"),
+    ("Adobe: Cấu hình Performance trong Photoshop (Memory Usage mặc định 70%, History States)", "https://helpx.adobe.com/photoshop/desktop/get-started/settings-and-preferences/configure-photoshop-performance-preferences.html"),
     ("Adobe: Lỗi scratch disk đầy trong Photoshop", "https://helpx.adobe.com/photoshop/desktop/troubleshoot/performance-stability-issues/troubleshoot-scratch-disk-full-errors-in-photoshop.html"),
     ("Adobe: Lỗi Unable to allocate memory trong After Effects (Empty Disk Cache)", "https://helpx.adobe.com/after-effects/desktop/troubleshooting/fixed-and-known-issues/allocate-memory-error.html"),
     ("Adobe: Nâng cấp mượt lên bản Creative Cloud mới (Remove Old Versions)", "https://helpx.adobe.com/x-productkb/global/ensure_smooth_update_creative_cloud.html"),
@@ -705,6 +708,7 @@ dict(
 <li>Camera Raw: keep Maximum Size at 5–10 GB unless you edit RAW daily.</li>
 <li>Creative Cloud: leave Remove old versions ticked when updating.</li>
 <li>Heavy video work: move the Media Cache to an external SSD (same Media Cache pane, Browse; Adobe recommends a dedicated SSD too) so the internal drive only holds the apps.</li>
+<li>Photoshop memory: Adobe says Photoshop takes 70% of available RAM by default, so on a 16 GB Mac seeing it hold about 8 GB while idle is normal. If you often run other heavy apps, open <b>Photoshop › Settings › Performance</b>, lower <b>Let Photoshop Use</b> in 5% steps (Adobe's advice), stay inside the <b>Ideal Range</b> it suggests, and restart the app. The trade-off: with less RAM, Photoshop writes more scratch data to disk on large files, so the internal drive can fill faster; point <b>Scratch Disks</b> at a drive with room to spare. More: <a href="{HOME}free-up-ram-mac/">do RAM cleaners help a Mac?</a></li>
 </ol>
 
 <h2 id="tidymint">Find it fast with Tidymint</h2>
@@ -716,6 +720,7 @@ dict(
     ("I cleared the cache and Adobe still takes 10 GB. Why?", "That is the installation: apps, shared libraries, Camera Raw, plug-ins. It only shrinks when you uninstall an app or an old version."),
     ("Can I delete the 2 GB CameraRaw folder in /Library/Application Support?", "Better not. Those are lens profiles and Camera Raw AI models, not a cache. Remove them and Photoshop re-downloads them or fails on RAW files."),
     ("Delete Media Cache in Finder or inside Premiere?", "Inside Premiere is safer because the app knows which files open projects still use. Finder only once every Adobe app is closed."),
+    ("Does moving Photoshop or its scratch files to an external drive reduce RAM use?", "No. How much RAM Photoshop uses is set by Let Photoshop Use in Settings › Performance, whatever drive it is installed on. An external drive only takes the scratch data Photoshop writes when RAM runs short, which keeps the internal drive from filling."),
     ("Does Tidymint clean Adobe automatically?", "There is no dedicated Adobe rule yet. Space Lens and Uninstaller help you find and remove old versions; clear the caches as described here."),
   ],
   sources=[
@@ -723,6 +728,7 @@ dict(
     ("Adobe: Delete media cache files manually (macOS path)", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/delete-media-cache-files-manually.html"),
     ("Adobe: Automatically manage your Media Cache files", "https://helpx.adobe.com/premiere/desktop/troubleshooting/media-issues/automatically-manage-your-media-cache-files.html"),
     ("Adobe: Optimize Lightroom Classic performance (Camera Raw cache defaults to 5 GB)", "https://helpx.adobe.com/lightroom-classic/desktop/technical-support/performance-guidelines/optimize-performance-lightroom.html"),
+    ("Adobe: Configure Photoshop performance preferences (Memory Usage defaults to 70%, History States)", "https://helpx.adobe.com/photoshop/desktop/get-started/settings-and-preferences/configure-photoshop-performance-preferences.html"),
     ("Adobe: Troubleshoot scratch disk full errors in Photoshop", "https://helpx.adobe.com/photoshop/desktop/troubleshoot/performance-stability-issues/troubleshoot-scratch-disk-full-errors-in-photoshop.html"),
     ("Adobe: Unable to allocate memory error in After Effects (Empty Disk Cache)", "https://helpx.adobe.com/after-effects/desktop/troubleshooting/fixed-and-known-issues/allocate-memory-error.html"),
     ("Adobe: Ensure a smooth upgrade to the next Creative Cloud version (Remove Old Versions)", "https://helpx.adobe.com/x-productkb/global/ensure_smooth_update_creative_cloud.html"),
@@ -1597,7 +1603,7 @@ dict(
 <h2 id="works">What actually helps</h2>
 <ol class="steps">
 <li><b>Find the heavy app.</b> In Activity Monitor › Memory, sort by the Memory column. Browsers with many tabs, video editors and local AI models are common at the top.</li>
-<li><b>Quit what you don't need</b>, or close tabs. That frees memory that was really in use.</li>
+<li><b>Quit what you don't need</b>, or close tabs. That frees memory that was really in use.</li><li><b>Cap apps that reserve memory.</b> Some apps hold a set share of RAM on purpose. Photoshop takes 70% of available RAM by default; lower it in Photoshop › Settings › Performance if you run other heavy apps at the same time (<a href="{HOME}adobe-storage-mac/">details in our Adobe guide</a>).</li>
 <li><b>Restart</b> if the Mac has been on for weeks or an app seems to leak memory.</li>
 <li><b>Keep free disk space.</b> When RAM is short, macOS swaps to disk, which needs room on the drive.</li>
 <li><b>If pressure is red every day</b>, your workload needs more memory. On Apple silicon Macs, memory can't be upgraded later, so this matters most when choosing your next Mac.</li>
@@ -1617,10 +1623,69 @@ dict(
   sources=[
     ("Apple: Check if your Mac needs more RAM in Activity Monitor", "https://support.apple.com/guide/activity-monitor/check-if-your-mac-needs-more-ram-actmntr34865/mac"),
     ("Apple: View memory usage in Activity Monitor on Mac", "https://support.apple.com/guide/activity-monitor/view-memory-usage-actmntr1004/mac"),
+    ("Adobe: Configure Photoshop performance preferences (Memory Usage defaults to 70%, History States)", "https://helpx.adobe.com/photoshop/desktop/get-started/settings-and-preferences/configure-photoshop-performance-preferences.html"),
   ],
   related=[("Free CleanMyMac alternative", "{HOME}cleanmymac-alternative/"), ("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("Tidymint home", "{HOME}")],
+  alt="giai-phong-ram-mac",
 ),
 
+dict(
+  lang="vi", slug="giai-phong-ram-mac", topic="compare", date="2026-11-03", read="6 phút đọc",
+  title="App giải phóng RAM cho Mac có tác dụng không? | Tidymint",
+  desc="RAM trống không làm Mac nhanh hơn. Cách đọc Áp lực Bộ nhớ trong Giám sát hoạt động, vì sao app xả RAM có thể phản tác dụng, và việc nào có ích cho máy.",
+  crumb="App giải phóng RAM",
+  h1="App giải phóng RAM cho Mac có tác dụng không? Việc nào có ích",
+  tldr="Thường là không. macOS được thiết kế để <b>dùng</b> RAM: giữ sẵn file vừa dùng để mở app nhanh hơn. Apple ghi rõ bộ nhớ trống không nhất thiết làm máy nhanh hơn. Hãy xem <b>Áp lực Bộ nhớ</b> trong Giám sát hoạt động: xanh là ổn, vàng là máy có thể cần thêm RAM, đỏ là cần thêm RAM. Đỏ thì tắt app đang ngốn nhiều nhất hoặc khởi động lại. App xả RAM chỉ vứt đi phần bộ nhớ đệm đó.",
+  toc=[("lam-tuong","Hiểu lầm: RAM trống là máy nhanh"),("xem-gi","Nên xem chỉ số nào"),("xa-ram","Vì sao xả RAM có thể phản tác dụng"),
+       ("cach-dung","Việc có ích cho máy"),("tidymint","Tidymint làm gì với RAM"),("faq","Hỏi đáp")],
+  body="""
+<h2 id="lam-tuong">Hiểu lầm: RAM trống là máy nhanh</h2>
+<p>Mở Giám sát hoạt động (Activity Monitor) trên gần như mọi máy Mac, ô "Bộ nhớ Được sử dụng" (Memory Used) đều cao. Nhìn thì giống có vấn đề, và các app giải phóng RAM hứa sửa bằng một cú bấm.</p>
+<p>Hướng dẫn của Apple nói ngược lại: macOS đạt hiệu suất tối đa bằng cách dùng và quản lý hết bộ nhớ, và <b>có bộ nhớ trống không nhất thiết làm máy nhanh hơn</b>.</p>
+
+<h2 id="xem-gi">Nên xem chỉ số nào</h2>
+<p>Mở <b>Giám sát hoạt động</b> (Ứng dụng › Tiện ích), bấm <b>Bộ nhớ</b> (Memory). Nhìn đồ thị <b>Áp lực Bộ nhớ</b> (Memory Pressure) ở cuối cửa sổ, đừng nhìn "Bộ nhớ Được sử dụng":</p>
+<div class="tbl"><table>
+<tr><th>Màu</th><th>Apple giải thích</th></tr>
+<tr><td>Xanh lục</td><td>Máy đang dùng RAM một cách hiệu quả</td></tr>
+<tr><td>Vàng</td><td>Máy có thể cần thêm RAM</td></tr>
+<tr><td>Đỏ</td><td>Máy cần thêm RAM</td></tr>
+</table></div>
+<p>Hai con số nữa cần lưu ý. <b>Tệp được ghi vào Bộ nhớ đệm</b> (Cached Files) là phần RAM giữ file vừa dùng để mở lại nhanh hơn. <b>Mức hoán đổi Được sử dụng</b> (Swap Used) là chỗ trên ổ khởi động macOS mượn khi RAM đầy. Có chút swap là bình thường, swap cứ tăng trong lúc Áp lực Bộ nhớ đỏ mới là dấu hiệu thiếu RAM thật.</p>
+
+<h2 id="xa-ram">Vì sao xả RAM có thể phản tác dụng</h2>
+<p>Phần lớn RAM mà các ứng dụng dọn dẹp khác nói "giải phóng" chính là bộ nhớ đệm file kể trên. Theo Apple, phần này nằm yên trong RAM tới khi bị ghi đè, nhờ vậy mở lại app nhanh hơn. Xả nó đi thì app hay file mở tiếp theo phải đọc lại từ ổ. Con số trên thanh menu đẹp hơn, còn máy vẫn vậy, thậm chí còn chậm hơn.</p>
+<p>Phần còn lại là bộ nhớ app đang dùng thật. Phần này quay lại ngay khi bạn dùng tiếp các app đó.</p>
+
+<h2 id="cach-dung">Việc có ích cho máy</h2>
+<ol class="steps">
+<li><b>Tìm app nặng.</b> Trong Giám sát hoạt động › Bộ nhớ, bấm cột Bộ nhớ để xếp từ cao xuống. Trình duyệt mở nhiều tab, app dựng video, mô hình AI chạy trên máy hay nằm đầu danh sách.</li>
+<li><b>Tắt app không dùng</b> hoặc đóng bớt tab. Cách này trả lại phần RAM đang dùng thật.</li>
+<li><b>Giới hạn app tự giữ RAM.</b> Vài app cố ý giữ sẵn một phần RAM. Photoshop mặc định giữ 70% RAM khả dụng; hay chạy thêm app nặng cùng lúc thì giảm ở Photoshop › Settings › Performance (<a href="{HOME}adobe-chiem-dung-luong-mac/">cách làm trong bài Adobe</a>).</li>
+<li><b>Khởi động lại</b> khi máy đã chạy nhiều tuần liền, hoặc một app có vẻ ngốn RAM tăng dần.</li>
+<li><b>Giữ ổ cứng còn chỗ trống.</b> Thiếu RAM thì macOS hoán đổi ra ổ cứng, khuyến nghị dọn dẹp ổ cứng cùng Tidymint.</li>
+<li><b>Ngày nào Áp lực Bộ nhớ cũng đỏ</b> có nghĩa là công việc của bạn cần nhiều RAM hơn.</li>
+</ol>
+
+<h2 id="tidymint">Tidymint làm gì với RAM</h2>
+<p>Chúng tôi chọn không làm nút giải phóng RAM, vì những lý do trên. Thanh menu của <a href="{HOME}">Tidymint</a> hiện RAM còn trống cạnh dung lượng ổ còn trống, và báo khi RAM dùng trên 90% (tối đa 1 giờ một lần, tắt được ở Cài đặt › Cảnh báo RAM cao), để bạn biết lúc nào nên mở Giám sát hoạt động. Phần còn lại của app lo dung lượng ổ: bộ nhớ đệm, nhật ký, file tải về cũ, phần sót lại của app đã gỡ, file lớn và file trùng. Mọi thứ luôn vào Thùng rác trước.</p>
+{CTA}""",
+  faq=[
+    ("Giải phóng RAM có làm Mac nhanh hơn không?", "Thường là không. Apple ghi rõ bộ nhớ trống không nhất thiết làm máy nhanh hơn. macOS giữ file vừa dùng trong RAM để mở app nhanh hơn."),
+    ("Làm sao biết Mac có cần thêm RAM không?", "Mở Giám sát hoạt động › Bộ nhớ, xem đồ thị Áp lực Bộ nhớ. Nếu nó đỏ phần lớn thời gian trong lúc bạn làm việc bình thường, máy cần thêm RAM."),
+    ("Bộ nhớ Được sử dụng cao có sao không?", "Tự nó thì không. Một phần là file được giữ trong bộ nhớ đệm, macOS nhả ra ngay khi app khác cần chỗ. Chỉ số cần theo dõi là Áp lực Bộ nhớ."),
+    ("Có nên cài app giải phóng RAM không?", "Không có nhiều lý do để cài. Xả bộ nhớ đệm file khiến lần mở app sau phải đọc lại từ ổ. Tắt app nặng hoặc khởi động lại mới trả lại phần RAM đang dùng thật."),
+    ("Photoshop chiếm 8 GB RAM dù đang rảnh có sao không?", "Bình thường. Photoshop mặc định giữ 70% RAM khả dụng cho riêng nó. Hay chạy thêm app nặng thì giảm ô Let Photoshop Use trong Photoshop › Settings › Performance, rồi mở lại app."),
+    ("Tidymint có giải phóng RAM không?", "Không. Tidymint hiện RAM còn trống trên thanh menu và báo khi RAM dùng trên 90%, nhưng không có nút xả bộ nhớ."),
+  ],
+  sources=[
+    ("Apple: Kiểm tra xem máy Mac có cần thêm RAM không trong Giám sát hoạt động", "https://support.apple.com/vi-vn/guide/activity-monitor/actmntr34865/mac"),
+    ("Apple: Xem mức sử dụng bộ nhớ trong Giám sát hoạt động trên máy Mac", "https://support.apple.com/vi-vn/guide/activity-monitor/actmntr1004/mac"),
+    ("Adobe: Cấu hình Performance trong Photoshop (Memory Usage mặc định 70%)", "https://helpx.adobe.com/photoshop/desktop/get-started/settings-and-preferences/configure-photoshop-performance-preferences.html"),
+  ],
+  related=[("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("10 cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="free-up-ram-mac",
+),
 dict(
   lang="vi", slug="capcut-chiem-dung-luong-mac", topic="apps", date="2026-10-29", read="6 phút đọc",
   title="CapCut chiếm dung lượng Mac: dọn sao an toàn | Tidymint",
