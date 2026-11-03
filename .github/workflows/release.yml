@@ -98,3 +98,22 @@ jobs:
             gh release create "v$V" build/Tidymint.zip --draft --title "Tidymint $V" --notes-file build/notes.md --verify-tag
             if [ "${{ steps.vt.outputs.ok }}" = "1" ]; then gh release edit "v$V" --draft=false --latest; fi
           fi
+
+      # Updates the cask in HaiTrung-Workspace/homebrew-tidymint once the release is public.
+      # Needs the secret TAP_TOKEN (fine-grained token, Contents read and write on that repository only).
+      # Without it the step is skipped and the cask is updated by hand.
+      - name: Homebrew tap
+        if: steps.v.outputs.draft == '0' && steps.vt.outputs.ok == '1'
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          if [ -z "$TAP_TOKEN" ]; then echo "No TAP_TOKEN: update the cask by hand"; exit 0; fi
+          V="${{ steps.v.outputs.version }}"
+          SHA="$(cut -d' ' -f1 build/sha256.txt)"
+          git clone -q "https://x-access-token:${TAP_TOKEN}@github.com/HaiTrung-Workspace/homebrew-tidymint.git" build/tap
+          cd build/tap
+          sed -i '' -E "s/^  version \".*\"/  version \"$V\"/; s/^  sha256 \".*\"/  sha256 \"$SHA\"/" Casks/tidymint.rb
+          grep -E '^  (version|sha256) ' Casks/tidymint.rb
+          if git diff --quiet; then echo "Cask already at $V"; exit 0; fi
+          git -c user.name=Tidymint -c user.email=HaiTrung-Workspace@users.noreply.github.com commit -qam "Update to $V"
+          git push -q origin HEAD:main
