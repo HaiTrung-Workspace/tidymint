@@ -12,6 +12,7 @@ GA_ID = "G-19HEJDJPN3"
 SHOT_H = {'byapp.jpg': 1085, 'apps.jpg': 1085}  # screenshots whose height differs from 1013 (captured at 1180x800)
 ICONS = {'smart': '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>', 'byapp': '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>', 'apps': '<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/>', 'lens': '<path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>', 'large': '<circle cx="12" cy="5" r="3"/><path d="M6.5 8a2 2 0 0 0-1.905 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8Z"/>', 'dupes': '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>', 'undo': '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>', 'startup': '<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/>', 'menubar': '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>', 'source': '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>', 'privacy': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>', 'changelog': '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>', 'listed': '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>', 'free': '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>', 'ai': '<rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/>', 'dev': '<polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/>', 'video': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>', 'unknown': '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>', 'bug': '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>', 'check': '<path d="M20 6 9 17l-5-5"/>', 'languages': '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>', 'office': '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>', 'arrow': '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'}
 ICONS["leaf"] = '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>'
+ICONS["download"] = '<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>'  # Lucide download
 LISTED_LINKS = [("awesome-mac", "https://github.com/jaywcjlove/awesome-mac"), ("AlternativeTo", "https://alternativeto.net/software/tidymint/about/"),
                 ("MacNative", "https://macnative.io/apps/tidymint"), ("MacUpdate", "https://tidymint.macupdate.com/"), ("Open Source Alternatives", "https://www.opensourcealternatives.to/item/tidymint"), ("SaaSHub", "https://www.saashub.com/tidymint"), ("awesome-swift-macos-apps", "https://github.com/jaywcjlove/awesome-swift-macos-apps")]
 def icon(k, size=22):
@@ -111,7 +112,7 @@ HOME_CSS = """
 .hero .eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--leaf);box-shadow:0 0 10px var(--leaf)}
 .hero h1{font-size:clamp(38px,6.4vw,72px)}
 .btn.lg{padding:16px 30px;font-size:17px}
-.micro{margin-top:14px;font-size:13px;color:var(--sub)}
+.micro{margin-top:14px;font-size:13px;color:var(--sub)}.dlc{color:var(--mint,#5ff0c0);font-weight:600;white-space:nowrap}.dlc svg{vertical-align:-2px;margin-right:4px}
 .trust{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:44px auto 0;max-width:1040px}
 .trust div{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:16px 10px;border-radius:14px;background:#ffffff06;border:1px solid var(--line);font-size:14px;color:var(--sub)}
 .trust b{color:var(--text);font-size:15px}
@@ -178,7 +179,8 @@ T = {
   h1='Your Mac is full.<br><span>Let’s find out why.</span>',
   sub="A free, open-source Mac cleaner that tracks nothing. See exactly what fills your disk, free up gigabytes, and undo any clean: everything goes to the Trash first.",
   cta1="Download free", cta2="How to install", cta_how="See how it works",
-  micro='macOS 14 or later · Apple silicon and Intel · Version <span class="ver">{v}</span>',
+  micro='macOS 14 or later · Apple silicon and Intel · Version <span class="ver">{v}</span>{dl}',
+  dl_word='downloads', dl_sep=',',
   trust=[("privacy","Privacy protected","Works offline, no account, no tracking"),("free","Free forever","No subscription, no paid tier"),("undo","Undo a wrong clean","Everything goes to the Trash, undo in one click"),("source","Open source","MIT licence, public, transparent and safe<br><a href=\"safety/\">See the evidence →</a>"),("listed","Listed in",LISTED)],
   pain_tag="Sound familiar?", pain_h="Three common worries, and how we solve them",
   pains=[("“Cleaners want a subscription, and cracked copies carry malware.”","Free for good","No account, no trial, no paid tier. Download it from GitHub, no crack needed."),("“What if it deletes something I need?”","You get it back, nothing lost","Everything goes to the Trash, nothing is erased. One click puts the whole last clean back where it was."),("“I need four apps just to see what fills my disk.”","One app, nine tools","Disk map, uninstaller, large files and duplicates in one place, plus free space in the menu bar.")],
@@ -247,7 +249,8 @@ T = {
   h1='MacBook đầy ổ?<br><span>Xem ngay thứ gì chiếm chỗ.</span>',
   sub="Zalo, Cốc Cốc, CapCut ngốn hàng GB? Tidymint dọn đúng phần rác, giữ nguyên tin nhắn và file công việc: miễn phí, mã nguồn mở, mọi thứ chỉ vào Thùng rác, có thể hoàn tác.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài", cta_how="Xem cách dùng",
-  micro='macOS 14 trở lên · Chip Apple silicon và Intel · Bản <span class="ver">{v}</span>',
+  micro='macOS 14 trở lên · Chip Apple silicon và Intel · Bản <span class="ver">{v}</span>{dl}',
+  dl_word='lượt tải', dl_sep='.',
   trust=[("languages","Tiếng Việt đầy đủ","App, web và hướng dẫn"),("free","Miễn phí trọn đời","Không thuê bao, không bản trả phí"),("privacy","Bảo vệ quyền riêng tư","Không cần mạng, không tài khoản, không theo dõi"),("undo","Dọn nhầm vẫn lấy lại được","Mọi thứ chỉ vào Thùng rác, hoàn tác bằng một cú bấm"),("source","Mã nguồn mở","Giấy phép MIT, công khai, minh bạch, an toàn<br><a href=\"an-toan/\">Xem bằng chứng →</a>"),("listed","Có tên trong",LISTED)],
   pain_tag="Nghe quen không?", pain_h="Ba nỗi lo hay gặp và cách giải quyết",
   pains=[("“Zalo ăn hết ổ, mà xoá thì sợ mất tin nhắn, mất ảnh chứng từ.”","Dọn mà không mất tin nhắn","Chỉ bộ nhớ đệm được chọn sẵn. Tin nhắn, đăng nhập khoá lại; ảnh, file xếp theo tháng để bạn tự chọn."),("“App dọn máy toàn thu phí năm, mà tải bản crack thì sợ dính mã độc.”","Miễn phí trọn đời, khỏi crack","Không tài khoản, không bản trả phí. Tải thẳng từ GitHub, mã nguồn ai cũng xem được."),("“Lỡ xoá nhầm file quan trọng thì sao?”","Lấy lại được, không mất gì","Mọi thứ chỉ vào Thùng rác, không xoá vĩnh viễn. Một cú bấm trả cả lần dọn vừa rồi về chỗ cũ.")],
@@ -337,7 +340,10 @@ def page(k):
     vi_on, en_on = ('class="on" ', '') if k == "vi" else ('', 'class="on" ')
     vi_href, en_href = ("./", "../") if k == "vi" else ("vi/", "./")
     ver = open(os.path.join(ROOT, "docs", "version.txt")).read().strip()
-    V = lambda x: x.replace("{v}", ver)
+    dlp = os.path.join(ROOT, "docs", "downloads.txt")
+    dln = open(dlp).read().strip() if os.path.exists(dlp) else ""
+    dl = (' · <span class="dlc" data-sep="%s">%s<b class="dln">%s</b> %s</span>' % (t["dl_word"] and t["dl_sep"], icon("download", 14), "{:,}".format(int(dln)).replace(",", t["dl_sep"]), t["dl_word"])) if dln.isdigit() else ""
+    V = lambda x: x.replace("{v}", ver).replace("{dl}", dl)
     ok = icon("check", 16)
     trust = "".join('<div><span class="ico">%s</span><b>%s</b>%s</div>' % (icon(a), b, c) for a, b, c in t["trust"])
     pains = "".join('<div class="stat pain"><span class="q">%s</span><b>%s</b><span>%s</span></div>' % x for x in t["pains"])
@@ -517,6 +523,7 @@ document.getElementById('ckOpen').onclick=function(){{show(true)}};
 if(!tmC)show(true);
 document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang}});var p=a.closest('.cta')||a.parentNode;if(!p.parentNode.querySelector('.dlhint')){{var d=document.createElement('p');d.className='dlhint';d.setAttribute('role','status');d.innerHTML={dlhint};p.insertAdjacentElement('afterend',d)}}}})}});
 document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','sponsor_click',{{link_url:a.href,page_lang:document.documentElement.lang,link_location:a.closest('footer')?'footer':'page'}})}})}});}})();
+fetch("{img}downloads.txt",{{cache:"no-store"}}).then(function(r){{return r.ok?r.text():null}}).then(function(n){{n=(n||"").trim();if(/^\\d+$/.test(n))document.querySelectorAll(".dlc").forEach(function(e){{e.querySelector(".dln").textContent=n.replace(/\\B(?=(\\d{{3}})+(?!\\d))/g,e.dataset.sep)}})}}).catch(function(){{}});
 fetch("{img}version.txt",{{cache:"no-store"}}).then(function(r){{return r.ok?r.text():null}}).then(function(v){{v=(v||"").trim();if(/^\\d+(\\.\\d+)+$/.test(v))document.querySelectorAll(".ver").forEach(function(e){{e.textContent=v}})}}).catch(function(){{}});
 const ENDPOINT = "{ENDPOINT}";
 document.getElementById('f').addEventListener('submit', async (e) => {{
