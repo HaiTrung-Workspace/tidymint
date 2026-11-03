@@ -49,7 +49,7 @@ jobs:
           {
             echo "## What's new"; echo
             cat build/items.md; echo
-            echo "Universal build (Apple silicon and Intel), macOS 14 or later. Not notarized yet: open it once via System Settings › Privacy & Security › Open Anyway ([Apple's guide](https://support.apple.com/102445))."
+            echo "Universal build (Apple silicon and Intel), macOS 14 or later. Not notarized yet: open it once via System Settings › Privacy & Security › Open Anyway. Step-by-step guide with screenshots: https://tidymint.app/install/ (Tiếng Việt: https://tidymint.app/vi/cai-dat/). Apple's guide: https://support.apple.com/102445"
             echo
             echo "SHA-256 \`Tidymint.zip\`: \`$SHA\`"
           } > build/notes.md
