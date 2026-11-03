@@ -1,7 +1,8 @@
 name: Release
 
 # Builds the macOS app on a GitHub runner and publishes the release.
-# - Push a tag vX.Y.Z (on a commit whose CHANGELOG.md has a "## X.Y.Z" section): public release, marked Latest.
+# - Push a tag vX.Y.Z (on a commit whose CHANGELOG.md has a "## X.Y.Z" section): draft release, VirusTotal scan,
+#   then public and Latest when the scan is clean (secret VT_API_KEY). Otherwise it stays a draft for a manual check.
 # - Push to the branch release-dryrun: same build, saved as a draft release (not public) for checking.
 on:
   push:
@@ -55,6 +56,36 @@ jobs:
           } > build/notes.md
           cat build/notes.md
 
+      # Virus scan before anything is public (from 0.4.0). Needs the repository secret VT_API_KEY
+      # (a free VirusTotal API key). Without it the release stays a draft and the scan is done by hand.
+      - name: VirusTotal
+        id: vt
+        if: steps.v.outputs.draft == '0'
+        env:
+          VT_API_KEY: ${{ secrets.VT_API_KEY }}
+        run: |
+          if [ -z "$VT_API_KEY" ]; then echo "No VT_API_KEY: release stays a draft"; echo "ok=0" >> "$GITHUB_OUTPUT"; exit 0; fi
+          SHA="$(cut -d' ' -f1 build/sha256.txt)"
+          ID=$(curl -sf -H "x-apikey: $VT_API_KEY" -F "file=@build/Tidymint.zip" https://www.virustotal.com/api/v3/files | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["id"])')
+          for i in $(seq 1 40); do
+            sleep 30
+            R=$(curl -sf -H "x-apikey: $VT_API_KEY" "https://www.virustotal.com/api/v3/analyses/$ID") || continue
+            ST=$(echo "$R" | python3 -c 'import json,sys; print(json.load(sys.stdin)["data"]["attributes"]["status"])')
+            [ "$ST" = "completed" ] && break
+          done
+          if [ "$ST" != "completed" ]; then echo "Scan not finished: release stays a draft"; echo "ok=0" >> "$GITHUB_OUTPUT"; exit 0; fi
+          LINE=$(echo "$R" | python3 -c '
+          import json,sys,datetime
+          s=json.load(sys.stdin)["data"]["attributes"]["stats"]
+          bad=s.get("malicious",0)+s.get("suspicious",0)
+          tot=bad+s.get("undetected",0)+s.get("harmless",0)
+          print("%d/%d engines flagged" % (bad,tot))')
+          { echo; echo "VirusTotal: $LINE \`Tidymint.zip\` (scanned $(date -u +%Y-%m-%d)): https://www.virustotal.com/gui/file/$SHA"; } >> build/notes.md
+          cat build/notes.md
+          case "$LINE" in 0/*) echo "ok=1" >> "$GITHUB_OUTPUT";; *) echo "Flagged: release stays a draft for a manual look"; echo "ok=0" >> "$GITHUB_OUTPUT";; esac
+
+      # A tag first makes a draft release. It goes public (Latest) only after a clean VirusTotal scan,
+      # so the public page has the scan result from the first minute.
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -64,5 +95,6 @@ jobs:
             gh release create "v$V-dryrun-${{ github.run_number }}" build/Tidymint.zip --draft --target "$GITHUB_SHA" \
               --title "Tidymint $V (dry run)" --notes-file build/notes.md
           else
-            gh release create "v$V" build/Tidymint.zip --title "Tidymint $V" --notes-file build/notes.md --latest --verify-tag
+            gh release create "v$V" build/Tidymint.zip --draft --title "Tidymint $V" --notes-file build/notes.md --verify-tag
+            if [ "${{ steps.vt.outputs.ok }}" = "1" ]; then gh release edit "v$V" --draft=false --latest; fi
           fi
