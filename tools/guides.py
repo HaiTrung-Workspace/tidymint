@@ -11,7 +11,7 @@ _spec2 = importlib.util.spec_from_file_location("tmcontent", os.path.join(ROOT, 
 C = importlib.util.module_from_spec(_spec2); _spec2.loader.exec_module(C)
 
 ART_CSS = """
-.relv summary{display:flex;align-items:center;gap:12px}.relv summary:after{margin-left:auto}.relv .ver{font-size:18px}.relv .small{color:var(--sub);font-weight:400}.relv ul{margin:0 0 16px}
+.relv summary{display:flex;align-items:center;gap:12px}.relv summary:after{margin-left:auto}.relv .ver{font-size:18px}.relv .small{color:var(--sub);font-weight:400}.relv ul{margin:0 0 16px}.relv .vt{color:var(--sub);font-size:14px;margin:-6px 0 18px}
 
 .crumb{font-size:14px;color:var(--sub);margin:28px 0 0}.crumb a{color:var(--sub)}
 .art{max-width:760px;margin:0 auto;padding:12px 0 40px}
@@ -301,8 +301,15 @@ def changelogpage(k):
         ds = (d.strftime("%d/%m/%Y") if k == "vi" else d.strftime("%B %-d, %Y")) if d else ""
         n = len(r[k]); cnt = ("%d thay đổi" % n) if k == "vi" else ("%d change%s" % (n, "" if n == 1 else "s"))
         head = "%s %s" % (h["next"], r["ver"]) if r["status"] == "next" else r["ver"]
-        parts.append('<details class="relv" id="v%s"%s><summary><span class="ver">%s</span><span class="small">%s · %s</span></summary><ul>%s</ul></details>'
-                     % (r["ver"].replace(".", ""), " open" if i == 0 else "", head, ds, cnt, "".join("<li>%s</li>" % x for x in r[k])))
+        vt = ""
+        if r.get("vt"):
+            v = r["vt"]; vd = datetime.date.fromisoformat(v["date"])
+            link = '<a href="https://www.virustotal.com/gui/file/%s">VirusTotal %s</a>' % (v["sha"], v["score"])
+            short = v["sha"][:8] + "…" + v["sha"][-4:]
+            vt = ('<p class="vt">Quét virus: %s, quét %s · SHA-256 <code>%s</code></p>' % (link, vd.strftime("%d/%m/%Y"), short)) if k == "vi" else \
+                 ('<p class="vt">Virus scan: %s, scanned %s · SHA-256 <code>%s</code></p>' % (link, vd.strftime("%B %-d, %Y"), short))
+        parts.append('<details class="relv" id="v%s"%s><summary><span class="ver">%s</span><span class="small">%s · %s</span></summary><ul>%s</ul>%s</details>'
+                     % (r["ver"].replace(".", ""), " open" if i == 0 else "", head, ds, cnt, "".join("<li>%s</li>" % x for x in r[k]), vt))
     body = "".join(parts) + '<p><a class="btn" href="%s">%s</a></p>' % (S.DL, h["dl"])
     dates = [r["date"] for r in CLG.RELEASES if r["date"]]
     h.update(lang=k, date=max(dates), hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body, lead="")
