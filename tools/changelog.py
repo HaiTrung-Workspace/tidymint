@@ -1,7 +1,7 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
-    dict(ver="0.3.7", date="2026-11-04", status="released",
+    dict(ver="0.3.7", date="2026-11-03", status="released",
          en=["New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range",
              "Photos and videos saved without a file extension (Zalo, Telegram, WhatsApp) now show real thumbnails and open large",
              "App index files (Zalo, Telegram) are kept out of the photo grid and the month counts; Telegram stickers and unfinished downloads are labelled",
