@@ -2,7 +2,7 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
-## 0.3.7 (2026-11-04)
+## 0.3.7 (2026-11-03)
 
 - New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range
 - Photos and videos saved without a file extension (Zalo, Telegram, WhatsApp) now show real thumbnails and open large
