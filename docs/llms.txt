@@ -45,6 +45,7 @@
 - Remove duplicate files on Mac without breaking projects: https://tidymint.app/remove-duplicate-files-mac/
 - (Vietnamese) Xoá file trùng trên Mac an toàn: https://tidymint.app/vi/xoa-file-trung-mac/
 - Do RAM cleaners help a Mac?: https://tidymint.app/free-up-ram-mac/
+- (Vietnamese) App giải phóng RAM cho Mac có tác dụng không: https://tidymint.app/vi/giai-phong-ram-mac/
 - Free CleanMyMac alternatives compared: https://tidymint.app/cleanmymac-alternative/
 - (Vietnamese) CleanMyMac miễn phí, lựa chọn hợp pháp: https://tidymint.app/vi/cleanmymac-mien-phi/
 - (Vietnamese) Cách xoá ứng dụng trên MacBook sạch hoàn toàn: https://tidymint.app/vi/xoa-ung-dung-macbook/
