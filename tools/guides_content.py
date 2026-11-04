@@ -1479,7 +1479,7 @@ dict(
 <figure class="fig-app"><img src="../dupes.jpg" alt="Tidymint's Duplicates page: groups of identical files with one copy kept" width="1600" height="1013" loading="lazy"><figcaption>Duplicates in Tidymint: identical files grouped, one copy always kept.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner built around those four rules:</p>
 <ul>
-<li>It scans Documents, Downloads, Desktop, Pictures, Movies and Music for files of 1 MB or more and <b>matches them by content</b>, not by name.</li>
+<li>It scans Documents, Downloads, Desktop, Pictures, Movies and Music, plus any external drive or folder you add in Settings, for files of 1 MB or more and <b>matches them by content</b>, not by name. When a file is on both the Mac and a drive, you choose which copy to keep.</li>
 <li>It skips folders like <code>.git</code>, <code>node_modules</code>, virtual environments, <code>build</code> and DerivedData.</li>
 <li><b>One copy is always kept</b>: preferably one outside Downloads, Desktop and temp folders, then the one with the shorter path.</li>
 <li>Before anything moves, it offers to <b>check your project folders</b> (set in Settings). It searches scripts and notes there for each file name, shows which script uses which copy, and offers to untick those and remove the rest.</li>
@@ -1551,7 +1551,7 @@ dict(
 <figure class="fig-app"><img src="../dupes.jpg" alt="Trang File trùng của Tidymint: các nhóm file giống hệt nhau, luôn giữ một bản" width="1600" height="1013" loading="lazy"><figcaption>File trùng trong Tidymint: gom nhóm file giống hệt nhau, luôn giữ lại một bản.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm theo đúng bốn luật trên:</p>
 <ul>
-<li>Quét Tài liệu, Tải về, Màn hình nền, Ảnh, Phim, Nhạc, tìm file từ 1 MB trở lên và <b>so theo nội dung</b>, không theo tên.</li>
+<li>Quét Tài liệu, Tải về, Màn hình nền, Ảnh, Phim, Nhạc, cùng ổ ngoài hay thư mục bạn thêm ở Cài đặt, tìm file từ 1 MB trở lên và <b>so theo nội dung</b>, không theo tên. File có cả trên máy lẫn trên ổ ngoài thì bạn chọn giữ bản nào.</li>
 <li>Bỏ qua các thư mục như <code>.git</code>, <code>node_modules</code>, môi trường ảo Python, <code>build</code>, DerivedData.</li>
 <li><b>Luôn giữ một bản</b>: ưu tiên bản nằm ngoài Tải về, Màn hình nền và thư mục tạm, rồi tới bản có đường dẫn ngắn hơn.</li>
 <li>Trước khi chuyển, Tidymint đề nghị <b>kiểm thư mục dự án</b> (khai ở Cài đặt): tìm tên từng file trong script và ghi chú ở đó, cho thấy script nào đang dùng bản nào, rồi đề nghị bỏ tick các bản đó và xoá phần còn lại.</li>
@@ -1787,7 +1787,7 @@ dict(
 ]
 
 GUIDES.append(dict(
-  lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-10-30", read="6 phút đọc",
+  lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-11-04", read="6 phút đọc",
   title="Tidymint có gửi dữ liệu của bạn đi không? | Tidymint",
   desc="App dọn máy được đọc cả ổ đĩa. Tidymint chạy ngay trên máy: không cần mạng, không tài khoản, không theo dõi. Giải thích dễ hiểu.",
   crumb="Quyền riêng tư",
@@ -1814,7 +1814,8 @@ GUIDES.append(dict(
 <p>Chỉ có các trường hợp dưới đây, và bạn biết rõ từng cái:</p>
 <div class="tbl"><table>
 <tr><th>Khi nào</th><th>Tidymint làm gì</th><th>Gửi đi thông tin gì</th></tr>
-<tr><td>Kiểm tra bản mới</td><td>Tải một tệp chữ chỉ chứa số phiên bản mới nhất (ví dụ 0.3.6), mỗi ngày tối đa một lần</td><td>Không gửi thông tin máy hay tệp nào</td></tr>
+<tr><td>Kiểm tra bản mới</td><td>Hỏi update.tidymint.app số phiên bản mới nhất (ví dụ 0.3.8), mỗi ngày tối đa một lần. Máy chủ đó cộng 1 vào số đếm trong ngày theo phiên bản app và phiên bản macOS, đọc từ dòng yêu cầu chuẩn mà mọi app Mac đều gửi. Không lưu địa chỉ IP, không có mã máy, mã nguồn công khai trong kho</td><td>Chỉ những gì yêu cầu chuẩn vốn có: phiên bản app và macOS. Không gửi thông tin máy hay tệp nào</td></tr>
+<tr><td>Bạn trả lời "Tidymint có giúp ích cho bạn không?" ở trang Dọn ngay</td><td>Gửi câu trả lời (hữu ích, bình thường, chưa hữu ích), lý do bạn tick và dòng bạn gõ thêm nếu có</td><td>Những thứ đó, cùng phiên bản app và ngôn ngữ. Không email, không đời máy, không mã máy. Hỏi tối đa hai lần</td></tr>
 <tr><td>Bạn bấm Gửi trong mục Liên hệ</td><td>Gửi góp ý cho người làm app</td><td>Email và nội dung bạn tự gõ. Nếu bạn tick ô kèm thông tin máy: phiên bản app, phiên bản macOS, đời máy</td></tr>
 <tr><td>Bạn bấm một đường link</td><td>Mở trình duyệt tới trang web, GitHub, mạng xã hội</td><td>Như mọi lần bạn tự mở web</td></tr>
 </table></div>
@@ -1846,7 +1847,7 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="tidymint-privacy", topic="start", date="2026-10-30", read="6 min read",
+  lang="en", slug="tidymint-privacy", topic="start", date="2026-11-04", read="6 min read",
   title="Does Tidymint Send Your Data Anywhere? | Tidymint",
   desc="A Mac cleaner can read your whole disk. Tidymint runs entirely on your Mac: works offline, no account, no tracking. Here's how.",
   crumb="Privacy",
@@ -1873,7 +1874,8 @@ GUIDES.append(dict(
 <p>Only in these cases, and you know about each one:</p>
 <div class="tbl"><table>
 <tr><th>When</th><th>What Tidymint does</th><th>What it sends</th></tr>
-<tr><td>Checking for updates</td><td>Downloads a text file that contains only the latest version number (for example 0.3.6), at most once a day</td><td>No information about your Mac or your files</td></tr>
+<tr><td>Checking for updates</td><td>Asks update.tidymint.app for the latest version number (for example 0.3.8), at most once a day. That server adds one to a daily count by app version and macOS version, read from the standard request line every Mac app sends. It keeps no IP address and no identifier, and its code is public in the repository</td><td>Only what the standard request already carries: app version and macOS version. No information about your Mac or your files</td></tr>
+<tr><td>You answer "Is Tidymint helping you?" on Clean Now</td><td>Sends your answer (helpful, okay, not yet), the reasons you tick and the optional line you type</td><td>Those, plus app version and language. No email, no Mac model, no identifier. Asked at most twice</td></tr>
 <tr><td>You click Send in Contact</td><td>Sends your feedback to the developer</td><td>The email and message you typed. If you tick the box: app version, macOS version and Mac model</td></tr>
 <tr><td>You click a link</td><td>Opens the website, GitHub or social pages in your browser</td><td>The same as opening any website yourself</td></tr>
 </table></div>
@@ -1919,7 +1921,7 @@ GUIDES.append(dict(
 <tr><th>Lời hứa</th><th>Tidymint làm thế nào</th><th>Bạn tự kiểm thế nào</th></tr>
 <tr><td><b>Dọn nhầm vẫn lấy lại được</b></td><td>Không xoá thẳng thứ gì: mọi dữ liệu chỉ vào Thùng rác của macOS. Nút Hoàn tác trả lần dọn gần nhất về đúng chỗ cũ (trừ khi bạn đã xoá trong đó, tất nhiên rồi). Đổ Thùng rác, Tidymint luôn xác nhận lại trước.</td><td>Dọn thử một mục nhỏ, kiểm tra Thùng rác trong Finder. Bấm Hoàn tác: mọi thứ về chỗ cũ.</td></tr>
 <tr><td><b>Không đụng đồ riêng tư</b></td><td>Thư viện Ảnh, Mail, mật khẩu (Keychain), iCloud Drive và thư mục đám mây không bao giờ được đưa ra dọn. Trong Dọn theo ứng dụng, tin nhắn và đăng nhập bị khoá, Tidymint tuyệt đối không đọc hay đụng tới.</td><td>Danh sách thư mục cấm nằm công khai trong mã nguồn (biến <code>neverBase</code>). Mục bị khoá hiện biểu tượng ổ khoá trong app.</td></tr>
-<tr><td><b>Không gửi dữ liệu đi</b></td><td>Quét và dọn chạy ngay trên máy, tắt mạng vẫn chạy. Tidymint chỉ lên mạng để kiểm tra bản mới (đọc một số phiên bản, mỗi ngày tối đa một lần). Dữ liệu duy nhất chuyển ra khỏi máy là những góp ý của bạn.</td><td>Tắt Wi-Fi rồi quét thử. Chi tiết và cách xem lưu lượng mạng: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</td></tr>
+<tr><td><b>Không gửi dữ liệu đi</b></td><td>Quét và dọn chạy ngay trên máy, tắt mạng vẫn chạy. Tidymint chỉ lên mạng để kiểm tra bản mới (đọc một số phiên bản, mỗi ngày tối đa một lần; lần kiểm được đếm theo phiên bản app và macOS, không lưu IP hay mã máy). Dữ liệu khác duy nhất chuyển ra khỏi máy là những góp ý của bạn.</td><td>Tắt Wi-Fi rồi quét thử. Chi tiết và cách xem lưu lượng mạng: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</td></tr>
 <tr><td><b>Không chạy ngầm quyền quản trị</b></td><td>Tidymint không cài tiến trình chạy ngầm với quyền cao nhất của máy. Khi gỡ app cài cho mọi tài khoản (ví dụ app từ App Store), chính macOS hỏi mật khẩu trong cửa sổ của hệ thống, Tidymint không thấy mật khẩu.</td><td>Trang đánh giá độc lập <a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a> ghi Tidymint ở mục chạy quyền cao: <b>Never</b> (không bao giờ).</td></tr>
 <tr><td><b>Miễn phí trọn đời, mã nguồn mở</b></td><td>Không tài khoản, không quảng cáo, không bản trả phí. Toàn bộ mã công khai theo giấy phép MIT.</td><td>Mã nguồn công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. Bạn không đọc code cũng không sao: ai rành đọc được, có gì bất thường cộng đồng sẽ thấy.</td></tr>
 </table></div>
@@ -2000,7 +2002,7 @@ GUIDES.append(dict(
 <tr><th>Promise</th><th>How Tidymint does it</th><th>How you can check</th></tr>
 <tr><td><b>A wrong clean can be undone</b></td><td>Nothing is deleted outright: everything only goes to the macOS Trash. The Undo button puts the most recent clean back where it was (unless you've already deleted it from the Trash, of course). Before emptying the Trash, Tidymint always asks you to confirm.</td><td>Clean one small item, then look in the Trash in Finder. Press Undo: everything goes back.</td></tr>
 <tr><td><b>Your private data is off limits</b></td><td>Your Photos library, Mail, passwords (Keychain), iCloud Drive and cloud folders are never offered for cleaning. In Clean by App, messages and logins are locked: Tidymint never reads or touches them.</td><td>The list of protected folders is public in the source code (<code>neverBase</code>). Locked items show a lock icon in the app.</td></tr>
-<tr><td><b>No data leaves your Mac</b></td><td>Scanning and cleaning run on your Mac and work offline. Tidymint only goes online to check for a new version (it reads a version number, at most once a day). The only data that leaves your Mac is feedback you choose to send.</td><td>Turn off Wi-Fi and run a scan. Details, and how to watch network traffic: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></td></tr>
+<tr><td><b>No data leaves your Mac</b></td><td>Scanning and cleaning run on your Mac and work offline. Tidymint only goes online to check for a new version (it reads a version number, at most once a day; that check is counted by app and macOS version, with no IP or identifier kept). The only other data that leaves your Mac is feedback you choose to send.</td><td>Turn off Wi-Fi and run a scan. Details, and how to watch network traffic: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></td></tr>
 <tr><td><b>No hidden admin-level process</b></td><td>Tidymint installs no background process with full system privileges. When you remove an app installed for every user (an App Store app, for example), macOS itself asks for your password in its own window. Tidymint never sees it.</td><td>The independent review site <a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a> lists Tidymint as runs elevated: <b>Never</b>.</td></tr>
 <tr><td><b>Free forever, open source</b></td><td>No account, no ads, no paid tier. All the code is public under the MIT license.</td><td>The source code is public on <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. You don't need to read code yourself: people who can read it can, and anything unusual would be noticed.</td></tr>
 </table></div>

@@ -7,19 +7,24 @@
  */
 const SHEET = 'Submissions';
 const COLUMNS = ['time', 'source', 'type', 'email', 'newsletter', 'consent', 'consentVersion',
-                 'message', 'app', 'macos', 'model', 'lang'];
+                 'message', 'app', 'macos', 'model', 'lang', 'answer', 'reasons'];
 const MAX_LEN = 5000;
 
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents || '{}');
     const email = String(data.email || '').trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return out('error: email');
-    // Simple flood guard: at most 5 submissions per email per hour.
+    // The in-app "Is Tidymint helping you?" card sends no email: one of three answers, optional reasons and a line.
+    const checkin = String(data.type || '') === 'checkin';
+    if (checkin) {
+      if (!['helpful', 'okay', 'not'].includes(String(data.answer || ''))) return out('error: answer');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return out('error: email');
+    // Simple flood guard: at most 5 submissions per email per hour (per app version for check-ins, which carry no email).
     const cache = CacheService.getScriptCache();
-    const key = 'n_' + email.toLowerCase();
+    const key = 'n_' + (checkin ? 'checkin_' + String(data.app || '') : email.toLowerCase());
+    const limit = checkin ? 500 : 5;
     const n = Number(cache.get(key) || 0);
-    if (n >= 5) return out('error: rate');
+    if (n >= limit) return out('error: rate');
     cache.put(key, String(n + 1), 3600);
 
     const sh = sheet();
