@@ -2,6 +2,14 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.4.0 (2026-11-05)
+
+- New look: Settings and the rest of the app follow the macOS style, with sections that fold, standard text and control sizes, and warnings lined up in their own column. The window keeps its proportions when you change the text size
+- New: open files from the lists. Click or press Space for Quick Look, double-click to open in its app, right-click for Open With, Show in Finder and Copy Path
+- New: the Uninstaller has a search box, remembers how you sorted it, and also finds the app's own cache and temp folders in /private/var/folders
+- New: switches in Settings to hide the menu bar icon and to turn off the daily check for a new version (Check Now still works). Add files or folders to the Ignore List yourself
+- Fixed: the Trash page could count a folder on an external drive that Finder does not treat as Trash, so the number stayed the same after emptying. It now shows what is left on each drive
+
 ## 0.3.8 (2026-11-04)
 
 - New: Duplicates and Large & Old Files can also scan external drives and extra folders you add in Settings. When the same file is on your Mac and on a drive, you choose which copy to keep

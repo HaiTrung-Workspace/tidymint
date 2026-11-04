@@ -2,6 +2,17 @@
 # Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.4.0", date="2026-11-05", status="released",
+         en=["New look: Settings and the rest of the app follow the macOS style, with sections that fold, standard text and control sizes, and warnings lined up in their own column. The window keeps its proportions when you change the text size",
+             "New: open files from the lists. Click or press Space for Quick Look, double-click to open in its app, right-click for Open With, Show in Finder and Copy Path",
+             "New: the Uninstaller has a search box, remembers how you sorted it, and also finds the app's own cache and temp folders in /private/var/folders",
+             "New: switches in Settings to hide the menu bar icon and to turn off the daily check for a new version (Check Now still works). Add files or folders to the Ignore List yourself",
+             "Fixed: the Trash page could count a folder on an external drive that Finder does not treat as Trash, so the number stayed the same after emptying. It now shows what is left on each drive"],
+         vi=["Diện mạo mới: Cài đặt và cả app theo kiểu macOS, nhóm thu gọn được, cỡ chữ và nút chuẩn, cảnh báo xếp thẳng cột riêng. Đổi cỡ chữ thì cửa sổ giữ đúng tỉ lệ",
+             "Mới: mở file ngay trong danh sách. Bấm một lần hoặc nhấn Space để xem nhanh, bấm đúp để mở bằng app của nó, chuột phải để Mở bằng, Hiện trong Finder, Chép đường dẫn",
+             "Mới: Gỡ app có ô tìm, nhớ cách sắp xếp, và tìm thêm thư mục cache, thư mục tạm của chính app trong /private/var/folders",
+             "Mới: công tắc trong Cài đặt để ẩn biểu tượng trên thanh menu và tắt lần kiểm bản mới hằng ngày (nút Kiểm tra vẫn dùng được). Tự thêm file, thư mục vào Danh sách bỏ qua",
+             "Sửa: trang Thùng rác có thể đếm cả một thư mục trên ổ cứng rời mà Finder không coi là Thùng rác, nên đổ xong con số không giảm. Giờ trang ghi rõ còn gì trên từng ổ"]),
     dict(ver="0.3.8", date="2026-11-04", status="released",
          vt=dict(score="0/66", date="2026-11-04", sha="e30c576247dd010c0dd865b220b8c8923d83da784cd4bde258a5860ec3733d42"),
          en=["New: Duplicates and Large & Old Files can also scan external drives and extra folders you add in Settings. When the same file is on your Mac and on a drive, you choose which copy to keep",

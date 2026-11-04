@@ -105,7 +105,7 @@ defaults write com.haitrung.diskcleanup protectedKeywords -array "my-profile-fol
 - Settings: `~/Library/Preferences/com.haitrung.diskcleanup.plist`
 - Activity log: `~/Library/Application Support/Tidymint/activity.log`
 
-The app works offline. It sends nothing anywhere unless you choose to send feedback or join the newsletter. See [PRIVACY.md](PRIVACY.md).
+Scanning and cleaning run on your Mac and work offline. The only automatic connection is a once-a-day check for a new version (update.tidymint.app, counted by app and macOS version only), which you can turn off in Settings. Anything else leaves your Mac only when you send it yourself (feedback, newsletter, the "Is Tidymint helping you?" card). See [PRIVACY.md](PRIVACY.md).
 
 ## Feedback
 
