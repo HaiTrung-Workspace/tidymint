@@ -1930,7 +1930,7 @@ GUIDES.append(dict(
 <p>Đây là những nơi độc lập, không do Tidymint điều hành. Bấm vào để xem tận nơi.</p>
 <div class="tbl"><table>
 <tr><th>Nơi</th><th>Họ làm gì</th><th>Kết quả</th></tr>
-<tr><td><a href="https://www.virustotal.com/gui/file/81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.3.7: <b>0/65</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 03/11/2026)</td></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/e30c576247dd010c0dd865b220b8c8923d83da784cd4bde258a5860ec3733d42">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.3.8: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 04/11/2026)</td></tr>
 <tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>Trang độc lập chấm các app dọn dẹp theo từng tiêu chí</td><td>Không theo dõi: None. Chạy quyền cao: Never. Mã công khai: Yes. Chưa ký Apple: ghi đỏ, đúng sự thật (xem mục Tidymint chưa có gì?)</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>Danh sách app Mac chọn lọc trên GitHub, người duyệt xem từng đề cử</td><td>Đã nhận Tidymint (26/10/2026)</td></tr>
 <tr><td>Danh bạ phần mềm</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a></td><td>Đã duyệt và đăng Tidymint (26/10 tới 01/11/2026)</td></tr>
@@ -1964,6 +1964,7 @@ GUIDES.append(dict(
 <h2 id="nhat-ky">Nhật ký minh bạch</h2>
 <p>Mỗi bước làm Tidymint đáng tin hơn đều được ghi ở đây, mới nhất trên cùng.</p>
 <ul>
+<li><b>04/11/2026</b>: Phát hành 0.3.8, VirusTotal quét 0/66. Bản này được một phiên rà code độc lập soát trước khi khoá (ba lượt, tìm và sửa 5 lỗi mức vừa và nhẹ ở lượt cuối), dựng trên máy của GitHub và tự quét VirusTotal trong quy trình phát hành. Sửa lỗi có từ bản trước: file đã Bỏ qua ở Gỡ app và File trùng vẫn có thể bị đưa vào Thùng rác.</li>
 <li><b>03/11/2026</b>: Phát hành 0.3.7, VirusTotal quét 0/65. Bản này sửa một lỗi có từ 0.3.6: mục Telegram trong Dọn theo ứng dụng có thể liệt kê lẫn vài file cơ sở dữ liệu của chính Telegram (không có đuôi file) cùng ảnh, video. Không file nào được chọn sẵn và mọi thứ chỉ vào Thùng rác nên vẫn hoàn tác được; 0.3.7 chặn hẳn.</li>
 <li><b>01/11/2026</b>: VirusTotal quét bản 0.3.6, 0/66. Thêm chính sách bảo mật, nút báo lỗi kín trên GitHub, tệp security.txt. SaaSHub duyệt Tidymint. AreWeCleanYet có trang đánh giá Tidymint.</li>
 <li><b>31/10/2026</b>: Open Source Alternatives duyệt Tidymint.</li>
@@ -1978,7 +1979,7 @@ GUIDES.append(dict(
        ("Phần mềm diệt virus trên máy tôi báo Tidymint thì sao?", "Hãy gửi email cho chúng tôi kèm tên phần mềm và ảnh chụp thông báo. Bạn cũng có thể so mã SHA-256 và xem kết quả VirusTotal như hướng dẫn ở trên để biết file có đúng là bản chính thức không."),
        ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
        ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu.")],
-  sources=[("VirusTotal: kết quả quét Tidymint.zip 0.3.7", "https://www.virustotal.com/gui/file/9594ed59660ef8fa52a8478686e8be5db9b9447c0516d60480743219574505c1"),
+  sources=[("VirusTotal: kết quả quét Tidymint.zip 0.3.8", "https://www.virustotal.com/gui/file/e30c576247dd010c0dd865b220b8c8923d83da784cd4bde258a5860ec3733d42"),
            ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
            ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
            ("Apple: Mở app an toàn trên máy Mac (Vẫn mở)", "https://support.apple.com/vi-vn/102445"),
@@ -2011,7 +2012,7 @@ GUIDES.append(dict(
 <p>These are independent places, not run by Tidymint. Click through and see for yourself.</p>
 <div class="tbl"><table>
 <tr><th>Where</th><th>What they do</th><th>Result</th></tr>
-<tr><td><a href="https://www.virustotal.com/gui/file/81720913a2599b01ea9a7c0d82e2f0200fa5a1d5a126099f4347678cc343ccc2">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 0.3.7 installer: <b>0/65</b>, none of the engines found anything harmful to your Mac (scanned 3 Nov 2026)</td></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/e30c576247dd010c0dd865b220b8c8923d83da784cd4bde258a5860ec3733d42">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 0.3.8 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 4 Nov 2026)</td></tr>
 <tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>An independent site that rates disk cleaners on a set of checks</td><td>Telemetry: None. Runs elevated: Never. Source published: Yes. Release signing: marked red, which is accurate (see What Tidymint doesn't have yet)</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>A curated list of Mac apps on GitHub, where maintainers review each submission</td><td>Accepted Tidymint (26 Oct 2026)</td></tr>
 <tr><td>Software directories</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a></td><td>Reviewed and listed Tidymint (26 Oct to 1 Nov 2026)</td></tr>
@@ -2045,6 +2046,7 @@ GUIDES.append(dict(
 <h2 id="log">Transparency log</h2>
 <p>Every step that makes Tidymint more trustworthy is recorded here, newest first.</p>
 <ul>
+<li><b>4 Nov 2026</b>: Released 0.3.8, VirusTotal scan 0/66. This version was reviewed by an independent code-review session before it was locked (three passes; the last one found and fixed 5 medium and low issues), built on GitHub's machines and scanned on VirusTotal as part of the release workflow. Fixes an issue from the previous version: files marked Ignore in the Uninstaller and in Duplicates could still be sent to the Trash.</li>
 <li><b>3 Nov 2026</b>: Released 0.3.7, VirusTotal scan 0/65. This version fixes an issue present since 0.3.6: the Telegram section of Clean by App could list a few of Telegram's own database files (they have no file extension) next to photos and videos. None were pre-selected and everything goes to the Trash, so it could be undone; 0.3.7 blocks them for good.</li>
 <li><b>1 Nov 2026</b>: VirusTotal scanned version 0.3.6: 0/66. Added a security policy, private vulnerability reporting on GitHub, and a security.txt file. SaaSHub approved Tidymint. AreWeCleanYet published a review page for Tidymint.</li>
 <li><b>31 Oct 2026</b>: Open Source Alternatives approved Tidymint.</li>
@@ -2059,7 +2061,7 @@ GUIDES.append(dict(
        ("My antivirus flags Tidymint. What now?", "Email us with the name of the antivirus and a screenshot of the warning. You can also compare the SHA-256 and check the VirusTotal result as shown above, to confirm the file is the official one."),
        ("Why does macOS say it can't verify the developer?", "Because Tidymint isn't signed by Apple yet (see What Tidymint doesn't have yet). Open it once with Open Anyway in System Settings; after that it opens normally."),
        ("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. Contents are read only when finding duplicates and when checking scripts in project folders you add yourself, all on your Mac, sent nowhere.")],
-  sources=[("VirusTotal: scan of Tidymint.zip 0.3.7", "https://www.virustotal.com/gui/file/9594ed59660ef8fa52a8478686e8be5db9b9447c0516d60480743219574505c1"),
+  sources=[("VirusTotal: scan of Tidymint.zip 0.3.8", "https://www.virustotal.com/gui/file/e30c576247dd010c0dd865b220b8c8923d83da784cd4bde258a5860ec3733d42"),
            ("AreWeCleanYet: Tidymint review page", "https://arewecleanyet.org/apps/tidymint/"),
            ("Tidymint security policy (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
            ("Apple: Safely open apps on your Mac (Open Anyway)", "https://support.apple.com/102445"),
