@@ -132,13 +132,22 @@ var appLang: String = UserDefaults.standard.string(forKey: "lang")
     ?? ((Locale.preferredLanguages.first ?? "en").hasPrefix("vi") ? "vi" : "en")
 func t(_ en: String, _ vi: String) -> String { appLang == "vi" ? vi : en }
 /// Date in the app language (e.g. "Sep 15, 2026" / "15 thg 9, 2026").
-func shortDate(_ d: Date) -> String {
-    let f = DateFormatter(); f.locale = Locale(identifier: appLang == "vi" ? "vi_VN" : "en_US"); f.dateStyle = .medium; f.timeStyle = .none
-    return f.string(from: d)
+/// "Last opened Oct 29, 2026" / "Mở lần cuối 29/10/2026": the date column of file rows (fixed width, so kept short).
+// Formatters are costly to create and rows redraw often: one per format and language, made once.
+private let viDayFmt: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM/yyyy"; return f }()
+private let shortFmts: [String: DateFormatter] = Dictionary(uniqueKeysWithValues: ["vi", "en"].map { l in
+    let f = DateFormatter(); f.locale = Locale(identifier: l == "vi" ? "vi_VN" : "en_US"); f.dateStyle = .medium; f.timeStyle = .none; return (l, f)
+})
+func openedLabel(_ d: Date) -> String {
+    if appLang == "vi" { return "Mở lần cuối " + viDayFmt.string(from: d) }
+    return "Last opened " + shortDate(d)
 }
+func shortDate(_ d: Date) -> String { (shortFmts[appLang == "vi" ? "vi" : "en"] ?? shortFmts["en"]!).string(from: d) }
 
 /// Replacement for @State.
 final class Flag: ObservableObject { @Published var v = false }
+/// Which Settings groups are unfolded (a class, not @State: see the note at the top of the file).
+final class OpenGroups: ObservableObject { @Published var ids: Set<String> = []; static let shared = OpenGroups() }
 
 /// Tooltip drawn by the app itself. macOS help tags often never appear on SwiftUI views that also track the mouse
 /// (hover tiles, cursors), so every tooltip in Tidymint uses this: a small bubble near the pointer after half a second.
@@ -506,6 +515,8 @@ struct CleanItem: Identifiable, Hashable {
         if cross == 2 { return t("Same file is on this Mac", "Có bản giống hệt trên máy") }
         return ""
     }
+    /// Warning shown on the row itself. Where a copy sits (Mac / external drive) is said once in the duplicate group header instead.
+    var rowNote: String { cross != 0 && !running && !hasDB && !nameMatch && refStrong.isEmpty && refWeak.isEmpty ? "" : note }
     var noteColor: Color { !refStrong.isEmpty || hasDB ? Theme.danger : (running || nameMatch || !refWeak.isEmpty ? Theme.warn : Theme.sub) }
     var refHelp: String { (refStrong + refWeak).map { $0.replacingOccurrences(of: NSHomeDirectory(), with: "~") }.joined(separator: "\n") }
     var date: Date? = nil
@@ -1296,6 +1307,17 @@ enum FinderOps {
     }
 }
 
+/// Status tag (warning, state, "Keep"): one look everywhere. Tags sit in a column at the RIGHT of a row, before the size,
+/// so they line up from row to row (style guide 1f), never after a name or path of varying length.
+struct StatusTag: View {
+    let text: String; let color: Color
+    init(_ text: String, _ color: Color) { self.text = text; self.color = color }
+    var body: some View {
+        Text(text).font(.system(size: fs(10), weight: .semibold)).foregroundColor(color)
+            .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(color.opacity(0.15))).fixedSize()
+    }
+}
+
 /// Small grey tag for a browser web app, with the reassurance as a tooltip.
 struct WebAppTag: View {
     let browser: String
@@ -1358,6 +1380,12 @@ enum Apps {
             L.appendingPathComponent("HTTPStorages/\(id)"), L.appendingPathComponent("HTTPStorages/\(id).binarycookies"),
             L.appendingPathComponent("WebKit/\(id)"),
         ]
+        // The user's own cache and temp folders under /private/var/folders (confstr(3): cache is never cleaned by the
+        // system, temp files unused for 3 days may be). Only the folder named exactly like this app's bundle id.
+        for key in [_CS_DARWIN_USER_CACHE_DIR, _CS_DARWIN_USER_TEMP_DIR] {
+            var buf = [CChar](repeating: 0, count: 1024)
+            if confstr(key, &buf, buf.count) > 0, !id.isEmpty { byID.append(URL(fileURLWithPath: String(cString: buf)).appendingPathComponent(id)) }
+        }
         byID += Scanner.children(L.appendingPathComponent("Group Containers")).filter { $0.lastPathComponent.hasSuffix(id) }
         byID += Scanner.children(L.appendingPathComponent("LaunchAgents")).filter { $0.lastPathComponent.hasPrefix(id) }
         var byName: [URL] = []
@@ -1646,6 +1674,7 @@ enum Phase { case idle, scanning, summary, review, done }
         didSet {
             if VM.advancedPages.contains(page), !advancedOpen { advancedOpen = true }
             fresh.remove(page)
+            hoverFile = nil; fileQL = nil   // a row of the old page may never report the pointer leaving
             if page == .settings { seenVersion = newVersion }
         }
     }
@@ -1675,6 +1704,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var largePhase: Phase = .idle
     @Published var trashSize: Int64 = 0
     @Published var trashCount = 0
+    /// What is in the Trash on each external drive (name, items, size); the Mac's own Trash is the rest.
+    @Published var trashOnDrives: [(String, Int, Int64)] = []
+    /// Set after Empty Trash when something stayed behind, so the page can say so instead of looking stuck.
+    @Published var trashLeftNote: String? = nil
     @Published var freeGB: Double = 0
     @Published var totalGB: Double = 0
     @Published var lastResult = ""
@@ -1693,8 +1726,50 @@ enum Phase { case idle, scanning, summary, review, done }
     func setLang(_ l: String) { appLang = l; UserDefaults.standard.set(l, forKey: "lang"); lang = l }
     @Published var textSize: String = appTextSize
     func setTextSize(_ v: String) {
+        let old = uiScale
         appTextSize = v; UserDefaults.standard.set(v, forKey: "textSize"); textSize = v
         theme = appTheme   // the root view is keyed on this; re-assigning rebuilds every view with the new sizes
+        fitWindow(from: old)
+    }
+    /// After a text-size change, grow or shrink the main window by the same ratio, so the layout keeps its proportions
+    /// instead of leaving empty space (Small) or squeezing (Large). Top-left corner stays put; never larger than the screen.
+    /// Like System Settings: the window widens only up to a set width (sidebar + a ~950 pt content area, scaled with the
+    /// text size), so content never floats in wide empty margins. Set on the NSWindow directly: a SwiftUI max frame with
+    /// content-size resizability made the scene update loop and crash (04/11/2026).
+    static var maxWindowWidth: CGFloat { (120 + 140 * uiScale) + 950 * uiScale }
+    func applyWindowLimits() {
+        guard let w = mainWindow else { return }
+        // SwiftUI rewrites contentMaxSize on every layout, so set the frame limit (maxSize) too, and clamp after any
+        // resize as a last guard (e.g. a resize that does not go through the size limits).
+        w.maxSize = NSSize(width: VM.maxWindowWidth, height: CGFloat.greatestFiniteMagnitude)
+        w.contentMaxSize = NSSize(width: VM.maxWindowWidth, height: CGFloat.greatestFiniteMagnitude)
+        clampWindow(w)
+        if resizeObs == nil {
+            resizeObs = NotificationCenter.default.addObserver(forName: NSWindow.didResizeNotification, object: w, queue: .main) { [weak self] n in
+                MainActor.assumeIsolated { if let w = n.object as? NSWindow { self?.clampWindow(w) } }
+            }
+        }
+    }
+    private var resizeObs: NSObjectProtocol?
+    func clampWindow(_ w: NSWindow) {
+        guard w.frame.width > VM.maxWindowWidth + 1 else { return }
+        var f = w.frame; f.size.width = VM.maxWindowWidth; w.setFrame(f, display: true)
+    }
+    /// The main window, handed over by WindowGrabber (SwiftUI's window has no stable title or identifier to search by).
+    weak var mainWindow: NSWindow?
+    func fitWindow(from old: CGFloat) {
+        applyWindowLimits()
+        guard let w = mainWindow, old > 0 else { return }
+        let r = uiScale / old
+        guard abs(r - 1) > 0.01 else { return }
+        let vf = (w.screen ?? NSScreen.main)?.visibleFrame ?? w.frame
+        var f = w.frame
+        let top = f.maxY
+        f.size.width = min(vf.width, VM.maxWindowWidth, max(980 * uiScale, f.width * r))
+        f.size.height = min(vf.height, max(600, f.height * r))
+        f.origin.y = max(vf.minY, top - f.height)
+        f.origin.x = min(max(vf.minX, f.origin.x), vf.maxX - f.width)
+        w.setFrame(f, display: true, animate: true)
     }
     @Published var theme: String = appTheme
     func setTheme(_ id: String) {
@@ -1760,6 +1835,8 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var ramTotal: Double = 0
     @Published var lowSpaceGB: Double = UserDefaults.standard.object(forKey: "lowSpaceGB") as? Double ?? 30
     @Published var ramAlert: Bool = UserDefaults.standard.object(forKey: "ramAlert") as? Bool ?? true
+    /// Daily check for a new version (asked for on MacRumors, 04/11/2026). Off: no automatic check; "Check Now" still works.
+    @Published var autoUpdateCheck: Bool = UserDefaults.standard.object(forKey: "autoUpdateCheck") as? Bool ?? true
     @Published var openAtLogin: Bool = SMAppService.mainApp.status == .enabled
     var lastDiskAlert = Date.distantPast, lastRamAlert = Date.distantPast
     var timer: Timer?
@@ -2133,6 +2210,7 @@ enum Phase { case idle, scanning, summary, review, done }
     }
     func setLowSpace(_ v: Double) { lowSpaceGB = v; UserDefaults.standard.set(v, forKey: "lowSpaceGB") }
     func setRamAlert(_ v: Bool) { ramAlert = v; UserDefaults.standard.set(v, forKey: "ramAlert") }
+    func setAutoUpdateCheck(_ v: Bool) { autoUpdateCheck = v; UserDefaults.standard.set(v, forKey: "autoUpdateCheck"); if v { checkUpdates() } }
     func setOpenAtLogin(_ v: Bool) {
         do { if v { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch { }
         openAtLogin = SMAppService.mainApp.status == .enabled
@@ -2181,17 +2259,39 @@ enum Phase { case idle, scanning, summary, review, done }
         if freeGB > 0 { DiskHistory.record(freeGB) }
     }
 
-    func refreshTrash() {
+    private var trashGen = 0
+    /// A drive's ".Trashes" made by macOS: owned by root or with the sticky bit (mode 1333). On drives mounted with
+    /// "ignore ownership" the owner reads as the user, so the sticky bit decides; FAT/exFAT have no Unix modes, accept.
+    /// A ".Trashes" made by a script (mode 755, seen 04/11/2026) is neither shown nor emptied by Finder, so skip it.
+    nonisolated static func isRealDriveTrash(_ trashes: URL) -> Bool {
+        var st = stat(); guard stat(trashes.path, &st) == 0 else { return false }
+        if st.st_uid == 0 || (st.st_mode & S_ISVTX) != 0 { return true }
+        var fs = statfs(); guard statfs(trashes.path, &fs) == 0 else { return false }
+        let type = withUnsafeBytes(of: fs.f_fstypename) { String(cString: $0.bindMemory(to: CChar.self).baseAddress!) }
+        return ["msdos", "exfat"].contains(type)
+    }
+    func refreshTrash(done: (() -> Void)? = nil) {
         let t = Scanner.trashURL
+        trashGen += 1; let gen = trashGen
         Task.detached {
             // Finder's Empty Trash also empties the Trash on each mounted drive (.Trashes/<uid>), so count those too.
             let vols = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeIsLocalKey], options: [.skipHiddenVolumes]) ?? []
             let uid = getuid()
             let trashes = [t] + vols.filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
-                .map { $0.appendingPathComponent(".Trashes/\(uid)") }.filter { FileManager.default.fileExists(atPath: $0.path) }
-            let s = trashes.reduce(Int64(0)) { $0 + Scanner.size($1) }
-            let c = trashes.reduce(0) { $0 + Scanner.children($1, hidden: false).count }
-            await MainActor.run { self.trashSize = s; self.trashCount = c }
+                .map { $0.appendingPathComponent(".Trashes/\(uid)") }
+                .filter { FileManager.default.fileExists(atPath: $0.path) && VM.isRealDriveTrash($0.deletingLastPathComponent()) }
+            // One walk per Trash: (count, size).
+            let each = trashes.map { (Scanner.children($0, hidden: false).count, Scanner.size($0)) }
+            let s = each.reduce(Int64(0)) { $0 + $1.1 }, c = each.reduce(0) { $0 + $1.0 }
+            let drives: [(String, Int, Int64)] = zip(trashes, each).dropFirst().compactMap { u, e in
+                e.0 == 0 ? nil : (u.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent, e.0, e.1)
+            }
+            await MainActor.run {
+                guard gen == self.trashGen else { return }   // a newer refresh started: drop this older result
+                self.trashSize = s; self.trashCount = c; self.trashOnDrives = drives
+                if c == 0 { self.trashLeftNote = nil }
+                done?()
+            }
         }
     }
 
@@ -2315,8 +2415,13 @@ enum Phase { case idle, scanning, summary, review, done }
         refreshTrash(); refreshDisk()
     }
     // Uninstaller filters
+    /// Uninstaller: filter the app list by name (matches ignoring case and accents), on top of appsFilter.
+    @Published var appsQuery = ""
     @Published var appsFilter = 0   // 0 all, 1 not opened in 6 months, 2 over 500 MB, 3 App Store, 4 other sources
-    @Published var appsSort = 0     // 0 size, 1 name, 2 last opened
+    /// Remembered between launches (asked for on MacRumors, 04/11/2026).
+    @Published var appsSort = min(max(UserDefaults.standard.integer(forKey: "appsSort"), 0), 2) {   // 0 size, 1 name, 2 last opened
+        didSet { UserDefaults.standard.set(appsSort, forKey: "appsSort") }
+    }
     private static var masMemo: [String: Bool] = [:]
     /// Cached: the Uninstaller filters call it for every app on every redraw.
     static func fromAppStore(_ u: URL) -> Bool {
@@ -2335,7 +2440,8 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
     var appsShown: [AppEntry] {
-        let a = appsMatching(appsFilter)
+        let q = appsQuery.trimmingCharacters(in: .whitespaces)
+        let a = appsMatching(appsFilter).filter { q.isEmpty || $0.name.range(of: q, options: [.caseInsensitive, .diacriticInsensitive]) != nil }
         switch appsSort {
         case 1: return a.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         case 2: return a.sorted { ($0.lastUsed ?? .distantPast) < ($1.lastUsed ?? .distantPast) }
@@ -2463,6 +2569,10 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var monthCollapsed = Set<Int>()   // weeks folded in the month viewer
     var monthAnchor: String? = nil               // last file clicked, for Shift-click ranges
     @Published var qlURL: URL? = nil
+    /// File lists (Large Files, Duplicates, leftovers...): Quick Look of one file (click, or Space over a row).
+    @Published var fileQL: URL? = nil
+    /// The file row under the pointer, for Space. Not published: only read when Space is pressed.
+    var hoverFile: URL? = nil
     func openMonth(_ app: String, _ g: String, _ row: String) {
         guard let r = appReports.first(where: { $0.id == app }), let grp = r.groups.first(where: { $0.id == g }),
               let rw = grp.rows.first(where: { $0.id == row }), rw.month != nil else { return }
@@ -2628,6 +2738,7 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var updChecking = false
     func checkUpdates(force: Bool = false) {
         guard force || !updChecking else { return }
+        guard force || autoUpdateCheck else { return }   // automatic check turned off in Settings: no request at all
         updChecking = true
         Updates.check(force: force) { v in self.newVersion = v; self.updChecking = false }
     }
@@ -2654,12 +2765,29 @@ enum Phase { case idle, scanning, summary, review, done }
                           "Finder chưa đổ (\(msg)). Cho phép Tidymint điều khiển Finder trong Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Tự động hoá, rồi thử lại."), "OK")
         } else {
             log("Emptied Trash: \(fmt(trashSize))")
-            undoable = nil; Journal.clear()   // the items are gone, Undo can no longer put them back
+            // Finder can leave items behind (seen 04/11/2026). Check again once Finder is done: if the Trash is empty,
+            // Undo can no longer put anything back; if not, say what is left and keep Undo.
+            trashLeftNote = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                self?.refreshTrash { [weak self] in
+                    guard let self else { return }
+                    if self.trashCount == 0 { self.undoable = nil; Journal.clear(); return }
+                    self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there. Open the Trash in Finder to see them, then empty it again.",
+                                           "Finder chưa đổ hết: còn \(self.trashCount) mục. Mở Thùng rác trong Finder để xem, rồi đổ lại.")
+                }
+            }
         }
         refreshTrash(); refreshDisk()
     }
 
     // Ignore list
+    /// Ignore list: pick files or folders by hand (Finder dialog), besides right-click in the scan lists.
+    func addIgnoredByPicker() {
+        let p = NSOpenPanel()
+        p.canChooseFiles = true; p.canChooseDirectories = true; p.allowsMultipleSelection = true
+        p.prompt = t("Choose", "Chọn"); p.message = t("Files and folders you pick will never show up in scans.", "File và thư mục bạn chọn sẽ không bao giờ hiện trong kết quả quét.")
+        if p.runModal() == .OK { for u in p.urls { ignore(u) } }
+    }
     func ignore(_ u: URL) {
         IgnoreList.add(u.path); ignored = IgnoreList.paths
         for i in cats.indices { cats[i].items.removeAll { $0.url == u } }
@@ -2771,6 +2899,9 @@ enum Phase { case idle, scanning, summary, review, done }
     }
 
     func reveal(_ u: URL) { NSWorkspace.shared.activateFileViewerSelecting([u]) }
+    /// Opens a file in the app the user set for its type; with no app set, macOS itself asks which app to use.
+    func openFile(_ u: URL) { NSWorkspace.shared.open(u) }
+    func openFile(_ u: URL, with app: URL) { NSWorkspace.shared.open([u], withApplicationAt: app, configuration: NSWorkspace.OpenConfiguration()) }
 
     func log(_ s: String) {
         let p = Stats.path
@@ -3201,7 +3332,7 @@ struct CheckBox: View {
     let state: Int
     var body: some View {
         Image(systemName: state == 2 ? "checkmark.square.fill" : (state == 1 ? "minus.square.fill" : "square"))
-            .font(.system(size: fs(17), weight: .medium))
+            .font(.system(size: fs(15), weight: .medium))
             .foregroundStyle(state == 0 ? AnyShapeStyle(Theme.ink.opacity(0.5)) : AnyShapeStyle(Theme.accent))
             // The whole square takes the click, not only the outline; hand cursor, no hover colour (lists stay calm).
             .contentShape(Rectangle())
@@ -3217,13 +3348,15 @@ struct PrimaryButton: View {
     let title: String; let action: () -> Void
     var disabled = false
     var width: CGFloat? = nil
+    /// Small macOS-size button for list rows (Settings): 12 pt text, tight padding, width from the label.
+    var compact = false
     var body: some View {
         Button(action: action) {
-            Text(title).font(Pill.font).foregroundColor(.white).lineLimit(1)
-                .frame(width: width.map { $0 - 2 * Pill.padH })
-                .padding(.horizontal, Pill.padH).padding(.vertical, Pill.padV)
-                .background(Capsule().fill(Theme.accent)).opacity(disabled ? 0.4 : 1)
-                .shadow(color: Theme.accentSolid.opacity(0.4), radius: 12, y: 4)
+            Text(title).font(compact ? .system(size: fs(13), weight: .medium) : Pill.font).foregroundColor(.white).lineLimit(1)
+                .frame(width: compact ? nil : width.map { $0 - 2 * Pill.padH })
+                .padding(.horizontal, compact ? 11 : Pill.padH).padding(.vertical, compact ? 4 : Pill.padV)
+                .background(compact ? AnyView(RoundedRectangle(cornerRadius: 6).fill(Theme.accentSolid)) : AnyView(Capsule().fill(Theme.accent))).opacity(disabled ? 0.4 : 1)
+                .shadow(color: Theme.accentSolid.opacity(compact ? 0 : 0.4), radius: 12, y: 4)
         }.buttonStyle(.plain).disabled(disabled).hoverLift()
     }
 }
@@ -3231,13 +3364,15 @@ struct PrimaryButton: View {
 struct GhostButton: View {
     let title: String; let action: () -> Void
     var width: CGFloat? = nil
+    /// Small macOS-size button for list rows (Settings): 12 pt text, tight padding, width from the label.
+    var compact = false
     var body: some View {
         Button(action: action) {
-            Text(title).font(.system(size: fs(14), weight: .medium)).foregroundColor(Theme.text).lineLimit(1)
-                .frame(width: width.map { $0 - 2 * Pill.padH })
-                .padding(.horizontal, Pill.padH).padding(.vertical, Pill.padV)
-                .background(Capsule().stroke(Theme.ink.opacity(0.35), lineWidth: 1))
-                .hoverBG(20, Theme.ink.opacity(0.1))
+            Text(title).font(.system(size: fs(13 + (compact ? 0 : 1)), weight: compact ? .regular : .medium)).foregroundColor(Theme.text).lineLimit(1)
+                .frame(width: compact ? nil : width.map { $0 - 2 * Pill.padH })
+                .padding(.horizontal, compact ? 11 : Pill.padH).padding(.vertical, compact ? 4 : Pill.padV)
+                .background(compact ? AnyView(RoundedRectangle(cornerRadius: 6).fill(Theme.ink.opacity(0.13))) : AnyView(Capsule().stroke(Theme.ink.opacity(0.35), lineWidth: 1)))
+                .hoverBG(compact ? 6 : 20, Theme.ink.opacity(0.1))
         }.buttonStyle(.plain).hoverLift()
     }
 }
@@ -3300,7 +3435,9 @@ struct Header: View {
     var body: some View {
         VStack(spacing: 6) {
             Text(title).font(.system(size: fs(28), weight: .bold)).foregroundColor(Theme.text)
+            // Narrow column so lines break evenly instead of running edge to edge with one orphan word.
             Text(sub).font(.system(size: fs(14))).foregroundColor(Theme.sub).multilineTextAlignment(.center)
+                .frame(maxWidth: 560 * uiScale).fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -3442,36 +3579,80 @@ struct ItemRow: View {
     @Binding var item: CleanItem
     let vm: VM
     var showDate = false
+    /// Duplicates: the copy suggested to keep shows a "Keep" tag. `keepColumn` reserves that column on every row of the
+    /// group, so the date and size columns stay in line whether or not a row has the tag.
+    var keep = false
+    var keepColumn = false
     var body: some View {
         HStack(spacing: 12) {
             Button { item.selected.toggle() } label: { CheckBox(state: item.selected ? 2 : 0) }.buttonStyle(.plain)
             FileThumb(url: item.url, side: 26 * uiScale)
+            // Name, path, and (when there is one) the warning on its own line: all start at the same left edge,
+            // so nothing pokes out between rows and the name never gets squeezed (style guide 1f).
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.name).foregroundColor(Theme.text).font(.system(size: fs(14))).lineLimit(1)
-                HStack(spacing: 6) {
-                    Text(item.shortPath).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
-                    if !item.note.isEmpty {
-                        Text(item.note).font(.system(size: fs(10), weight: .semibold)).foregroundColor(item.noteColor)
-                            .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(item.noteColor.opacity(0.15)))
-                            .tip(item.refHelp)
-                    }
+                Text(item.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
+                Text(item.shortPath).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
+                if !item.rowNote.isEmpty {
+                    Label(item.rowNote, systemImage: "exclamationmark.triangle.fill").font(.system(size: fs(11), weight: .medium))
+                        .foregroundColor(item.noteColor).lineLimit(1).tip(item.refHelp)
                 }
             }
-            Spacer()
-            if showDate, let d = item.date {
-                Text(t("Last opened ", "Mở lần cuối ") + shortDate(d)).foregroundColor(Theme.sub).font(.system(size: fs(11)))
+            Spacer(minLength: 12)
+            if keepColumn {
+                Group { if keep { StatusTag(t("Keep", "Giữ"), Theme.green) } }.frame(width: 50 * uiScale, alignment: .center)
+            }
+            if showDate {
+                Text(item.date.map(openedLabel) ?? "")
+                    .foregroundColor(Theme.sub).font(.system(size: fs(11)).monospacedDigit())
+                    .lineLimit(1).frame(width: 165 * uiScale, alignment: .trailing)
             }
             Text(fmt(item.size)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit()).frame(width: 80 * uiScale, alignment: .trailing)
         }
         .padding(.vertical, 9).padding(.horizontal, 12)
         .hoverBG(8, Theme.ink.opacity(0.07))
         .contentShape(Rectangle())
-        .contextMenu {
-            Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(item.url) }
+        // Like Finder: double-click opens in the default app, click shows a preview, Space over the row too.
+        .onTapGesture(count: 2) { vm.fileQL = nil; vm.openFile(item.url) }
+        .onTapGesture { vm.fileQL = item.url }
+        .onHover { inside in
+            if inside { vm.hoverFile = item.url } else if vm.hoverFile == item.url { vm.hoverFile = nil }
+        }
+        .contextMenu { FileMenu(url: item.url, vm: vm)
             Button(item.selected ? t("Deselect", "Bỏ chọn") : t("Select", "Chọn")) { item.selected.toggle() }
             Divider()
             Button(t("Ignore (don't show again)", "Bỏ qua (không hiện lại)")) { let u = item.url; DispatchQueue.main.async { vm.ignore(u) } }
         }
+    }
+}
+
+/// Right-click items for a file, Finder style: Open, Open With, Quick Look, Show in Finder, Copy Path.
+/// Nothing here deletes; cleaning stays with the tick boxes and Move to Trash.
+struct FileMenu: View {
+    let url: URL
+    let vm: VM
+    var openWith = true
+    var quickLook = true
+    var body: some View {
+        Button(t("Open", "Mở")) { vm.openFile(url) }
+        if openWith { Menu(t("Open With", "Mở bằng")) {
+            let def = NSWorkspace.shared.urlForApplication(toOpen: url)
+            let apps = NSWorkspace.shared.urlsForApplications(toOpen: url)
+            if let d = def {
+                Button(FileManager.default.displayName(atPath: d.path) + t(" (default)", " (mặc định)")) { vm.openFile(url, with: d) }
+                if apps.count > 1 { Divider() }
+            }
+            ForEach(apps.filter { $0 != def }.prefix(20), id: \.self) { a in
+                Button(FileManager.default.displayName(atPath: a.path)) { vm.openFile(url, with: a) }
+            }
+            if def == nil && apps.isEmpty { Text(t("No app can open this file", "Chưa có app mở được file này")) }
+        } }
+        if quickLook { Button(t("Quick Look", "Xem nhanh")) { vm.fileQL = url } }
+        Divider()
+        Button(t("Show in Finder", "Hiện trong Finder")) { vm.reveal(url) }
+        Button(t("Copy Path", "Chép đường dẫn")) {
+            NSPasteboard.general.clearContents(); NSPasteboard.general.setString(url.path, forType: .string)
+        }
+        Divider()
     }
 }
 
@@ -3484,21 +3665,21 @@ struct DoneBanner: View {
             UndoNote(vm: vm, text: n.text)
         } else if let d = vm.doneInfo, d.page == page {
             HStack(spacing: 14) {
-                Image(systemName: "checkmark.circle.fill").font(.system(size: fs(30))).foregroundColor(Theme.green)
+                Image(systemName: "checkmark.circle.fill").font(.system(size: fs(22))).foregroundColor(Theme.green)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(d.size > 0 ? t("\(fmt(d.size)) tidier", "Gọn thêm \(fmt(d.size))") : t("Done", "Xong"))
-                        .font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
+                        .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     Text(t("\(d.count) items moved to the Trash. Empty the Trash to free the space for real.",
                            "\(d.count) mục đã vào Thùng rác. Đổ Thùng rác thì ổ mới trống thật.") + (d.fail > 0 ? t(" \(d.fail) skipped.", " Bỏ qua \(d.fail) mục.") : ""))
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 8)
-                if vm.bannerCanUndo { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoFromBanner() } }
-                GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.page = .trash }
+                if vm.bannerCanUndo { GhostButton(title: t("Undo", "Hoàn tác"), action: { vm.undoFromBanner() }, compact: true) }
+                GhostButton(title: t("Open Trash", "Xem Thùng rác"), action: { vm.page = .trash }, compact: true)
                 Button { vm.doneInfo = nil } label: { Image(systemName: "xmark").font(.system(size: fs(12), weight: .semibold)) }
                     .buttonStyle(.icon).foregroundColor(Theme.sub).tip(t("Close", "Đóng"), trailing: true)
             }
-            .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.green.opacity(0.12)))
+            .padding(14).background(RoundedRectangle(cornerRadius: 10).fill(Theme.green.opacity(0.12)))
             .padding(.horizontal, 24).padding(.bottom, 10)
         }
     }
@@ -3561,7 +3742,7 @@ struct JunkCard: View {
                     SafetyBadge(level: cat.safety, why: cat.why)
                 }
                 Text(fmt(picked ? cat.selectedSize : cat.total)).font(.system(size: fs(24), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
-                Text(cat.title).font(.system(size: fs(14), weight: .semibold)).foregroundColor(Theme.text).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                Text(cat.title).font(.system(size: fs(13))).foregroundColor(Theme.text).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                 Text(cat.desc).font(.system(size: fs(12))).foregroundColor(Theme.sub).lineLimit(2).fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
                 Text(picked ? t("Selected · Review", "Đã chọn · Xem") : t("Not selected · Review", "Chưa chọn · Xem"))
@@ -3790,9 +3971,9 @@ struct SysPartCard: View {
                     .frame(width: 32, height: 32).background(Circle().fill(Theme.accent.opacity(0.14)))
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Text(part.title).font(.system(size: fs(14), weight: .semibold)).foregroundColor(Theme.text)
-                        Text(badge.0).font(.system(size: fs(10), weight: .semibold)).foregroundColor(badge.1)
-                            .padding(.horizontal, 7).padding(.vertical, 2).background(Capsule().fill(badge.1.opacity(0.15)))
+                        Text(part.title).font(.system(size: fs(13))).foregroundColor(Theme.text)
+                        Spacer(minLength: 8)
+                        StatusTag(badge.0, badge.1)
                     }
                     Text(part.note).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 14) {
@@ -3838,7 +4019,7 @@ struct SysDataView: View {
         VStack(spacing: 0) {
             HStack(spacing: 10) {
                 Button { vm.sysOpen = false } label: { Image(systemName: "chevron.left") }.buttonStyle(.icon).foregroundColor(Theme.text).tip(t("Back", "Lùi"))
-                Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(20), weight: .bold)).foregroundColor(Theme.text)
+                Text(t("What is in System Data", "System Data gồm những gì")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                 Spacer()
                 if !vm.sysBusy { TextLink(t("Scan again", "Quét lại"), size: fs(12), weight: .semibold, color: Theme.text) { vm.scanSys() } }
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
@@ -4050,7 +4231,7 @@ struct CleanupView: View {
                 Text(t("Last step: review the Trash, then empty it.", "Bước cuối: xem lại Thùng rác rồi đổ.")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoLast() } }
-                    GhostButton(title: t("Scan Again", "Quét lại")) { vm.scanJunk() }
+                    GhostButton(title: t("Scan Again", "Quét lại"), action: { vm.scanJunk() }, compact: true)
                     PrimaryButton(title: t("Open Trash", "Xem Thùng rác"), action: { vm.page = .trash })
                 }
                 if Invite.shouldShow() { InviteCard(source: "after-clean").frame(maxWidth: 520).padding(.top, 8) }
@@ -4067,7 +4248,7 @@ struct ReviewView: View {
             HStack {
                 Button { vm.phase = .summary } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
-                Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
+                Text(t("Cleanup Details", "Dọn rác chi tiết")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                 Spacer()
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select All", "Chọn tất cả")) { vm.setAll(true) }
@@ -4082,9 +4263,9 @@ struct ReviewView: View {
                         VStack(spacing: 0) {
                             HStack(spacing: 12) {
                                 Button { vm.toggleCat(cat.id) } label: { CheckBox(state: cat.state) }.buttonStyle(.plain)
-                                Image(systemName: cat.icon).font(.system(size: fs(18))).foregroundStyle(Theme.accent).frame(width: 26)
+                                Image(systemName: cat.icon).font(.system(size: fs(15))).foregroundStyle(Theme.accent).frame(width: 26)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(cat.title).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
+                                    Text(cat.title).foregroundColor(Theme.text).font(.system(size: fs(13)))
                                     Text(cat.desc).foregroundColor(Theme.sub).font(.system(size: fs(11)))
                                 }
                                 Spacer()
@@ -4139,9 +4320,31 @@ struct ByAppView: View {
     }
 }
 
+/// Local external drives mounted now (under /Volumes, not hidden, not network): for Space Lens.
+func externalDrives() -> [URL] {
+    (FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeIsLocalKey, .volumeIsInternalKey], options: [.skipHiddenVolumes]) ?? [])
+        .filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
+        .sorted { $0.lastPathComponent.localizedCaseInsensitiveCompare($1.lastPathComponent) == .orderedAscending }
+}
 func appIcon(_ bundleIDs: [String]) -> NSImage {
     for b in bundleIDs { if let u = NSWorkspace.shared.urlForApplication(withBundleIdentifier: b) { return NSWorkspace.shared.icon(forFile: u.path) } }
     return NSWorkspace.shared.icon(for: .applicationBundle)
+}
+func appInstalled(_ bundleIDs: [String]) -> Bool { bundleIDs.contains { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0) != nil } }
+
+/// App icon for a Clean by App rule. The app may be gone while its data stays (e.g. CapCut removed, Movies/CapCut left):
+/// then a neutral tile with the app's initial instead of macOS's blank "application" icon, which looks broken.
+struct RuleIcon: View {
+    let name: String; let bundleIDs: [String]; let side: CGFloat
+    var body: some View {
+        if appInstalled(bundleIDs) {
+            Image(nsImage: appIcon(bundleIDs)).resizable().frame(width: side, height: side)
+        } else {
+            RoundedRectangle(cornerRadius: side * 0.22).fill(Theme.ink.opacity(0.12))
+                .overlay(Text(String(name.prefix(1))).font(.system(size: side * 0.48, weight: .semibold)).foregroundColor(Theme.sub))
+                .frame(width: side * 0.86, height: side * 0.86).frame(width: side, height: side)
+        }
+    }
 }
 
 struct AppList: View {
@@ -4150,12 +4353,12 @@ struct AppList: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(t("Clean by App", "Dọn theo ứng dụng")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
+                    Text(t("Clean by App", "Dọn theo ứng dụng")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                     Text(t("\(vm.appReports.count) apps, \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })) can be cleaned.", "\(vm.appReports.count) app, có thể dọn \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable }))."))
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 }
                 Spacer()
-                GhostButton(title: t("Scan Again", "Quét lại")) { vm.scanByApp() }
+                GhostButton(title: t("Scan Again", "Quét lại"), action: { vm.scanByApp() }, compact: true)
             }.padding(.horizontal, 24).padding(.top, 30).padding(.bottom, 14)
             DoneBanner(vm: vm, page: .byapp)
             if !vm.appMsg.isEmpty { Text(vm.appMsg).font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 24).padding(.bottom, 8) }
@@ -4169,25 +4372,21 @@ struct AppList: View {
                     LazyVStack(spacing: 10) {
                         ForEach(vm.appReports) { r in
                             HStack(spacing: 14) {
-                                Image(nsImage: appIcon(r.rule.bundleIDs)).resizable().frame(width: 40, height: 40)
+                                RuleIcon(name: r.rule.name, bundleIDs: r.rule.bundleIDs, side: 40)
                                 VStack(alignment: .leading, spacing: 3) {
-                                    HStack(spacing: 8) {
-                                        Text(r.rule.name).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
-                                        if r.running {
-                                            Text(t("Open", "Đang mở")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.warn)
-                                                .padding(.horizontal, 6).padding(.vertical, 1).background(Capsule().fill(Theme.warn.opacity(0.15)))
-                                        }
-                                    }
+                                    Text(r.rule.name).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold))
                                     Text(r.groups.map { "\($0.section.title) \(fmt($0.total))" }.joined(separator: " · ")).font(.system(size: fs(11))).foregroundColor(Theme.sub).lineLimit(1)
                                 }
-                                Spacer()
+                                Spacer(minLength: 12)
+                                if r.running { StatusTag(t("Open", "Đang mở"), Theme.warn) }
+                                else if !appInstalled(r.rule.bundleIDs) { StatusTag(t("App removed", "App đã gỡ"), Theme.sub).tip(t("The app is gone but its data is still here.", "App đã gỡ nhưng dữ liệu vẫn còn.")) }
                                 VStack(alignment: .trailing, spacing: 2) {
-                                    Text(fmt(r.total)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold).monospacedDigit())
+                                    Text(fmt(r.total)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold).monospacedDigit())
                                     Text(t("\(fmt(r.cleanable)) cleanable", "dọn được \(fmt(r.cleanable))")).font(.system(size: fs(11))).foregroundColor(Theme.sub)
-                                }
+                                }.frame(minWidth: 110 * uiScale, alignment: .trailing)
                                 Image(systemName: "chevron.right").foregroundColor(Theme.sub)
                             }
-                            .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card)).hoverBG(14, Theme.ink.opacity(0.06))
+                            .padding(14).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card)).hoverBG(10, Theme.ink.opacity(0.06))
                             .contentShape(Rectangle()).onTapGesture { vm.appSel = r.id; vm.appAge = 0 }
                         }
                     }.padding(.horizontal, 24).padding(.bottom, 16)
@@ -4211,8 +4410,8 @@ struct AppDetail: View {
                 Button { vm.closeMonth(); vm.appSel = nil } label: { Label(t("Back", "Quay lại"), systemImage: "chevron.left").padding(.horizontal, 6).padding(.vertical, 3).hoverTile() }.buttonStyle(.plain).foregroundColor(Theme.text)
                 Spacer()
                 HStack(spacing: 8) {
-                    Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 22, height: 22)
-                    Text(report.rule.name).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
+                    RuleIcon(name: report.rule.name, bundleIDs: report.rule.bundleIDs, side: 22)
+                    Text(report.rule.name).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     Text(fmt(report.total)).font(.system(size: fs(13))).foregroundColor(Theme.sub)
                 }
                 Spacer()
@@ -4245,7 +4444,7 @@ struct AppDetail: View {
                                 if locked { Image(systemName: "lock.fill").foregroundColor(Theme.danger).frame(width: 18) }
                                 else { Button { vm.toggleAppGroup(report.id, g.id) } label: { CheckBox(state: g.state) }.buttonStyle(.plain) }
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(g.section.title).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
+                                    Text(g.section.title).foregroundColor(Theme.text).font(.system(size: fs(13)))
                                     Text(g.section.why).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(2)
                                 }
                                 Spacer()
@@ -4273,10 +4472,19 @@ struct AppDetail: View {
                                         if row.month != nil { Image(systemName: "chevron.right").foregroundColor(Theme.sub).font(.system(size: fs(12))) }
                                     }
                                     .padding(.vertical, 6).padding(.horizontal, 12).hoverBG(8, Theme.ink.opacity(0.07)).contentShape(Rectangle())
-                                    .onTapGesture { if row.month != nil { vm.openMonth(report.id, g.id, row.id) } }
+                                    // A month opens the month viewer; a single file or folder: click = Quick Look,
+                                    // double-click = open in its default app, Space over it = Quick Look (like Finder).
+                                    .onTapGesture(count: 2) { if row.month == nil, let u = row.urls.first { vm.fileQL = nil; vm.openFile(u) } }
+                                    .onTapGesture { if row.month != nil { vm.openMonth(report.id, g.id, row.id) } else if let u = row.urls.first { vm.fileQL = u } }
+                                    .onHover { inside in
+                                        guard row.month == nil, let u = row.urls.first else { return }
+                                        if inside { vm.hoverFile = u } else if vm.hoverFile == u { vm.hoverFile = nil }
+                                    }
                                     .contextMenu {
-                                        if row.month != nil { Button(t("View files", "Xem các file")) { vm.openMonth(report.id, g.id, row.id) } }
-                                        Button(t("Reveal in Finder", "Mở trong Finder")) { if let u = row.urls.first { vm.reveal(u) } }
+                                        if row.month != nil {
+                                            Button(t("View files", "Xem các file")) { vm.openMonth(report.id, g.id, row.id) }
+                                            if let u = row.urls.first { Button(t("Show in Finder", "Hiện trong Finder")) { vm.reveal(u) } }
+                                        } else if let u = row.urls.first { FileMenu(url: u, vm: vm) }
                                     }
                                 }.padding(.leading, 26)
                             }
@@ -4452,7 +4660,7 @@ struct MonthViewer: View {
                 Spacer()
                 VStack(spacing: 2) {
                     HStack(spacing: 8) {
-                        Image(nsImage: appIcon(report.rule.bundleIDs)).resizable().frame(width: 20, height: 20)
+                        RuleIcon(name: report.rule.name, bundleIDs: report.rule.bundleIDs, side: 20)
                         Text("\(report.rule.name) · \(group?.section.title ?? "") · \(row?.title ?? "")").font(.system(size: fs(15), weight: .semibold)).foregroundColor(Theme.text).lineLimit(1)
                     }
                     Text(t("\(vm.monthItems.count) files · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))", "\(vm.monthItems.count) file · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))"))
@@ -4497,7 +4705,7 @@ struct MonthViewer: View {
                                         .onTapGesture { vm.clickMonth(it.id, shift: NSEvent.modifierFlags.contains(.shift)) }
                                         .contextMenu {
                                             Button(t("Show large", "Xem to")) { vm.previewMonth(it.id) }
-                                            Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(it.url) }
+                                            FileMenu(url: it.url, vm: vm, quickLook: false)
                                         }
                                 }
                             }
@@ -4533,7 +4741,7 @@ struct MonthViewer: View {
                                     .onTapGesture { vm.clickMonth(it.id, shift: NSEvent.modifierFlags.contains(.shift)) }
                                     .contextMenu {
                                         Button(t("Show large", "Xem to")) { vm.previewMonth(it.id) }
-                                        Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(it.url) }
+                                        FileMenu(url: it.url, vm: vm, quickLook: false)
                                     }
                                 }
                             }
@@ -4576,7 +4784,7 @@ struct MonthViewer: View {
             HStack {
                 Text(vm.monthPick.isEmpty ? t("Nothing ticked", "Chưa tick gì")
                      : t("\(vm.monthPick.count) ticked · \(fmt(pickSize))", "Đã tick \(vm.monthPick.count) · \(fmt(pickSize))"))
-                    .foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold).monospacedDigit())
+                    .foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit())
                 Spacer()
                 Text(t("Ticked files are cleaned with the rest when you press Move to Trash.", "File đã tick được dọn cùng khi bấm Chuyển vào Thùng rác."))
                     .foregroundColor(Theme.sub).font(.system(size: fs(11)))
@@ -4665,17 +4873,17 @@ struct LargeView: View {
             switch vm.largePhase {
             case .idle:
                 VStack(spacing: 28) {
-                    Header(title: t("Large & Old Files", "File lớn và cũ"), sub: t("Files over 100 MB in Documents, Downloads, Desktop, Movies, Music and Pictures, plus drives and folders added in Settings.\nNothing is selected by default.", "File trên 100 MB trong Documents, Downloads, Desktop, Movies, Music, Pictures, cùng ổ và thư mục thêm ở Cài đặt.\nMặc định không tick, bạn tự chọn."))
+                    Header(title: t("Large & Old Files", "File lớn và cũ"), sub: t("Files over 100 MB in your folders and the drives added in Settings.\nNothing is ticked; you choose.", "File trên 100 MB trong các thư mục của bạn và ổ đã thêm ở Cài đặt.\nKhông tick sẵn, bạn tự chọn."))
                     BigScanButton(label: t("Scan", "Quét")) { vm.scanLarge() }
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             case .scanning:
                 Scanning(text: t("Looking for large files...", "Đang tìm file lớn...")).frame(maxWidth: .infinity, maxHeight: .infinity)
             default:
                 HStack {
-                    Text(t("Large Files (\(vm.large.count))", "File lớn (\(vm.large.count))")).font(.system(size: fs(17), weight: .semibold)).foregroundColor(Theme.text)
+                    Text(t("Large Files (\(vm.large.count))", "File lớn (\(vm.large.count))")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     Spacer()
                     Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
-                        .pickerStyle(.segmented).frame(width: 240)
+                        .pickerStyle(.segmented).controlSize(.small).fixedSize()
                     Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
                 DoneBanner(vm: vm, page: .large)
@@ -4722,6 +4930,10 @@ struct LensView: View {
                 HStack(spacing: 12) {
                     GhostButton(title: "Library") { vm.openLens(Scanner.lib) }
                     GhostButton(title: "Documents") { vm.openLens(Scanner.home.appendingPathComponent("Documents")) }
+                    // External drives plugged in right now (local disks under /Volumes, not network shares or hidden volumes).
+                    ForEach(externalDrives(), id: \.path) { d in
+                        GhostButton(title: d.lastPathComponent) { vm.openLens(d) }.tip(t("Map this external drive", "Xem bản đồ ổ cứng rời này"))
+                    }
                 }
                 TextLink(t("Disk full of \"System Data\"? See what is in it", "Ổ đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(13), weight: .semibold) { vm.openSys() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -4781,8 +4993,13 @@ struct LensView: View {
                                     .padding(.horizontal, 10).padding(.vertical, 8)
                                     .background(RoundedRectangle(cornerRadius: 8).fill(vm.hoverNode == n.id || vm.lensSel.contains(n.url) ? Theme.cardHi : Color.clear))
                                     .contentShape(Rectangle())
-                                    .onTapGesture { if n.isDir { vm.openLens(n.url) } }
-                                    .onHover { h in vm.hoverNode = h ? n.id : nil }
+                                    // Folder: click goes into it. File: click = Quick Look, double-click = open. Space = Quick Look.
+                                    .onTapGesture(count: 2) { if !n.isDir && n.otherCount == 0 { vm.fileQL = nil; vm.openFile(n.url) } }
+                                    .onTapGesture { if n.isDir { vm.openLens(n.url) } else if n.otherCount == 0 { vm.fileQL = n.url } }
+                                    .onHover { h in
+                                        vm.hoverNode = h ? n.id : nil
+                                        if n.otherCount == 0 { if h { vm.hoverFile = n.url } else if vm.hoverFile == n.url { vm.hoverFile = nil } }
+                                    }
                                     .contextMenu { nodeMenu(n) }
                                 }
                             }.padding(.horizontal, 12)
@@ -4844,9 +5061,12 @@ struct LensView: View {
         }
     }
     @ViewBuilder func nodeMenu(_ n: Node) -> some View {
-        Button(t("Reveal in Finder", "Mở trong Finder")) { vm.reveal(n.url) }
-        if n.isDir { Button(t("Open", "Mở")) { vm.openLens(n.url) } }
-        Divider()
+        if n.isDir {
+            Button(t("Open in Space Lens", "Xem trong Bản đồ ổ đĩa")) { vm.openLens(n.url) }
+            FileMenu(url: n.url, vm: vm, openWith: false)
+        } else {
+            FileMenu(url: n.url, vm: vm)
+        }
         if Scanner.blocked(n.url.path) {
             Text(t("Protected: cannot be removed here", "Được bảo vệ: không xoá từ đây được"))
         } else {
@@ -4870,27 +5090,54 @@ func sessionName(_ s: Journal.Session) -> String {
 struct TrashView: View {
     @ObservedObject var vm: VM
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: vm.trashCount == 0 ? "trash" : "trash.fill").font(.system(size: fs(70))).foregroundStyle(Theme.accent)
-            Text(fmt(vm.trashSize)).font(.system(size: fs(46), weight: .bold)).foregroundColor(Theme.text)
-            Text(vm.trashCount == 0 ? t("The Trash is empty.", "Thùng rác trống.") : t("\(vm.trashCount) items in the Trash", "\(vm.trashCount) mục trong Thùng rác")).foregroundColor(Theme.sub)
-            HStack(spacing: 14) {
-                GhostButton(title: t("Show in Finder", "Mở trong Finder")) { NSWorkspace.shared.open(Scanner.trashURL) }
-                PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
+        // Same layout language as Settings (style guide 1f): page title, rounded blocks, notes under each block.
+        ScrollView { VStack(alignment: .leading, spacing: 14) {
+            Text(t("Trash", "Thùng rác")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
+            VStack(alignment: .leading, spacing: 6) {
+                SettingsBox {
+                    HStack(spacing: 14) {
+                        Image(systemName: vm.trashCount == 0 ? "trash" : "trash.fill").font(.system(size: fs(26))).foregroundStyle(Theme.accent).frame(width: 40)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(fmt(vm.trashSize)).font(.system(size: fs(20), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
+                            Text(vm.trashCount == 0 ? t("The Trash is empty.", "Thùng rác trống.") : t("\(vm.trashCount) items in the Trash", "\(vm.trashCount) mục trong Thùng rác"))
+                                .font(.system(size: fs(11))).foregroundColor(Theme.sub)
+                            ForEach(vm.trashOnDrives, id: \.0) { d in
+                                Label(t("\(d.1) items, \(fmt(d.2)) on \(d.0)", "\(d.1) mục, \(fmt(d.2)) trên ổ \(d.0)"), systemImage: "externaldrive")
+                                    .font(.system(size: fs(11))).foregroundColor(Theme.sub)
+                            }
+                        }
+                        Spacer(minLength: 12)
+                        GhostButton(title: t("Show in Finder", "Mở trong Finder"), action: { NSWorkspace.shared.open(Scanner.trashURL) }, compact: true)
+                        PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0, compact: true)
+                    }.settingFlat()
+                }
+                if let n = vm.trashLeftNote, vm.trashCount > 0 {
+                    Label(n, systemImage: "exclamationmark.triangle.fill").font(.system(size: fs(11), weight: .medium)).foregroundColor(Theme.warn)
+                        .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 14)
+                }
+                SettingNote(t("Emptying cannot be undone. Take a quick look first.", "Đổ rồi thì không lấy lại được. Liếc qua một lượt trước đã."))
             }
-            Text(t("Emptying cannot be undone. Take a quick look first.", "Dọn sạch rồi thì không lấy lại được. Liếc qua một lượt trước đã.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
-            if let n = vm.undoNote { Text(n.text).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.green) }
+            if let n = vm.undoNote {
+                Label(n.text, systemImage: "arrow.uturn.backward.circle.fill").font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 14)
+            }
             if let s = vm.undoable {
-                VStack(spacing: 8) {
-                    Text(t("Last clean\(sessionName(s)): \(s.entries.count) items, \(fmt(s.size)), \(ago(s.date))", "Lần dọn vừa rồi\(sessionName(s)): \(s.entries.count) mục, \(fmt(s.size)), \(ago(s.date))"))
-                        .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
-                    GhostButton(title: t("Undo last clean", "Hoàn tác lần dọn vừa rồi")) { vm.undoLast() }
-                    Text(t("Undo puts back only these items. The Trash total above also counts what was there before.", "Hoàn tác chỉ trả về đúng các mục này. Con số Thùng rác ở trên tính cả những thứ đã có từ trước."))
-                        .font(.system(size: fs(12))).foregroundColor(Theme.sub)
-                }.padding(.top, 10)
+                Text(t("Last clean", "Lần dọn vừa rồi")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text).padding(.top, 6).padding(.leading, 4)
+                VStack(alignment: .leading, spacing: 6) {
+                    SettingsBox {
+                        HStack(spacing: 12) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(t("\(s.entries.count) items, \(fmt(s.size))", "\(s.entries.count) mục, \(fmt(s.size))") + sessionName(s))
+                                    .font(.system(size: fs(13))).foregroundColor(Theme.text)
+                                Text(ago(s.date)).font(.system(size: fs(11))).foregroundColor(Theme.sub)
+                            }
+                            Spacer(minLength: 12)
+                            GhostButton(title: t("Undo", "Hoàn tác"), action: { vm.undoLast() }, compact: true)
+                        }.settingFlat()
+                    }
+                    SettingNote(t("Undo puts back only these items. The Trash total above also counts what was there before.", "Hoàn tác chỉ trả về đúng các mục này. Con số Thùng rác ở trên tính cả những thứ đã có từ trước."))
+                }
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }.frame(maxWidth: 760 * uiScale, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 24).frame(maxWidth: .infinity) }
         .onAppear { vm.refreshTrash() }
     }
 }
@@ -4899,10 +5146,14 @@ struct IgnoreView: View {
     @ObservedObject var vm: VM
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(t("Ignore List", "Danh sách bỏ qua")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
-                Text(t("Items here are never shown in scans. Right-click any item in Cleanup, Large Files or Space Lens to add it.", "Mục ở đây không bao giờ hiện trong kết quả quét. Chuột phải vào một mục ở Dọn rác chi tiết, File lớn hoặc Bản đồ ổ đĩa để thêm."))
-                    .foregroundColor(Theme.sub).font(.system(size: fs(12)))
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(t("Ignore List", "Danh sách bỏ qua")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
+                    Text(t("Items here never show up in scans. Add files or folders here, or right-click an item in a scan list.", "Mục ở đây không bao giờ hiện trong kết quả quét. Thêm file, thư mục ở đây, hoặc chuột phải vào một mục trong danh sách quét."))
+                        .foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                }
+                Spacer(minLength: 16)
+                GhostButton(title: t("Add…", "Thêm…"), action: { vm.addIgnoredByPicker() }, compact: true)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 16)
             if vm.ignored.isEmpty {
                 Text(t("Nothing ignored yet.", "Chưa bỏ qua mục nào.")).foregroundColor(Theme.sub).frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -5162,8 +5413,22 @@ struct Sidebar: View {
     }
 }
 
+/// Gives the VM the NSWindow that hosts the main view, so window limits can be set on it directly.
+struct WindowGrabber: NSViewRepresentable {
+    let vm: VM
+    final class V: NSView {
+        var onWindow: ((NSWindow) -> Void)?
+        override func viewDidMoveToWindow() { super.viewDidMoveToWindow(); if let w = window { onWindow?(w) } }
+    }
+    func makeNSView(context: Context) -> V {
+        let v = V(); v.onWindow = { w in MainActor.assumeIsolated { vm.mainWindow = w; vm.applyWindowLimits() } }; return v
+    }
+    func updateNSView(_ v: V, context: Context) {}
+}
+
 struct RootView: View {
     @ObservedObject var vm: VM
+    @StateObject private var keys = KeyTap()
     var body: some View {
         HStack(spacing: 0) {
             Sidebar(vm: vm)
@@ -5188,16 +5453,31 @@ struct RootView: View {
         }
         .background(Theme.bg)
         .frame(minWidth: 980 * uiScale, minHeight: 600)
+        .background(WindowGrabber(vm: vm))
         .id(vm.theme + vm.textSize)
         .preferredColorScheme(Theme.p.light ? .light : .dark)
         .ignoresSafeArea()
-        .onAppear { vm.checkUpdates(); vm.windowShown() }
-        .onDisappear { vm.windowGone() }
+        .quickLookPreview(Binding(get: { vm.fileQL }, set: { vm.fileQL = $0 }))
+        .onAppear {
+            vm.checkUpdates(); vm.windowShown()
+            // Space over a file row shows it (Quick Look), Space again closes it, like Finder.
+            // Not while typing in a field, and not in the month viewer (it has its own Space).
+            keys.start { e in
+                MainActor.assumeIsolated {
+                    guard e.keyCode == 49, e.modifierFlags.intersection([.command, .option, .control]).isEmpty,
+                          vm.monthRef == nil, !(NSApp.keyWindow?.firstResponder is NSTextView) else { return false }
+                    if vm.fileQL != nil { vm.fileQL = nil; return true }
+                    if let h = vm.hoverFile, FileManager.default.fileExists(atPath: h.path) { vm.fileQL = h; return true }
+                    return false
+                }
+            }
+        }
+        .onDisappear { vm.windowGone(); keys.stop() }
     }
 }
 
-/// Update check: one request a day to GitHub's public releases endpoint. Nothing about the Mac is sent;
-/// the app only reads the latest version number and shows a line if it is newer. No auto-install.
+/// Update check: when the window opens, at most once a day, asks update.tidymint.app (backup: tidymint.app, then GitHub)
+/// for the latest version number and shows a line if it is newer. No auto-install. Off in Settings: no automatic check.
 enum Updates {
     static let api = URL(string: "https://api.github.com/repos/HaiTrung-Workspace/tidymint/releases/latest")!
     static let page = URL(string: "https://github.com/HaiTrung-Workspace/tidymint/releases/latest")!
@@ -5258,13 +5538,13 @@ struct AppsView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(t("Uninstaller", "Gỡ app")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
+                Text(t("Uninstaller", "Gỡ app")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                 Spacer()
                 Picker("", selection: $vm.appsTab) {
                     Text(t("Apps", "App") + " (\(vm.apps.count))").tag(0)
                     Text(t("Leftovers", "File sót") + " (\(vm.leftovers.count))").tag(1)
                     Text(t("Installers", "File cài đặt") + " (\(vm.installers.count))").tag(2)
-                }.pickerStyle(.segmented).frame(width: 360)
+                }.pickerStyle(.segmented).controlSize(.small).fixedSize()
                 if vm.appsBusy { ProgressView().controlSize(.small).tint(Theme.text).padding(.leading, 6) }
                 Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -5286,6 +5566,8 @@ struct AppsView: View {
     var appsTab: some View {
         HStack(spacing: 0) {
             VStack(spacing: 0) {
+            TextField(t("Search apps", "Tìm app"), text: $vm.appsQuery)
+                .textFieldStyle(.roundedBorder).controlSize(.small).padding(.horizontal, 12).padding(.top, 8)
             HStack(spacing: 8) {
                 Menu {
                     ForEach(0..<5, id: \.self) { f in
@@ -5316,10 +5598,10 @@ struct AppsView: View {
                                     } else {
                                         Text(t("Never opened", "Chưa mở lần nào")).foregroundColor(Theme.sub).font(.system(size: fs(10))).lineLimit(1)
                                     }
-                                    if let b = a.webAppBrowser { WebAppTag(browser: b) }
                                 }
                             }
-                            Spacer()
+                            Spacer(minLength: 8)
+                            if let b = a.webAppBrowser { WebAppTag(browser: b) }
                             Text(fmt(a.size)).foregroundColor(Theme.sub).font(.system(size: fs(12)).monospacedDigit())
                         }
                         .padding(.horizontal, 10).padding(.vertical, 8)
@@ -5327,6 +5609,7 @@ struct AppsView: View {
                         .hoverBG(8, Theme.ink.opacity(0.07))
                         .contentShape(Rectangle())
                         .onTapGesture { vm.loadRelated(a.id) }
+                        .contextMenu { FileMenu(url: a.url, vm: vm, openWith: false, quickLook: false) }
                     }
                 }.padding(.horizontal, 12)
             }
@@ -5337,7 +5620,7 @@ struct AppsView: View {
                     HStack(spacing: 12) {
                         Image(nsImage: NSWorkspace.shared.icon(forFile: vm.apps[i].url.path)).resizable().frame(width: 48, height: 48)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(vm.apps[i].name).font(.system(size: fs(18), weight: .bold)).foregroundColor(Theme.text)
+                            Text(vm.apps[i].name).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                             Text(vm.apps[i].bundleID).font(.system(size: fs(11))).foregroundColor(Theme.sub)
                         }
                     }.padding(20)
@@ -5428,7 +5711,7 @@ struct DupesView: View {
         VStack(spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Duplicates", "File trùng")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
+                    Text(t("Duplicates", "File trùng")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                     Text(t("Identical files (same content, any name) over 1 MB in Documents, Downloads, Desktop, Pictures, Movies, Music, plus drives and folders added in Settings.",
                            "File giống hệt nhau về nội dung (dù khác tên), trên 1 MB, trong Documents, Downloads, Desktop, Pictures, Movies, Music, cùng ổ và thư mục thêm ở Cài đặt."))
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub)
@@ -5469,7 +5752,8 @@ struct DupesView: View {
                                     FileThumb(url: g.items[0].url, side: 30 * uiScale)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(g.items[0].name).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold)).lineLimit(1)
-                                        Text(t("\(g.items.count) copies × \(fmt(g.size))", "\(g.items.count) bản × \(fmt(g.size))")).foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                                        Text(t("\(g.items.count) copies × \(fmt(g.size))", "\(g.items.count) bản × \(fmt(g.size))") + (g.isCross ? t(" · on this Mac and an external drive", " · trên máy và ổ cứng rời") : ""))
+                                            .foregroundColor(Theme.sub).font(.system(size: fs(11)))
                                     }
                                     Spacer()
                                     Text(t("extra ", "thừa ") + fmt(g.wasted)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit())
@@ -5480,16 +5764,10 @@ struct DupesView: View {
                                 if g.expanded {
                                     Divider().background(Theme.ink.opacity(0.1))
                                     ForEach(Array($g.items.enumerated()), id: \.element.id) { idx, $it in
-                                        HStack(spacing: 0) {
-                                            ItemRow(item: $it, vm: vm, showDate: true)
-                                            if idx == 0 {
-                                                Text(t("Keep", "Giữ")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.green)
-                                                    .padding(.horizontal, 6).padding(.vertical, 2).background(Capsule().fill(Theme.green.opacity(0.15))).padding(.trailing, 10)
-                                            }
-                                        }
+                                        ItemRow(item: $it, vm: vm, showDate: true, keep: idx == 0, keepColumn: true)
                                     }.padding(.leading, 14)
                                 }
-                            }.background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+                            }.background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
                         }
                     }.padding(.horizontal, 24).padding(.bottom, 16)
                 }
@@ -5526,7 +5804,7 @@ struct CloudView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Cloud Cleanup", "Dữ liệu đám mây")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
+                    Text(t("Cloud Cleanup", "Dữ liệu đám mây")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                     Text(t("How much of Google Drive, iCloud and other cloud folders is stored on this Mac. Files that live only in the cloud count as 0.",
                            "Google Drive, iCloud và các thư mục mây đang chiếm bao nhiêu trên máy. File chỉ nằm trên mây tính là 0."))
                         .foregroundColor(Theme.sub).font(.system(size: fs(12)))
@@ -5544,14 +5822,14 @@ struct CloudView: View {
                         VStack(spacing: 0) {
                             HStack(spacing: 12) {
                                 Image(systemName: p.isICloud ? "icloud.fill" : "externaldrive.connected.to.line.below")
-                                    .font(.system(size: fs(18))).foregroundStyle(Theme.accent).frame(width: 26)
+                                    .font(.system(size: fs(15))).foregroundStyle(Theme.accent).frame(width: 26)
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(p.name).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
+                                    Text(p.name).foregroundColor(Theme.text).font(.system(size: fs(13)))
                                     if !p.account.isEmpty { Text(p.account).foregroundColor(Theme.sub).font(.system(size: fs(11))) }
                                 }
                                 Spacer()
                                 Text(t("on this Mac: ", "trên máy: ")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
-                                Text(fmt(p.local)).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold).monospacedDigit())
+                                Text(fmt(p.local)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit())
                                 Image(systemName: "chevron.down").rotationEffect(.degrees(p.expanded ? 0 : -90)).foregroundColor(Theme.sub)
                             }
                             .padding(14).hoverBG(14, Theme.ink.opacity(0.06)).contentShape(Rectangle())
@@ -5589,145 +5867,301 @@ struct CloudView: View {
 }
 
 // MARK: - Settings page
+/// A Settings group: a header card (title, one-line summary of what is inside, optional badge, chevron) that folds its rows.
+/// Thin line between rows of the Settings list (System Settings style: one card, rows split by a hairline).
+struct RowLine: View { var body: some View { Rectangle().fill(Theme.ink.opacity(0.08)).frame(height: 1) } }
+
+/// One foldable group of the Settings list: icon, title, one-line summary, optional attention badge, chevron.
+/// Rows inside are indented under the title and share the same card (chốt kiểu A, 04/11/2026).
+struct SettingsGroup<Content: View>: View {
+    let id: String
+    let icon: String
+    let title: String
+    let summary: String
+    let badge: String?
+    var first = false
+    @ObservedObject var groups: OpenGroups
+    @ViewBuilder let content: () -> Content
+    var isOpen: Bool { groups.ids.contains(id) }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeOut(duration: 0.18)) { if isOpen { groups.ids.remove(id) } else { groups.ids.insert(id) } }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: icon).font(.system(size: fs(15))).foregroundColor(Theme.brandMint).frame(width: 20)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold))
+                        if !isOpen { Text(summary).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1) }
+                    }
+                    Spacer(minLength: 12)
+                    if let b = badge {
+                        Text(b).font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.warn)
+                            .padding(.horizontal, 8).padding(.vertical, 2)
+                            .background(Capsule().fill(Theme.warn.opacity(0.14)))
+                    }
+                    Image(systemName: "chevron.right").font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.sub)
+                        .rotationEffect(.degrees(isOpen ? 90 : 0))
+                }
+                .padding(.horizontal, 12).padding(.vertical, 8).contentShape(Rectangle())
+            }.buttonStyle(.plain).hoverBG(8, Theme.ink.opacity(0.05))
+            if isOpen { VStack(alignment: .leading, spacing: 14) { content() } }
+        }
+    }
+}
+
+/// Theme colour dot in Settings: the name shows under the selected one only; others show it on hover (like macOS Appearance).
+/// Which theme dot the pointer is on (shared by the row, so only one name shows at a time).
+final class HoveredTheme: ObservableObject { @Published var id: String? = nil; @Published var inRow = false }
+
+struct ThemeSwatch: View {
+    let pl: Palette
+    @ObservedObject var vm: VM
+    @ObservedObject var hover: HoveredTheme
+    var body: some View {
+        let on = vm.theme == pl.id
+        // While the pointer is anywhere on the row the selected name stays hidden, so it does not blink between dots.
+        let showName = hover.id == pl.id || (on && !hover.inRow)
+        Button { vm.setTheme(pl.id) } label: {
+            Circle().fill(LinearGradient(colors: pl.bg.map { Color(hex: $0) } + pl.accent.suffix(1).map { Color(hex: $0) }, startPoint: .topLeading, endPoint: .bottomTrailing))
+                .frame(width: 22, height: 22)
+                .overlay(Circle().stroke(Theme.ink.opacity(on ? 0.95 : 0.25), lineWidth: on ? 2 : 1))
+                .overlay(alignment: .top) {
+                    Text(appLang == "vi" ? pl.nameVI.components(separatedBy: " (").first ?? pl.nameVI : pl.nameEN)
+                        .font(.system(size: fs(10))).foregroundColor(on ? Theme.text : Theme.sub)
+                        .fixedSize().offset(y: 27).opacity(showName ? 1 : 0)
+                }
+        }.buttonStyle(.plain).onHover { inside in
+            if inside { hover.id = pl.id } else if hover.id == pl.id { hover.id = nil }
+        }.padding(.bottom, 16)
+    }
+}
+
+/// Explanation under a Settings block, outside it (System Settings style).
+struct SettingNote: View {
+    let text: String
+    init(_ text: String) { self.text = text }
+    var body: some View {
+        Text(text).foregroundColor(Theme.sub).font(.system(size: fs(11))).fixedSize(horizontal: false, vertical: true).padding(.horizontal, 14)
+    }
+}
+
+/// One rounded block of Settings rows (System Settings style). Rows are split by a hairline; the first row's line is clipped off.
+struct SettingsBox<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) { content() }.padding(.top, -1)
+            .background(Theme.card)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.ink.opacity(0.06), lineWidth: 1))
+    }
+}
+
+extension View {
+    /// A row inside a SettingsBox: hairline on top (clipped off for the first row).
+    /// `attention`: something here needs the user (new version, permission off): a soft warning tint.
+    func settingFlat(attention: Bool = false) -> some View {
+        self.padding(.horizontal, 14).padding(.vertical, 11)
+            .background(attention ? Theme.warn.opacity(0.07) : Color.clear)
+            .overlay(alignment: .top) { RowLine().padding(.horizontal, 14) }
+    }
+}
+
 
 struct SettingsView: View {
     @ObservedObject var vm: VM
+    /// Groups start folded (chốt 04/11/2026); a group shows a badge in its header when something inside needs attention.
+    // Shared, not per view: changing text size or theme rebuilds every view, and the open group must stay open.
+    @ObservedObject private var groups = OpenGroups.shared
+    /// The disk/RAM icon in the menu bar (same key as the MenuBarExtra in the App). Off: no icon; the app stays reachable
+    /// from the Dock and Applications, and the low disk / RAM alerts still arrive as notifications.
+    @AppStorage("showMenuBar") private var showMenuBar = true
+    @StateObject private var themeHover = HoveredTheme()
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 18) {
-            Text(t("Settings", "Cài đặt")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
-            settingRow(t("Theme", "Giao diện màu"), "") {
-                HStack(spacing: 10) {
-                    ForEach(palettes, id: \.id) { pl in
-                        Button { vm.setTheme(pl.id) } label: {
-                            VStack(spacing: 4) {
-                                Circle().fill(LinearGradient(colors: pl.bg.map { Color(hex: $0) } + pl.accent.suffix(1).map { Color(hex: $0) }, startPoint: .topLeading, endPoint: .bottomTrailing))
-                                    .frame(width: 30, height: 30)
-                                    .overlay(Circle().stroke(Theme.ink.opacity(vm.theme == pl.id ? 0.95 : 0.25), lineWidth: vm.theme == pl.id ? 2 : 1))
-                                Text(appLang == "vi" ? pl.nameVI.components(separatedBy: " (").first ?? pl.nameVI : pl.nameEN)
-                                    .font(.system(size: fs(10))).foregroundColor(vm.theme == pl.id ? Theme.text : Theme.sub)
-                            }
-                        }.buttonStyle(.plain).hoverLift().tip(appLang == "vi" ? pl.nameVI : pl.nameEN)
-                    }
+            Text(t("Settings", "Cài đặt")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
+            VStack(alignment: .leading, spacing: 14) {
+            SettingsGroup(id: "scan", icon: "magnifyingglass", title: t("Scanning and cleaning", "Quét và dọn"),
+                          summary: t("Full Disk Access, project folders, external drives", "Truy cập toàn bộ ổ đĩa, thư mục dự án, ổ cứng rời"),
+                          badge: vm.fullDiskAccess ? nil : t("Needs Full Disk Access", "Cần bật quyền"), first: true, groups: groups) {
+                settingRow(t("Full Disk Access", "Truy cập toàn bộ ổ đĩa"),
+                           vm.fullDiskAccess ? t("On. Mail, Safari and Messages are measured too.", "Đã bật. Mail, Safari, Tin nhắn cũng được đo.")
+                                             : t("Off: Mail, Safari and Messages are left out of scans. Turn it on in System Settings, then come back.",
+                                                 "Đang tắt: Mail, Safari, Tin nhắn bị bỏ qua khi quét. Bật trong Cài đặt hệ thống rồi quay lại."), attention: !vm.fullDiskAccess) {
+                    // The app cannot grant or revoke this itself: the switch shows the real state and opens the
+                    // Privacy pane in System Settings; it flips when the user comes back (checked on activation).
+                    Toggle("", isOn: Binding(get: { vm.fullDiskAccess }, set: { _ in NSWorkspace.shared.open(VM.fdaSettings) }))
+                        .toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
-            }
-            settingRow(t("Text size", "Cỡ chữ"), "") {
-                Picker("", selection: Binding(get: { vm.textSize }, set: { vm.setTextSize($0) })) {
-                    Text(t("Small", "Nhỏ")).tag("small")
-                    Text(t("Default", "Mặc định")).tag("default")
-                    Text(t("Large", "Lớn")).tag("large")
-                }.pickerStyle(.segmented).labelsHidden().frame(width: 240 * uiScale)
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(t("Project folders", "Thư mục dự án")).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
-                        Text(t("Where you keep code or AI workspaces. Drafts (_tmp, _to_delete) are found here, duplicates here are never pre-selected, and links are checked here before deleting.",
-                               "Nơi chứa code hoặc thư mục làm việc với AI. App tìm nháp (_tmp, _to_delete) ở đây, không tick sẵn file trùng ở đây, và kiểm tra liên kết ở đây trước khi xoá."))
-                            .foregroundColor(Theme.sub).font(.system(size: fs(11))).fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer()
-                    GhostButton(title: t("Add folder", "Thêm thư mục"), action: { vm.addProjectFolder() }, width: Pill.rowWidth)
-                }
-                ForEach(vm.projects, id: \.self) { p in
-                    HStack(spacing: 8) {
-                        Image(systemName: "folder").foregroundColor(Theme.link)
-                        Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
-                        Spacer()
-                        TextLink(t("Remove", "Gỡ")) { vm.removeProjectFolder(p) }
-                    }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
-                }
-            }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(t("External drives and extra folders", "Ổ ngoài và thư mục quét thêm")).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
-                        Text(t("Duplicates and Large & Old Files also look here. Add as many drives as you like; a drive that is not plugged in is skipped. Network drives and Time Machine backups are not supported.",
-                               "File trùng và File lớn và cũ quét thêm ở đây. Thêm bao nhiêu ổ cũng được, ổ chưa cắm thì bỏ qua. Chưa hỗ trợ ổ mạng và ổ sao lưu Time Machine."))
-                            .foregroundColor(Theme.sub).font(.system(size: fs(11))).fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer()
-                    GhostButton(title: t("Add", "Thêm"), action: { vm.addExtraFolder() }, width: Pill.rowWidth)
-                }.onAppear { vm.refreshExtras() }
-                ForEach(vm.extras, id: \.self) { p in
-                    HStack(spacing: 8) {
-                        Image(systemName: Prefs.onOtherDrive(p) ? "externaldrive" : "folder").foregroundColor(Theme.link)
-                        Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
-                        if vm.extrasMissing.contains(p) {
-                            Text(t("Not connected", "Chưa cắm")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.warn)
+                VStack(alignment: .leading, spacing: 6) {
+                SettingsBox {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(t("Project folders", "Thư mục dự án")).foregroundColor(Theme.text).font(.system(size: fs(13)))
                         }
                         Spacer()
-                        TextLink(t("Remove", "Gỡ")) { vm.removeExtraFolder(p) }
-                    }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
+                        GhostButton(title: t("Add…", "Thêm…"), action: { vm.addProjectFolder() }, compact: true)
+                    }
+                    ForEach(vm.projects, id: \.self) { p in
+                        HStack(spacing: 8) {
+                            Image(systemName: "folder").foregroundColor(Theme.link)
+                            Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
+                            Spacer()
+                            TextLink(t("Remove", "Gỡ")) { vm.removeProjectFolder(p) }
+                        }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
+                    }
+                }.settingFlat()
                 }
-                HStack(spacing: 10) {
-                    Text(t("When a file is both on this Mac and on a drive", "Khi một file có cả trên máy lẫn trên ổ ngoài"))
-                        .foregroundColor(Theme.text).font(.system(size: fs(12)))
-                    Spacer()
-                    Picker("", selection: Binding(get: { vm.crossKeep }, set: { vm.setCrossKeep($0) })) {
-                        Text(t("Let me choose each time", "Để tôi tự chọn mỗi lần")).tag("ask")
-                        Text(t("Keep the drive copy (frees space on the Mac)", "Giữ bản trên ổ ngoài (lấy lại chỗ trên máy)")).tag("external")
-                        Text(t("Keep the Mac copy", "Giữ bản trên máy")).tag("mac")
-                    }.labelsHidden().frame(width: 300 * uiScale)
-                }.padding(.top, 4)
-            }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
-            settingRow(t("Full Disk Access", "Truy cập toàn bộ ổ đĩa"),
-                       vm.fullDiskAccess ? t("On. Mail, Safari and Messages are measured too.", "Đã bật. Mail, Safari, Tin nhắn cũng được đo.")
-                                         : t("Off, so Mail, Safari and Messages stay hidden from scans. Turn on Tidymint in System Settings, then come back.",
-                                             "Chưa bật, nên Mail, Safari, Tin nhắn bị ẩn khỏi lượt quét. Bật Tidymint trong Cài đặt hệ thống rồi quay lại.")) {
-                if vm.fullDiskAccess {
-                    Label(t("On", "Đã bật"), systemImage: "checkmark.circle.fill").font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.green)
-                } else {
-                    PrimaryButton(title: t("Open Settings", "Mở Cài đặt"), action: { NSWorkspace.shared.open(VM.fdaSettings) }, width: Pill.rowWidth)
+                SettingNote(t("Code or AI work folders. Tidymint finds drafts (_tmp, _to_delete) here, never pre-selects duplicates here, and checks links before deleting.",
+                                   "Thư mục code hoặc làm việc với AI. Tidymint tìm nháp (_tmp, _to_delete) ở đây, không tick sẵn file trùng ở đây và kiểm tra liên kết trước khi xoá."))
+                }
+                VStack(alignment: .leading, spacing: 6) {
+                SettingsBox {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(t("External drives and extra folders", "Ổ cứng rời và thư mục quét thêm")).foregroundColor(Theme.text).font(.system(size: fs(13)))
+                        }
+                        Spacer()
+                        GhostButton(title: t("Add…", "Thêm…"), action: { vm.addExtraFolder() }, compact: true)
+                    }.onAppear { vm.refreshExtras() }
+                    ForEach(vm.extras, id: \.self) { p in
+                        HStack(spacing: 8) {
+                            Image(systemName: Prefs.onOtherDrive(p) ? "externaldrive" : "folder").foregroundColor(Theme.link)
+                            Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
+                            if vm.extrasMissing.contains(p) {
+                                Text(t("Not connected", "Chưa cắm")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.warn)
+                            }
+                            Spacer()
+                            TextLink(t("Remove", "Gỡ")) { vm.removeExtraFolder(p) }
+                        }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
+                    }
+                    HStack(spacing: 10) {
+                        Text(t("When a file is both on this Mac and on a drive", "Khi một file có cả trên máy lẫn trên ổ cứng rời"))
+                            .foregroundColor(Theme.text).font(.system(size: fs(12)))
+                        Spacer()
+                        // A pop-up sized to the chosen option, so its text sits at the right edge like the other controls.
+                        let opts: [(String, String)] = [("ask", t("Let me choose each time", "Để tôi tự chọn mỗi lần")),
+                                                        ("external", t("Keep the drive copy (frees space on the Mac)", "Giữ bản trên ổ cứng rời (lấy lại chỗ trên máy)")),
+                                                        ("mac", t("Keep the Mac copy", "Giữ bản trên máy"))]
+                        Menu {
+                            ForEach(opts, id: \.0) { o in
+                                Button { vm.setCrossKeep(o.0) } label: { if vm.crossKeep == o.0 { Label(o.1, systemImage: "checkmark") } else { Text(o.1) } }
+                            }
+                        } label: {
+                            Text(opts.first { $0.0 == vm.crossKeep }?.1 ?? opts[0].1)
+                        }.menuStyle(.button).controlSize(.small).fixedSize()
+                    }.padding(.top, 4)
+                }.settingFlat()
+                }
+                SettingNote(t("Duplicates and Large & Old Files also scan here. Unplugged drives are skipped; network drives and Time Machine backups are not supported.",
+                                   "File trùng và File lớn và cũ quét thêm ở đây. Ổ chưa cắm thì bỏ qua; chưa hỗ trợ ổ mạng và ổ sao lưu Time Machine."))
                 }
             }
-            settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
-                       vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
-                                            : t("Checks for a new version once a day. The check is counted by app and macOS version only; nothing else about your Mac is sent.\n\nTidymint is free and will stay free. Sponsorships go toward the Apple Developer account ($99/year): with it, Apple verifies the app, new users just open it and it runs, no trip to Settings > Security, and each update reaches you faster.",
-                                                "Kiểm tra bản mới mỗi ngày một lần. Lần kiểm chỉ được đếm theo phiên bản app và macOS, không gửi gì khác về máy.\n\nTidymint miễn phí và sẽ luôn miễn phí. Mỗi khoản ủng hộ góp vào tài khoản Apple Developer (99 USD/năm): có nó, app được Apple xác nhận, người mới cài chỉ cần mở là chạy, không phải qua bước Cài đặt > Bảo mật, và mỗi bản cập nhật tới tay bạn nhanh hơn.")) {
-                VStack(alignment: .trailing, spacing: 10) {
+            SettingsGroup(id: "menubar", icon: "bell", title: t("Menu bar and alerts", "Thanh menu và cảnh báo"),
+                          summary: t("Menu bar icon, open at login, low disk space, high memory", "Biểu tượng thanh menu, mở cùng máy, ổ sắp đầy, RAM cao"), badge: nil, groups: groups) {
+                settingRow(t("Show in menu bar", "Hiện trên thanh menu"),
+                           t("Free disk space and RAM at a glance. Off: alerts still arrive as notifications; open Tidymint from the Dock or Applications.",
+                             "Xem nhanh dung lượng trống và RAM. Tắt: cảnh báo vẫn hiện thành thông báo; mở Tidymint từ Dock hoặc Applications.")) {
+                    Toggle("", isOn: $showMenuBar).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
+                settingRow(t("Open at login", "Mở cùng máy"),
+                           t("Keeps the menu bar icon running after a restart.", "Giữ biểu tượng trên thanh menu sau khi khởi động lại máy.")) {
+                    Toggle("", isOn: Binding(get: { vm.openAtLogin }, set: { vm.setOpenAtLogin($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
+                settingRow(t("Low disk space alert", "Cảnh báo ổ sắp đầy"),
+                           vm.lowSpaceGB > 0
+                           ? String(format: t("Alerts when free space drops below %.0f GB, at most every 6 hours. Enter 0 to turn off.", "Báo khi chỗ trống dưới %.0f GB, tối đa 6 giờ một lần. Nhập 0 để tắt."), vm.lowSpaceGB)
+                           : t("Off. Enter a number of GB to turn it on.", "Đang tắt. Nhập số GB để bật.")) {
+                    HStack(spacing: 6) {
+                        TextField("0", text: Binding(get: { vm.lowSpaceGB > 0 ? String(Int(vm.lowSpaceGB)) : "" },
+                                                     set: { vm.setLowSpace(min(10_000, max(0, Double($0.filter(\.isNumber)) ?? 0))) }))
+                            .textFieldStyle(.roundedBorder).multilineTextAlignment(.trailing).controlSize(.small).frame(width: 56)
+                        Text("GB").foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                    }
+                }
+                settingRow(t("High memory alert", "Cảnh báo RAM cao"),
+                           t("Alerts when over 90% of RAM is in use, at most once an hour.", "Báo khi RAM dùng trên 90%, tối đa 1 giờ một lần.")) {
+                    Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
+            }
+            SettingsGroup(id: "look", icon: "paintpalette", title: t("Appearance", "Giao diện"),
+                          summary: t("Theme, text size", "Màu giao diện, cỡ chữ"), badge: nil, groups: groups) {
+                SettingsBox {
+                settingRow(t("Theme", "Giao diện màu"), "") {
+                    HStack(spacing: 12) {
+                        ForEach(palettes, id: \.id) { pl in ThemeSwatch(pl: pl, vm: vm, hover: themeHover) }
+                    }.contentShape(Rectangle()).onHover { themeHover.inRow = $0; if !$0 { themeHover.id = nil } }
+                }
+                settingRow(t("Text size", "Cỡ chữ"), "") {
+                    Picker("", selection: Binding(get: { vm.textSize }, set: { vm.setTextSize($0) })) {
+                        Text(t("Small", "Nhỏ")).tag("small")
+                        Text(t("Default", "Mặc định")).tag("default")
+                        Text(t("Large", "Lớn")).tag("large")
+                    }.pickerStyle(.segmented).labelsHidden().controlSize(.small).fixedSize()
+                }
+                }
+            }
+            SettingsGroup(id: "about", icon: "info.circle", title: t("Updates and about", "Cập nhật và thông tin"),
+                          summary: t("Version \(Updates.current), update check, privacy, support", "Phiên bản \(Updates.current), kiểm bản mới, quyền riêng tư, ủng hộ"),
+                          badge: vm.newVersion != nil ? t("New version", "Có bản mới") : nil, groups: groups) {
+                settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
+                           vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
+                                                : (vm.autoUpdateCheck ? t("Checks once a day. Only the app and macOS version are counted; nothing else about your Mac is sent.", "Kiểm mỗi ngày một lần. Chỉ đếm theo phiên bản app và macOS, không gửi gì khác về máy.")
+                                                                      : t("Automatic check is off.", "Đã tắt tự kiểm tra.")), attention: vm.newVersion != nil) {
                     HStack(spacing: 10) {
                         if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }
-                        if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }, width: Pill.rowWidth) }
-                        else { GhostButton(title: t("Check now", "Kiểm tra ngay"), action: { vm.checkUpdates(force: true) }, width: Pill.rowWidth) }
+                        if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }, compact: true) }
+                        else { GhostButton(title: t("Check Now", "Kiểm tra"), action: { vm.checkUpdates(force: true) }, compact: true) }
                     }
-                    PrimaryButton(title: t("Support the project", "Ủng hộ dự án"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, width: Pill.rowWidth)
+                }
+                settingRow(t("Check for new versions automatically", "Tự kiểm tra bản mới"),
+                           t("At most once a day, when the window opens, Tidymint asks update.tidymint.app for the latest version number.\nBackup: tidymint.app, GitHub.",
+                             "Mỗi ngày tối đa một lần, khi mở cửa sổ, Tidymint hỏi update.tidymint.app số phiên bản mới nhất.\nDự phòng: tidymint.app, GitHub.")) {
+                    Toggle("", isOn: Binding(get: { vm.autoUpdateCheck }, set: { vm.setAutoUpdateCheck($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
+                settingRow(t("Support the project", "Ủng hộ dự án"),
+                           t("Free forever. Sponsorships pay for the Apple Developer account ($99/year), so Apple can verify the app and new users just open it, no trip to Settings > Security.",
+                             "Miễn phí trọn đời. Tiền ủng hộ trả phí tài khoản Apple Developer (99 USD/năm) để Apple xác nhận app, người mới cài mở là chạy, không phải qua Cài đặt > Bảo mật.")) {
+                    PrimaryButton(title: t("Sponsor", "Ủng hộ"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, compact: true)
+                }
+                settingRow(t("Privacy", "Quyền riêng tư"),
+                           t("What Tidymint sends, and what it never sends.", "Tidymint gửi gì đi, và không bao giờ gửi gì.")) {
+                    TextLink(t("View", "Xem"), url: URL(string: Backend.privacyURL)!)
+                }
+                if appLang == "vi" {
+                    settingRow("Cùng tác giả: Cồn Cào", "Kiến thức đồ uống: whisky, sake, cocktail.") {
+                        TextLink("concao.org", url: ConCao.url("settings"))
+                    }
                 }
             }
-            settingRow(t("Open at login", "Mở cùng máy"),
-                       t("Keeps the menu bar monitor running after restart.", "Giữ biểu tượng theo dõi trên thanh menu sau khi khởi động lại máy.")) {
-                Toggle("", isOn: Binding(get: { vm.openAtLogin }, set: { vm.setOpenAtLogin($0) })).toggleStyle(.switch).labelsHidden()
             }
-            settingRow(t("Low disk space alert", "Cảnh báo ổ sắp đầy"),
-                       vm.lowSpaceGB > 0
-                       ? String(format: t("Notify when free space drops below %.0f GB (at most every 6 hours). Enter 0 to turn off.", "Báo khi dung lượng trống dưới %.0f GB (tối đa 6 giờ báo một lần). Nhập 0 để tắt."), vm.lowSpaceGB)
-                       : t("Off. Enter a number of GB to be notified when free space drops below it.", "Đang tắt. Nhập số GB để được báo khi dung lượng trống xuống dưới mức đó.")) {
-                HStack(spacing: 6) {
-                    TextField("0", text: Binding(get: { vm.lowSpaceGB > 0 ? String(Int(vm.lowSpaceGB)) : "" },
-                                                 set: { vm.setLowSpace(min(10_000, max(0, Double($0.filter(\.isNumber)) ?? 0))) }))
-                        .textFieldStyle(.roundedBorder).multilineTextAlignment(.trailing).frame(width: 64)
-                    Text("GB").foregroundColor(Theme.sub).font(.system(size: fs(12)))
-                }
-            }
-            settingRow(t("High memory alert", "Cảnh báo RAM cao"),
-                       t("Notify when more than 90% of RAM is in use (at most once an hour).", "Báo khi RAM dùng trên 90% (tối đa 1 giờ báo một lần).")) {
-                Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden()
-            }
-            if appLang == "vi" {
-                settingRow("Cùng tác giả: Cồn Cào", "Kiến thức đồ uống: whisky, sake, cocktail.") {
-                    TextLink("concao.org", url: ConCao.url("settings"))
-                }
-            }
-        }.padding(.horizontal, 24).padding(.bottom, 24).frame(maxWidth: .infinity, alignment: .leading) }
+            .frame(maxWidth: 760 * uiScale)
+        }.padding(.horizontal, 24).padding(.bottom, 24).frame(maxWidth: .infinity) }
+        // A group with something waiting (permission off, new version) opens by itself; the rest stay folded.
+        .onAppear { openAttention() }
+        .onReceive(vm.$newVersion) { v in if v != nil { groups.ids.insert("about") } }   // @Published sends before the value is set
     }
-    func settingRow<C: View>(_ title: String, _ sub: String, @ViewBuilder _ control: () -> C) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
-                if !sub.isEmpty { Text(sub).foregroundColor(Theme.sub).font(.system(size: fs(11))).fixedSize(horizontal: false, vertical: true) }
+    func openAttention() {
+        if !vm.fullDiskAccess { groups.ids.insert("scan") }
+        if vm.newVersion != nil { groups.ids.insert("about") }
+    }
+    /// One setting. With a description: its own rounded block, the description as a note under it (System Settings style).
+    /// Without: a bare row, to be grouped with others inside a SettingsBox.
+    func settingRow<C: View>(_ title: String, _ sub: String, attention: Bool = false, @ViewBuilder _ control: () -> C) -> some View {
+        let row = HStack {
+            HStack(spacing: 6) {
+                if attention { Circle().fill(Theme.warn).frame(width: 7, height: 7) }
+                Text(title).foregroundColor(Theme.text).font(.system(size: fs(13)))
             }
             Spacer(minLength: 16)
             control()
-        }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+        }.settingFlat(attention: attention)
+        return Group {
+            if sub.isEmpty { row }
+            else { VStack(alignment: .leading, spacing: 6) { SettingsBox { row }; SettingNote(sub) } }
+        }
     }
 }
 
@@ -6084,11 +6518,12 @@ let sharedVM = MainActor.assumeIsolated { VM() }
 struct DiskCleanupApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @ObservedObject var vm = sharedVM
+    @AppStorage("showMenuBar") var showMenuBar = true
     var body: some Scene {
         Window("Tidymint", id: "main") { RootView(vm: vm) }
             .windowStyle(.hiddenTitleBar)
             .defaultSize(width: 1080, height: 700)
-        MenuBarExtra {
+        MenuBarExtra(isInserted: $showMenuBar) {
             MenuView(vm: vm).id(vm.theme)
         } label: {
             Image(nsImage: menuBarImage(free: vm.freeGB, total: vm.totalGB, level: vm.diskLevel))
@@ -6105,7 +6540,7 @@ struct StartupView: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(t("Startup Items", "Khởi động cùng máy")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
+                Text(t("Startup Items", "Khởi động cùng máy")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                 Text(t("Background helpers that start with your Mac, each with who signed it. This is not antivirus: Tidymint states facts, you decide. For a second opinion use KnockKnock (free, open source) or Malwarebytes.",
                        "Các tiến trình chạy ngầm khi bật máy, kèm ai đã ký chúng. Đây không phải diệt virus: Tidymint chỉ nêu sự thật, bạn tự quyết. Muốn kiểm thêm, dùng KnockKnock (miễn phí, mã mở) hoặc Malwarebytes."))
                     .foregroundColor(Theme.sub).font(.system(size: fs(12)))
@@ -6125,10 +6560,13 @@ struct StartupView: View {
                     ForEach([0, 1, 2], id: \.self) { sc in
                         let rows = vm.launch.indices.filter { vm.launch[$0].scope == sc }
                         if !rows.isEmpty {
-                            Text(sc == 0 ? t("YOUR ACCOUNT (can remove here)", "CỦA TÀI KHOẢN CỦA BẠN (gỡ được ở đây)")
-                                 : sc == 1 ? t("ALL USERS · AGENTS (needs admin, remove via the app or Settings)", "CẢ MÁY · AGENT (cần quyền admin, gỡ bằng app gốc hoặc Cài đặt)")
-                                 : t("ALL USERS · SYSTEM SERVICES (needs admin)", "CẢ MÁY · DỊCH VỤ HỆ THỐNG (cần quyền admin)"))
-                                .font(.system(size: fs(10), weight: .semibold)).tracking(0.6).foregroundColor(Theme.sub).padding(.top, 10).padding(.leading, 4)
+                            // Section title 13 semibold + a short note in the secondary colour (style guide 1f).
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text(sc == 0 ? t("Your account", "Tài khoản của bạn") : sc == 1 ? t("All users · agents", "Cả máy · agent") : t("All users · system services", "Cả máy · dịch vụ hệ thống"))
+                                    .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
+                                Text(sc == 0 ? t("can remove here", "gỡ được ở đây") : sc == 1 ? t("needs admin, remove via the app or Settings", "cần quyền admin, gỡ bằng app gốc hoặc Cài đặt") : t("needs admin", "cần quyền admin"))
+                                    .font(.system(size: fs(11))).foregroundColor(Theme.sub)
+                            }.padding(.top, 12).padding(.bottom, 2).padding(.leading, 4)
                             ForEach(rows, id: \.self) { i in LaunchRow(e: $vm.launch[i], vm: vm) }
                         }
                     }
@@ -6138,7 +6576,7 @@ struct StartupView: View {
                 Text(vm.launchMsg.isEmpty ? t("\(vm.launch.count) items", "\(vm.launch.count) mục") : vm.launchMsg)
                     .foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(2)
                 Spacer()
-                GhostButton(title: t("Open Login Items settings", "Mở cài đặt Mục đăng nhập")) {
+                GhostButton(title: t("Login Items…", "Mục đăng nhập…")) {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension")!)
                 }
                 PrimaryButton(title: t("Remove selected", "Gỡ mục đã chọn"), action: { vm.removeLaunch() },
@@ -6160,16 +6598,16 @@ struct LaunchRow: View {
                 Image(systemName: "lock.fill").font(.system(size: fs(12))).foregroundColor(Theme.sub).frame(width: 17)
             }
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(e.owner).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium)).lineLimit(1)
-                    if e.orphan { badge(t("App removed", "App đã gỡ"), Theme.danger) }
-                    if e.running == true { badge(t("Running", "Đang chạy"), Theme.green) }
-                    if case .apple = e.sign {} else if !e.sign.label.isEmpty { badge(e.sign.label, e.sign.color).tip(e.sign.help) }
-                    ForEach(e.flags, id: \.self) { f in badge(f.label, Theme.warn).tip(f.help) }
-                }
+                Text(e.owner).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
                 Text(e.label).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1).truncationMode(.middle)
             }
-            Spacer()
+            Spacer(minLength: 12)
+            HStack(spacing: 6) {
+                if e.orphan { StatusTag(t("App removed", "App đã gỡ"), Theme.danger) }
+                if e.running == true { StatusTag(t("Running", "Đang chạy"), Theme.green) }
+                if case .apple = e.sign {} else if !e.sign.label.isEmpty { StatusTag(e.sign.label, e.sign.color).tip(e.sign.help) }
+                ForEach(e.flags, id: \.self) { f in StatusTag(f.label, Theme.warn).tip(f.help) }
+            }
             TextLink(t("Reveal", "Xem file")) { vm.reveal(e.url) }
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
@@ -6194,7 +6632,7 @@ struct StatsView: View {
         let runs = log.filter { $0.freed > 0 }.count
         let df: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM HH:mm"; return f }()
         VStack(alignment: .leading, spacing: 16) {
-            Text(t("Statistics", "Thống kê")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
+            Text(t("Statistics", "Thống kê")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
             HStack(spacing: 12) {
                 statCard(t("Freed in total", "Tổng đã giải phóng"), fmt(freed))
                 statCard(t("Cleanups", "Số lần dọn"), "\(runs)")
@@ -6230,7 +6668,7 @@ struct StatsView: View {
             Text(title).font(.system(size: fs(11))).foregroundColor(Theme.sub)
             Text(value).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
         }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+        .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
         .hoverBG(12, Theme.ink.opacity(0.05))
     }
 }
@@ -6510,7 +6948,7 @@ struct ConCaoHint: View {
             }
             .font(.system(size: fs(12)))
             .padding(.horizontal, 14).padding(.vertical, 10)
-            .background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
             .onAppear { ConCao.markShown() }
         }
     }
@@ -6530,43 +6968,59 @@ struct FieldBox<C: View>: View {
     }
 }
 
+/// Brand logos for the Contact footer: Simple Icons (CC0) / Lucide (LinkedIn), the same shapes as the website footer,
+/// as 64 px template PNGs so they take the theme colour. Brand logos are the one exception to SF Symbols (style guide 1e).
+enum BrandIcon {
+    static let png: [String: String] = [
+        "facebook": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEqklEQVR4nOSbaahNXRjH/7je9/XKEG4hwzVe81AocxK+yRSSKRER8oFuQr4gpYxdUcoUGTOVWRkzRzJPtwjJkMwyPf+7zqnd7pxz99p7re2s61f/2z17r3vuXs9ew7Oe9awcxEN3UQtRc1FTUW1RdVGNxP1XoteiZ6K7otuim6KzsEwZ2KGNaKCoN1Tlw/JFdF50XLRV9BCGMWmAXNFE0RhRY9jhhmiTaK3oHQxgwgBNRAWicYiPz6L1ooWip4hAOYSnrGiWaJuoI+KlfOJ/ThC9EV1BSMK2AL71zaJOyA44RowSPYcmZaHPJNE1ZE/lCQdbzhoDoIluC9ghGoLsplA0JWjhoAaoJjog6gw3OCgaBDWNZiSIASpDzcXN4RanRD1LKlQuwP1Dog5wj/qiBqI9mQqVZIBlomFwl3ZQ0+TFdAUydQE6NusQD/ehuhnFGeZtQi88ZWpCvdV8UTOoWah3sK8vLnci1Y10BqCTwYVIedjjh2inaAGUi6sLDXEnYFm2AraGJ/4b6fyAXbBb+ctQq8LhCFd58lOjLGexLalupDLAfFFd2IOLma6iR4iGrhPXTTTUf9HfBepA9cf/YAeOKeNhBrrj96AHu0A97wW/FefBXuVPQi2XTRHGjWfLnuq94G0BtAwDDjkwz6/E90dauvrQGQS9cMGUJ/rGD14rzoSdypP9MFt58gvhqAW1cizGa4CRsMdKmCesAciY5C/JN95fVBX2OIbw0OGhS8s3533G6ggP45Qc8J8mDTAC9rgEff6HcsP5XBVhB/ogS9gFOBD2gz10w1V8Ji5nGe6yVXnSlz/YAtrDbvO/BT34ZnrAPnSMig3QC3b5AD3iii5XEHWlAVrBLroG6Ib4aEkDNIVd3muU5ebKv4iPxjRAPuzyXaNsBcRLPg1QCdlDGP8+CrVpgCi7Q66TSwPEbfVsIpeV1+mj6WAEqUwa6bjBRRm+x68ziE4ODfAJbtIe0XlPA3yEezC2YMJNfkcDaO+oZgFtYYYXNEAR3KMNzPCAs4DxvJsYaA0zFBvgKtzDVAu4SgNchlv8AzPuOzdWTnIMYBdwaSDk6tWE88YX/yH5RfvgDqaa/17+SO4LMDx0GHbog+DeYJ7oMeKhIf9XsgUcgZv+QFguIGFob1+KKxcgGyhM/uI1wGr8HTAxe2Pyg9cAzNRejtLPUu8H/3TC3FvdIKZL8CUv9F7wG+ClaA5KLwX+C6kcCnaD6yh9MNFzk/9iOo+K6bCuBkpSwWyz0alupDPAA8Sb/28b5ga9TXUjk0/NcwCL4D5MnD6d7mZJi4rZUAFPV+EWe2GmAkFWVdyjPwf3YOVnlFQoiAGYTMT8AZcCJ4sRoPIk6LqazlEX0RpkP0yDKwhaWCew8BXquAyzx3V2fOOCBy8Hi1bp/FGYyMp2UUtkGFn/AFzccJt/NzQJG1piyilPY0zDn91Y4TFb5h0z7e0NQhAltsY8Peb/MUa3AvEuovgCJkOdG4g0Q5kILhaJpkMdaOBD3YY9WNmxUFtjRuIXJrfG2RX4UDwlzjwfnu810Sq4CzxX1AiquW+AQWydHvdSBcEPOudBRagZRD0KdfLL6hjzGwAA///8mGIKAAAABklEQVQDABV6wtD33EZdAAAAAElFTkSuQmCC",
+        "instagram": "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",
+        "x": "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",
+        "linkedin": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACdUlEQVR4nOyaS0gWURiGX82CDLoH3SkoCqJoUxEVtO2yKIhqE0S1rhZdFkGbaNMmWqQbcSGCC0HFlbhVBG/gwoUiiO68gW5UULy8H+NCZM7MOf6/Z/7xOw88CHO+Ec7LzJzbXwHlVEA5IQAoR30AeyxqrtD39Au9Q1fpKHYJZSlt0unfdO+Wthb6js4i5yQF8Jn+TWjvpA/pCnKM6RU4R5voPvOtOE+naC9yTLnh+hN6AOm8Qc4xjQI3YcdV5BxTAHOwYwI5xxTAAOywrStZTKNAJe2h18y3Ypnepf3IMaaP4AJ9tfHXxDfkvPNC0kxwmlbTE/QgoqdiEtGw95I2YxdQBuWE1SCUEwKAcko5gOv0KT1Lj9OjdJ7OIBqNOmgbCqTUAthPP9IP9JJFvUzZG+gfOoZtUCrDoEzI3tJf9DTcWaL/N+532qQxBdBIX6Cw/2HLYdpKH6BwZPL2CA4z1HJki6w1ZEFVjM4LMmvtgsM+RZbfgAuIPmRHUFxkF6uOrtH6tOKsngBZW7Sj+J3fTC29l1aUVQD/6GXsLLKTLd+yyqSiLAK4geiL74NT9EdSQRYB1MAvXxHtYMfiO4D79Bb8Iq/CJ1Oj7wCewZ0q+pgeorfpd0TjvQvPTQ2+J0JypnjRoVbOJ4Zi2uTMQl6l17BH1haDWy/6fAJkyLPtvIzh0rkhQ7ssiuRschz2xL56PgM46VArh69pR26L9CfsiV1j+JwJnnGo7bOs64Y9mQfgMusbsawbhj3H4i76DCDrpXfs6x62xKCcEACUEwKAckIAUE4IAMoJAUA5IQAoJwQA5agPIPxOEMoJAUA5IQAoJwQA5awDAAD//48o/vsAAAAGSURBVAMAe85Nuv8OnGMAAAAASUVORK5CYII=",
+        "github": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAGOElEQVR4nNSbaYwURRTH/yoqRrmCgC5RRHFdPOItRIhuPONNBIlG8YxAxOOLGI2JWaPRaPygon4wMcZzjfE+UIgYFTxwN0iCwiJ4gBKCqCiurgoB3n+qC3qb7ul61d0zPb/kv9nuqZqZelNd/eq9131QHwaKBov2DY5/Ff0m+gM1pg+Kp1U0XnSEaLSoWbRXQtse0XLRMtHXogWiT1AguyB/hoouF10kOhX5ME/0uqhd9DtyJE8DcMA3iU5Hsbwjekw0BzmQhwGuFN0lOgS1hZfJHaI3kYEsBmgSPSM6A/XlJdEMeF4au8KPKaKlqP/gyaUws+FceKA1QH/Rq6JnRQNQHrjwviuaJdpT01FzCfAan4PaX+taOmFmw3qXxq4GOEE0WzQEjcEqmLvRd2kNXQxA56VDtDcai7Wio5EyE9LWgEGiuWi8wZP9YXyGqmvCbqgOB38UGpfhooNFryU1qGaA50QXoPHhD9gt+jzuxaRLYLroClRnI8ymhutIi+g20fconq9gHJ8RwWcf6NDnISS46HGLID28lUjesVleQLyRJsC4qCchX14RPSz6NOa1hQ6fxzvDQdGTcdvhB5E+eLIg4fwbgSaLHhUNE/0tWixaJFoDs++nGAfYAyY+YHWA6DiYFbyvaIXoGsQP3PIF0g3AGcMf5v7wyegMGBO8mQt0g+eltOGA6KV9Cz8YQ+C9/N+UdjeLHkE6jDeMFK2zJ6JrwD1wZ4NDG/7KvoMn3yB98ORPuMGZPTN8ImyAsaIz4U4tokmu9FW05QJqQ3G9DDATOoajPIxQtKWxptsDawB6fBdDxzEoD8dCx9X2H2uAydAzBuVhpLI9d7TH8x9rgEugg07QDJSHKdAziX9oAK6M2kDmDXDYatYQ7lbvhI7T+Id+AFf+uYqOjNu3oHxwx0pvb7Bj+y2iAZwBJ0PHfSgn9DYfV7Tn2Mfxz+GKTluRMQxdMLOV7VtogMMUHejPu3pd9YCbom5F+2YaQBPkXIPys0rRdhQNoAkjO0Va68xaRdth9Oc1uYFNKD//KdoOoQHS4oJhNJuOeuESy7A0aXd0/VF+Bina9nD6a6oyNLuueqHZF/yjNcChKDfMXA1UtN9AA/ys6LCP6EiUl/HK9qtpgJ+gwysNXSPOh46KAZbp+uwIJpQMrv6TdF2wlAZYpOtTSZa2onxMg/4u1cHtMBeOX6DjS5QrIsRiDUafh+q6oR9nAN3bhbp+lSSENgBRJMxjagf/gajbusFvQc+9outQf56CXxKX2avtmSGmkH1DXG2iu1F7eL/n4LXRbAtnzHo7A5jV7YAfbUHfWobJGcTtgv/g30ewsw1vhGiMuPsoq6+4ws6HSWYyHrh7pA0zykw2nCXaDFOztxH5wjz/VJgKtethnDJfbkdw+48mR3k3iBZCLRGdgh0uM1d/Vlw0oTpclZlC7wzeQ+twTYQZNL/PZdBtcqrBbHOzPYgagEUOD8R04vpAJ2NxcMz6G6arXTcenEUaL40RXl5Wo5E/V8HMogpxBRK00KiY85zSnOL2lslZ8THSYbSWYbd10HEijL+RJ/zReu0X4qJBUxM608tqDx2zjv9WpPME9IMnnAG5VISHmBY9ERcN+hEmUhxXHcbrkIvc/OCYhUecruOQTBv8a4f6ic5DPvDSbo+eTCqU3A8mAxTnW3MxZGHSX6FznK50iviAhM0acYa8B1O50QM/+H4fITs/wFSb7PQ9qlWKMneWVAJzC0z9T9FwJnYhG8xjjE16n2oR4Q9hVsw4+IBE2m0wDzQR3iR490k0YlpInLeLG2POMwHJ2VF08XTWJ1rORnI1WwWXnAATjnHlM7zWP0OxD01kMQB/+dSst+YDOBNmJbzGKcYFL+z+sv6P1/BE+EN/ZIWuS6WqjINPK+GroLXwhaIXoaseZ+rtf/hBl3W5ov1qmMEvce2gfWSGcQM+PKGp/fMdPNH8QCyNZ3Wp8+CJz0NTXcEHPYnicf1+vC0zKKJ+9Nb3qTFeZ3QrWV6zEsWR9v3ehrlMvH0SXwNYGFdjtoj7hywlsUkkZaO5u2yFWZO0i2Qv8n52+BwYY0wIjp8WXYtscMfJnScXw5dFzyNHYxfx8DRhGS1jBp3IByZlNZUfzmwDAAD//5M94tAAAAAGSURBVAMA4fEEQpAZsWwAAAAASUVORK5CYII=",
+    ]
+    static func image(_ k: String) -> NSImage? {
+        guard let s = png[k], let d = Data(base64Encoded: s), let i = NSImage(data: d) else { return nil }
+        i.isTemplate = true; i.size = NSSize(width: 16, height: 16); return i
+    }
+}
+
+/// Round icon link in a footer (email, social): icon only, name as tooltip.
+struct FooterIcon: View {
+    let tip: String; let url: URL; var brand: String? = nil; var symbol: String? = nil
+    @StateObject private var h = Flag()
+    var body: some View {
+        Button { NSWorkspace.shared.open(url) } label: {
+            Group {
+                if let b = brand, let img = BrandIcon.image(b) { Image(nsImage: img).renderingMode(.template).resizable().frame(width: 15, height: 15) }
+                else { Image(systemName: symbol ?? "link").font(.system(size: fs(13))) }
+            }
+            .foregroundColor(h.v ? Theme.brandMint : Theme.sub)
+            .frame(width: 30, height: 30).background(Circle().fill(Theme.ink.opacity(h.v ? 0.12 : 0.07)))
+        }.buttonStyle(.plain).onHover { h.v = $0 }.tip(tip)
+    }
+}
+
 struct ContactView: View {
-    static let social: [(String, String)] = [("Facebook", "https://www.facebook.com/tidymintapp"), ("Instagram", "https://www.instagram.com/tidymint.app/"),
-                                             ("X", "https://x.com/tidymintapp"), ("LinkedIn", "https://www.linkedin.com/company/tidymint/"),
-                                             ("GitHub", "https://github.com/HaiTrung-Workspace/tidymint")]
+    static let social: [(String, String, String)] = [("Facebook", "facebook", "https://www.facebook.com/tidymintapp"), ("Instagram", "instagram", "https://www.instagram.com/tidymint.app/"),
+                                             ("X", "x", "https://x.com/tidymintapp"), ("LinkedIn", "linkedin", "https://www.linkedin.com/company/tidymint/"),
+                                             ("GitHub", "github", "https://github.com/HaiTrung-Workspace/tidymint")]
     @ObservedObject var vm: VM
     @StateObject private var f = FormState()
     var body: some View {
+      VStack(spacing: 0) {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Contact the developer", "Liên hệ nhà phát triển")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
+                    Text(t("Contact the developer", "Liên hệ nhà phát triển")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                     Text(t("Feedback, bug reports and questions go straight to the developer. An email address is needed so you can get a reply.",
                            "Góp ý, báo lỗi, câu hỏi đều tới thẳng nhà phát triển. Cần email để có thể trả lời bạn."))
                         .foregroundColor(Theme.sub).font(.system(size: fs(12)))
-                    HStack(spacing: 4) {
-                        Text(t("Or email", "Hoặc gửi email tới")).foregroundColor(Theme.sub)
-                        TextLink("hello@tidymint.app", url: URL(string: "mailto:hello@tidymint.app")!)
-                    }.font(.system(size: fs(12)))
-                    // Brand accounts and public bug reports. Plain links: nothing is loaded until the person clicks.
-                    HStack(spacing: 4) {
-                        Text(t("Follow Tidymint:", "Theo dõi Tidymint:")).foregroundColor(Theme.sub)
-                        ForEach(Array(ContactView.social.enumerated()), id: \.offset) { i, s in
-                            if i > 0 { Text("·").foregroundColor(Theme.sub.opacity(0.6)) }
-                            TextLink(s.0, url: URL(string: s.1)!)
-                        }
-                    }.font(.system(size: fs(12)))
-                    TextLink(t("Report a bug on GitHub", "Báo lỗi trên GitHub"), url: URL(string: "https://github.com/HaiTrung-Workspace/tidymint/issues")!)
                 }.padding(.top, 34)
-                HStack(spacing: 8) {
-                    ForEach([("feedback", t("Feedback", "Góp ý")), ("bug", t("Bug report", "Báo lỗi")), ("question", t("Question", "Câu hỏi"))], id: \.0) { k, label in
-                        Button { f.kind = k } label: {
-                            Text(label).font(.system(size: fs(12), weight: .medium)).foregroundColor(f.kind == k ? .white : Theme.text)
-                                .padding(.horizontal, 14).padding(.vertical, 6)
-                                .background(Capsule().fill(f.kind == k ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.card)))
-                        }.buttonStyle(.plain).hoverLift()
-                    }
-                }
+                Picker("", selection: $f.kind) {
+                    Text(t("Feedback", "Góp ý")).tag("feedback")
+                    Text(t("Bug report", "Báo lỗi")).tag("bug")
+                    Text(t("Question", "Câu hỏi")).tag("question")
+                }.pickerStyle(.segmented).labelsHidden().controlSize(.small).fixedSize()
                 FieldBox(title: t("Your email (required)", "Email của bạn (bắt buộc)")) {
                     TextField("name@example.com", text: $f.email).textFieldStyle(.plain).foregroundColor(Theme.text)
                         .onSubmit { submit(newsletter: true) }
@@ -6583,20 +7037,15 @@ struct ContactView: View {
                     Text(f.result).font(.system(size: fs(13), weight: .medium)).foregroundColor(f.ok ? Theme.green : Theme.warn)
                 }
                 HStack(spacing: 10) {
+                    TextLink(t("Report a bug on GitHub", "Báo lỗi trên GitHub"), url: URL(string: "https://github.com/HaiTrung-Workspace/tidymint/issues")!)
                     if f.sending { ProgressView().controlSize(.small).tint(Theme.text) }
                     Spacer()
                     // Return (outside the message box) = the main button.
-                    Button { submit(newsletter: true) } label: {
-                        Text(t("Send & get the newsletter", "Gửi và nhận bản tin")).font(.system(size: fs(15), weight: .semibold)).foregroundColor(.white)
-                            .padding(.horizontal, 28).padding(.vertical, 11)
-                            .background(Capsule().fill(Theme.accent)).shadow(color: Theme.accentSolid.opacity(0.4), radius: 12, y: 4)
-                    }.buttonStyle(.plain).hoverLift().disabled(f.sending).keyboardShortcut(.defaultAction)
-                    Button { submit(newsletter: false) } label: {
-                        Text(t("Send only", "Chỉ gửi")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
-                            .padding(.horizontal, 12).padding(.vertical, 6)
-                            .background(Capsule().stroke(Theme.ink.opacity(0.25), lineWidth: 1))
-                    }.buttonStyle(.plain).hoverBG(14, Theme.ink.opacity(0.08)).disabled(f.sending)
+                    GhostButton(title: t("Send Only", "Chỉ gửi"), action: { submit(newsletter: false) }).disabled(f.sending)
+                    PrimaryButton(title: t("Send & Subscribe", "Gửi và nhận bản tin"), action: { submit(newsletter: true) }, disabled: f.sending)
+                        .keyboardShortcut(.defaultAction)
                 }
+                // The newsletter consent stays right under the button it belongs to.
                 HStack(spacing: 6) {
                     Spacer()
                     Text(Backend.newsletterText).font(.system(size: fs(11))).foregroundColor(Theme.sub)
@@ -6606,6 +7055,14 @@ struct ContactView: View {
                 }
             }.padding(.horizontal, 24).padding(.bottom, 24)
         }
+        // Footer: email and brand accounts as icons (plain links: nothing loads until clicked).
+        RowLine()
+        HStack(spacing: 8) {
+            Spacer()
+            FooterIcon(tip: "hello@tidymint.app", url: URL(string: "mailto:hello@tidymint.app")!, symbol: "envelope")
+            ForEach(ContactView.social, id: \.1) { s in FooterIcon(tip: s.0, url: URL(string: s.2)!, brand: s.1) }
+        }.padding(.horizontal, 24).padding(.vertical, 12)
+      }
     }
     func submit(newsletter: Bool) {
         let email = f.email.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -6868,7 +7325,7 @@ struct FreeSpaceChart: View {
                 }
                 Picker("", selection: $pick.days) {
                     Text(t("7 days", "7 ngày")).tag(7); Text(t("30 days", "30 ngày")).tag(30); Text(t("90 days", "90 ngày")).tag(90)
-                }.pickerStyle(.segmented).frame(width: 220)
+                }.pickerStyle(.segmented).controlSize(.small).fixedSize()
             }
             if data.count < 2 {
                 Text(t("Not enough days yet. Tidymint notes the free space once a day while it is open.",
@@ -6907,6 +7364,6 @@ struct FreeSpaceChart: View {
                 .chartXSelection(value: $pick.sel)
                 .frame(height: 150)
             }
-        }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+        }.padding(14).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
     }
 }
