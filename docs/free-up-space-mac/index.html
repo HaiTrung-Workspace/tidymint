@@ -164,6 +164,10 @@ summary{user-select:none}
  .topnav.open nav .links a{padding:13px 0;border-bottom:1px solid #ffffff12;color:var(--text);font-size:16px}.topnav.open nav .links a:last-child{border-bottom:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
+.cpw{position:relative}.cpw pre{padding-right:52px}
+.cpb{position:absolute;top:8px;right:8px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:#ffffff0d;color:var(--sub);cursor:pointer}
+.cpb:hover{color:var(--leaf);border-color:var(--leaf)}.cpb.ok{color:var(--leaf)}
+.cpi{display:inline-flex;align-items:center;gap:6px}.cpi .cpb{position:static;width:26px;height:26px;border-radius:6px;flex:none}
 .relv summary{display:flex;align-items:center;gap:12px}.relv summary:after{margin-left:auto}.relv .ver{font-size:18px}.relv .small{color:var(--sub);font-weight:400}.relv ul{margin:0 0 16px}.relv .vt{color:var(--sub);font-size:14px;margin:-6px 0 18px}
 
 .crumb{font-size:14px;color:var(--sub);margin:28px 0 0}.crumb a{color:var(--sub)}
@@ -295,6 +299,16 @@ document.querySelectorAll('a[href*="releases/latest/download"]').forEach(functio
 if((location.pathname.indexOf('/install/')>-1||location.pathname.indexOf('/cai-dat/')>-1)&&'IntersectionObserver' in window){var seen={};var io=new IntersectionObserver(function(es){es.forEach(function(e){var n=e.target.id.replace(/[^0-9]/g,'');if(e.isIntersecting&&n&&!seen[n]){seen[n]=1;gtag('event','install_step',{step:+n,page_lang:document.documentElement.lang})}})},{threshold:0.6});document.querySelectorAll('h2[id]').forEach(function(h){io.observe(h)})}
 document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){a.addEventListener('click',function(){gtag('event','sponsor_click',{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide',link_location:a.closest('footer')?'footer':'page'})})});
 document.querySelectorAll('a[data-help]').forEach(function(a){a.addEventListener('click',function(){gtag('event','free_help_click',{help_type:a.getAttribute('data-help'),page_lang:document.documentElement.lang})})});})();
+</script>
+<script>
+(function(){var vi=document.documentElement.lang==='vi',L=vi?'Sao chép':'Copy',D=vi?'Đã chép':'Copied',
+C='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>',
+K='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+function btn(get){var b=document.createElement('button');b.type='button';b.className='cpb';b.innerHTML=C;b.title=L;b.setAttribute('aria-label',L);
+b.addEventListener('click',function(){var t=get();function done(){b.innerHTML=K;b.classList.add('ok');b.title=D;setTimeout(function(){b.innerHTML=C;b.classList.remove('ok');b.title=L},1500)}
+if(navigator.clipboard)navigator.clipboard.writeText(t).then(done);else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();done()}});return b}
+document.querySelectorAll('.art pre').forEach(function(p){var w=document.createElement('div');w.className='cpw';p.parentNode.insertBefore(w,p);w.appendChild(p);w.appendChild(btn(function(){return p.innerText.trim()}))});
+document.querySelectorAll('.art code.cp').forEach(function(c){var w=document.createElement('span');w.className='cpi';c.parentNode.insertBefore(w,c);w.appendChild(c);w.appendChild(btn(function(){return c.innerText.trim()}))});})();
 </script>
 </body>
 </html>

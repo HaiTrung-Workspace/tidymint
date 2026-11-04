@@ -24,8 +24,8 @@
 - Contact: hello@tidymint.app
 
 ## Guides
-- Install step by step with screenshots: https://tidymint.app/install/
-- (Vietnamese) Cài đặt từng bước có ảnh: https://tidymint.app/vi/cai-dat/
+- Install, update and uninstall step by step with screenshots: https://tidymint.app/install/
+- (Vietnamese) Cài đặt, cập nhật và gỡ từng bước có ảnh: https://tidymint.app/vi/cai-dat/
 - Does Tidymint send your data anywhere (privacy, runs on your Mac): https://tidymint.app/tidymint-privacy/
 - Is Tidymint safe: evidence, who has checked it, release process, how to verify the download: https://tidymint.app/safety/
 - (Vietnamese) Tidymint có gửi dữ liệu đi không (quyền riêng tư, chạy trên máy): https://tidymint.app/vi/quyen-rieng-tu-tidymint/
