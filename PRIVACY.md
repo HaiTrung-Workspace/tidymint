@@ -4,7 +4,7 @@ The Tidymint app runs entirely on your Mac. It does not track you, show ads, or 
 
 ## What leaves your Mac
 
-Only what you choose to send from **Contact** or the newsletter invitation:
+Only what you choose to send from **Contact**, the newsletter invitation, or the one-time "Is Tidymint helping you?" card on Clean Now:
 
 | Data | Why |
 |---|---|
@@ -12,12 +12,13 @@ Only what you choose to send from **Contact** or the newsletter invitation:
 | Your message and its type (feedback, bug, question) | To read and act on it |
 | App version, macOS version, Mac model, language (optional, on by default, can be unticked) | To reproduce bugs |
 | Newsletter choice, the exact consent text and its version | To keep proof that you asked for the newsletter |
+| Your answer to "Is Tidymint helping you?" (helpful, okay, not yet), the reasons you tick and the optional line you type, app version, language. No email, no Mac model, no identifier | To learn what to improve. The card shows at most twice, from 14 days after the first launch |
 
 Submissions are stored in a private Google Sheet owned by the developer.
 
 ## Update check
 
-Once a day, when the app is open, it downloads a small text file from tidymint.app (and, if that fails, asks GitHub's public releases page) to learn the latest version number. The request carries no data about you or your Mac beyond what any web request includes (your IP address, which GitHub Pages and GitHub log under their own policies). Nothing is installed automatically; the app only shows a line with a download link.
+Once a day, when the app is open, it asks update.tidymint.app for the latest version number (if that fails, the copy on tidymint.app, then GitHub's public releases page). The request is the same plain request as before and carries nothing extra. update.tidymint.app adds one to a daily count, split by app version and macOS version, read from the standard User-Agent line every Mac app request includes (for example "Tidymint/0.3.8 ... Darwin/27.2.0"). It does not store your IP address, any identifier, or anything else, and request logs are off. This is how we know roughly how many Macs open Tidymint each day. The code is public in `backend/update-worker.js`. Nothing is installed automatically; the app only shows a line with a download link.
 
 ## Newsletter
 
