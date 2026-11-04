@@ -2,6 +2,19 @@
 # Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.3.8", date="2026-11-04", status="released",
+         en=["New: Duplicates and Large & Old Files can also scan external drives and extra folders you add in Settings. When the same file is on your Mac and on a drive, you choose which copy to keep",
+             "New: a one-line question on Clean Now after two weeks of use, \"Is Tidymint helping you?\". One click, no email, asked at most twice",
+             "New look for the Scan button: the mint leaf, with the word showing when you hover",
+             "Fixed: Ignore in the Uninstaller and in Duplicates did not take effect, so an ignored file could still go to the Trash",
+             "Fixed: the Trash page counts drives too, Undo goes away once you empty the Trash, Uninstall waits until related files are listed, and the month viewer frees space right after the Trash is emptied",
+             "The daily update check now goes through update.tidymint.app and is counted by app and macOS version only; nothing else about your Mac is sent (see Privacy)"],
+         vi=["Mới: File trùng và File lớn quét thêm ổ ngoài và thư mục bạn thêm ở Cài đặt. Một file có cả trên máy lẫn trên ổ ngoài thì bạn chọn giữ bản nào",
+             "Mới: sau hai tuần dùng, trang Dọn ngay hỏi một dòng \"Tidymint có giúp ích cho bạn không?\". Bấm một cái, không cần email, hỏi tối đa hai lần",
+             "Nút Quét có diện mạo mới: chiếc lá bạc hà, rê chuột vào thì hiện chữ",
+             "Sửa: nút Bỏ qua ở Gỡ app và File trùng trước đây không có tác dụng, file đã bỏ qua vẫn có thể vào Thùng rác",
+             "Sửa: trang Thùng rác đếm cả ổ ngoài, nút Hoàn tác tự ẩn sau khi đổ Thùng rác, Gỡ app chờ liệt kê xong file liên quan, và trình xem tháng trả chỗ trống ngay sau khi đổ Thùng rác",
+             "Lần kiểm bản mới hằng ngày đi qua update.tidymint.app và chỉ được đếm theo phiên bản app và macOS; không gửi gì khác về máy (xem Quyền riêng tư)"]),
     dict(ver="0.3.7", date="2026-11-03", status="released",
          vt=dict(score="0/65", date="2026-11-03", sha="9594ed59660ef8fa52a8478686e8be5db9b9447c0516d60480743219574505c1"),
          en=["New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range",

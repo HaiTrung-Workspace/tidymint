@@ -2,6 +2,15 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.3.8 (2026-11-04)
+
+- New: Duplicates and Large & Old Files can also scan external drives and extra folders you add in Settings. When the same file is on your Mac and on a drive, you choose which copy to keep
+- New: a one-line question on Clean Now after two weeks of use, "Is Tidymint helping you?". One click, no email, asked at most twice
+- New look for the Scan button: the mint leaf, with the word showing when you hover
+- Fixed: Ignore in the Uninstaller and in Duplicates did not take effect, so an ignored file could still go to the Trash
+- Fixed: the Trash page counts drives too, Undo goes away once you empty the Trash, Uninstall waits until related files are listed, and the month viewer frees space right after the Trash is emptied
+- The daily update check now goes through update.tidymint.app and is counted by app and macOS version only; nothing else about your Mac is sent (see Privacy)
+
 ## 0.3.7 (2026-11-03)
 
 - New: Clean by App opens each month as a grid of photos and videos, split by week. Tick single files, a whole week or the whole month, drag a box over many, or Shift-click a range
