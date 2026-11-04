@@ -4323,6 +4323,12 @@ struct ByAppView: View {
     }
 }
 
+/// Local external drives mounted now (under /Volumes, not hidden, not network): for Space Lens.
+func externalDrives() -> [URL] {
+    (FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeIsLocalKey, .volumeIsInternalKey], options: [.skipHiddenVolumes]) ?? [])
+        .filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
+        .sorted { $0.lastPathComponent.localizedCaseInsensitiveCompare($1.lastPathComponent) == .orderedAscending }
+}
 func appIcon(_ bundleIDs: [String]) -> NSImage {
     for b in bundleIDs { if let u = NSWorkspace.shared.urlForApplication(withBundleIdentifier: b) { return NSWorkspace.shared.icon(forFile: u.path) } }
     return NSWorkspace.shared.icon(for: .applicationBundle)
@@ -4927,6 +4933,10 @@ struct LensView: View {
                 HStack(spacing: 12) {
                     GhostButton(title: "Library") { vm.openLens(Scanner.lib) }
                     GhostButton(title: "Documents") { vm.openLens(Scanner.home.appendingPathComponent("Documents")) }
+                    // External drives plugged in right now (local disks under /Volumes, not network shares or hidden volumes).
+                    ForEach(externalDrives(), id: \.path) { d in
+                        GhostButton(title: d.lastPathComponent) { vm.openLens(d) }.tip(t("Map this external drive", "Xem bản đồ ổ cứng rời này"))
+                    }
                 }
                 TextLink(t("Disk full of \"System Data\"? See what is in it", "Ổ đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(13), weight: .semibold) { vm.openSys() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
