@@ -133,14 +133,16 @@ var appLang: String = UserDefaults.standard.string(forKey: "lang")
 func t(_ en: String, _ vi: String) -> String { appLang == "vi" ? vi : en }
 /// Date in the app language (e.g. "Sep 15, 2026" / "15 thg 9, 2026").
 /// "Last opened Oct 29, 2026" / "Mở lần cuối 29/10/2026": the date column of file rows (fixed width, so kept short).
+// Formatters are costly to create and rows redraw often: one per format and language, made once.
+private let viDayFmt: DateFormatter = { let f = DateFormatter(); f.dateFormat = "dd/MM/yyyy"; return f }()
+private let shortFmts: [String: DateFormatter] = Dictionary(uniqueKeysWithValues: ["vi", "en"].map { l in
+    let f = DateFormatter(); f.locale = Locale(identifier: l == "vi" ? "vi_VN" : "en_US"); f.dateStyle = .medium; f.timeStyle = .none; return (l, f)
+})
 func openedLabel(_ d: Date) -> String {
-    if appLang == "vi" { let f = DateFormatter(); f.dateFormat = "dd/MM/yyyy"; return "Mở lần cuối " + f.string(from: d) }
+    if appLang == "vi" { return "Mở lần cuối " + viDayFmt.string(from: d) }
     return "Last opened " + shortDate(d)
 }
-func shortDate(_ d: Date) -> String {
-    let f = DateFormatter(); f.locale = Locale(identifier: appLang == "vi" ? "vi_VN" : "en_US"); f.dateStyle = .medium; f.timeStyle = .none
-    return f.string(from: d)
-}
+func shortDate(_ d: Date) -> String { (shortFmts[appLang == "vi" ? "vi" : "en"] ?? shortFmts["en"]!).string(from: d) }
 
 /// Replacement for @State.
 final class Flag: ObservableObject { @Published var v = false }
@@ -1672,6 +1674,7 @@ enum Phase { case idle, scanning, summary, review, done }
         didSet {
             if VM.advancedPages.contains(page), !advancedOpen { advancedOpen = true }
             fresh.remove(page)
+            hoverFile = nil; fileQL = nil   // a row of the old page may never report the pointer leaving
             if page == .settings { seenVersion = newVersion }
         }
     }
@@ -2256,27 +2259,39 @@ enum Phase { case idle, scanning, summary, review, done }
         if freeGB > 0 { DiskHistory.record(freeGB) }
     }
 
-    func refreshTrash() {
+    private var trashGen = 0
+    /// A drive's ".Trashes" made by macOS: owned by root or with the sticky bit (mode 1333). On drives mounted with
+    /// "ignore ownership" the owner reads as the user, so the sticky bit decides; FAT/exFAT have no Unix modes, accept.
+    /// A ".Trashes" made by a script (mode 755, seen 04/11/2026) is neither shown nor emptied by Finder, so skip it.
+    nonisolated static func isRealDriveTrash(_ trashes: URL) -> Bool {
+        var st = stat(); guard stat(trashes.path, &st) == 0 else { return false }
+        if st.st_uid == 0 || (st.st_mode & S_ISVTX) != 0 { return true }
+        var fs = statfs(); guard statfs(trashes.path, &fs) == 0 else { return false }
+        let type = withUnsafeBytes(of: fs.f_fstypename) { String(cString: $0.bindMemory(to: CChar.self).baseAddress!) }
+        return ["msdos", "exfat"].contains(type)
+    }
+    func refreshTrash(done: (() -> Void)? = nil) {
         let t = Scanner.trashURL
+        trashGen += 1; let gen = trashGen
         Task.detached {
             // Finder's Empty Trash also empties the Trash on each mounted drive (.Trashes/<uid>), so count those too.
             let vols = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeIsLocalKey], options: [.skipHiddenVolumes]) ?? []
             let uid = getuid()
             let trashes = [t] + vols.filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
                 .map { $0.appendingPathComponent(".Trashes/\(uid)") }
-                // Only a Trash macOS itself made: ".Trashes" owned by root. A ".Trashes" folder made by a script or copy
-                // is not shown or emptied by Finder (seen 04/11/2026), so counting it made the number look stuck.
-                .filter { u in
-                    FileManager.default.fileExists(atPath: u.path) &&
-                    ((try? FileManager.default.attributesOfItem(atPath: u.deletingLastPathComponent().path))?[.ownerAccountID] as? NSNumber)?.intValue == 0
-                }
-            let s = trashes.reduce(Int64(0)) { $0 + Scanner.size($1) }
-            let c = trashes.reduce(0) { $0 + Scanner.children($1, hidden: false).count }
-            let drives: [(String, Int, Int64)] = trashes.dropFirst().compactMap { u in
-                let n = Scanner.children(u, hidden: false).count
-                return n == 0 ? nil : (u.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent, n, Scanner.size(u))
+                .filter { FileManager.default.fileExists(atPath: $0.path) && VM.isRealDriveTrash($0.deletingLastPathComponent()) }
+            // One walk per Trash: (count, size).
+            let each = trashes.map { (Scanner.children($0, hidden: false).count, Scanner.size($0)) }
+            let s = each.reduce(Int64(0)) { $0 + $1.1 }, c = each.reduce(0) { $0 + $1.0 }
+            let drives: [(String, Int, Int64)] = zip(trashes, each).dropFirst().compactMap { u, e in
+                e.0 == 0 ? nil : (u.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent, e.0, e.1)
             }
-            await MainActor.run { self.trashSize = s; self.trashCount = c; self.trashOnDrives = drives }
+            await MainActor.run {
+                guard gen == self.trashGen else { return }   // a newer refresh started: drop this older result
+                self.trashSize = s; self.trashCount = c; self.trashOnDrives = drives
+                if c == 0 { self.trashLeftNote = nil }
+                done?()
+            }
         }
     }
 
@@ -2750,21 +2765,19 @@ enum Phase { case idle, scanning, summary, review, done }
                           "Finder chưa đổ (\(msg)). Cho phép Tidymint điều khiển Finder trong Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Tự động hoá, rồi thử lại."), "OK")
         } else {
             log("Emptied Trash: \(fmt(trashSize))")
-            undoable = nil; Journal.clear()   // the items are gone, Undo can no longer put them back
-        }
-        refreshTrash(); refreshDisk()
-        // Finder can leave items behind (seen 04/11/2026: a folder in an external drive's Trash stayed after Empty Trash).
-        // Check again once Finder is done and say what is left, instead of showing an unchanged number with no reason.
-        trashLeftNote = nil
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-            guard let self else { return }
-            self.refreshTrash()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                guard self.trashCount > 0 else { return }
-                self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there. Open the Trash in Finder to see them, then empty it again.",
-                                       "Finder chưa đổ hết: còn \(self.trashCount) mục. Mở Thùng rác trong Finder để xem, rồi đổ lại.")
+            // Finder can leave items behind (seen 04/11/2026). Check again once Finder is done: if the Trash is empty,
+            // Undo can no longer put anything back; if not, say what is left and keep Undo.
+            trashLeftNote = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+                self?.refreshTrash { [weak self] in
+                    guard let self else { return }
+                    if self.trashCount == 0 { self.undoable = nil; Journal.clear(); return }
+                    self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there. Open the Trash in Finder to see them, then empty it again.",
+                                           "Finder chưa đổ hết: còn \(self.trashCount) mục. Mở Thùng rác trong Finder để xem, rồi đổ lại.")
+                }
             }
         }
+        refreshTrash(); refreshDisk()
     }
 
     // Ignore list
@@ -5444,7 +5457,7 @@ struct RootView: View {
                     guard e.keyCode == 49, e.modifierFlags.intersection([.command, .option, .control]).isEmpty,
                           vm.monthRef == nil, !(NSApp.keyWindow?.firstResponder is NSTextView) else { return false }
                     if vm.fileQL != nil { vm.fileQL = nil; return true }
-                    if let h = vm.hoverFile { vm.fileQL = h; return true }
+                    if let h = vm.hoverFile, FileManager.default.fileExists(atPath: h.path) { vm.fileQL = h; return true }
                     return false
                 }
             }
@@ -6118,7 +6131,7 @@ struct SettingsView: View {
         }.padding(.horizontal, 24).padding(.bottom, 24).frame(maxWidth: .infinity) }
         // A group with something waiting (permission off, new version) opens by itself; the rest stay folded.
         .onAppear { openAttention() }
-        .onReceive(vm.$newVersion) { _ in openAttention() }
+        .onReceive(vm.$newVersion) { v in if v != nil { groups.ids.insert("about") } }   // @Published sends before the value is set
     }
     func openAttention() {
         if !vm.fullDiskAccess { groups.ids.insert("scan") }
