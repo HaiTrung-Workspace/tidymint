@@ -201,7 +201,8 @@ document.getElementById('ckOpen').onclick=function(){{show(true)}};
 if(!tmC)show(true);
 document.querySelectorAll('a[href*="releases/latest/download"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','download_click',{{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide'}})}})}});
 if((location.pathname.indexOf('/install/')>-1||location.pathname.indexOf('/cai-dat/')>-1)&&'IntersectionObserver' in window){{var seen={{}};var io=new IntersectionObserver(function(es){{es.forEach(function(e){{var n=e.target.id.replace(/[^0-9]/g,'');if(e.isIntersecting&&n&&!seen[n]){{seen[n]=1;gtag('event','install_step',{{step:+n,page_lang:document.documentElement.lang}})}}}})}},{{threshold:0.6}});document.querySelectorAll('h2[id]').forEach(function(h){{io.observe(h)}})}}
-document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','sponsor_click',{{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide',link_location:a.closest('footer')?'footer':'page'}})}})}});}})();
+document.querySelectorAll('a[href*="github.com/sponsors/"]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','sponsor_click',{{link_url:a.href,page_lang:document.documentElement.lang,page_type:'guide',link_location:a.closest('footer')?'footer':'page'}})}})}});
+document.querySelectorAll('a[data-help]').forEach(function(a){{a.addEventListener('click',function(){{gtag('event','free_help_click',{{help_type:a.getAttribute('data-help'),page_lang:document.documentElement.lang}})}})}});}})();
 </script>
 </body>
 </html>
@@ -324,9 +325,14 @@ SP = {
    use=["<b>Tài khoản Apple Developer, 99 USD mỗi năm.</b> Có nó, app được Apple xác nhận: người mới tải về mở là chạy, không phải vào Cài đặt > Bảo mật để cho phép.",
         "<b>Cập nhật tới nhanh hơn.</b> App đã xác nhận có thể tự cập nhật, bạn không phải tải lại bản mới bằng tay.",
         "<b>Phần còn lại</b> (nếu có) trả tên miền tidymint.app và thời gian làm bản mới."],
-   h_free="Không cần tiền vẫn giúp được",
-   free=["<b>Gắn sao trên GitHub.</b> Nhiều sao thì người lạ tin app hơn khi lần đầu thấy nó.",
-         "<b>Báo lỗi hoặc gợi ý.</b> Mở mục Issues trên GitHub, hoặc dùng mục Liên hệ ngay trong app.",
+   h_top="3 cách giúp miễn phí, mỗi cách 30 giây",
+   top=["<b>Gắn sao trên GitHub.</b> Số sao là thứ người ta xem đầu tiên ở một app mã nguồn mở.",
+        "<b>Bấm thích trên AlternativeTo.</b> Lượt thích đưa Tidymint lên cao trong danh sách app miễn phí thay CleanMyMac.",
+        "<b>Viết đánh giá trên MacUpdate.</b> Vài dòng thật lòng, khen hay chê đều được, giúp người sau biết app thế nào."],
+   top_btn=["Gắn sao trên GitHub", "Thích trên AlternativeTo", "Đánh giá trên MacUpdate"],
+   h_money="Ủng hộ bằng tiền",
+   h_free="Cách giúp khác",
+   free=["<b>Báo lỗi hoặc gợi ý.</b> Mở mục Issues trên GitHub, hoặc dùng mục Liên hệ ngay trong app.",
          "<b>Gửi cho người cần.</b> Một người bạn đang kêu máy đầy là đủ.",
          "<b>Gợi ý app cần dọn.</b> Mở mục Issues trên GitHub, ghi tên app và thư mục nó chiếm nhiều dung lượng. Tidymint sẽ đo trên máy thật rồi mới thêm vào."],
    h_promise="Tidymint cam kết",
@@ -342,9 +348,14 @@ SP = {
    use=["<b>The Apple Developer account, $99 a year.</b> With it, Apple verifies the app: new users download it and it just opens, no trip to Settings > Security.",
         "<b>Faster updates.</b> A verified app can update itself, so you no longer download each new version by hand.",
         "<b>Anything left over</b> pays for the tidymint.app domain and time spent on new versions."],
-   h_free="Ways to help that cost nothing",
-   free=["<b>Star it on GitHub.</b> Stars help strangers trust the app the first time they see it.",
-         "<b>Report a bug or suggest something.</b> Open an issue on GitHub, or use Contact inside the app.",
+   h_top="Three free ways to help, 30 seconds each",
+   top=["<b>Star it on GitHub.</b> Stars are the first thing people look at on an open-source app.",
+        "<b>Like it on AlternativeTo.</b> Likes move Tidymint up the list of free CleanMyMac alternatives.",
+        "<b>Review it on MacUpdate.</b> A few honest lines, good or bad, tell the next person what to expect."],
+   top_btn=["Star on GitHub", "Like on AlternativeTo", "Review on MacUpdate"],
+   h_money="Sponsor the project",
+   h_free="Other ways to help",
+   free=["<b>Report a bug or suggest something.</b> Open an issue on GitHub, or use Contact inside the app.",
          "<b>Send it to someone who needs it.</b> One friend complaining about a full Mac is enough.",
          "<b>Suggest an app to clean.</b> Open an issue on GitHub with the app name and the folder that takes up space. Tidymint measures it on a real Mac before adding it."],
    h_promise="What Tidymint promises",
@@ -354,13 +365,19 @@ SP = {
    star="Star on GitHub", issue="Report a bug on GitHub"),
 }
 SPONSOR = "https://github.com/sponsors/HaiTrung-Workspace"
+FREE_HELP = [("github_star", "https://github.com/HaiTrung-Workspace/tidymint"),
+             ("alternativeto_like", "https://alternativeto.net/software/tidymint/about/"),
+             ("macupdate_review", "https://tidymint.macupdate.com/")]
 def sponsorpage(k):
     h = dict(SP[k]); ul = lambda xs: "<ul>%s</ul>" % "".join("<li>%s</li>" % x for x in xs)
     s1, s2 = h["status"]
-    body = ('<div class="body"><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
+    btns = "".join('<a class="btn %s" data-help="%s" href="%s" target="_blank" rel="noopener">%s</a>' % ("primary" if i == 0 else "ghost", key, url, h["top_btn"][i])
+                   for i, (key, url) in enumerate(FREE_HELP))
+    body = ('<div class="body"><h2 id="free" style="scroll-margin-top:90px">%s</h2>%s<p class="cta">%s</p>'
+            '<h2>%s</h2><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
             '<p class="cta"><a class="btn primary" href="%s">%s <span class="arr">→</span></a></p>'
-            '<h2>%s</h2>%s<h2>%s</h2>%s<p class="cta"><a class="btn ghost" href="%s">%s</a><a class="btn ghost" href="%s/issues">%s</a></p>'
-            '<h2>%s</h2>%s</div>') % (s1, s2, SPONSOR, h["sponsor"], h["h_use"], ul(h["use"]), h["h_free"], ul(h["free"]), S.GH, h["star"], S.GH, h["issue"], h["h_promise"], ul(h["promise"]))
+            '<h2>%s</h2>%s<h2>%s</h2>%s<p class="cta"><a class="btn ghost" href="%s/issues">%s</a></p>'
+            '<h2>%s</h2>%s</div>') % (h["h_top"], ul(h["top"]), btns, h["h_money"], s1, s2, SPONSOR, h["sponsor"], h["h_use"], ul(h["use"]), h["h_free"], ul(h["free"]), S.GH, h["issue"], h["h_promise"], ul(h["promise"]))
     h.update(lang=k, date="2026-10-30", hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body,
              lead='<p class="lead">%s</p>' % h["desc"])
     return h
