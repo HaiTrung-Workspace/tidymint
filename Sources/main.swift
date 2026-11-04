@@ -84,6 +84,8 @@ enum Theme {
     static var sidebar: Color { shade.opacity(p.light ? 0.16 : 0.22) }
     static var card: Color { ink.opacity(p.light ? 0.06 : 0.08) }
     static var cardHi: Color { ink.opacity(p.light ? 0.11 : 0.14) }
+    /// Dark core of the Scan button: the brand "tile" green on dark themes, a soft white on light ones.
+    static var tile: Color { p.light ? Color(hex: 0xf3faf6) : Color(hex: 0x0d2b24) }
     static var accent: LinearGradient { LinearGradient(colors: p.accent.map { Color(hex: $0) }, startPoint: .leading, endPoint: .trailing) }
     static var accentSolid: Color { Color(hex: p.accent[p.accent.count - 1]) }
     static var link: Color { Color(hex: p.link) }
@@ -341,24 +343,144 @@ struct MenuRow: View {
 enum Prefs {
     /// Folders where the user keeps projects (code, AI workspaces). Used to look for drafts,
     /// to never pre-select duplicates inside them, and to check links before deleting.
-    static var projectFolders: [String] {
-        get { UserDefaults.standard.stringArray(forKey: "projectFolders") ?? [] }
-        set { UserDefaults.standard.set(newValue, forKey: "projectFolders") }
-    }
     /// Extra path keywords that must never be touched (e.g. a browser-profile folder name).
     static var protectedKeywords: [String] { UserDefaults.standard.stringArray(forKey: "protectedKeywords") ?? [] }
-    static func inProject(_ p: String) -> Bool { projectFolders.contains { p == $0 || p.hasPrefix($0 + "/") } }
+    private static var projectCache: [String]? = nil
+    private static let projectLock = NSLock()
+    static var projectFolders: [String] {
+        get { projectLock.lock(); defer { projectLock.unlock() }
+              if let c = projectCache { return c }
+              let v = UserDefaults.standard.stringArray(forKey: "projectFolders") ?? []; projectCache = v; return v }
+        set { projectLock.lock(); projectCache = newValue; projectLock.unlock(); UserDefaults.standard.set(newValue, forKey: "projectFolders") }
+    }
+    static func inProject(_ p: String) -> Bool { let q = canonical(p); return projectFolders.contains { q == $0 || q.hasPrefix($0 + "/") } }
+    /// Drive name as it was when a path on it was saved (project folder, extra folder, ignore list), by volume UUID.
+    /// A renamed drive ("SSD" became "SSD 1") then still matches those saved paths.
+    private static var volCache: [String: String]? = nil
+    static var volumeNames: [String: String] {
+        get { projectLock.lock(); defer { projectLock.unlock() }
+              if let c = volCache { return c }
+              let v = UserDefaults.standard.dictionary(forKey: "volumeNames") as? [String: String] ?? [:]; volCache = v; return v }
+        set { projectLock.lock(); volCache = newValue; projectLock.unlock(); UserDefaults.standard.set(newValue, forKey: "volumeNames") }
+    }
+    static func rememberVolume(of path: String) {
+        guard onOtherDrive(path), let root = volumeRoot(path),
+              let id = (try? URL(fileURLWithPath: root).resourceValues(forKeys: [.volumeUUIDStringKey]))?.volumeUUIDString else { return }
+        if volumeNames[id] == nil { volumeNames[id] = root }
+    }
+    static func volumeRoot(_ p: String) -> String? {
+        let parts = p.split(separator: "/", omittingEmptySubsequences: true)
+        return parts.count >= 2 && parts[0] == "Volumes" ? "/" + parts.prefix(2).joined(separator: "/") : nil
+    }
+    /// The path with the drive name it was saved under (see volumeNames); unchanged for anything else.
+    static func canonical(_ p: String) -> String {
+        guard let root = volumeRoot(p) else { return p }
+        driveLock.lock(); let known = uuidCache[root]; driveLock.unlock()
+        let id: String?
+        if let known { id = known }
+        else {
+            id = (try? URL(fileURLWithPath: root).resourceValues(forKeys: [.volumeUUIDStringKey]))?.volumeUUIDString
+            if let id { driveLock.lock(); uuidCache[root] = id; driveLock.unlock() }
+        }
+        guard let id, let saved = volumeNames[id], saved != root else { return p }
+        return saved + p.dropFirst(root.count)
+    }
+    private static var uuidCache: [String: String] = [:]
+    /// Extra places scanned by Duplicates and Large & Old Files: external drives, or folders in the home folder
+    /// outside the usual six (Documents, Downloads...). Added by the user in Settings. Several drives are fine.
+    static var extraFolders: [String] {
+        get { UserDefaults.standard.stringArray(forKey: "extraScanFolders") ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: "extraScanFolders") }
+    }
+    /// Volume UUID of each extra folder on an external drive, so the folder is found again when the drive comes back
+    /// under another name ("SSD 1" when two drives share a name, or after a rename).
+    static var extraVolumeIDs: [String: String] {
+        get { UserDefaults.standard.dictionary(forKey: "extraScanVolumeIDs") as? [String: String] ?? [:] }
+        set { UserDefaults.standard.set(newValue, forKey: "extraScanVolumeIDs") }
+    }
+    /// Where an extra folder is right now, or nil when its drive is not plugged in.
+    static func resolveExtra(_ path: String) -> String? {
+        let fm = FileManager.default
+        guard onOtherDrive(path) else { return fm.fileExists(atPath: path) ? path : nil }
+        let parts = path.split(separator: "/", omittingEmptySubsequences: true)   // ["Volumes", name, rest...]
+        guard parts.count >= 2 else { return nil }
+        let root = "/" + parts.prefix(2).joined(separator: "/")
+        let rest = parts.dropFirst(2).joined(separator: "/")
+        let want = extraVolumeIDs[path]
+        func uuid(_ u: URL) -> String? { (try? u.resourceValues(forKeys: [.volumeUUIDStringKey]))?.volumeUUIDString }
+        if fm.fileExists(atPath: path) {
+            // Same name, but a different drive is mounted there: not our folder.
+            if let w = want, let now = uuid(URL(fileURLWithPath: root)), now != w { return nil }
+            return path
+        }
+        guard let w = want else { return nil }
+        let vols = fm.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeUUIDStringKey], options: [.skipHiddenVolumes]) ?? []
+        guard let v = vols.first(where: { uuid($0) == w }) else { return nil }
+        let p = rest.isEmpty ? v.path : v.appendingPathComponent(rest).path
+        return fm.fileExists(atPath: p) ? p : nil
+    }
+    /// Extra folders present right now: a drive that is not plugged in is skipped, not reported as an error.
+    static var extraRoots: [URL] { extraFolders.compactMap(resolveExtra).map { URL(fileURLWithPath: $0) } }
+    enum ExtraCheck { case ok, outside, network, readOnly, timeMachine }
+    /// Allowed: a folder on another local, writable drive (/Volumes/<name>), or a folder inside the home folder that is not Library.
+    /// The startup disk seen through /Volumes resolves to "/" and is refused. Network drives are refused: macOS has no Trash
+    /// there, so a "move to Trash" would fail. Time Machine backups are refused: macOS manages them.
+    static func extraCheck(_ u: URL) -> ExtraCheck {
+        let real = u.resolvingSymlinksInPath().path
+        let home = FileManager.default.homeDirectoryForCurrentUser.resolvingSymlinksInPath().path
+        if real.hasPrefix("/Volumes/") {
+            let v = try? u.resourceValues(forKeys: [.volumeIsLocalKey, .volumeIsReadOnlyKey, .volumeURLKey])
+            if v?.volumeIsLocal == false { return .network }
+            if v?.volumeIsReadOnly == true { return .readOnly }
+            let rootKids = (try? FileManager.default.contentsOfDirectory(atPath: v?.volume?.path ?? real)) ?? []
+            // HFS+ backups keep Backups.backupdb; APFS backups are folders named like 2026-11-04-101500.backup.
+            if rootKids.contains(where: { $0 == "Backups.backupdb" || $0.range(of: #"^\d{4}-\d{2}-\d{2}-\d{6}\.(backup|previous|inprogress|interrupted)$"#, options: .regularExpression) != nil }) { return .timeMachine }
+            return .ok
+        }
+        guard real.hasPrefix(home + "/") else { return .outside }
+        return (real == home + "/Library" || real.hasPrefix(home + "/Library/")) ? .outside : .ok
+    }
+    /// True when the path is on a drive other than the startup disk.
+    /// A second volume on the internal disk is not "another drive": the space stays on the same SSD.
+    /// Cached per volume, called from scans on background threads.
+    static func onOtherDrive(_ p: String) -> Bool {
+        guard p.hasPrefix("/Volumes/") else { return false }
+        let parts = p.split(separator: "/", omittingEmptySubsequences: true)
+        guard parts.count >= 2 else { return false }
+        let root = "/" + parts.prefix(2).joined(separator: "/")
+        driveLock.lock(); defer { driveLock.unlock() }
+        if let v = driveCache[root] { return v }
+        guard let r = try? URL(fileURLWithPath: root).resourceValues(forKeys: [.volumeIsEjectableKey, .volumeIsRemovableKey, .volumeIsInternalKey]) else {
+            return true   // not mounted right now: nothing to cache, and a /Volumes path that is not there is not the startup disk
+        }
+        let other = r.volumeIsEjectable == true || r.volumeIsRemovable == true || r.volumeIsInternal == false
+        driveCache[root] = other
+        return other
+    }
+    private static var driveCache: [String: Bool] = [:]
+    static let driveLock = NSLock()
+    /// Which copy to keep when the same file is on the Mac and on an external drive:
+    /// "ask" (nothing pre-selected, the user picks), "external" (free space on the Mac), "mac" (keep the Mac copy).
+    static var crossKeep: String {
+        get { UserDefaults.standard.string(forKey: "crossDriveKeep") ?? "ask" }
+        set { UserDefaults.standard.set(newValue, forKey: "crossDriveKeep") }
+    }
 }
 
 enum IgnoreList {
     static let key = "ignoredPaths"
+    /// Kept in memory: `contains` runs for every file a scan walks.
+    private static var cached: [String]? = nil
+    private static let lock = NSLock()
     static var paths: [String] {
-        get { UserDefaults.standard.stringArray(forKey: key) ?? [] }
-        set { UserDefaults.standard.set(newValue, forKey: key) }
+        get { lock.lock(); defer { lock.unlock() }
+              if let c = cached { return c }
+              let v = UserDefaults.standard.stringArray(forKey: key) ?? []; cached = v; return v }
+        set { lock.lock(); cached = newValue; lock.unlock(); UserDefaults.standard.set(newValue, forKey: key) }
     }
-    static func add(_ p: String) { if !paths.contains(p) { paths.append(p) } }
+    static func add(_ p: String) { Prefs.rememberVolume(of: p); let q = Prefs.canonical(p); if !paths.contains(q) { paths.append(q) } }
     static func remove(_ p: String) { paths.removeAll { $0 == p } }
-    static func contains(_ p: String) -> Bool { paths.contains { p == $0 || p.hasPrefix($0 + "/") } }
+    static func contains(_ p: String) -> Bool { let q = Prefs.canonical(p); return paths.contains { q == $0 || q.hasPrefix($0 + "/") } }
 }
 
 // MARK: - Model
@@ -373,15 +495,18 @@ struct CleanItem: Identifiable, Hashable {
     var refWeak: [String] = []     // only mentioned in notes
     var nameMatch = false          // found by app name, not bundle id: could belong to something else
     var hasDB = false              // a database sits inside: may be the user's own data
+    var cross = 0                  // duplicate group spans the Mac and an external drive: 1 = this copy is on the Mac, 2 = on an external drive
     var note: String {
         if running { return t("App is open, quit it first", "App đang mở, tắt app rồi dọn") }
         if hasDB { return t("Has a database inside, may be your data", "Có database bên trong, có thể là dữ liệu của bạn") }
         if nameMatch { return t("Matched by name only, check first", "Khớp theo tên app, kiểm tra trước") }
         if !refStrong.isEmpty { return t("Used by \(refStrong.count) script/skill", "Script/skill đang dùng (\(refStrong.count))") }
         if !refWeak.isEmpty { return t("Mentioned in \(refWeak.count) notes", "Được nhắc trong \(refWeak.count) ghi chú") }
+        if cross == 1 { return t("Same file is on an external drive", "Có bản giống hệt trên ổ ngoài") }
+        if cross == 2 { return t("Same file is on this Mac", "Có bản giống hệt trên máy") }
         return ""
     }
-    var noteColor: Color { !refStrong.isEmpty || hasDB ? Theme.danger : Theme.warn }
+    var noteColor: Color { !refStrong.isEmpty || hasDB ? Theme.danger : (running || nameMatch || !refWeak.isEmpty ? Theme.warn : Theme.sub) }
     var refHelp: String { (refStrong + refWeak).map { $0.replacingOccurrences(of: NSHomeDirectory(), with: "~") }.joined(separator: "\n") }
     var date: Date? = nil
     var label: String? = nil       // friendlier name than the file name (e.g. "My iPhone · Oct 2, 2026")
@@ -622,7 +747,7 @@ enum Scanner {
                              descEN: "_to_delete and _tmp folders in your project folders (set them in Settings)",
                              descVI: "Thư mục _to_delete, _tmp trong thư mục dự án (chọn ở Cài đặt)",
                              safety: .review, whyEN: "Your own drafts. Check the folder before cleaning.", whyVI: "Nháp của chính bạn. Xem lại thư mục trước khi dọn.",
-                             items: make(findDirs(projects, names: ["_to_delete", "_to-delete", "_tmp"], depth: 5), running: run, minSize: 1)))
+                             items: make(findDirs(projects, names: ["_to_delete", "_to-delete", "_tmp"], depth: 5), running: run, defaultOn: false, minSize: 1)))
 
         step(5, "~/Downloads")
         let cutoff = Date().addingTimeInterval(-14 * 86400)
@@ -637,8 +762,24 @@ enum Scanner {
         return cats.filter { !$0.items.isEmpty }
     }
 
-    static func scanLarge(minMB: Int64 = 100) -> [CleanItem] {
-        let roots = ["Documents", "Downloads", "Desktop", "Movies", "Music", "Pictures"].map { home.appendingPathComponent($0) }
+    /// Scan roots without overlap: resolved paths, and a folder already inside another root is dropped,
+    /// so no file is counted twice (it would otherwise show up as its own duplicate).
+    static func scanRoots(_ base: [URL], extras: Bool = true) -> [URL] {
+        // Base folders stay as written (~/Documents even if it is a link elsewhere), so project folders and
+        // the ignore list, saved with those paths, still match. Only the extra folders are resolved.
+        let all = base.map(\.standardizedFileURL) + (extras ? Prefs.extraRoots.map { $0.resolvingSymlinksInPath().standardizedFileURL } : [])
+        var kept: [URL] = []
+        for u in all.sorted(by: { $0.path.count < $1.path.count }) where fm.fileExists(atPath: u.path) {
+            if kept.contains(where: { u.path == $0.path || u.path.hasPrefix($0.path + "/") }) { continue }
+            kept.append(u)
+        }
+        return kept
+    }
+
+    /// `extras`: also walk the drives and folders added in Settings (the Large & Old Files page). Smart Scan leaves them out
+    /// so the quick scan stays quick even with a big external drive attached.
+    static func scanLarge(minMB: Int64 = 100, extras: Bool = false) -> [CleanItem] {
+        let roots = scanRoots(["Documents", "Downloads", "Desktop", "Movies", "Music", "Pictures"].map { home.appendingPathComponent($0) }, extras: extras)
         let keys: Set<URLResourceKey> = [.totalFileAllocatedSizeKey, .isRegularFileKey, .contentAccessDateKey, .contentModificationDateKey]
         var out: [CleanItem] = []
         for r in roots {
@@ -1020,7 +1161,16 @@ extension AppRules {
 
 struct Bubble { let node: Node; var x: CGFloat; var y: CGFloat; var r: CGFloat; let color: Color }
 
-func pack(_ nodes: [Node], in size: CGSize) -> [Bubble] {
+/// Same nodes and size give the same layout: hovering a bubble redraws the view, packing again would be wasted.
+@MainActor private var packCache: (key: String, value: [Bubble])? = nil
+@MainActor func pack(_ nodes: [Node], in size: CGSize) -> [Bubble] {
+    let key = "\(Int(size.width))x\(Int(size.height))|" + nodes.map { "\($0.url.path)=\($0.size)" }.joined(separator: "|")
+    if let c = packCache, c.key == key { return c.value }
+    let v = packLayout(nodes, in: size)
+    packCache = (key, v)
+    return v
+}
+func packLayout(_ nodes: [Node], in size: CGSize) -> [Bubble] {
     // Bubble area is proportional to size (radius = square root); no forced minimum size.
     guard !nodes.isEmpty, size.width > 50 else { return [] }
     let maxS = Double(nodes.map(\.size).max() ?? 1)
@@ -1279,11 +1429,13 @@ struct DupGroup: Identifiable {
     var expanded = false
     var wasted: Int64 { size * Int64(max(0, items.count - 1)) }
     var selectedSize: Int64 { items.filter(\.selected).reduce(0) { $0 + $1.size } }
+    /// Copies both on the Mac and on an external drive.
+    var isCross: Bool { items.contains { $0.cross == 1 } && items.contains { $0.cross == 2 } }
 }
 
 enum Dupes {
     static let roots = ["Documents", "Downloads", "Desktop", "Pictures", "Movies", "Music"].map { Scanner.home.appendingPathComponent($0) }
-    static let skipDirs: Set<String> = [".git", "node_modules", "__pycache__", ".venv", "venv", "build", "DerivedData"]
+    static let skipDirs: Set<String> = [".git", "node_modules", "__pycache__", ".venv", "venv", "build", "DerivedData", "Backups.backupdb"]
 
     static func hash(_ u: URL, limit: Int? = nil) -> String? {
         guard let h = try? FileHandle(forReadingFrom: u) else { return nil }
@@ -1303,23 +1455,43 @@ enum Dupes {
         return hasher.finalize().map { String(format: "%02x", $0) }.joined()
     }
 
-    /// Which copy to keep: not in Downloads/Desktop/_tmp, then shorter path, then older.
+    /// Which copy to keep: not in Downloads/Desktop/_tmp, then shorter path.
     static func keepScore(_ u: URL) -> (Int, Int) {
         let p = u.path
         let temp = ["/Downloads/", "/Desktop/", "/_tmp", "/_to_delete", "/_to-delete"].contains { p.contains($0) } ? 1 : 0
         return (temp, p.count)
     }
+    /// Order a group (kept copy first) and set what is pre-selected.
+    /// A group with copies both on the Mac and on an external drive follows `rule` (Prefs.crossKeep):
+    /// "external" keeps the external copy, "mac" keeps the Mac copy, "ask" pre-selects nothing.
+    /// Copies inside project folders are never pre-selected.
+    static func arrange(_ items: [CleanItem], rule: String) -> [CleanItem] {
+        let onExt = { (i: CleanItem) in Prefs.onOtherDrive(i.url.path) }
+        let isCross = items.contains(where: onExt) && items.contains { !onExt($0) }
+        var out = items.sorted { keepScore($0.url) < keepScore($1.url) }
+        if isCross && rule != "ask" {
+            let keepExt = rule == "external"
+            out = out.filter { onExt($0) == keepExt } + out.filter { onExt($0) != keepExt }
+        }
+        for i in out.indices {
+            out[i].cross = isCross ? (onExt(out[i]) ? 2 : 1) : 0
+            out[i].selected = i > 0 && !Prefs.inProject(out[i].url.path) && !(isCross && rule == "ask") && out[i].refStrong.isEmpty
+        }
+        return out
+    }
 
     static func scan(minBytes: Int64 = 1 << 20, progress: @escaping (Int) -> Void) -> [DupGroup] {
         var bySize: [Int64: [URL]] = [:]
         var count = 0
-        let keys: Set<URLResourceKey> = [.fileSizeKey, .isRegularFileKey, .isDirectoryKey]
-        for r in roots {
+        let keys: Set<URLResourceKey> = [.fileSizeKey, .isRegularFileKey, .isDirectoryKey, .fileResourceIdentifierKey]
+        var seenFiles = Set<NSObject>()   // hard links share one file: count it once, trashing a link frees nothing
+        for r in Scanner.scanRoots(roots) {
             guard let en = FileManager.default.enumerator(at: r, includingPropertiesForKeys: Array(keys),
                                                           options: [.skipsHiddenFiles, .skipsPackageDescendants], errorHandler: { _, _ in true }) else { continue }
             for case let f as URL in en {
                 if skipDirs.contains(f.lastPathComponent) || Scanner.skip(f.path) { en.skipDescendants(); continue }
                 guard let v = try? f.resourceValues(forKeys: keys), v.isRegularFile == true, let sz = v.fileSize, Int64(sz) >= minBytes else { continue }
+                if let fid = v.fileResourceIdentifier as? NSObject, !seenFiles.insert(fid).inserted { continue }
                 bySize[Int64(sz), default: []].append(f)
                 count += 1; if count % 500 == 0 { progress(count) }
             }
@@ -1332,12 +1504,9 @@ enum Dupes {
                 var byFull: [String: [URL]] = [:]
                 for u in us { if let h = hash(u) { byFull[h, default: []].append(u) } }
                 for (_, same) in byFull where same.count > 1 {
-                    let sorted = same.sorted { keepScore($0) < keepScore($1) }
-                    let items = sorted.enumerated().map { i, u -> CleanItem in
-                        let d = (try? u.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
-                        // Keep the first copy; pre-select extra copies only outside project folders (Downloads, Desktop...).
-                        return CleanItem(url: u, size: sz, selected: i > 0 && !Prefs.inProject(u.path), date: d)
-                    }
+                    let items = arrange(same.map { u in
+                        CleanItem(url: u, size: sz, selected: false, date: (try? u.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate)
+                    }, rule: Prefs.crossKeep)
                     groups.append(DupGroup(size: sz, items: items))
                 }
             }
@@ -1538,10 +1707,53 @@ enum Phase { case idle, scanning, summary, review, done }
         p.prompt = t("Add", "Thêm")
         guard p.runModal() == .OK else { return }
         var list = Prefs.projectFolders
-        for u in p.urls where !list.contains(u.path) { list.append(u.path) }
+        for u in p.urls { Prefs.rememberVolume(of: u.path); let q = Prefs.canonical(u.path); if !list.contains(q) { list.append(q) } }
         Prefs.projectFolders = list; projects = list
     }
     func removeProjectFolder(_ path: String) { Prefs.projectFolders.removeAll { $0 == path }; projects = Prefs.projectFolders }
+    @Published var extras: [String] = Prefs.extraFolders
+    /// Extra folders whose drive is not plugged in right now; refreshed when the list changes and when Settings opens.
+    @Published var extrasMissing = Set<String>()
+    func refreshExtras() { extrasMissing = Set(Prefs.extraFolders.filter { Prefs.resolveExtra($0) == nil }) }
+    func addExtraFolder() {
+        let p = NSOpenPanel(); p.canChooseDirectories = true; p.canChooseFiles = false; p.allowsMultipleSelection = true
+        p.directoryURL = URL(fileURLWithPath: "/Volumes"); p.prompt = t("Add", "Thêm")
+        guard p.runModal() == .OK else { return }
+        var list = Prefs.extraFolders
+        var ids = Prefs.extraVolumeIDs
+        var refused: [Prefs.ExtraCheck] = []
+        for u in p.urls {
+            let c = Prefs.extraCheck(u)
+            guard c == .ok else { refused.append(c); continue }
+            let path = u.resolvingSymlinksInPath().path
+            if !list.contains(path) { list.append(path) }
+            if Prefs.onOtherDrive(path), let id = (try? u.resourceValues(forKeys: [.volumeUUIDStringKey]))?.volumeUUIDString { ids[path] = id; Prefs.rememberVolume(of: path) }
+        }
+        Prefs.extraVolumeIDs = ids; Prefs.extraFolders = list; extras = list; refreshExtras()
+        if let c = refused.first {
+            let a = NSAlert()
+            switch c {
+            case .network:
+                a.messageText = t("Network drives are not supported", "Chưa hỗ trợ ổ mạng")
+                a.informativeText = t("macOS has no Trash on a network drive, so Tidymint could not move files there safely.", "macOS không có Thùng rác trên ổ mạng, nên Tidymint không chuyển file ở đó vào Thùng rác một cách an toàn được.")
+            case .readOnly:
+                a.messageText = t("This drive is read-only", "Ổ này chỉ đọc")
+                a.informativeText = t("Files on it cannot be moved to the Trash (common for NTFS drives formatted on Windows).", "Không chuyển được file trên ổ này vào Thùng rác (hay gặp với ổ NTFS định dạng trên Windows).")
+            case .timeMachine:
+                a.messageText = t("This is a Time Machine backup", "Đây là ổ sao lưu Time Machine")
+                a.informativeText = t("macOS manages old backups on its own. Remove them in Time Machine, not here.", "macOS tự quản lý bản sao lưu cũ. Muốn xoá thì làm trong Time Machine, không làm ở đây.")
+            default:
+                a.messageText = t("Pick an external drive or a folder in your home folder", "Chọn một ổ ngoài hoặc một thư mục trong thư mục người dùng")
+                a.informativeText = t("Library, system folders and the startup disk as a whole are not scanned.", "Tidymint không quét thư mục Library, thư mục hệ thống hay cả ổ khởi động.")
+            }
+            a.runModal()
+        }
+    }
+    func removeExtraFolder(_ path: String) {
+        Prefs.extraFolders.removeAll { $0 == path }; Prefs.extraVolumeIDs[path] = nil; extras = Prefs.extraFolders; refreshExtras()
+    }
+    @Published var crossKeep: String = Prefs.crossKeep
+    func setCrossKeep(_ v: String) { Prefs.crossKeep = v; crossKeep = v }
 
     // Monitor (menu bar)
     @Published var ramUsed: Double = 0
@@ -1563,19 +1775,26 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var appsMsgErr = false
 
     func scanApps() {
+        CheckIn.shared.used()
         appsBusy = true; appsMsg = ""; appsMsgErr = false
         Task.detached {
             let a = Apps.list(); let l = Apps.leftovers(); let i = Apps.installers()
             await MainActor.run { self.apps = a; self.leftovers = l; self.installers = i; self.appsBusy = false; self.markDone(.apps) }
         }
     }
+    /// App whose related files are still being searched: Uninstall waits, so the app is not removed without its data.
+    @Published var relatedLoading: UUID? = nil
     func loadRelated(_ id: UUID) {
         selApp = id
         guard let i = apps.firstIndex(where: { $0.id == id }), apps[i].related.isEmpty else { return }
         let a = apps[i]
+        relatedLoading = id
         Task.detached {
             let r = Apps.related(a)
-            await MainActor.run { if let j = self.apps.firstIndex(where: { $0.id == id }) { self.apps[j].related = r } }
+            await MainActor.run {
+                if let j = self.apps.firstIndex(where: { $0.id == id }) { self.apps[j].related = r }
+                if self.relatedLoading == id { self.relatedLoading = nil }
+            }
         }
     }
     func uninstall(_ id: UUID) {
@@ -1663,6 +1882,7 @@ enum Phase { case idle, scanning, summary, review, done }
     var dupSelected: Int64 { dupes.reduce(0) { $0 + $1.selectedSize } }
 
     func scanDupes() {
+        CheckIn.shared.used()
         dupBusy = true; dupMsg = ""; dupCount = 0; dupes = []
         if doneInfo?.page == .dupes { doneInfo = nil }
         Task.detached {
@@ -1680,6 +1900,10 @@ enum Phase { case idle, scanning, summary, review, done }
         guard let i = dupes.firstIndex(where: { $0.id == id }) else { return }
         let on = dupGroupState(dupes[i]) != 2
         for j in dupes[i].items.indices { dupes[i].items[j].selected = on && j > 0 }
+    }
+    /// Re-apply a keep rule to the groups that span the Mac and an external drive (menu on the Duplicates page).
+    func dupApplyCross(_ rule: String) {
+        for i in dupes.indices where dupes[i].isCross { dupes[i].items = Dupes.arrange(dupes[i].items, rule: rule) }
     }
     func dupAutoSelect(all: Bool) {
         for i in dupes.indices { for j in dupes[i].items.indices { dupes[i].items[j].selected = all ? j > 0 : false } }
@@ -1796,15 +2020,27 @@ enum Phase { case idle, scanning, summary, review, done }
 
     private func doTrashDupes() {
         var picked: [CleanItem] = []
+        var skippedGroups = 0
+        let fm = FileManager.default
         for g in dupes {
             var sel = g.items.filter(\.selected)
             if sel.count == g.items.count { sel.removeFirst() }   // always keep at least one copy
+            guard !sel.isEmpty else { continue }
+            // The copy that stays must still be there, unchanged in size (a drive may have been unplugged since the scan).
+            let kept = g.items.filter { k in !sel.contains { $0.url == k.url } }
+            let alive = kept.contains { k in ((try? fm.attributesOfItem(atPath: k.url.path)[.size]) as? NSNumber)?.int64Value == g.size }
+            guard alive else { skippedGroups += 1; continue }
             picked += sel
         }
-        guard !picked.isEmpty else { dupMsg = t("Nothing left to delete.", "Không còn file nào để xoá."); return }
-        let (ok, fail) = trash(picked.map(\.url))
+        guard !picked.isEmpty else {
+            dupMsg = skippedGroups > 0 ? t("Skipped: the copy to keep is no longer there (drive unplugged?). Scan again.", "Bỏ qua: bản giữ lại không còn ở đó (ổ đã rút?). Quét lại nhé.")
+                                       : t("Nothing left to delete.", "Không còn file nào để xoá.")
+            return
+        }
+        let (ok, fail) = trash(picked.map(\.url), sizes: Dictionary(picked.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a }))
         let size = okSize(picked)
         dupMsg = t("Moved \(ok) duplicates (\(fmt(size))) to the Trash.", "Đã chuyển \(ok) file trùng (\(fmt(size))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") + failNote : "")
+            + (skippedGroups > 0 ? t(" Skipped \(skippedGroups) groups whose kept copy is gone.", " Bỏ qua \(skippedGroups) nhóm vì bản giữ lại không còn.") : "")
         log(dupMsg)
         finished(.dupes, ok, size, fail); dupMsg = ""
         let gone = lastOK
@@ -1865,7 +2101,12 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
 
-    func refreshRAM() { let r = ramInfo(); ramUsed = r.used; ramTotal = r.total }
+    /// Assign only on a visible change: every assignment of a published value redraws every open page.
+    func refreshRAM() {
+        let r = ramInfo()
+        if abs(r.used - ramUsed) >= 0.05 { ramUsed = r.used }
+        if r.total != ramTotal { ramTotal = r.total }
+    }
     var tickCount = 0
     func tick() {
         refreshRAM(); tickCount += 1
@@ -1933,16 +2174,23 @@ enum Phase { case idle, scanning, summary, review, done }
 
     func refreshDisk() {
         let v = try? URL(fileURLWithPath: NSHomeDirectory()).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey, .volumeTotalCapacityKey])
-        freeGB = Double(v?.volumeAvailableCapacityForImportantUsage ?? 0) / 1_000_000_000
-        totalGB = Double(v?.volumeTotalCapacity ?? 0) / 1_000_000_000
+        let f = Double(v?.volumeAvailableCapacityForImportantUsage ?? 0) / 1_000_000_000
+        let tot = Double(v?.volumeTotalCapacity ?? 0) / 1_000_000_000
+        if abs(f - freeGB) >= 0.05 { freeGB = f }
+        if abs(tot - totalGB) >= 0.05 { totalGB = tot }
         if freeGB > 0 { DiskHistory.record(freeGB) }
     }
 
     func refreshTrash() {
         let t = Scanner.trashURL
         Task.detached {
-            let s = Scanner.size(t)
-            let c = Scanner.children(t, hidden: false).count
+            // Finder's Empty Trash also empties the Trash on each mounted drive (.Trashes/<uid>), so count those too.
+            let vols = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeIsLocalKey], options: [.skipHiddenVolumes]) ?? []
+            let uid = getuid()
+            let trashes = [t] + vols.filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
+                .map { $0.appendingPathComponent(".Trashes/\(uid)") }.filter { FileManager.default.fileExists(atPath: $0.path) }
+            let s = trashes.reduce(Int64(0)) { $0 + Scanner.size($1) }
+            let c = trashes.reduce(0) { $0 + Scanner.children($1, hidden: false).count }
             await MainActor.run { self.trashSize = s; self.trashCount = c }
         }
     }
@@ -1957,23 +2205,31 @@ enum Phase { case idle, scanning, summary, review, done }
     }
 
     func scanLarge() {
+        CheckIn.shared.used()
         if doneInfo?.page == .large { doneInfo = nil }
         largePhase = .scanning
         Task.detached {
-            let r = Scanner.scanLarge()
+            let r = Scanner.scanLarge(extras: true)
             await MainActor.run { self.large = r; self.largePhase = .review; self.markDone(.large) }
         }
     }
 
     func smartScan() {
-        phase = .scanning; largePhase = .scanning; scanStep = 0; scanDetail = ""
+        CheckIn.shared.used()
+        let withExtras = !Prefs.extraFolders.isEmpty   // then the Large page keeps its own result, Smart Scan does not touch it
+        phase = .scanning; if !withExtras { largePhase = .scanning }; scanStep = 0; scanDetail = ""
         refreshTrash(); refreshDisk()
         let cb = stepCallback()
         Task.detached {
             let j = Scanner.scanJunk(step: cb)
             cb(6, "~/Documents, Downloads, Desktop, Movies, Music, Pictures")
-            let l = Scanner.scanLarge()
-            await MainActor.run { self.cats = j; self.large = l; self.phase = .summary; self.largePhase = .review; self.markDone(.smart) }
+            // With extra drives set, the Large page scans them itself; a quick scan without them would show a partial list.
+            let l = withExtras ? [] : Scanner.scanLarge()
+            await MainActor.run {
+                self.cats = j; self.phase = .summary
+                if !withExtras { self.large = l; self.largePhase = .review }
+                self.markDone(.smart)
+            }
         }
     }
 
@@ -2029,7 +2285,7 @@ enum Phase { case idle, scanning, summary, review, done }
         guard confirm(t("Move \(picked.count) items to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
                       picked.prefix(8).map { "• \($0.name), \(fmt($0.size))" }.joined(separator: "\n") + (picked.count > 8 ? "\n…" : ""),
                       t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
-        let (ok, fail) = trash(picked.map(\.url), label: "sysdata")
+        let (ok, fail) = trash(picked.map(\.url), label: "sysdata", sizes: Dictionary(picked.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a }))
         let freed = okSize(picked)
         log("System Data: moved \(ok) items (\(fmt(freed))) to Trash")
         finished(.lens, ok, freed, fail)
@@ -2061,7 +2317,13 @@ enum Phase { case idle, scanning, summary, review, done }
     // Uninstaller filters
     @Published var appsFilter = 0   // 0 all, 1 not opened in 6 months, 2 over 500 MB, 3 App Store, 4 other sources
     @Published var appsSort = 0     // 0 size, 1 name, 2 last opened
-    static func fromAppStore(_ u: URL) -> Bool { FileManager.default.fileExists(atPath: u.appendingPathComponent("Contents/_MASReceipt/receipt").path) }
+    private static var masMemo: [String: Bool] = [:]
+    /// Cached: the Uninstaller filters call it for every app on every redraw.
+    static func fromAppStore(_ u: URL) -> Bool {
+        if let v = masMemo[u.path] { return v }
+        let v = FileManager.default.fileExists(atPath: u.appendingPathComponent("Contents/_MASReceipt/receipt").path)
+        masMemo[u.path] = v; return v
+    }
     func appsMatching(_ f: Int) -> [AppEntry] {
         let old = Date().addingTimeInterval(-182 * 86400)
         switch f {
@@ -2096,17 +2358,23 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var undoable: Journal.Session? = Journal.load()
     /// Move items to the Trash and remember where each one went, so the whole run can be undone.
     /// `strict` refuses paths outside the home folder or too close to its root (off only for a folder the user picked by hand).
-    func trash(_ urls: [URL], label: String = "", strict: Bool = true, alsoUndo: [Journal.Entry] = []) -> (Int, Int) {
+    func trash(_ urls: [URL], label: String = "", strict: Bool = true, alsoUndo: [Journal.Entry] = [], sizes: [URL: Int64] = [:]) -> (Int, Int) {
         var ok = 0, fail = 0
         lastOK = []; lastErr = ""
+        if Demo.active { lastErr = t("demo mode, nothing is moved", "chế độ demo, không chuyển gì"); return (0, urls.count) }
         var moved: [Journal.Entry] = alsoUndo
         for u in urls {
+            if IgnoreList.contains(u.path) {
+                fail += 1
+                if lastErr.isEmpty { lastErr = t("in the Ignore list", "nằm trong danh sách Bỏ qua") }
+                continue
+            }
             if strict && !Scanner.safeToTrash(u) {
                 fail += 1
                 if lastErr.isEmpty { lastErr = t("refused, path is outside the safe area", "từ chối, đường dẫn nằm ngoài vùng an toàn") }
                 continue
             }
-            let size = Scanner.size(u)
+            let size = sizes[u] ?? Scanner.size(u)   // known sizes skip a full re-walk of the folder on the main thread
             var dest: NSURL?
             do { try FileManager.default.trashItem(at: u, resultingItemURL: &dest); ok += 1; lastOK.insert(u)
                  if let d = dest as URL? { moved.append(Journal.Entry(from: u.path, to: d.path, size: size)) } }
@@ -2157,7 +2425,7 @@ enum Phase { case idle, scanning, summary, review, done }
     func cleanJunk() {
         let sel = cats.flatMap { $0.items.filter(\.selected) }
         let size = sel.reduce(0) { $0 + $1.size }
-        let (ok, fail) = trash(sel.map(\.url), label: "cleanup"); _ = size
+        let (ok, fail) = trash(sel.map(\.url), label: "cleanup", sizes: Dictionary(sel.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a })); _ = size
         lastFreed = okSize(sel); lastCount = ok
         lastResult = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + failNote : "")
         log(lastResult)
@@ -2168,7 +2436,7 @@ enum Phase { case idle, scanning, summary, review, done }
     func cleanLarge() {
         let sel = large.filter(\.selected)
         let size = sel.reduce(0) { $0 + $1.size }
-        let (ok, fail) = trash(sel.map(\.url), label: "large"); _ = size
+        let (ok, fail) = trash(sel.map(\.url), label: "large", sizes: Dictionary(sel.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a })); _ = size
         lastResult = t("Moved \(ok) large files (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) file lớn (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") + failNote : "")
         log(lastResult)
         finished(.large, ok, okSize(sel), fail)
@@ -2262,6 +2530,7 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
     func scanByApp() {
+        CheckIn.shared.used()
         appBusy = true; appMsg = ""
         Task.detached(priority: .userInitiated) {
             let r = AppRules.scan()
@@ -2327,7 +2596,10 @@ enum Phase { case idle, scanning, summary, review, done }
         Task.detached(priority: .userInitiated) {
             let fresh = AppRules.scan().first { $0.id == id }
             await MainActor.run {
-                if let f = fresh { self.appReports[i] = f } else { self.appReports.remove(at: i); self.appSel = nil }
+                // Look the row up again: a rescan may have replaced the list meanwhile.
+                if let j = self.appReports.firstIndex(where: { $0.id == id }) {
+                    if let f = fresh { self.appReports[j] = f } else { self.appReports.remove(at: j); self.appSel = nil }
+                }
                 self.refreshTrash(); self.refreshDisk()
             }
         }
@@ -2372,7 +2644,18 @@ enum Phase { case idle, scanning, summary, review, done }
         guard confirm(t("Empty Trash?", "Đổ Thùng rác?"), t("\(trashCount) items, \(fmt(trashSize)). This cannot be undone.", "\(trashCount) mục, \(fmt(trashSize)). Đổ rồi không lấy lại được."), t("Empty Trash", "Đổ Thùng rác")) else { return }
         var err: NSDictionary?
         NSAppleScript(source: "tell application \"Finder\" to empty trash")?.executeAndReturnError(&err)
-        log("Emptied Trash: \(fmt(trashSize))")
+        if let e = err, (e[NSAppleScript.errorNumber] as? Int) == -128 {
+            // The person cancelled Finder's own confirmation: nothing happened, nothing to report.
+        } else if let e = err {
+            let msg = (e[NSAppleScript.errorMessage] as? String) ?? "\(e)"
+            log("ERROR empty Trash: \(msg)")
+            _ = confirm(t("Could not empty the Trash", "Chưa đổ được Thùng rác"),
+                        t("Finder did not empty it (\(msg)). Allow Tidymint to control Finder in System Settings > Privacy & Security > Automation, then try again.",
+                          "Finder chưa đổ (\(msg)). Cho phép Tidymint điều khiển Finder trong Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Tự động hoá, rồi thử lại."), "OK")
+        } else {
+            log("Emptied Trash: \(fmt(trashSize))")
+            undoable = nil; Journal.clear()   // the items are gone, Undo can no longer put them back
+        }
         refreshTrash(); refreshDisk()
     }
 
@@ -2383,11 +2666,19 @@ enum Phase { case idle, scanning, summary, review, done }
         cats.removeAll { $0.items.isEmpty }
         large.removeAll { $0.url == u }
         lensNodes.removeAll { $0.url == u }
+        let under = { (x: URL) in x == u || x.path.hasPrefix(u.path + "/") }
+        leftovers.removeAll { under($0.url) }
+        installers.removeAll { under($0.url) }
+        for i in apps.indices { apps[i].related.removeAll { under($0.url) } }
+        for i in dupes.indices { dupes[i].items.removeAll { under($0.url) } }
+        dupes.removeAll { $0.items.count < 2 }
+        for i in sysParts.indices { sysParts[i].items.removeAll { under($0.url) } }
     }
     func unignore(_ p: String) { IgnoreList.remove(p); ignored = IgnoreList.paths }
 
     // Space Lens
     func openLens(_ u: URL) {
+        if lensPath.isEmpty { CheckIn.shared.used() }
         lensPath.append(u); lensFwd = []; lensSel = []; loadLens()
     }
     func lensUp(to i: Int) { lensPath = Array(lensPath.prefix(i + 1)); lensFwd = []; lensSel = []; loadLens() }
@@ -2463,6 +2754,7 @@ enum Phase { case idle, scanning, summary, review, done }
     /// both pages then show their normal start state. Smart Clean and Large Files keep their results.
     func trimMemory(deep: Bool) {
         ThumbStore.cache.removeAllObjects()
+        FileKind.clearMemo()
         if deep {
             if !lensBusy { stopLens(); lensPath = []; lensNodes = []; lensSel = []; lensFwd = []; sizeCache = [:] }
             if !dupBusy { dupes = []; dupMsg = "" }
@@ -2799,12 +3091,15 @@ enum Stats {
             let firstNum = m.split(whereSeparator: { !$0.isNumber }).first.flatMap { Int($0) } ?? 0
             if firstNum == 0 { return 0 }
         }
-        guard let open = m.firstIndex(of: "("), let close = m[open...].firstIndex(of: ")") else { return 0 }
-        let inner = m[m.index(after: open)..<close].replacingOccurrences(of: ",", with: ".")
-        let bits = inner.split(separator: " ")
-        guard bits.count == 2, let v = Double(bits[0]) else { return 0 }
-        let mult: Double = ["bytes": 1, "KB": 1e3, "MB": 1e6, "GB": 1e9, "TB": 1e12][String(bits[1])] ?? 0
-        return Int64(v * mult)
+        // First "(number unit)" group: an app name can carry its own parentheses ("Foo (Beta)").
+        let units: [String: Double] = ["bytes": 1, "KB": 1e3, "MB": 1e6, "GB": 1e9, "TB": 1e12]
+        var rest = m[...]
+        while let open = rest.firstIndex(of: "("), let close = rest[open...].firstIndex(of: ")") {
+            let bits = rest[rest.index(after: open)..<close].replacingOccurrences(of: ",", with: ".").split(separator: " ")
+            if bits.count == 2, let v = Double(bits[0]), let mult = units[String(bits[1])] { return Int64(v * mult) }
+            rest = rest[rest.index(after: close)...]
+        }
+        return 0
     }
 }
 
@@ -2816,9 +3111,13 @@ enum DiskHistory {
         guard let d = FileManager.default.contents(atPath: path), let m = try? JSONDecoder().decode([String: Double].self, from: d) else { return [:] }
         return m
     }
+    private static var lastWritten: (day: String, gb: Double)? = nil
     static func record(_ gb: Double) {
+        let day = key.string(from: Date()), v = (gb * 10).rounded() / 10
+        if let w = lastWritten, w.day == day, w.gb == v { return }   // unchanged: skip the read and rewrite of the file
+        lastWritten = (day, v)
         var m = load()
-        m[key.string(from: Date())] = (gb * 10).rounded() / 10
+        m[day] = v
         if m.count > 400 { for k in m.keys.sorted().prefix(m.count - 400) { m.removeValue(forKey: k) } }
         _ = Stats.path
         if let d = try? JSONEncoder().encode(m) { try? d.write(to: URL(fileURLWithPath: path)) }
@@ -2943,21 +3242,44 @@ struct GhostButton: View {
     }
 }
 
+/// The mint leaf from the brand kit (assets/brand/src/leaf-path.txt), as a polygon in a 0...1000 box, width:height = 845:1311.
+struct LeafShape: Shape {
+    static let pts: [CGFloat] = [717,0,704,2,685,5,658,13,633,23,607,37,583,53,562,71,543,91,527,111,525,111,522,110,516,106,512,102,505,92,499,79,480,85,455,97,443,104,428,114,414,126,402,138,382,164,373,177,367,192,366,191,341,154,309,171,286,186,267,200,241,224,227,240,214,257,203,276,196,293,192,305,191,314,189,314,161,270,159,271,151,279,139,292,128,306,115,326,106,346,99,365,93,388,89,416,89,438,90,444,88,444,26,416,25,417,24,462,24,477,28,507,31,527,40,560,49,589,55,603,44,603,31,602,19,600,1,594,0,595,9,623,21,651,29,667,42,688,57,709,83,739,112,765,141,788,176,810,211,830,254,849,256,870,260,892,261,894,264,912,272,934,287,968,295,982,307,1000,308,999,306,997,303,979,301,956,301,936,303,910,311,872,318,850,330,821,343,795,356,772,373,746,398,711,439,659,512,575,553,526,589,478,617,435,628,413,643,382,651,360,658,334,663,309,664,284,664,258,662,241,660,239,661,235,662,236,667,255,670,282,670,315,669,320,669,328,666,350,657,382,650,403,637,434,615,477,585,524,552,571,496,644,463,689,442,720,421,755,404,786,391,814,378,851,371,882,396,887,431,890,488,890,511,888,540,885,568,881,597,876,625,870,653,863,705,847,705,846,699,845,683,839,669,831,670,830,685,830,707,827,740,821,760,816,781,809,818,794,852,776,873,763,878,759,868,763,855,766,841,767,827,767,804,764,788,760,785,759,816,749,843,736,873,718,897,698,918,677,942,649,960,622,974,594,973,594,964,598,948,603,937,604,931,604,922,602,917,599,914,594,928,585,942,572,952,561,963,543,975,520,987,491,999,449,999,448,994,451,985,452,962,452,932,449,930,448,941,439,953,424,962,404,968,381,970,365,971,328,969,302,964,274,954,281,941,286,924,289,915,290,914,289,915,277,915,259,909,227,895,181,875,132,873,132,861,142,844,153,831,159,828,159,828,154,826,144,820,130,810,111,798,93,763,50,736,20]
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        let aspect: CGFloat = 845.0 / 1311.0
+        var w = r.width, h = r.height
+        if w / h > aspect { w = h * aspect } else { h = w / aspect }
+        let ox = r.midX - w / 2, oy = r.midY - h / 2
+        let xs = stride(from: 0, to: Self.pts.count, by: 2).map { CGPoint(x: ox + Self.pts[$0] / 1000 * w, y: oy + Self.pts[$0 + 1] / 1000 * h) }
+        guard let f = xs.first else { return p }
+        p.move(to: f); for q in xs.dropFirst() { p.addLine(to: q) }; p.closeSubpath()
+        return p
+    }
+}
+
+/// The big Scan button: a dark core with the mint leaf inside a thin ring. Hover fades the leaf and shows the word.
 struct BigScanButton: View {
     let label: String; let action: () -> Void
     @StateObject private var pulse = Flag()   // hover
     @StateObject private var breath = Flag()  // slow idle breathing, off when Reduce Motion is on
     var body: some View {
         let still = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        let hot = pulse.v
         Button(action: action) {
             ZStack {
-                Circle().fill(Theme.accent.opacity(breath.v ? 0.30 : 0.18)).frame(width: 190, height: 190)
-                    .scaleEffect(pulse.v ? 1.08 : (breath.v ? 1.05 : 0.97))
-                Circle().fill(Theme.accent).frame(width: 150, height: 150)
-                    .shadow(color: Theme.accentSolid.opacity(breath.v || pulse.v ? 0.6 : 0.35), radius: breath.v ? 30 : 20)
-                Text(label).font(.system(size: fs(22), weight: .bold)).foregroundColor(.white)
+                Circle().fill(Theme.accentSolid.opacity(breath.v || hot ? 0.20 : 0.12)).frame(width: 190, height: 190)
+                    .scaleEffect(still ? 1 : (hot ? 1.08 : (breath.v ? 1.05 : 0.97)))
+                Circle().fill(Theme.tile).frame(width: 150, height: 150)
+                    .overlay(Circle().stroke(Theme.accentSolid.opacity(hot ? 1 : 0.6), lineWidth: 2))
+                    .shadow(color: Theme.accentSolid.opacity(breath.v || hot ? 0.6 : 0.35), radius: breath.v || hot ? 30 : 20)
+                LeafShape().fill(Theme.accent).frame(width: 88, height: 88)
+                    .opacity(hot ? 0.18 : 1).scaleEffect(hot && !still ? 1.06 : 1)
+                Text(label).font(.system(size: fs(24), weight: .bold)).foregroundColor(Theme.text)
+                    .opacity(hot ? 1 : 0)
             }
         }.buttonStyle(.plain)
+        .accessibilityLabel(label)
         .onHover { h in withAnimation(.easeOut(duration: 0.25)) { pulse.v = h } }
         // Breathe three times after the page appears, then rest. A forever animation kept the CPU at ~10% even with the
         // window closed, so the cue is finite: finished animations cost nothing.
@@ -3001,6 +3323,7 @@ enum FileKind {
     static let videoExt: Set<String> = ["mov", "mp4", "m4v", "avi", "mkv", "webm", "3gp"]
     private static var memo: [String: FileKind] = [:]
     private static let lock = NSLock()
+    static func clearMemo() { lock.lock(); memo = [:]; lock.unlock() }
     static func of(_ url: URL) -> FileKind {
         let e = url.pathExtension.lowercased()
         if imageExt.contains(e) { return .image }
@@ -3603,6 +3926,7 @@ struct SmartView: View {
             case .scanning:
                 ScanSteps(title: t("Scanning your Mac...", "Đang quét máy..."), steps: VM.junkSteps + [t("Large files", "File lớn")], current: vm.scanStep, detail: vm.scanDetail)
             case .idle:
+                CheckInCard()
                 Header(title: t("Tidy up a little?", "Dọn máy chút nhé?"),
                        sub: t("Scan finds the safe part: caches, logs, old installers. You see what it is, then press Clean.\nEverything goes to the Trash first, so you can change your mind.",
                               "Quét sẽ tìm phần an toàn: bộ nhớ đệm, nhật ký, file cài đặt cũ. Bạn xem rồi mới bấm Dọn.\nMọi thứ vào Thùng rác trước, đổi ý thì lấy lại được."))
@@ -3614,6 +3938,7 @@ struct SmartView: View {
                     }.buttonStyle(.plain).hoverLift()
                 }
                 BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
+                    .onAppear { CheckIn.shared.refresh() }   // the card itself is empty while hidden, so it cannot carry onAppear
                 Text(t("Nothing is moved until you press Clean.", "Chưa dọn gì cho tới khi bạn bấm Dọn.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     HomeCard(title: t("Chrome, Slack, Telegram...", "Zalo, Chrome, Telegram..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
@@ -3631,7 +3956,7 @@ struct SmartView: View {
                          "Không có gì an toàn để dọn lúc này. Thử Dọn theo ứng dụng hoặc File lớn, là phần chỉ bạn quyết được."))
                     .foregroundColor(Theme.sub).multilineTextAlignment(.center).frame(maxWidth: 520)
                 HStack(spacing: 12) {
-                    if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoLast(); vm.phase = .idle } }
+                    if vm.undoable != nil { GhostButton(title: t("Undo", "Hoàn tác")) { vm.undoLast(); if vm.undoable == nil { vm.phase = .idle } } }
                     GhostButton(title: t("Open Trash", "Xem Thùng rác")) { vm.page = .trash }
                     PrimaryButton(title: t("Empty Trash", "Đổ Thùng rác"), action: { vm.emptyTrash() }, disabled: vm.trashCount == 0)
                 }
@@ -4054,17 +4379,19 @@ struct CellFrames: PreferenceKey {
 enum PreviewLinks {
     static let dir = FileManager.default.temporaryDirectory.appendingPathComponent("tidymint-preview", isDirectory: true)
     static var made: [String: URL] = [:]
+    static var failed = Set<String>()   // not retried on every redraw
     static func link(_ u: URL, ext: String) -> URL {
         if let l = made[u.path] { return l }
+        if failed.contains(u.path) { return u }
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let l = dir.appendingPathComponent("\(made.count + 1)-\(u.lastPathComponent).\(ext)")
-        guard (try? FileManager.default.linkItem(at: u, to: l)) != nil else { return u }
+        guard (try? FileManager.default.linkItem(at: u, to: l)) != nil else { failed.insert(u.path); return u }
         made[u.path] = l; return l
     }
     /// Removes only names inside Tidymint's own preview folder.
     static func clear() {
         for l in made.values where l.deletingLastPathComponent().standardizedFileURL == dir.standardizedFileURL { try? FileManager.default.removeItem(at: l) }
-        made = [:]
+        made = [:]; failed = []
         if let left = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
             for l in left { try? FileManager.default.removeItem(at: l) }
         }
@@ -4256,7 +4583,7 @@ struct MonthViewer: View {
                 GhostButton(title: t("Done", "Xong"), action: { vm.closeMonth() })
             }.padding(.horizontal, 24).padding(.vertical, 14).background(Theme.ink.opacity(0.03))
         }
-        .quickLookPreview(Binding(get: { vm.qlURL }, set: { vm.qlURL = $0 }), in: vm.monthItems.map(\.previewURL))
+        .quickLookPreview(Binding(get: { vm.qlURL }, set: { vm.qlURL = $0 }), in: vm.qlURL == nil ? [] : vm.monthItems.map(\.previewURL))
         .onAppear {
             keys.start { e in
                 MainActor.assumeIsolated {
@@ -4269,7 +4596,12 @@ struct MonthViewer: View {
                 }
             }
         }
-        .onDisappear { keys.stop() }
+        .onDisappear {
+            keys.stop()
+            // Window closed or page left with a month open: drop the preview links, or they keep the space of
+            // trashed photos allocated until the next launch.
+            if vm.monthRef != nil { vm.closeMonth() }
+        }
     }
 }
 
@@ -4333,7 +4665,7 @@ struct LargeView: View {
             switch vm.largePhase {
             case .idle:
                 VStack(spacing: 28) {
-                    Header(title: t("Large & Old Files", "File lớn và cũ"), sub: t("Files over 100 MB in Documents, Downloads, Desktop, Movies, Music and Pictures.\nNothing is selected by default.", "File trên 100 MB trong Documents, Downloads, Desktop, Movies, Music, Pictures.\nMặc định không tick, bạn tự chọn."))
+                    Header(title: t("Large & Old Files", "File lớn và cũ"), sub: t("Files over 100 MB in Documents, Downloads, Desktop, Movies, Music and Pictures, plus drives and folders added in Settings.\nNothing is selected by default.", "File trên 100 MB trong Documents, Downloads, Desktop, Movies, Music, Pictures, cùng ổ và thư mục thêm ở Cài đặt.\nMặc định không tick, bạn tự chọn."))
                     BigScanButton(label: t("Scan", "Quét")) { vm.scanLarge() }
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             case .scanning:
@@ -4352,9 +4684,12 @@ struct LargeView: View {
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 2) {
-                            ForEach(sortedIdx(), id: \.self) { i in
-                                ItemRow(item: $vm.large[i], vm: vm, showDate: true)
+                            let index = Dictionary(uniqueKeysWithValues: vm.large.enumerated().map { ($1.id, $0) })
+                            ForEach(sortedIDs(), id: \.self) { id in
+                                if let i = index[id] {
+                                    ItemRow(item: $vm.large[i], vm: vm, showDate: true)
                                     .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+                                }
                             }
                         }.padding(.horizontal, 24)
                     }
@@ -4367,10 +4702,11 @@ struct LargeView: View {
             }
         }
     }
-    func sortedIdx() -> [Int] {
-        let idx = Array(vm.large.indices)
-        if sortByDate.v { return idx.sorted { (vm.large[$0].date ?? .distantFuture) < (vm.large[$1].date ?? .distantFuture) } }
-        return idx.sorted { vm.large[$0].size > vm.large[$1].size }
+    /// Rows keyed by item id, so a row never shows another file's thumbnail after items are removed.
+    func sortedIDs() -> [UUID] {
+        let l = vm.large
+        if sortByDate.v { return l.sorted { ($0.date ?? .distantFuture) < ($1.date ?? .distantFuture) }.map(\.id) }
+        return l.sorted { $0.size > $1.size }.map(\.id)
     }
 }
 
@@ -4880,14 +5216,23 @@ enum Updates {
             let cached = ud.string(forKey: "upd-latest") ?? ""
             done(newer(cached, than: current) ? cached : nil); return
         }
-        // The website copy is tried first: it is a plain text file on the same host as the docs and reachable
-        // on networks where api.github.com is slow or blocked. GitHub's API is the fallback.
-        var req = URLRequest(url: site); req.timeoutInterval = 6; req.cachePolicy = .reloadIgnoringLocalCacheData
-        URLSession.shared.dataTask(with: req) { data, resp, _ in
-            let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
-            if code == 200, let d = data, let v = String(data: d, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines), !parts(v).isEmpty {
-                DispatchQueue.main.async { record(v, done) }; return
-            }
+        // Plain text first: update.tidymint.app (counts the check per day, app version and macOS from the standard
+        // User-Agent, nothing else is sent and no IP is kept; code in app/dev/worker-update), then the copy on the website,
+        // then GitHub's API. Each is tried only if the one before gave no version.
+        func plain(_ urls: [URL], _ fallback: @escaping () -> Void) {
+            guard let u = urls.first else { fallback(); return }
+            var req = URLRequest(url: u); req.timeoutInterval = 6; req.cachePolicy = .reloadIgnoringLocalCacheData
+            URLSession.shared.dataTask(with: req) { data, resp, _ in
+                let code = (resp as? HTTPURLResponse)?.statusCode ?? 0
+                if code == 200, let d = data, let v = String(data: d, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+                   v.range(of: #"^v?\d+(\.\d+){1,3}$"#, options: .regularExpression) != nil {   // a Wi-Fi login page also answers 200
+                    DispatchQueue.main.async { record(v, done) }; return
+                }
+                plain(Array(urls.dropFirst()), fallback)
+            }.resume()
+        }
+        let isDev = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true   // the Dev build is not counted
+        plain(isDev ? [site] : [counter, site]) {
             var r2 = URLRequest(url: api); r2.timeoutInterval = 8
             r2.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
             URLSession.shared.dataTask(with: r2) { data, _, _ in
@@ -4895,8 +5240,9 @@ enum Updates {
                 if let d = data, let j = try? JSONSerialization.jsonObject(with: d) as? [String: Any], let tg = j["tag_name"] as? String { tag = tg }
                 DispatchQueue.main.async { if let tg = tag { record(tg, done) } else { done(nil) } }
             }.resume()
-        }.resume()
+        }
     }
+    static let counter = URL(string: "https://update.tidymint.app/version")!
     static let site = URL(string: "https://tidymint.app/version.txt")!
     private static func record(_ v: String, _ done: (String?) -> Void) {
         let ud = UserDefaults.standard
@@ -5017,7 +5363,10 @@ struct AppsView: View {
                                 Text(fmt(vm.apps[i].size)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit())
                             }.padding(.vertical, 6).padding(.horizontal, 12)
                             ForEach($vm.apps[i].related) { $it in ItemRow(item: $it, vm: vm) }
-                            if vm.apps[i].related.isEmpty {
+                            if vm.relatedLoading == vm.apps[i].id {
+                                Text(t("Looking for related files...", "Đang tìm file liên quan..."))
+                                    .font(.system(size: fs(12))).foregroundColor(Theme.sub).padding(12)
+                            } else if vm.apps[i].related.isEmpty {
                                 Text(t("No related files found in Library.", "Không thấy file liên quan trong Library."))
                                     .font(.system(size: fs(12))).foregroundColor(Theme.sub).padding(12)
                             }
@@ -5027,7 +5376,7 @@ struct AppsView: View {
                         let tot = vm.apps[i].size + vm.apps[i].related.filter(\.selected).reduce(0) { $0 + $1.size }
                         Text(selLabel(1 + vm.apps[i].related.filter(\.selected).count, tot)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
                         Spacer()
-                        PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) }).disabled(vm.appsBusy)
+                        PrimaryButton(title: t("Uninstall", "Gỡ app"), action: { vm.uninstall(vm.apps[i].id) }).disabled(vm.appsBusy || vm.relatedLoading == vm.apps[i].id)
                     }.padding(.horizontal, 20).padding(.vertical, 14).background(Theme.shade.opacity(0.25))
                 }
             } else {
@@ -5080,14 +5429,19 @@ struct DupesView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(t("Duplicates", "File trùng")).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
-                    Text(t("Identical files (same content, any name) over 1 MB in Documents, Downloads, Desktop, Pictures, Movies, Music.",
-                           "File giống hệt nhau về nội dung (dù khác tên), trên 1 MB, trong Documents, Downloads, Desktop, Pictures, Movies, Music."))
+                    Text(t("Identical files (same content, any name) over 1 MB in Documents, Downloads, Desktop, Pictures, Movies, Music, plus drives and folders added in Settings.",
+                           "File giống hệt nhau về nội dung (dù khác tên), trên 1 MB, trong Documents, Downloads, Desktop, Pictures, Movies, Music, cùng ổ và thư mục thêm ở Cài đặt."))
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 }
                 Spacer()
                 Menu(t("Select", "Chọn")) {
                     Button(t("Select all duplicates (keep one)", "Chọn mọi bản trùng (giữ 1 bản)")) { vm.dupAutoSelect(all: true) }
                     Button(t("Deselect all", "Bỏ chọn tất cả")) { vm.dupAutoSelect(all: false) }
+                    if vm.dupes.contains(where: \.isCross) {
+                        Divider()
+                        Button(t("Copies on the Mac and a drive: keep the drive copy", "Bản trùng giữa máy và ổ ngoài: giữ bản trên ổ ngoài")) { vm.dupApplyCross("external") }
+                        Button(t("Copies on the Mac and a drive: keep the Mac copy", "Bản trùng giữa máy và ổ ngoài: giữ bản trên máy")) { vm.dupApplyCross("mac") }
+                    }
                 }.menuStyle(.borderlessButton).frame(width: 70).foregroundColor(Theme.text).padding(.vertical, 3).hoverTile()
                 Button { vm.scanDupes() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
@@ -5283,6 +5637,39 @@ struct SettingsView: View {
                     }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
                 }
             }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(t("External drives and extra folders", "Ổ ngoài và thư mục quét thêm")).foregroundColor(Theme.text).font(.system(size: fs(14), weight: .semibold))
+                        Text(t("Duplicates and Large & Old Files also look here. Add as many drives as you like; a drive that is not plugged in is skipped. Network drives and Time Machine backups are not supported.",
+                               "File trùng và File lớn và cũ quét thêm ở đây. Thêm bao nhiêu ổ cũng được, ổ chưa cắm thì bỏ qua. Chưa hỗ trợ ổ mạng và ổ sao lưu Time Machine."))
+                            .foregroundColor(Theme.sub).font(.system(size: fs(11))).fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer()
+                    GhostButton(title: t("Add", "Thêm"), action: { vm.addExtraFolder() }, width: Pill.rowWidth)
+                }.onAppear { vm.refreshExtras() }
+                ForEach(vm.extras, id: \.self) { p in
+                    HStack(spacing: 8) {
+                        Image(systemName: Prefs.onOtherDrive(p) ? "externaldrive" : "folder").foregroundColor(Theme.link)
+                        Text(p.replacingOccurrences(of: NSHomeDirectory(), with: "~")).foregroundColor(Theme.text).font(.system(size: fs(12))).lineLimit(1).truncationMode(.middle)
+                        if vm.extrasMissing.contains(p) {
+                            Text(t("Not connected", "Chưa cắm")).font(.system(size: fs(10), weight: .semibold)).foregroundColor(Theme.warn)
+                        }
+                        Spacer()
+                        TextLink(t("Remove", "Gỡ")) { vm.removeExtraFolder(p) }
+                    }.padding(.horizontal, 10).padding(.vertical, 5).hoverBG(8, Theme.ink.opacity(0.06))
+                }
+                HStack(spacing: 10) {
+                    Text(t("When a file is both on this Mac and on a drive", "Khi một file có cả trên máy lẫn trên ổ ngoài"))
+                        .foregroundColor(Theme.text).font(.system(size: fs(12)))
+                    Spacer()
+                    Picker("", selection: Binding(get: { vm.crossKeep }, set: { vm.setCrossKeep($0) })) {
+                        Text(t("Let me choose each time", "Để tôi tự chọn mỗi lần")).tag("ask")
+                        Text(t("Keep the drive copy (frees space on the Mac)", "Giữ bản trên ổ ngoài (lấy lại chỗ trên máy)")).tag("external")
+                        Text(t("Keep the Mac copy", "Giữ bản trên máy")).tag("mac")
+                    }.labelsHidden().frame(width: 300 * uiScale)
+                }.padding(.top, 4)
+            }.padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
             settingRow(t("Full Disk Access", "Truy cập toàn bộ ổ đĩa"),
                        vm.fullDiskAccess ? t("On. Mail, Safari and Messages are measured too.", "Đã bật. Mail, Safari, Tin nhắn cũng được đo.")
                                          : t("Off, so Mail, Safari and Messages stay hidden from scans. Turn on Tidymint in System Settings, then come back.",
@@ -5295,8 +5682,8 @@ struct SettingsView: View {
             }
             settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
                        vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
-                                            : t("Checks GitHub once a day for a new version; nothing about your Mac is sent.\n\nTidymint is free and will stay free. Sponsorships go toward the Apple Developer account ($99/year): with it, Apple verifies the app, new users just open it and it runs, no trip to Settings > Security, and each update reaches you faster.",
-                                                "Kiểm tra bản mới mỗi ngày một lần trên GitHub, không gửi thông tin gì về máy.\n\nTidymint miễn phí và sẽ luôn miễn phí. Mỗi khoản ủng hộ góp vào tài khoản Apple Developer (99 USD/năm): có nó, app được Apple xác nhận, người mới cài chỉ cần mở là chạy, không phải qua bước Cài đặt > Bảo mật, và mỗi bản cập nhật tới tay bạn nhanh hơn.")) {
+                                            : t("Checks for a new version once a day. The check is counted by app and macOS version only; nothing else about your Mac is sent.\n\nTidymint is free and will stay free. Sponsorships go toward the Apple Developer account ($99/year): with it, Apple verifies the app, new users just open it and it runs, no trip to Settings > Security, and each update reaches you faster.",
+                                                "Kiểm tra bản mới mỗi ngày một lần. Lần kiểm chỉ được đếm theo phiên bản app và macOS, không gửi gì khác về máy.\n\nTidymint miễn phí và sẽ luôn miễn phí. Mỗi khoản ủng hộ góp vào tài khoản Apple Developer (99 USD/năm): có nó, app được Apple xác nhận, người mới cài chỉ cần mở là chạy, không phải qua bước Cài đặt > Bảo mật, và mỗi bản cập nhật tới tay bạn nhanh hơn.")) {
                 VStack(alignment: .trailing, spacing: 10) {
                     HStack(spacing: 10) {
                         if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }
@@ -5540,15 +5927,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let me = ProcessInfo.processInfo.processIdentifier
             for other in NSRunningApplication.runningApplications(withBundleIdentifier: bid) where other.processIdentifier != me {
                 other.terminate()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { if !other.isTerminated { other.forceTerminate() } }
+                // Grace period long enough for a move to the Trash in progress to finish and write its Undo record.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10) { if !other.isTerminated { other.forceTerminate() } }
             }
         }
         NSApp.applicationIconImage = dockIcon(Theme.p)
         if !a.contains("--demo") { sharedVM.checkFullDiskAccess() }
         PreviewLinks.clear()   // leftovers from a run that quit with the month viewer open
+        if !a.contains("--demo") { _ = CheckIn.shared.firstOpen }   // saved once, on the first launch
         // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
         // `--page <name> --window <W>x<H>` opens a page at a fixed size.
-        if let i = a.firstIndex(of: "--export-icon"), i + 1 < a.count {
+        if let i = a.firstIndex(of: "--export-icon"), i + 1 < a.count, a[i + 1].lowercased().hasSuffix(".png") {
             // Writes the 1024px app icon for Resources/AppIcon.png, then quits. Used by build tooling.
             let img = makeAppIcon(Theme.p)
             if let tiff = img.tiffRepresentation, let rep = NSBitmapImageRep(data: tiff), let png = rep.representation(using: .png, properties: [:]) {
@@ -5563,6 +5952,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
             if pg == .lens && a.contains("--sysdata") { sharedVM.openSys() }
+            // `--scan` starts the scan of Duplicates or Large & Old Files right away (test helper).
+            if pg == .dupes && a.contains("--scan") {
+                sharedVM.scanDupes()
+                // `--detail` opens the first group once the scan is done (test helper).
+                if a.contains("--detail") {
+                    Task { @MainActor in
+                        while sharedVM.dupBusy { try? await Task.sleep(nanoseconds: 300_000_000) }
+                        if !sharedVM.dupes.isEmpty { sharedVM.dupes[0].expanded = true }
+                    }
+                }
+            }
+            if pg == .large && a.contains("--scan") { sharedVM.scanLarge() }
             if pg == .smart && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .summary; sharedVM.lastFreed = sharedVM.junkSelected; sharedVM.lastCount = 38 }
             if a.contains("--done") { sharedVM.lastResult = t("Moved 128 items (6.2 GB) to the Trash.", "Đã chuyển 128 mục (6,2 GB) vào Thùng rác.") }
         }
@@ -5872,6 +6273,180 @@ enum Backend {
     }
 }
 
+// MARK: - Check-in ("Is Tidymint helping you?")
+
+/// A one-line card at the top of Clean Now, asked once: 14 days after the first launch and 2 uses of a main feature
+/// (or 60 days and 1 use). X on the question = later (14 more days, once), then never again.
+/// The answer goes to the same form endpoint as Contact: no email, no machine id. The Dev build never asks.
+@MainActor final class CheckIn: ObservableObject {
+    static let shared = CheckIn()
+    enum Step { case hidden, ask, why, thanks, sent }
+    @Published var step: Step = .hidden
+    @Published var reasons = Set<String>()
+    @Published var note = ""
+    var answer = ""
+    let d = UserDefaults.standard
+
+    /// First launch, saved once. Updating the app keeps UserDefaults (same bundle id), so a release never restarts the clock.
+    /// Someone upgrading from 0.3.7 has no key yet: the oldest trace of earlier use is taken (activity log, data folder).
+    var firstOpen: Date {
+        if let v = d.object(forKey: "firstOpenDate") as? Date { return v }
+        var cands = [Date()]
+        if let e = Stats.load().first?.date { cands.append(e) }
+        if let c = (try? FileManager.default.attributesOfItem(atPath: Stats.dir))?[.creationDate] as? Date { cands.append(c) }
+        let v = cands.min()!
+        d.set(v, forKey: "firstOpenDate")
+        return v
+    }
+    /// Uses of a main feature (scan, clean by app, uninstaller, space lens, large files, duplicates).
+    /// Started from the activity log for people upgrading, so their earlier cleanups count.
+    var uses: Int {
+        if d.object(forKey: "featureUses") == nil { d.set(Stats.load().count, forKey: "featureUses") }
+        return d.integer(forKey: "featureUses")
+    }
+    func used() { d.set(uses + 1, forKey: "featureUses") }
+
+    var isDev: Bool { Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true }
+    func shouldAsk(now: Date = Date()) -> Bool {
+        guard !isDev, !Demo.active else { return false }
+        let state = d.string(forKey: "checkinState") ?? ""
+        if state == "done" { return false }
+        if let next = d.object(forKey: "checkinNext") as? Date, now < next { return false }
+        let days = now.timeIntervalSince(firstOpen) / 86400, n = uses
+        return (days >= 14 && n >= 2) || (days >= 60 && n >= 1)
+    }
+    /// Called when the Clean Now page shows.
+    func refresh() { if step == .hidden && shouldAsk() { step = .ask }; flushPending() }
+
+    func later() {
+        if (d.string(forKey: "checkinState") ?? "") == "" {
+            d.set("later", forKey: "checkinState"); d.set(Date().addingTimeInterval(14 * 86400), forKey: "checkinNext")
+        } else { d.set("done", forKey: "checkinState") }
+        step = .hidden
+    }
+    func choose(_ a: String) {
+        answer = a
+        d.set("done", forKey: "checkinState")
+        send(["answer": a])
+        step = a == "helpful" ? .thanks : .why
+    }
+    func sendWhy() {
+        send(["answer": answer, "reasons": reasons.sorted().joined(separator: ", "), "message": note.trimmingCharacters(in: .whitespacesAndNewlines)])
+        step = .sent
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { if self.step == .sent { self.step = .hidden } }
+    }
+    func close() { d.set("done", forKey: "checkinState"); step = .hidden }
+
+    private func send(_ extra: [String: String]) {
+        var f = ["source": "checkin", "type": "checkin", "email": "", "newsletter": "no", "message": "",
+                 "app": Backend.systemInfo["app"] ?? "?", "lang": appLang]
+        f.merge(extra) { _, b in b }
+        Backend.send(f) { ok in if !ok { self.queue(f) } }
+    }
+    /// No network: kept and sent at the next launch.
+    private func queue(_ f: [String: String]) {
+        var f = f
+        let n = (Int(f["tries"] ?? "0") ?? 0) + 1
+        guard n <= 5 else { return }   // given up after 5 tries: no endless requests on every page visit
+        f["tries"] = String(n)
+        var q = d.array(forKey: "checkinPending") as? [[String: String]] ?? []
+        q.append(f); d.set(Array(q.suffix(5)), forKey: "checkinPending")
+    }
+    private func flushPending() {
+        guard let q = d.array(forKey: "checkinPending") as? [[String: String]], !q.isEmpty else { return }
+        d.removeObject(forKey: "checkinPending")
+        for f in q { Backend.send(f) { ok in if !ok { self.queue(f) } } }
+    }
+    static func freeHelpURL() -> URL {
+        URL(string: t("https://tidymint.app/sponsor/", "https://tidymint.app/vi/ung-ho/") + "?utm_source=tidymint&utm_medium=app&utm_campaign=checkin#free")!
+    }
+}
+
+struct CheckInCard: View {
+    @ObservedObject var c = CheckIn.shared
+    static let reasons: [(String, String, String)] = [
+        ("little", "Frees too little", "Dọn được ít"), ("hard", "Hard to follow", "Khó hiểu"),
+        ("apps", "Missing my apps", "Thiếu app hay dùng"), ("rare", "Rarely need it", "Ít khi cần dọn"), ("other", "Something else", "Lý do khác")]
+    func pill(_ title: String, _ icon: String, _ a: String) -> some View {
+        Button { c.choose(a) } label: {
+            Label(title, systemImage: icon).font(.system(size: fs(12), weight: .medium)).foregroundColor(Theme.text)
+                .padding(.horizontal, 10).padding(.vertical, 5).background(Capsule().stroke(Theme.ink.opacity(0.3), lineWidth: 1))
+        }.buttonStyle(.plain).hoverLift()
+    }
+    func xButton(_ act: @escaping () -> Void, tip: String) -> some View {
+        Button(action: act) { Image(systemName: "xmark").font(.system(size: fs(11), weight: .semibold)).foregroundColor(Theme.sub) }
+            .buttonStyle(.plain).tip(tip)
+    }
+    var body: some View {
+        Group {
+            switch c.step {
+            case .hidden: EmptyView()
+            case .ask:
+                HStack(spacing: 8) {
+                    Text(t("Is Tidymint helping you?", "Tidymint có giúp ích cho bạn không?")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
+                    Spacer(minLength: 6)
+                    pill(t("Helpful", "Hữu ích"), "hand.thumbsup", "helpful")
+                    pill(t("It's okay", "Bình thường"), "face.smiling", "okay")
+                    pill(t("Not yet", "Chưa hữu ích"), "hand.thumbsdown", "not")
+                    xButton({ c.later() }, tip: t("Later", "Để sau"))
+                }.onExitCommand { c.later() }
+            case .why:
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text(t("What is Tidymint missing?", "Tidymint còn thiếu gì?")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
+                        Spacer()
+                        xButton({ c.close() }, tip: t("Skip", "Bỏ qua"))
+                    }
+                    HStack(spacing: 6) {
+                        ForEach(Self.reasons, id: \.0) { r in
+                            let on = c.reasons.contains(r.0)
+                            Button { if on { c.reasons.remove(r.0) } else { c.reasons.insert(r.0) } } label: {
+                                HStack(spacing: 4) {
+                                    if on { Image(systemName: "checkmark").font(.system(size: fs(10), weight: .bold)) }
+                                    Text(t(r.1, r.2))
+                                }.font(.system(size: fs(12), weight: .medium)).foregroundColor(on ? Theme.text : Theme.sub)
+                                    .padding(.horizontal, 10).padding(.vertical, 5)
+                                    .background(Capsule().fill(on ? Theme.accentSolid.opacity(0.25) : Color.clear))
+                                    .overlay(Capsule().stroke(on ? Theme.accentSolid : Theme.ink.opacity(0.3), lineWidth: 1))
+                            }.buttonStyle(.plain)
+                        }
+                    }
+                    HStack(spacing: 8) {
+                        TextField(t("Add a line (optional)", "Thêm một dòng (không bắt buộc)"), text: $c.note)
+                            .textFieldStyle(.roundedBorder).font(.system(size: fs(12)))
+                        PrimaryButton(title: t("Send", "Gửi"), action: { c.sendWhy() },
+                                      disabled: c.reasons.isEmpty && c.note.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                }.onExitCommand { c.close() }
+            case .thanks:
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Image(systemName: "leaf").foregroundColor(Theme.accentSolid)
+                        Text(t("Thank you. Tidymint stays free thanks to Mint keepers like you.", "Cảm ơn bạn. Tidymint miễn phí nhờ những Mint keepers như bạn."))
+                            .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
+                        Spacer()
+                        xButton({ c.close() }, tip: t("Close", "Đóng"))
+                    }
+                    HStack(spacing: 12) {
+                        PrimaryButton(title: t("3 free ways to help", "3 cách giúp miễn phí"), action: { NSWorkspace.shared.open(CheckIn.freeHelpURL()); c.close() })
+                        TextLink(t("Support the project", "Ủng hộ dự án"), url: sponsorURL("checkin"))
+                    }
+                }.onExitCommand { c.close() }
+            case .sent:
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark").foregroundColor(Theme.green)
+                    Text(t("Sent. Thank you, we read every reply.", "Đã gửi. Cảm ơn bạn, chúng tôi sẽ đọc từng góp ý.")).font(.system(size: fs(13))).foregroundColor(Theme.text)
+                    Spacer()
+                }
+            }
+        }
+        .padding(.horizontal, c.step == .hidden ? 0 : 14).padding(.vertical, c.step == .hidden ? 0 : 10)
+        .background(RoundedRectangle(cornerRadius: 12).fill(c.step == .hidden ? Color.clear : Theme.card))
+        .frame(maxWidth: 680)
+        .animation(.easeOut(duration: 0.2), value: c.step)
+    }
+}
+
 /// When to show the newsletter invitation after a cleanup: never again after signing up or "Don't ask again",
 /// otherwise at most once every 14 days.
 enum Invite {
@@ -6113,6 +6688,8 @@ struct InviteCard: View {
 // MARK: - Sample data for screenshots (--demo). Nothing here touches real files.
 
 @MainActor enum Demo {
+    /// Sample rows point at real paths; nothing may be moved while demo data is on screen.
+    static var active = false
     static let H = NSHomeDirectory()
     static func u(_ p: String) -> URL { URL(fileURLWithPath: H + "/" + p) }
     static func gb(_ x: Double) -> Int64 { Int64(x * 1_000_000_000) }
@@ -6178,6 +6755,7 @@ struct InviteCard: View {
         }
     }
     static func load(_ vm: VM) {
+        active = true
         vm.cats = [
             Category(id: "usercache", titleEN: "User Cache Files", titleVI: "Bộ nhớ đệm người dùng", icon: "internaldrive",
                      descEN: "Temporary files apps rebuild on their own", descVI: "File tạm, app tự tạo lại khi cần",
@@ -6200,7 +6778,7 @@ struct InviteCard: View {
                      items: [item(".npm/_cacache", mb(3420), true), item("Library/Application Support/com.apple.wallpaper/aerials", gb(6.8), true)]),
             Category(id: "drafts", titleEN: "Project Drafts", titleVI: "Nháp trong thư mục dự án", icon: "tray.full",
                      descEN: "_to_delete and _tmp folders in your project folders", descVI: "Thư mục _to_delete, _tmp trong thư mục dự án",
-                     safety: .review, items: [item("Projects/ai-video/_tmp", mb(2860), true), item("Projects/landing-page/_to_delete", mb(418), true)]),
+                     safety: .review, items: [item("Projects/ai-video/_tmp", mb(2860), false), item("Projects/landing-page/_to_delete", mb(418), false)]),
             Category(id: "downloads", titleEN: "Old Downloads (14+ days)", titleVI: "Downloads cũ hơn 14 ngày", icon: "arrow.down.circle",
                      descEN: "Not selected by default. Review before removing", descVI: "Mặc định không tick, xem rồi chọn",
                      safety: .review, items: [item("Downloads/Figma-125.4.dmg", mb(412), false, days: 41), item("Downloads/Zoom.pkg", mb(98), false, days: 63),
