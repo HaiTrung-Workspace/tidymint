@@ -3,6 +3,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.3.8", date="2026-11-04", status="released",
+         vt=dict(score="0/66", date="2026-11-04", sha="e30c576247dd010c0dd865b220b8c8923d83da784cd4bde258a5860ec3733d42"),
          en=["New: Duplicates and Large & Old Files can also scan external drives and extra folders you add in Settings. When the same file is on your Mac and on a drive, you choose which copy to keep",
              "New: a one-line question on Clean Now after two weeks of use, \"Is Tidymint helping you?\". One click, no email, asked at most twice",
              "New look for the Scan button: the mint leaf, with the word showing when you hover",
