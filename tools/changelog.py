@@ -3,6 +3,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.4.0", date="2026-11-05", status="released",
+         vt=dict(score="0/65", date="2026-11-05", sha="1f274be4e8c64baa234acc68dd6ac01b1936884a4c5a4d675627284c22b31f90"),
          en=["New look: Settings and the rest of the app follow the macOS style, with sections that fold, standard text and control sizes, and warnings lined up in their own column. The window keeps its proportions when you change the text size",
              "New: open files from the lists. Click or press Space for Quick Look, double-click to open in its app, right-click for Open With, Show in Finder and Copy Path",
              "New: the Uninstaller has a search box, remembers how you sorted it, and also finds the app's own cache and temp folders in /private/var/folders",
