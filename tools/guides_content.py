@@ -253,14 +253,14 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="cai-dat", topic="start", date="2026-10-28", read="4 phút đọc",
+  lang="vi", slug="cai-dat", topic="start", date="2026-11-05", read="4 phút đọc",
   title="Cài Tidymint trên Mac: từng bước có ảnh | Tidymint",
   desc="Tải Tidymint, mở lần đầu khi macOS báo bị chặn, bấm Vẫn mở trong Quyền riêng tư và Bảo mật, cấp quyền Truy cập toàn bộ ổ đĩa. Mỗi bước một ảnh chụp màn hình.",
   crumb="Cài đặt từng bước",
   h1="Cài Tidymint trên Mac, từng bước có ảnh",
   tldr="Tidymint chưa được Apple công chứng, nên lần đầu mở macOS sẽ chặn và bạn phải bấm <b>Vẫn mở</b> (Open Anyway) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, mục <b>Bảo mật</b> ở giữa trang. Cả quy trình mất khoảng 2 phút và chỉ làm một lần. Ảnh chụp trên macOS tiếng Anh; máy tiếng Việt có cùng vị trí, tên mục dịch trong ngoặc.",
   toc=[("b1","Bước 1: Tải và giải nén"),("b2","Bước 2: Kéo vào Ứng dụng"),("b3","Bước 3: Mở lần đầu, bấm Xong"),("b4","Bước 4: Bấm Vẫn mở"),
-       ("b5","Bước 5: Xác nhận và nhập mật khẩu"),("b6","Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa"),("cap-nhat","Cập nhật bản mới"),("khong-thay","Không thấy nút Vẫn mở?"),("faq","Câu hỏi thường gặp")],
+       ("b5","Bước 5: Xác nhận và nhập mật khẩu"),("b6","Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa"),("cap-nhat","Cập nhật bản mới"),("go-tidymint","Gỡ Tidymint"),("khong-thay","Không thấy nút Vẫn mở?"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="b1">Bước 1: Tải và giải nén</h2>
 <p>Bấm <a href="{DL}">Tải Tidymint</a>. File <b>Tidymint.zip</b> (khoảng 3 MB) nằm trong thư mục <b>Downloads</b>. Nhấp đúp file zip, macOS tự giải nén ra app <b>Tidymint</b> ngay cạnh.</p>
@@ -290,6 +290,25 @@ dict(
 <li>Mở app. macOS chặn một lần như bước 3, làm lại bước 3 đến 5: bấm Xong, vào Quyền riêng tư &amp; Bảo mật bấm <b>Vẫn mở</b>, nhập mật khẩu.</li>
 </ol>
 <p>Không cần cấp lại quyền Truy cập toàn bộ ổ đĩa. Cài đặt, giao diện, thư mục dự án và danh sách bỏ qua vẫn giữ nguyên.</p>
+<h2 id="go-tidymint">Gỡ Tidymint</h2>
+<p>Cách nhanh nhất là kéo Tidymint vào Thùng rác. Muốn sạch hẳn thì xoá thêm 4 mục nhỏ trong thư mục Thư viện (dưới 1 MB trên máy thử). Những gì Tidymint đã dọn vẫn nằm nguyên trong Thùng rác; gỡ app chỉ làm mất nút <b>Hoàn tác</b>, muốn lấy lại file thì kéo nó ra khỏi Thùng rác như bình thường.</p>
+<ol>
+<li>Thoát Tidymint (biểu tượng trên thanh menu › Thoát). Mở Finder › <b>Ứng dụng</b>, kéo <b>Tidymint</b> vào Thùng rác.</li>
+<li>Muốn sạch hẳn: trong Finder bấm <b>Đi › Đi tới thư mục</b> (Shift‑Cmd‑G), dán từng đường dẫn dưới đây, rồi kéo mục hiện ra vào Thùng rác.</li>
+</ol>
+<div class="tbl"><table>
+<tr><th>Đường dẫn</th><th>Là gì</th></tr>
+<tr><td><code class="cp">~/Library/Application Support/Tidymint</code></td><td>Lịch sử dung lượng, ghi chú, nhật ký lần dọn gần nhất</td></tr>
+<tr><td><code class="cp">~/Library/Preferences/com.haitrung.diskcleanup.plist</code></td><td>Cài đặt: ngôn ngữ, giao diện, cỡ chữ, thư mục dự án, danh sách bỏ qua</td></tr>
+<tr><td><code class="cp">~/Library/Caches/com.haitrung.diskcleanup</code></td><td>Bộ nhớ đệm macOS tạo khi app kiểm bản mới</td></tr>
+<tr><td><code class="cp">~/Library/HTTPStorages/com.haitrung.diskcleanup</code></td><td>Như trên, phần macOS lưu cho kết nối mạng</td></tr>
+</table></div>
+<p><code>com.haitrung.diskcleanup</code> là mã định danh của app từ hồi còn tên "Disk Cleanup", giữ lại để bản cập nhật không bắt bạn cấp lại quyền. macOS còn tạo cho mỗi app một thư mục bộ nhớ đệm và một thư mục file tạm trong <code>/private/var/folders</code>; file tạm macOS tự xoá sau 3 ngày không dùng. Muốn xoá luôn bộ nhớ đệm, dán lệnh dưới đây vào Terminal để mở thư mục đó, rồi kéo thư mục <code>com.haitrung.diskcleanup</code> vào Thùng rác:</p>
+<pre><code>open "$(getconf DARWIN_USER_CACHE_DIR)"</code></pre>
+<p>Cài bằng Homebrew thì gỡ bằng một trong hai lệnh. Lệnh đầu chỉ gỡ app, giữ cài đặt để sau này cài lại như cũ; lệnh sau gỡ sạch cả 4 mục ở bảng trên:</p>
+<pre><code>brew uninstall --cask tidymint</code></pre>
+<pre><code>brew uninstall --zap --cask tidymint</code></pre>
+<p>Không cần khởi động lại máy: Tidymint không cài tiến trình chạy nền, tiện ích hệ thống hay trình trợ giúp quyền quản trị. Dòng Tidymint trong <b>Truy cập toàn bộ ổ đĩa</b> để nguyên cũng được: không còn app thì quyền đó không có tác dụng, cài lại thì khỏi cấp lại; muốn xoá hẳn thì chọn dòng đó, bấm <b>−</b>. Trang <b>Gỡ ứng dụng</b> trong Tidymint cố ý không liệt kê chính Tidymint, để app không bao giờ tự chuyển mình vào Thùng rác giữa lúc đang dọn.</p>
 <h2 id="khong-thay">Không thấy nút Vẫn mở?</h2>
 <ul>
 <li>Nút chỉ hiện một lúc sau khi macOS vừa chặn. Nhấp đúp Tidymint lần nữa, bấm Done, rồi quay lại Quyền riêng tư &amp; Bảo mật.</li>
@@ -307,20 +326,22 @@ dict(
   sources=[
     ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/102445"),
     ("Apple: Kiểm soát quyền truy cập file và thư mục trên máy Mac", "https://support.apple.com/guide/mac-help/mchld5a35146/mac"),
+    ("Apple: Gỡ cài đặt ứng dụng trên máy Mac", "https://support.apple.com/vi-vn/102610"),
+    ("Homebrew: lệnh brew uninstall --zap", "https://docs.brew.sh/Manpage"),
   ],
   related=[("CleanMyMac miễn phí? Lựa chọn hợp pháp", "{HOME}cleanmymac-mien-phi/"), ("Zalo chiếm bao nhiêu GB trên MacBook", "{HOME}zalo-chiem-dung-luong-macbook/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="install",
 ),
 
 dict(
-  lang="en", slug="install", topic="start", date="2026-10-28", read="4 min read",
+  lang="en", slug="install", topic="start", date="2026-11-05", read="4 min read",
   title="Install Tidymint on Mac: Step by Step With Screenshots | Tidymint",
   desc="Download Tidymint, get past the first-launch block, click Open Anyway in Privacy & Security and grant Full Disk Access. One screenshot per step.",
   crumb="Install step by step",
   h1="Install Tidymint on your Mac, step by step",
   tldr="Tidymint is not notarized by Apple yet, so the first launch is blocked and you need to click <b>Open Anyway</b> in <b>System Settings › Privacy &amp; Security</b>, under the <b>Security</b> heading halfway down the page. The whole thing takes about two minutes and only happens once.",
   toc=[("s1","Step 1: Download and unzip"),("s2","Step 2: Move to Applications"),("s3","Step 3: First launch, click Done"),("s4","Step 4: Click Open Anyway"),
-       ("s5","Step 5: Confirm and enter your password"),("s6","Step 6: Grant Full Disk Access"),("update","Updating to a new version"),("missing","No Open Anyway button?"),("faq","FAQ")],
+       ("s5","Step 5: Confirm and enter your password"),("s6","Step 6: Grant Full Disk Access"),("update","Updating to a new version"),("uninstall","Uninstall Tidymint"),("missing","No Open Anyway button?"),("faq","FAQ")],
   body="""
 <h2 id="s1">Step 1: Download and unzip</h2>
 <p>Click <a href="{DL}">Download Tidymint</a>. <b>Tidymint.zip</b> (about 3 MB) lands in <b>Downloads</b>. Double-click it and macOS unzips the <b>Tidymint</b> app next to it.</p>
@@ -350,6 +371,25 @@ dict(
 <li>Open the app. macOS blocks it once, as in step 3: repeat steps 3 to 5 (click Done, click <b>Open Anyway</b> in Privacy &amp; Security, enter your password).</li>
 </ol>
 <p>You do not need to grant Full Disk Access again. Your settings, theme, project folders and ignore list stay as they were.</p>
+<h2 id="uninstall">Uninstall Tidymint</h2>
+<p>The quickest way is to drag Tidymint to the Trash. For a clean removal, also delete 4 small items in your Library folder (under 1 MB on our test Mac). Everything Tidymint cleaned stays in the Trash; uninstalling only removes the <b>Undo</b> button, and you can still drag any file back out of the Trash.</p>
+<ol>
+<li>Quit Tidymint (menu bar icon › Quit). Open Finder › <b>Applications</b> and drag <b>Tidymint</b> to the Trash.</li>
+<li>For a clean removal: in Finder choose <b>Go › Go to Folder</b> (Shift‑Cmd‑G), paste each path below, and drag the item to the Trash.</li>
+</ol>
+<div class="tbl"><table>
+<tr><th>Path</th><th>What it is</th></tr>
+<tr><td><code class="cp">~/Library/Application Support/Tidymint</code></td><td>Disk usage history, notes, the last clean's log</td></tr>
+<tr><td><code class="cp">~/Library/Preferences/com.haitrung.diskcleanup.plist</code></td><td>Settings: language, theme, text size, project folders, ignore list</td></tr>
+<tr><td><code class="cp">~/Library/Caches/com.haitrung.diskcleanup</code></td><td>Cache macOS creates when the app checks for updates</td></tr>
+<tr><td><code class="cp">~/Library/HTTPStorages/com.haitrung.diskcleanup</code></td><td>Same, the part macOS keeps for network connections</td></tr>
+</table></div>
+<p><code>com.haitrung.diskcleanup</code> is the app's identifier from when it was called "Disk Cleanup", kept so updates never ask you to grant permissions again. macOS also gives each app a cache folder and a temporary folder in <code>/private/var/folders</code>; it removes temporary files unused for 3 days. To remove the cache too, paste this into Terminal to open that folder, then drag the <code>com.haitrung.diskcleanup</code> folder to the Trash:</p>
+<pre><code>open "$(getconf DARWIN_USER_CACHE_DIR)"</code></pre>
+<p>Installed with Homebrew? Use one of two commands. The first removes the app and keeps your settings for a later reinstall; the second also removes all 4 items in the table:</p>
+<pre><code>brew uninstall --cask tidymint</code></pre>
+<pre><code>brew uninstall --zap --cask tidymint</code></pre>
+<p>No restart needed: Tidymint installs no background process, system extension or privileged helper. The Tidymint line in <b>Full Disk Access</b> can stay: without the app it does nothing, and a reinstall will not ask again; to remove it, select the line and click <b>−</b>. Tidymint's own <b>Uninstall</b> page deliberately leaves Tidymint off the list, so the app never moves itself to the Trash in the middle of a clean.</p>
 <h2 id="missing">No Open Anyway button?</h2>
 <ul>
 <li>The button only appears for a while after a blocked launch. Double-click Tidymint again, click Done, then return to Privacy &amp; Security.</li>
@@ -366,6 +406,8 @@ dict(
   sources=[
     ("Apple: Safely open apps on your Mac", "https://support.apple.com/102445"),
     ("Apple: Control access to files and folders on Mac", "https://support.apple.com/guide/mac-help/mchld5a35146/mac"),
+    ("Apple: Uninstall apps on your Mac", "https://support.apple.com/en-us/102610"),
+    ("Homebrew: brew uninstall --zap", "https://docs.brew.sh/Manpage"),
   ],
   related=[("Free CleanMyMac alternative (open source)", "{HOME}cleanmymac-alternative/"), ("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Tidymint home", "{HOME}")],
   alt="cai-dat",
