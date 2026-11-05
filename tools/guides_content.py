@@ -180,8 +180,8 @@ dict(
 
 dict(
   lang="vi", slug="zalo-chiem-dung-luong-macbook", topic="apps", date="2026-10-27", read="6 phút đọc",
-  title="Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào | Tidymint",
-  desc="Zalo trên Mac lưu ảnh, file và bộ nhớ đệm trong thư mục ZaloData, có máy vài chục GB. Cách xem Zalo đang chiếm bao nhiêu, phần nào xoá được, phần nào mất tin nhắn.",
+  title="Zalo chiếm bao nhiêu GB trên MacBook và cách dọn | Tidymint",
+  desc="Zalo trên Mac lưu ảnh, file và bộ nhớ đệm trong ZaloData, có máy vài chục GB. Cách xem Zalo chiếm bao nhiêu, phần nào xoá được, phần nào mất tin nhắn.",
   crumb="Zalo chiếm dung lượng MacBook",
   h1="Zalo chiếm bao nhiêu GB trên MacBook và dọn thế nào",
   tldr="Zalo cất mọi thứ trong thư mục ẩn <code>~/Library/Application Support/ZaloData</code>. Phần nặng nhất là <b>ảnh và file trong tin nhắn</b> (thư mục <code>media</code>), rồi đến tin nhắn (<code>Database</code>, không được xoá) và bộ nhớ đệm (xoá thoải mái). Thoát Zalo trước, chuyển các thư mục cache vào Thùng rác, ảnh cũ thì tự chọn. Trên máy của tác giả, ZaloData chiếm 3,6 GB, trong đó 2,5 GB là ảnh và file.",
@@ -335,7 +335,7 @@ dict(
 
 dict(
   lang="en", slug="install", topic="start", date="2026-11-05", read="4 min read",
-  title="Install Tidymint on Mac: Step by Step With Screenshots | Tidymint",
+  title="How to Install Tidymint on Mac, With Screenshots | Tidymint",
   desc="Download Tidymint, get past the first-launch block, click Open Anyway in Privacy & Security and grant Full Disk Access. One screenshot per step.",
   crumb="Install step by step",
   h1="Install Tidymint on your Mac, step by step",
