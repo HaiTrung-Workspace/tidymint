@@ -372,7 +372,16 @@ enum Phase { case idle, scanning, summary, review, done }
         }
     }
     /// Whether every extra copy (all except "Keep") is selected
-    var dupAllExtrasSelected: Bool { !dupes.isEmpty && dupes.allSatisfy { g in g.items.dropFirst().allSatisfy(\.selected) } }
+    /// True when every copy the automatic pick may take is ticked. Copies it never takes (APFS clones, project files,
+    /// files scripts use, cross-drive groups set to "ask") do not count, otherwise the button could never switch to Deselect.
+    var dupAllExtrasSelected: Bool {
+        var any = false
+        for g in dupes {
+            let ask = g.isCross && Prefs.crossKeep == "ask"
+            for it in g.items.dropFirst() where Dupes.autoPick(it, ask: ask) { if !it.selected { return false }; any = true }
+        }
+        return any
+    }
     func dupGroupState(_ g: DupGroup) -> Int {
         let n = g.items.dropFirst().filter(\.selected).count
         return n == 0 ? 0 : (n == g.items.count - 1 ? 2 : 1)

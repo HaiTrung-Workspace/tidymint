@@ -125,6 +125,18 @@ import AVFoundation
                              item("Downloads/dataset-v2.zip", gb(2.4), false, days: 28)]),
         ]
         vm.phase = .summary
+        // Screenshot helpers: --demo-review opens the list of items, --demo-done the result screen with Undo (an in-memory
+        // session only, nothing on disk; Undo there finds no files and changes nothing).
+        let args = CommandLine.arguments
+        if args.contains("--demo-review") { vm.phase = .review }
+        if args.contains("--demo-done") {
+            let sel = vm.cats.flatMap { $0.items.filter(\.selected) }
+            let freed = sel.reduce(0) { $0 + $1.size }
+            vm.lastFreed = freed; vm.lastCount = sel.count
+            vm.lastResult = t("Moved \(sel.count) items (\(fmt(freed))) to the Trash.", "Đã chuyển \(sel.count) mục (\(fmt(freed))) vào Thùng rác.")
+            vm.undoable = Journal.Session(date: Date(), label: "cleanup", entries: sel.map { Journal.Entry(from: $0.url.path, to: "/nonexistent/demo", size: $0.size) })
+            vm.phase = .done
+        }
         vm.large = [item("Movies/Screen Recording 2026-09-14.mov", gb(8.2), false, days: 42),
                     item("Downloads/sdxl-base-1.0.safetensors", gb(6.9), false, days: 77),
                     item("Documents/Footage/interview-raw.mp4", gb(4.1), false, days: 120),
