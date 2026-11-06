@@ -3,6 +3,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.5.1", date="2026-11-06", status="released",
+         vt=dict(score="0/66", date="2026-11-06", sha="4b2f53ad6402ca05ce3ca1e2e839361cb026c0a3429d9bc38b60318b8fdacfce"),
          en=["Fix: in Duplicates, Select all extra copies switches to Deselect all again when a group holds copies Tidymint never picks on its own (APFS clones, files in project folders)",
              "Fix: an empty Trash no longer shows a few KB left over from a hidden Finder file on an external drive"],
          vi=["Sửa lỗi: ở File trùng, nút Chọn mọi bản thừa lại chuyển được sang Bỏ chọn tất cả khi nhóm có bản Tidymint không tự chọn (bản sao APFS, file trong thư mục dự án)",
