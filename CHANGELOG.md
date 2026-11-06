@@ -2,6 +2,11 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.5.1 (2026-11-06)
+
+- Fix: in Duplicates, Select all extra copies switches to Deselect all again when a group holds copies Tidymint never picks on its own (APFS clones, files in project folders)
+- Fix: an empty Trash no longer shows a few KB left over from a hidden Finder file on an external drive
+
 ## 0.5.0 (2026-11-06)
 
 - New: Mintangle arranges windows with keyboard shortcuts (halves, quarters, thirds, two thirds, maximize, center, next screen) or by dragging a window to an edge or corner. Shortcuts can be changed. Off by default; macOS asks for Accessibility permission only when you turn it on

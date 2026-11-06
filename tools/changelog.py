@@ -2,6 +2,11 @@
 # Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.5.1", date="2026-11-06", status="released",
+         en=["Fix: in Duplicates, Select all extra copies switches to Deselect all again when a group holds copies Tidymint never picks on its own (APFS clones, files in project folders)",
+             "Fix: an empty Trash no longer shows a few KB left over from a hidden Finder file on an external drive"],
+         vi=["Sửa lỗi: ở File trùng, nút Chọn mọi bản thừa lại chuyển được sang Bỏ chọn tất cả khi nhóm có bản Tidymint không tự chọn (bản sao APFS, file trong thư mục dự án)",
+             "Sửa lỗi: Thùng rác trống không còn báo vài KB do một file ẩn của Finder trên ổ ngoài"]),
     dict(ver="0.5.0", date="2026-11-06", status="released",
          vt=dict(score="0/67", date="2026-11-06", sha="ae9f12026b3c3a81e5796847d39bee495290ba70bc832de93ed1761921d55b4d"),
          en=['New: Mintangle arranges windows with keyboard shortcuts (halves, quarters, thirds, two thirds, maximize, center, next screen) or by dragging a window to an edge or corner. Shortcuts can be changed. Off by default; macOS asks for Accessibility permission only when you turn it on',

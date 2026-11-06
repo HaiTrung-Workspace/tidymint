@@ -241,7 +241,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
             sharedVM.page = pg
-            if pg == .cleanup && a.contains("--demo") { sharedVM.phase = a.contains("--done") ? .done : .review }
+            if pg == .cleanup && a.contains("--demo") { sharedVM.phase = (a.contains("--done") || a.contains("--demo-done")) ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
             if pg == .organize && a.contains("--demo") { Demo.organize(sharedOrg) }
             if pg == .lens && a.contains("--sysdata") { sharedVM.openSys() }
