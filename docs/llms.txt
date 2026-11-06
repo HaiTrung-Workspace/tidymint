@@ -28,6 +28,8 @@
 - (Vietnamese) Cài đặt, cập nhật và gỡ từng bước có ảnh: https://tidymint.app/vi/cai-dat/
 - Does Tidymint send your data anywhere (privacy, runs on your Mac): https://tidymint.app/tidymint-privacy/
 - Is Tidymint safe: evidence, who has checked it, release process, how to verify the download: https://tidymint.app/safety/
+- Mintdrop drop shelf (gather files, drag out, move, trash with Undo; move vs copy explained): https://tidymint.app/mintdrop-drop-shelf-mac/
+- Mintangle window tiling (shortcuts for halves, corners, thirds; drag to edges; Accessibility permission explained): https://tidymint.app/mintangle-window-tiling-mac/
 - (Vietnamese) Tidymint có gửi dữ liệu đi không (quyền riêng tư, chạy trên máy): https://tidymint.app/vi/quyen-rieng-tu-tidymint/
 - (Vietnamese) Tidymint có an toàn không: bằng chứng, ai đã kiểm, quy trình phát hành, cách tự kiểm file tải về: https://tidymint.app/vi/an-toan/
 - How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/

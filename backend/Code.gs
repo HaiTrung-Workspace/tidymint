@@ -36,7 +36,31 @@ function doPost(e) {
   }
 }
 
-function doGet() { return out('Tidymint collector is running'); }
+// GET ?stats=1: aggregate counts of the in-app check-in answers (helpful / okay / not), all time and the last
+// 24 hours, so the daily report can read them without opening the sheet. Counts only: no text, no email, no row.
+function doGet(e) {
+  if (!(e && e.parameter && e.parameter.stats)) return out('Tidymint collector is running');
+  try {
+    const sh = sheet();
+    const rows = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, COLUMNS.length).getValues() : [];
+    const iT = COLUMNS.indexOf('time'), iType = COLUMNS.indexOf('type'), iA = COLUMNS.indexOf('answer'), iM = COLUMNS.indexOf('message');
+    const since = Date.now() - 24 * 3600 * 1000;
+    const zero = () => ({ helpful: 0, okay: 0, not: 0, with_message: 0 });
+    const all = zero(), day = zero();
+    let last = null, feedback = 0, feedbackDay = 0;
+    for (const r of rows) {
+      const t = r[iT] instanceof Date ? r[iT].getTime() : Date.parse(r[iT]);
+      if (String(r[iType]) !== 'checkin') { feedback++; if (t >= since) feedbackDay++; continue; }
+      const a = String(r[iA]); if (!(a in all)) continue;
+      all[a]++; if (String(r[iM] || '').trim()) all.with_message++;
+      if (t >= since) { day[a]++; if (String(r[iM] || '').trim()) day.with_message++; }
+      if (!last || t > last) last = t;
+    }
+    const body = JSON.stringify({ generated: new Date().toISOString(), checkin_all: all, checkin_24h: day,
+      checkin_last_at: last ? new Date(last).toISOString() : null, feedback_all: feedback, feedback_24h: feedbackDay });
+    return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) { return out('error: ' + err); }
+}
 
 function sheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();

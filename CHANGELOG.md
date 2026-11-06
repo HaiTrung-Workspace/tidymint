@@ -2,6 +2,18 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.5.0 (2026-11-06)
+
+- New: Mintangle arranges windows with keyboard shortcuts (halves, quarters, thirds, two thirds, maximize, center, next screen) or by dragging a window to an edge or corner. Shortcuts can be changed. Off by default; macOS asks for Accessibility permission only when you turn it on
+- New: Mintdrop, a drop shelf. Shake the pointer while dragging files, or press ⌃⌥S, to collect files from several places, then drag them out together, move them to a folder, or put them in the Trash with Undo. Off by default, nothing is copied
+- Show instead of hide: Clean Now lists every folder that holds something, with items under 500 KB folded into one row you can select instead of being left out. The Uninstaller shows Apple and protected apps (locked). Large Files includes hidden files (tagged)
+- Every rule that stays has a one-line note on its page (Clean by App, Large Files, Duplicates, Leftovers, Installers, Startup)
+- Duplicates recognises copies that macOS made without using extra space (APFS clones). Removing one frees nothing, so Tidymint never picks it for removal
+- The Uninstaller also removes the extension folders of the app being removed. Extensions of apps that are still installed are no longer called leftovers
+- Safer: Space Lens no longer lets you move the home folder's own Library, Desktop, Documents or Trash folders to the Trash, and Empty Trash no longer freezes the window on a large Trash
+- Fixed: moving files from Desktop and Documents synced with iCloud to the Trash could fail with error 513. The Trash page also counts the iCloud Drive Trash
+- Fixed: the app could quit after cleaning, or after uninstalling the last app in the list
+
 ## 0.4.0 (2026-11-05)
 
 - New look: Settings and the rest of the app follow the macOS style, with sections that fold, standard text and control sizes, and warnings lined up in their own column. The window keeps its proportions when you change the text size

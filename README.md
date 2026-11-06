@@ -94,7 +94,7 @@ cd tidymint
 
 ## What it never touches
 
-Photos libraries, Mail, keychains and passwords, cloud storage roots, iCloud Drive internals, Apple system caches, browser profiles for antidetect tools, and anything on your Ignore list. You can add more protected keywords:
+Photos libraries, Mail, keychains and passwords, cloud storage roots, iCloud Drive internals, Apple system caches, logins, cookies and history in any browser profile, including antidetect browsers (only their cache folders are offered), and anything on your Ignore list. You can add more protected keywords:
 
 ```bash
 defaults write com.haitrung.diskcleanup protectedKeywords -array "my-profile-folder"
