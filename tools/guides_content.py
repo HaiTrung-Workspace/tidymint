@@ -1843,6 +1843,7 @@ GUIDES.append(dict(
 <p>Để biết chỗ nào đang chiếm dung lượng, app dọn dẹp phải nhìn được các thư mục macOS giấu đi: bộ nhớ đệm, nhật ký, dữ liệu của Zalo, Chrome, Mail. macOS khoá các thư mục này, chỉ mở khi bạn cấp quyền <b>Truy cập toàn bộ ổ đĩa</b> (Full Disk Access) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>.</p>
 <p>Theo Apple, quyền này cho app <b>truy cập mọi tệp trên máy</b>, kể cả dữ liệu của Mail, Tin nhắn, Safari và bản sao lưu Time Machine. Nói cách khác: <b>chọn app dọn máy cũng là chọn ai được nhìn vào máy mình</b>. Vì vậy câu hỏi \"app này có gửi gì đi không\" rất đáng hỏi.</p>
 
+<p>Từ bản 0.5.0 có thêm một quyền tuỳ chọn: <b>Trợ năng</b> (Accessibility), chỉ dành cho Mintangle (xếp cửa sổ). Mintangle tắt sẵn, bạn không bật thì Tidymint không bao giờ hỏi quyền này. Bật lên, app chỉ dùng quyền để dời và đổi cỡ cửa sổ, không đọc nội dung, không ghi phím gõ.</p>
 <h2 id="chay-tren-may">Tidymint làm việc thế nào: mọi thứ chạy ngay trên máy bạn</h2>
 <p>Hình dung Tidymint như <b>người thợ dọn nhà làm việc ngay trong nhà bạn</b>: đi từng phòng, ghi lại thứ gì to, thứ gì cũ, đưa bạn tờ danh sách. Bạn đánh dấu thứ muốn bỏ, thợ mang ra Thùng rác. Thợ không chụp ảnh đồ đạc gửi về công ty, và về tay không.</p>
 <ol class="steps">
@@ -1903,6 +1904,7 @@ GUIDES.append(dict(
 <p>To find what is taking up space, a cleaner has to look inside folders macOS keeps hidden: caches, logs, and data from Chrome, Slack or Mail. macOS locks these folders until you grant <b>Full Disk Access</b> in <b>System Settings › Privacy &amp; Security</b>.</p>
 <p>Apple describes this permission as letting an app <b>access all files on your computer</b>, including data from Mail, Messages and Safari, and Time Machine backups. In other words, <b>choosing a cleaner means choosing who gets to look inside your Mac</b>. So \"does this app send anything out?\" is exactly the right question to ask.</p>
 
+<p>From 0.5.0 there is one more optional permission: <b>Accessibility</b>, used only by Mintangle (window tiling). Mintangle is off by default, and Tidymint never asks for this permission unless you turn it on. When on, the app uses it only to move and resize windows. It does not read their content or record your keystrokes.</p>
 <h2 id="on-your-mac">How Tidymint works: everything happens on your Mac</h2>
 <p>Think of Tidymint as <b>a cleaner working inside your home</b>: it walks through each room, notes what is big or old, and hands you a list. You mark what to throw out, and it carries those things to the Trash. It doesn't photograph your belongings for head office, and it leaves empty-handed.</p>
 <ol class="steps">
@@ -2021,7 +2023,8 @@ GUIDES.append(dict(
   faq=[("App miễn phí thì kiếm tiền từ đâu?", "Tidymint không bán dữ liệu và không chạy quảng cáo. Chi phí do người làm tự bỏ ra, cộng tiền ủng hộ tự nguyện qua GitHub Sponsors. Mã công khai, nên nếu app lén gửi gì đi thì ai cũng thấy."),
        ("Phần mềm diệt virus trên máy tôi báo Tidymint thì sao?", "Hãy gửi email cho chúng tôi kèm tên phần mềm và ảnh chụp thông báo. Bạn cũng có thể so mã SHA-256 và xem kết quả VirusTotal như hướng dẫn ở trên để biết file có đúng là bản chính thức không."),
        ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
-       ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu.")],
+       ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu."),
+       ("Mintangle xin quyền Trợ năng để làm gì?", "Để dời và đổi cỡ cửa sổ khi bạn bấm phím tắt hoặc kéo cửa sổ vào mép màn hình. Mintangle tắt sẵn, chỉ khi bạn bật thì macOS mới hỏi quyền. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ, không gửi gì đi. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư & Bảo mật › Trợ năng, lúc nào cũng được.")],
   sources=[("VirusTotal: kết quả quét Tidymint.zip 0.3.8", "https://www.virustotal.com/gui/file/1f274be4e8c64baa234acc68dd6ac01b1936884a4c5a4d675627284c22b31f90"),
            ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
            ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
@@ -2104,7 +2107,8 @@ GUIDES.append(dict(
   faq=[("If it's free, how does Tidymint make money?", "Tidymint doesn't sell data and shows no ads. Costs are covered by the maker, plus voluntary support through GitHub Sponsors. The code is public, so if the app secretly sent anything out, anyone could see it."),
        ("My antivirus flags Tidymint. What now?", "Email us with the name of the antivirus and a screenshot of the warning. You can also compare the SHA-256 and check the VirusTotal result as shown above, to confirm the file is the official one."),
        ("Why does macOS say it can't verify the developer?", "Because Tidymint isn't signed by Apple yet (see What Tidymint doesn't have yet). Open it once with Open Anyway in System Settings; after that it opens normally."),
-       ("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. Contents are read only when finding duplicates and when checking scripts in project folders you add yourself, all on your Mac, sent nowhere.")],
+       ("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. Contents are read only when finding duplicates and when checking scripts in project folders you add yourself, all on your Mac, sent nowhere."),
+       ("Why does Mintangle ask for Accessibility permission?", "To move and resize windows when you press a shortcut or drag a window to a screen edge. Mintangle is off by default, and macOS asks only when you turn it on. Tidymint does not read what is inside windows, does not record the keys you type, and sends nothing. Turn Mintangle off, or switch Tidymint off in Privacy & Security › Accessibility, at any time.")],
   sources=[("VirusTotal: scan of Tidymint.zip 0.3.8", "https://www.virustotal.com/gui/file/1f274be4e8c64baa234acc68dd6ac01b1936884a4c5a4d675627284c22b31f90"),
            ("AreWeCleanYet: Tidymint review page", "https://arewecleanyet.org/apps/tidymint/"),
            ("Tidymint security policy (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
@@ -2112,4 +2116,216 @@ GUIDES.append(dict(
            ("Tidymint source code on GitHub (MIT license)", "https://github.com/HaiTrung-Workspace/tidymint")],
   related=[("Does Tidymint send your data anywhere?", "{HOME}tidymint-privacy/"), ("Install Tidymint on Mac, step by step", "{HOME}install/"), ("Tidymint home", "{HOME}")],
   alt="an-toan",
+))
+
+# --- 0.5.0 tools: Mintdrop and Mintangle (linked from the app's own pages) ---
+
+GUIDES.append(dict(
+  lang="vi", slug="mintdrop-ke-tha-file-mac", topic="start", date="2026-11-06", read="4 phút đọc",
+  title="Gom file từ nhiều nơi, kéo đi một lần: Mintdrop | Tidymint",
+  desc="Mintdrop là kệ thả file nổi trên Mac: lắc chuột khi kéo file hoặc nhấn ⌃⌥S, gom file rồi kéo ra, dời vào thư mục hay bỏ Thùng rác, có Hoàn tác.",
+  crumb="Mintdrop",
+  h1="Gom file từ nhiều nơi về một kệ, kéo đi một lần",
+  tldr="Mintdrop là một chiếc kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, rồi <b>kéo cả nhóm đi</b>, <b>dời vào một thư mục</b> hoặc <b>bỏ vào Thùng rác</b>. Kệ chỉ nhớ đường dẫn, <b>không chép file nào</b>. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
+  toc=[("khi-nao","Dùng khi nào"),("bat","Bật Mintdrop"),("mo-ke","Mở kệ"),("chon","Chọn nhiều file"),("xu-ly","Kéo ra, dời, bỏ Thùng rác"),
+       ("chuyen-hay-chep","Kéo ra là chuyển hay chép?"),("hoan-tac","Hoàn tác"),("rieng-tu","Quyền riêng tư"),("faq","Câu hỏi thường gặp")],
+  body="""<h2 id="khi-nao">Dùng khi nào</h2>
+<ul><li><b>Gom ảnh để gửi</b>: vài ảnh ở Downloads, vài ảnh ở Desktop, một file trong thư mục dự án. Thả hết lên kệ, rồi kéo cả nhóm vào Zalo hay Mail một lần.</li>
+<li><b>Dọn Desktop</b>: thả các file lộn xộn lên kệ, bấm Dời vào… để chuyển cả nhóm vào đúng thư mục. Lỡ tay thì Hoàn tác.</li>
+<li><b>Gom file thừa</b>: gặp file nào không cần thì thả lên kệ, xong thì chuyển cả nhóm vào Thùng rác một lần.</li></ul>
+<h2 id="bat">Bật Mintdrop</h2>
+<ol class="steps"><li>Mở Tidymint, ở thanh bên chọn nhóm <b>CÔNG CỤ › Mintdrop</b>.</li><li>Bấm <b>Bật Mintdrop</b>. Không cần cấp quyền gì thêm.</li></ol>
+<h2 id="mo-ke">Mở kệ: 3 cách</h2>
+<ul><li><b>Lắc chuột khi đang kéo file</b>: kéo một hay nhiều file trong Finder, lắc qua lại vài lần, kệ hiện ngay dưới con trỏ. Thả tay là file nằm trên kệ. Tắt được trong trang Mintdrop.</li>
+<li><b>Phím tắt ⌃⌥S</b> (Control, Option, S): mở hoặc ẩn kệ.</li>
+<li>Nút <b>Mở kệ</b> trong trang Mintdrop.</li></ul>
+<p>Ảnh, video và PDF hiện ảnh thu nhỏ. Nhấn <b>Space</b> để xem nhanh, bấm đúp để mở file. <b>⌘W</b> ẩn kệ, file vẫn còn trên kệ.</p>
+<h2 id="chon">Chọn nhiều file (giống Finder)</h2>
+<ul><li>Bấm một file: chọn file đó. Giữ <b>⌘</b> rồi bấm: thêm hoặc bớt từng file. Giữ <b>Shift</b> rồi bấm: chọn cả dải.</li>
+<li>Kéo chuột ở chỗ trống của danh sách: hiện khung chọn, chạm dòng nào chọn dòng đó.</li>
+<li><b>⌘A</b> chọn tất cả, <b>Esc</b> bỏ chọn.</li></ul>
+<p>Chưa chọn gì thì mọi thao tác áp cho cả kệ. Có chọn thì chỉ áp cho file đã chọn.</p>
+<h2 id="xu-ly">Kéo ra, dời, bỏ Thùng rác</h2>
+<ul><li><b>Kéo ra</b>: kéo một file thì chỉ file đó đi. Muốn kéo nhiều file cùng lúc: chọn chúng trước (⌘ hoặc Shift), rồi kéo một file bất kỳ trong nhóm đã chọn. Ô <b>Kéo cả N mục đi</b> ở cuối kệ kéo toàn bộ kệ (hoặc cả nhóm đang chọn).</li>
+<li><b>Dời vào…</b>: chọn một thư mục, các file được chuyển hẳn sang đó. Trùng tên thì file mới được đặt thêm số (ví dụ "Báo cáo 2.pdf"), không ghi đè.</li>
+<li><b>Chuyển vào Thùng rác</b>: như mọi lần dọn trong Tidymint, file chỉ vào Thùng rác của macOS.</li>
+<li>Dấu trừ cạnh mỗi dòng và nút X trên đầu kệ chỉ <b>bỏ file khỏi kệ</b>, file không bị xoá.</li></ul>
+<h2 id="chuyen-hay-chep">Kéo ra là chuyển hay chép?</h2>
+<p>Kệ không tự quyết. Nơi bạn thả file quyết định, đúng như khi kéo file trong Finder:</p>
+<div class="tbl"><table><tr><th>Thả vào đâu</th><th>Kết quả</th></tr>
+<tr><td>Thư mục trên cùng ổ đĩa</td><td><b>Chuyển</b> (như cắt rồi dán). File rời chỗ cũ, kệ tự bỏ dòng đó</td></tr>
+<tr><td>Thư mục trên ổ khác (ổ rời, USB)</td><td><b>Chép</b>. File gốc vẫn ở chỗ cũ và vẫn trên kệ</td></tr>
+<tr><td>Giữ phím Option khi thả vào Finder</td><td><b>Chép</b></td></tr>
+<tr><td>Một app (Mail, Zalo, ô tải lên của trình duyệt)</td><td>App lấy một bản để đính kèm hoặc tải lên, file gốc không đổi</td></tr></table></div>
+<p>Nút <b>Dời vào…</b> thì luôn là chuyển hẳn.</p>
+<h2 id="hoan-tac">Hoàn tác</h2>
+<p>Sau mỗi thao tác, dòng trạng thái cuối kệ có nút <b>Hoàn tác</b>:</p>
+<ul><li>Kéo ra một thư mục cùng ổ, hoặc <b>Dời vào…</b>: file về đúng chỗ cũ và quay lại kệ.</li>
+<li><b>Chuyển vào Thùng rác</b>: file được lấy lại từ Thùng rác về chỗ cũ.</li></ul>
+<p>Giới hạn cần biết: chỉ hoàn tác được <b>lần gần nhất</b>. Hoàn tác không bao giờ ghi đè: nếu chỗ cũ đã có file cùng tên, file đó được bỏ qua và kệ báo rõ. Đã đổ Thùng rác thì không lấy lại được.</p>
+<h2 id="rieng-tu">Quyền riêng tư</h2>
+<p>Mintdrop không cần quyền nào của macOS. Khi bạn giữ chuột, kệ chỉ xem có file đang được kéo hay không, và chỉ khi đó mới theo dõi chuột để nhận ra cú lắc. Kệ không đọc nội dung file, không gửi gì đi. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
+""",
+  faq=[("Mintdrop có chép file của tôi không?", "Không. Kệ chỉ nhớ đường dẫn tới file. File chỉ được chép khi bạn kéo nó sang ổ khác hoặc giữ Option khi thả, giống hệt Finder."),
+       ("Lắc chuột không mở được kệ?", "Kiểm tra Mintdrop đang bật và mục Lắc chuột khi kéo file đang bật trong trang Mintdrop. Phải lắc trong lúc vẫn đang giữ chuột kéo file. Cách chắc ăn nhất là nhấn ⌃⌥S."),
+       ("Phím ⌃⌥S không chạy?", "Một app khác có thể đang giữ tổ hợp này, trang Mintdrop sẽ báo. Khi đó bạn mở kệ bằng cách lắc chuột, hoặc tắt phím đó ở app kia.")],
+  sources=[("Apple: Kéo và thả mục trên Mac (giữ Option để chép)", "https://support.apple.com/guide/mac-help/mh35852/mac"),
+           ("Chính sách quyền riêng tư của Tidymint (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
+  related=[("Mintangle: xếp cửa sổ bằng phím tắt", "{HOME}mintangle-xep-cua-so-mac/"), ("Tidymint có an toàn không?", "{HOME}an-toan/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="mintdrop-drop-shelf-mac",
+))
+
+GUIDES.append(dict(
+  lang="en", slug="mintdrop-drop-shelf-mac", topic="start", date="2026-11-06", read="4 min read",
+  title="Gather Files From Anywhere, Move Them at Once | Tidymint",
+  desc="Mintdrop is a floating drop shelf for Mac: shake while dragging or press ⌃⌥S, collect files, then drag them out, move them or trash them, with Undo.",
+  crumb="Mintdrop",
+  h1="Gather Files From Anywhere on One Shelf, Then Move Them All at Once",
+  tldr="Mintdrop is a small shelf that floats on your screen. Drop files from several folders onto it, then <b>drag them out together</b>, <b>move them to a folder</b> or <b>put them in the Trash</b>. The shelf only remembers paths and <b>never copies a file</b>. Part of Tidymint since 0.5.0, off by default, no permission needed.",
+  toc=[("when","When to use it"),("turn-on","Turn on Mintdrop"),("open","Open the shelf"),("select","Select several files"),("handle","Drag out, move, trash"),
+       ("move-or-copy","Does dragging out move or copy?"),("undo","Undo"),("privacy","Privacy"),("faq","FAQ")],
+  body="""<h2 id="when">When to use it</h2>
+<ul><li><b>Gather photos to send</b>: a few in Downloads, a few on the Desktop, one in a project folder. Drop them all on the shelf, then drag the group into Mail or a chat app at once.</li>
+<li><b>Tidy the Desktop</b>: drop the loose files on the shelf and use Move to… to put the whole group in the right folder. Changed your mind? Undo.</li>
+<li><b>Collect leftovers</b>: drop each file you no longer need on the shelf as you find it, then send the group to the Trash in one go.</li></ul>
+<h2 id="turn-on">Turn on Mintdrop</h2>
+<ol class="steps"><li>Open Tidymint and choose <b>TOOLS › Mintdrop</b> in the sidebar.</li><li>Click <b>Turn on</b>. No extra permission is needed.</li></ol>
+<h2 id="open">Open the shelf: 3 ways</h2>
+<ul><li><b>Shake while dragging files</b>: drag one or more files in Finder and shake the pointer a few times. The shelf appears under the pointer; let go and the files land on it. You can turn this off on the Mintdrop page.</li>
+<li><b>Shortcut ⌃⌥S</b> (Control, Option, S) shows or hides the shelf.</li>
+<li>The <b>Open shelf</b> button on the Mintdrop page.</li></ul>
+<p>Photos, videos and PDFs show a thumbnail. Press <b>Space</b> for Quick Look, double-click to open. <b>⌘W</b> hides the shelf and keeps its files.</p>
+<h2 id="select">Select several files (like Finder)</h2>
+<ul><li>Click selects one file. <b>⌘</b>-click adds or removes one. <b>Shift</b>-click selects a range.</li>
+<li>Drag on the empty part of the list to draw a selection box.</li>
+<li><b>⌘A</b> selects all, <b>Esc</b> clears the selection.</li></ul>
+<p>With nothing selected, every action applies to the whole shelf. With a selection, only to the selected files.</p>
+<h2 id="handle">Drag out, move, trash</h2>
+<ul><li><b>Drag out</b>: dragging one file moves just that file. To drag several at once, select them first (⌘ or Shift), then drag any file in the selection. The <b>Drag all N out</b> bar at the bottom carries the whole shelf (or the current selection).</li>
+<li><b>Move to…</b>: pick a folder and the files move there. If a name is taken, the new file gets a number ("Report 2.pdf"); nothing is overwritten.</li>
+<li><b>Move to Trash</b>: like every clean in Tidymint, files only go to the macOS Trash.</li>
+<li>The minus next to each row and the X at the top only <b>take files off the shelf</b>; the files are not deleted.</li></ul>
+<h2 id="move-or-copy">Does dragging out move or copy?</h2>
+<p>The shelf does not decide. Where you drop decides, exactly as when you drag in Finder:</p>
+<div class="tbl"><table><tr><th>Drop onto</th><th>Result</th></tr>
+<tr><td>A folder on the same disk</td><td><b>Move</b> (like cut and paste). The file leaves its old place and drops off the shelf</td></tr>
+<tr><td>A folder on another disk (external drive, USB)</td><td><b>Copy</b>. The original stays where it was, and on the shelf</td></tr>
+<tr><td>Holding Option while dropping in Finder</td><td><b>Copy</b></td></tr>
+<tr><td>An app (Mail, a chat app, a browser upload box)</td><td>The app takes a copy to attach or upload; the original is unchanged</td></tr></table></div>
+<p>The <b>Move to…</b> button always moves.</p>
+<h2 id="undo">Undo</h2>
+<p>After each action, the status line at the bottom of the shelf offers <b>Undo</b>:</p>
+<ul><li>Dragged out to a folder on the same disk, or <b>Move to…</b>: the files go back where they were and back on the shelf.</li>
+<li><b>Move to Trash</b>: the files come back from the Trash.</li></ul>
+<p>Limits: only the <b>last</b> action can be undone. Undo never overwrites: if a file with the same name now sits in the old place, that file is skipped and the shelf says so. Once the Trash is emptied, nothing comes back.</p>
+<h2 id="privacy">Privacy</h2>
+<p>Mintdrop needs no macOS permission. While a mouse button is held, it only checks whether files are being dragged, and only then follows the pointer to notice a shake. It never reads file contents and sends nothing. Details: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
+""",
+  faq=[("Does Mintdrop copy my files?", "No. The shelf only remembers where files are. A file is copied only when you drag it to another disk or hold Option while dropping, exactly as in Finder."),
+       ("Shaking does not open the shelf?", "Check that Mintdrop and Shake while dragging are both on, on the Mintdrop page. Shake while still holding the files. The sure way is ⌃⌥S."),
+       ("⌃⌥S does nothing?", "Another app may hold that shortcut; the Mintdrop page says so. Open the shelf by shaking, or free the shortcut in the other app.")],
+  sources=[("Apple: Drag and drop items on Mac (hold Option to copy)", "https://support.apple.com/guide/mac-help/mh35852/mac"),
+           ("Tidymint privacy policy (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
+  related=[("Mintangle: arrange windows with shortcuts", "{HOME}mintangle-window-tiling-mac/"), ("Is Tidymint safe?", "{HOME}safety/"), ("Tidymint home", "{HOME}")],
+  alt="mintdrop-ke-tha-file-mac",
+))
+
+_MT_KEYS = [("Nửa trái / phải", "Left / right half", "⌃⌥ ← / →"), ("Nửa trên / dưới", "Top / bottom half", "⌃⌥ ↑ / ↓"),
+            ("Góc trên trái, trên phải, dưới trái, dưới phải", "Top left, top right, bottom left, bottom right", "⌃⌥ U, I, J, K"),
+            ("1/3 trái, giữa, phải", "First, center, last third", "⌃⌥ D, F, G"), ("2/3 trái, phải", "First, last two thirds", "⌃⌥ E, T"),
+            ("Phóng to hết", "Maximize", "⌃⌥ Return"), ("Gần kín màn hình", "Almost maximize", "⌃⌥⇧ Return"), ("Cao hết màn hình", "Maximize height", "⌃⌥⇧ ↑"),
+            ("Căn giữa", "Center", "⌃⌥ C"), ("To thêm / nhỏ lại", "Larger / smaller", "⌃⌥ = / −"), ("Trả về cỡ cũ", "Restore", "⌃⌥ Delete"),
+            ("Sang màn hình kế tiếp / trước", "Next / previous display", "⌃⌥⌘ → / ←")]
+def _mt_table(vi):
+    head = "<tr><th>Thao tác</th><th>Phím tắt</th></tr>" if vi else "<tr><th>Action</th><th>Shortcut</th></tr>"
+    return '<div class="tbl"><table>' + head + "".join("<tr><td>%s</td><td><code>%s</code></td></tr>" % (a if vi else b, k) for a, b, k in _MT_KEYS) + "</table></div>"
+
+GUIDES.append(dict(
+  lang="vi", slug="mintangle-xep-cua-so-mac", topic="start", date="2026-11-06", read="4 phút đọc",
+  title="Xếp cửa sổ Mac gọn chỉ với một phím: Mintangle | Tidymint",
+  desc="Mintangle xếp cửa sổ Mac thành nửa, 1/4, 1/3, 2/3 bằng phím tắt hoặc kéo vào mép màn hình. Mặc định tắt, chỉ hỏi quyền Trợ năng khi bạn bật lên.",
+  crumb="Mintangle",
+  h1="Xếp mọi cửa sổ vào đúng chỗ chỉ với một phím bấm",
+  tldr="Mintangle đặt cửa sổ vào nửa màn hình, một góc, 1/3 hoặc 2/3 chỉ bằng một phím tắt, hoặc khi bạn kéo cửa sổ vào mép màn hình. Bộ phím giống Rectangle nên ai quen Rectangle dùng được ngay. Có trong Tidymint từ bản 0.5.0, <b>mặc định tắt</b>, chỉ khi bạn bật thì macOS mới hỏi quyền <b>Trợ năng</b>.",
+  toc=[("vi-sao","macOS đã có sẵn, sao cần Mintangle?"),("bat","Bật và cấp quyền"),("phim-tat","Phím tắt mặc định"),("keo","Kéo cửa sổ vào mép"),
+       ("tuy-chinh","Đổi phím tắt và tuỳ chọn"),("rieng-tu","Quyền Trợ năng dùng để làm gì"),("faq","Câu hỏi thường gặp")],
+  body="""<h2 id="vi-sao">macOS đã có sẵn, sao cần Mintangle?</h2>
+<p>Từ macOS 15, Apple có sẵn xếp cửa sổ: kéo vào mép, menu Cửa sổ, và phím tắt Fn-Control kèm phím mũi tên cho nửa màn hình. Nhưng phím tắt của Apple <b>không có cho 4 góc và không chia 1/3</b>. Mintangle bổ sung đúng phần đó, và dùng được cả trên macOS 14.</p>
+<h2 id="bat">Bật và cấp quyền</h2>
+<ol class="steps"><li>Trong Tidymint, chọn <b>CÔNG CỤ › Mintangle</b> ở thanh bên, bấm <b>Bật và cấp quyền</b>.</li>
+<li>macOS hiện hộp thoại hỏi quyền. Mở <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật › Trợ năng</b> (Accessibility), bật công tắc cạnh Tidymint.</li>
+<li>Quay lại Tidymint: trang Mintangle tự nhận quyền và bắt đầu chạy.</li></ol>
+<h2 id="phim-tat">Phím tắt mặc định</h2>
+<p>⌃ là Control, ⌥ là Option, ⇧ là Shift, ⌘ là Command.</p>
+""" + _mt_table(True) + """
+<p><b>Ít phím phải nhớ</b>: với nửa màn hình và góc, bấm lại cùng phím tắt thì đổi độ rộng: 1/2 › 2/3 › 1/3. Mục Cách hoạt động cho chọn kiểu khác, ví dụ sang màn hình kế bên.</p>
+<h2 id="keo">Kéo cửa sổ vào mép</h2>
+<div class="tbl"><table><tr><th>Kéo cửa sổ tới</th><th>Cửa sổ thành</th></tr>
+<tr><td>Mép trái hoặc phải</td><td>Nửa màn hình bên đó</td></tr><tr><td>Mép trên</td><td>Phóng to hết</td></tr>
+<tr><td>Một góc</td><td>1/4 màn hình ở góc đó</td></tr><tr><td>Mép dưới</td><td>1/3 màn hình, trái, giữa hay phải tuỳ chỗ con trỏ</td></tr></table></div>
+<p>Khung màu bạc hà hiện trước chỗ cửa sổ sẽ nằm. Kéo cửa sổ ra khỏi mép thì nó trở về cỡ cũ.</p>
+<p>macOS 15 trở lên cũng có xếp cửa sổ khi kéo vào mép. Để hai cái không chồng nhau, tắt mục <b>Drag windows to left or right edge of screen to tile</b> trong <b>Cài đặt hệ thống › Màn hình nền &amp; Dock</b>. Khi tính năng này của macOS đang bật, trang Mintangle hiện dòng <b>Xếp cửa sổ của macOS cũng đang bật</b> trong phần Kéo vào mép màn hình, kèm nút <b>Mở Cài đặt</b> đưa thẳng tới chỗ đó.</p>
+<h2 id="tuy-chinh">Đổi phím tắt và tuỳ chọn</h2>
+<ul><li><b>Đổi phím</b>: bấm vào một dòng, gõ tổ hợp mới. Tổ hợp phải có <b>Control hoặc Command</b>, vì từ macOS 15 Apple không nhận phím tắt toàn hệ thống chỉ có Option hay Shift. Phím trùng với phím tắt của macOS thì Mintangle báo và có nút mở cài đặt Bàn phím.</li>
+<li><b>Khoảng cách giữa các cửa sổ</b>: 0 tới 20 điểm.</li>
+<li><b>App không áp dụng</b>: Mintangle bỏ qua cửa sổ của các app trong danh sách.</li>
+<li><b>Khôi phục mặc định</b> trả bộ phím về như bảng trên.</li></ul>
+<h2 id="rieng-tu">Quyền Trợ năng dùng để làm gì</h2>
+<p>Theo Apple, quyền Trợ năng cho phép app điều khiển máy, và bạn chỉ nên cấp cho app mình tin. Tidymint dùng quyền này để đọc vị trí, kích thước cửa sổ và dời, đổi cỡ chúng: cửa sổ đang mở phía trước khi bạn bấm phím tắt, và cửa sổ dưới con trỏ khi bạn kéo. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ (phím tắt đăng ký với macOS, macOS chỉ báo khi đúng phím của Mintangle được bấm), không gửi gì đi. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư &amp; Bảo mật › Trợ năng, lúc nào cũng được. Chi tiết: <a href="{HOME}an-toan/">Tidymint có an toàn không</a>.</p>
+""",
+  faq=[("Phím tắt không chạy?", "Kiểm tra Tidymint đã được bật trong Quyền riêng tư & Bảo mật › Trợ năng. Nếu trang Mintangle báo phím bị app khác giữ, bấm vào dòng đó để chọn phím khác, hoặc thoát app kia (Rectangle, Magnet)."),
+       ("Có cửa sổ không xếp được?", "Một số app đặt cỡ tối thiểu hoặc không cho đổi cỡ, khi đó cửa sổ chỉ được dời, không co lại vừa khung. Bạn có thể thêm app đó vào danh sách App không áp dụng."),
+       ("Đã cấp quyền mà vẫn không chạy?", "Vào Quyền riêng tư & Bảo mật › Trợ năng, tắt công tắc Tidymint rồi bật lại, sau đó mở lại Tidymint. macOS đôi khi giữ quyền cũ sau khi app được cập nhật."),
+       ("Tắt Mintangle thì sao?", "Phím tắt và kéo xếp ngừng ngay. Quyền Trợ năng vẫn nằm trong Cài đặt cho tới khi bạn tự tắt, Tidymint không dùng tới nó.")],
+  sources=[("Apple: Cho phép app trợ năng truy cập máy Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
+           ("Apple: Xếp cửa sổ trên Mac", "https://support.apple.com/guide/mac-help/mchlef287e5d/mac"),
+           ("Apple: Phím tắt xếp cửa sổ", "https://support.apple.com/guide/mac-help/mchl9674d0b0/mac"),
+           ("Apple: Cài đặt Màn hình nền & Dock", "https://support.apple.com/guide/mac-help/mchlp1119/mac")],
+  related=[("Mintdrop: kệ thả file", "{HOME}mintdrop-ke-tha-file-mac/"), ("Tidymint có gửi dữ liệu đi không?", "{HOME}quyen-rieng-tu-tidymint/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="mintangle-window-tiling-mac",
+))
+
+GUIDES.append(dict(
+  lang="en", slug="mintangle-window-tiling-mac", topic="start", date="2026-11-06", read="4 min read",
+  title="Snap Mac Windows Into Place With One Key | Tidymint",
+  desc="Mintangle tiles Mac windows into halves, quarters, thirds and two thirds with shortcuts or by dragging to a screen edge. Off by default, asks only when on.",
+  crumb="Mintangle",
+  h1="Put Every Window in Its Place With One Shortcut",
+  tldr="Mintangle puts a window in a half, a corner, a third or two thirds of the screen with one shortcut, or when you drag it to a screen edge. The keys match Rectangle, so Rectangle users feel at home. Part of Tidymint since 0.5.0, <b>off by default</b>; macOS asks for <b>Accessibility</b> permission only when you turn it on.",
+  toc=[("why","macOS has tiling, so why Mintangle?"),("turn-on","Turn on and grant permission"),("shortcuts","Default shortcuts"),("drag","Drag windows to an edge"),
+       ("customize","Change shortcuts and options"),("privacy","What the Accessibility permission is for"),("faq","FAQ")],
+  body="""<h2 id="why">macOS has tiling, so why Mintangle?</h2>
+<p>Since macOS 15, Apple tiles windows when you drag them to an edge, from the Window menu, and with Fn-Control plus an arrow key for halves. But Apple's shortcuts have <b>no keys for the four corners and no thirds</b>. Mintangle adds exactly that, and also works on macOS 14.</p>
+<h2 id="turn-on">Turn on and grant permission</h2>
+<ol class="steps"><li>In Tidymint, choose <b>TOOLS › Mintangle</b> in the sidebar and click <b>Turn on and grant permission</b>.</li>
+<li>macOS asks for permission. Open <b>System Settings › Privacy &amp; Security › Accessibility</b> and switch Tidymint on.</li>
+<li>Back in Tidymint, the Mintangle page picks up the permission and starts working.</li></ol>
+<h2 id="shortcuts">Default shortcuts</h2>
+<p>⌃ is Control, ⌥ is Option, ⇧ is Shift, ⌘ is Command.</p>
+""" + _mt_table(False) + """
+<p><b>Fewer keys to remember</b>: for halves and corners, pressing the same shortcut again changes the width: 1/2 › 2/3 › 1/3. Behavior lets you pick another option, such as moving to the next display.</p>
+<h2 id="drag">Drag windows to an edge</h2>
+<div class="tbl"><table><tr><th>Drag the window to</th><th>It becomes</th></tr>
+<tr><td>Left or right edge</td><td>That half of the screen</td></tr><tr><td>Top edge</td><td>Maximized</td></tr>
+<tr><td>A corner</td><td>A quarter, in that corner</td></tr><tr><td>Bottom edge</td><td>A third: left, center or right, depending on the pointer</td></tr></table></div>
+<p>A mint outline shows where the window will land. Drag it away from the edge and it goes back to its old size.</p>
+<p>macOS 15 and later also tile when you drag to an edge. To keep the two from overlapping, turn off <b>Drag windows to left or right edge of screen to tile</b> in <b>System Settings › Desktop &amp; Dock</b>. While it is on, the Mintangle page shows <b>macOS window tiling is also on</b> under Drag to screen edges, with an <b>Open Settings</b> button that takes you there.</p>
+<h2 id="customize">Change shortcuts and options</h2>
+<ul><li><b>Change a key</b>: click a row and press the new combination. It must include <b>Control or Command</b>, because since macOS 15 Apple refuses system-wide shortcuts that use only Option or Shift. If a key matches a macOS shortcut, Mintangle warns you and offers to open Keyboard settings.</li>
+<li><b>Gap between windows</b>: 0 to 20 points.</li>
+<li><b>Apps to leave alone</b>: Mintangle ignores windows of the apps in this list.</li>
+<li><b>Restore defaults</b> puts the keys back as in the table above.</li></ul>
+<h2 id="privacy">What the Accessibility permission is for</h2>
+<p>Apple says Accessibility lets an app control your Mac, and that you should grant it only to apps you trust. Tidymint uses it to read the position and size of windows and to move or resize them: the front window when you press a shortcut, and the window under the pointer when you drag it. Tidymint does not read what is inside windows, does not record your keystrokes (shortcuts are registered with macOS, which tells Tidymint only when one of its own keys is pressed), and sends nothing. Turn Mintangle off, or switch Tidymint off in Privacy &amp; Security › Accessibility, at any time. Details: <a href="{HOME}safety/">Is Tidymint safe?</a></p>
+""",
+  faq=[("A shortcut does nothing?", "Check that Tidymint is on in Privacy & Security › Accessibility. If the Mintangle page says a key is taken by another app, click that row to pick another key, or quit the other app (Rectangle, Magnet)."),
+       ("Some window will not tile?", "Some apps set a minimum size or cannot be resized; then the window is moved but not shrunk to fit. You can add that app to Apps to leave alone."),
+       ("Permission granted but nothing happens?", "In Privacy & Security › Accessibility, switch Tidymint off and on again, then reopen Tidymint. macOS sometimes keeps a stale permission after an app update."),
+       ("What happens if I turn Mintangle off?", "Shortcuts and drag tiling stop at once. The Accessibility switch stays in System Settings until you turn it off; Tidymint no longer uses it.")],
+  sources=[("Apple: Allow accessibility apps to access your Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
+           ("Apple: Tile windows on Mac", "https://support.apple.com/guide/mac-help/mchlef287e5d/mac"),
+           ("Apple: Window tiling keyboard shortcuts", "https://support.apple.com/guide/mac-help/mchl9674d0b0/mac"),
+           ("Apple: Desktop & Dock settings", "https://support.apple.com/guide/mac-help/mchlp1119/mac")],
+  related=[("Mintdrop: a drop shelf", "{HOME}mintdrop-drop-shelf-mac/"), ("Does Tidymint send your data anywhere?", "{HOME}tidymint-privacy/"), ("Tidymint home", "{HOME}")],
+  alt="mintangle-xep-cua-so-mac",
 ))

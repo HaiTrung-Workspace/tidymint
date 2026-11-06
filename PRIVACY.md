@@ -22,6 +22,10 @@ When the Tidymint window opens, at most once a day, it asks update.tidymint.app 
 
 You can turn the daily check off in Settings > **Check for new versions automatically** (from 0.4.0). With it off, the app only asks when you press **Check Now**.
 
+## Accessibility permission (Mintangle, from 0.5.0)
+
+Mintangle is off by default. Only when you turn it on does Tidymint ask macOS for Accessibility permission. It uses it to read the position and size of windows and to move or resize them: the front window when you press a Mintangle shortcut, and the window under the pointer when you click and drag it (to know whether it reaches a screen edge). It does not read what is inside windows and does not record the keys you type: shortcuts are registered with macOS, which tells Tidymint only when one of its own shortcuts is pressed. Nothing is sent anywhere. Apple notes that this permission is broad, so you can turn Mintangle off, or switch Tidymint off in System Settings > Privacy & Security > Accessibility, at any time. Mintdrop needs no extra permission: while the mouse button is held it checks whether files are being dragged, and only then follows the pointer, to notice a shake.
+
 ## Newsletter
 
 You only join the newsletter by clicking **Send & get the newsletter** or **Subscribe**. Nothing is pre-ticked. The newsletter covers Mac tips, AI tools and drinks (concao.org). Every issue has an unsubscribe link, and you can ask for your data to be deleted at any time through **Contact**.
