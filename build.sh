@@ -87,10 +87,14 @@ if [ "$1" = "--dev" ]; then
     echo "Run it from: $APP   (or FORCE_DEV_INSTALL=1 ./build.sh --dev to replace it)"
     exit 0
   fi
-  mkdir -p "$HOME/Applications"; osascript -e "quit app \"$DEST\"" 2>/dev/null || true
+  mkdir -p "$HOME/Applications"
+  # Quit only the Dev copy (by bundle id; both copies are named Tidymint) and reopen it after, so it keeps running in the background.
+  WAS_RUNNING=0; pgrep -f "Tidymint Dev.app/Contents/MacOS" >/dev/null && WAS_RUNNING=1
+  osascript -e 'tell application id "com.haitrung.diskcleanup.dev" to quit' 2>/dev/null || true
   rm -rf "$DEST"; cp -R "$APP" "$HOME/Applications/"
   # Refresh the icon Finder and the Dock show (they cache the old one otherwise).
   touch "$DEST"
   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST" 2>/dev/null || true
+  [ "$WAS_RUNNING" = 1 ] && { sleep 1; open -g "$DEST"; echo "Reopened: $DEST"; }
   echo "Installed: $DEST ($NEW_V)"
 fi

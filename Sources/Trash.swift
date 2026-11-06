@@ -86,8 +86,12 @@ extension VM {
             let trashes = local + vols.filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
                 .map { $0.appendingPathComponent(".Trashes/\(uid)") }
                 .filter { FileManager.default.fileExists(atPath: $0.path) && VM.isRealDriveTrash($0.deletingLastPathComponent()) }
-            // One walk per Trash: (count, size).
-            let each = trashes.map { (Scanner.children($0, hidden: false).count, Scanner.size($0)) }
+            // One walk per Trash: (count, size). Both skip hidden files: Finder leaves a .DS_Store in an empty drive Trash
+            // (seen 06/11/2026), which made an empty Trash read "8 KB".
+            let each = trashes.map { tr -> (Int, Int64) in
+                let kids = Scanner.children(tr, hidden: false)
+                return (kids.count, kids.reduce(Int64(0)) { $0 + Scanner.size($1) })
+            }
             let s = each.reduce(Int64(0)) { $0 + $1.1 }, c = each.reduce(0) { $0 + $1.0 }
             let drives: [(String, Int, Int64)] = zip(trashes, each).dropFirst(local.count).compactMap { u, e in
                 e.0 == 0 ? nil : (u.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent, e.0, e.1)
@@ -159,6 +163,8 @@ extension VM {
     /// Put everything from the last run back where it was (only items still sitting in the Trash).
     func undoLast() {
         guard let s = undoable else { return }
+        // Demo sessions live only in memory: never touch the real Undo journal or activity log.
+        if Demo.active { undoable = nil; return }
         let needsPassword = s.entries.contains { ((try? FileManager.default.attributesOfItem(atPath: $0.to)[.ownerAccountID] as? NSNumber)?.intValue) == 0 }
         guard confirm(t("Undo the last clean\(sessionName(s))?", "Hoàn tác lần dọn vừa rồi\(sessionName(s))?"),
                       t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ.")
