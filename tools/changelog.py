@@ -3,6 +3,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.5.0", date="2026-11-06", status="released",
+         vt=dict(score="0/67", date="2026-11-06", sha="ae9f12026b3c3a81e5796847d39bee495290ba70bc832de93ed1761921d55b4d"),
          en=['New: Mintangle arranges windows with keyboard shortcuts (halves, quarters, thirds, two thirds, maximize, center, next screen) or by dragging a window to an edge or corner. Shortcuts can be changed. Off by default; macOS asks for Accessibility permission only when you turn it on',
              'New: Mintdrop, a drop shelf. Shake the pointer while dragging files, or press ⌃⌥S, to collect files from several places, then drag them out together, move them to a folder, or put them in the Trash with Undo. Off by default, nothing is copied',
              'Show instead of hide: Clean Now lists every folder that holds something, with items under 500 KB folded into one row you can select instead of being left out. The Uninstaller shows Apple and protected apps (locked). Large Files includes hidden files (tagged)',
