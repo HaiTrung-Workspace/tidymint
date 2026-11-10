@@ -1,0 +1,78 @@
+name: Bug report
+description: Something in Tidymint does not work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. English or Tiếng Việt are both fine.
+        For a security problem, please do not open a public issue: use the private report link on the "New issue" page.
+  - type: input
+    id: version
+    attributes:
+      label: Tidymint version
+      description: Settings > Updates and about, or Tidymint > About.
+      placeholder: "0.5.1"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac model
+      placeholder: "macOS 15.6, MacBook Air M2"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options:
+        - Downloaded Tidymint.zip from GitHub
+        - Homebrew
+        - Built from source
+    validations:
+      required: true
+  - type: dropdown
+    id: fda
+    attributes:
+      label: Is Full Disk Access granted to Tidymint?
+      description: System Settings > Privacy & Security > Full Disk Access.
+      options:
+        - "Yes"
+        - "No"
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does it happen?
+      options:
+        - Clean Now / Cleanup
+        - Clean by App
+        - Duplicates
+        - Large Files
+        - Space Lens
+        - Uninstaller
+        - Trash / Undo
+        - Mintangle (window tiling)
+        - Mintdrop (drop shelf)
+        - Menu bar
+        - Settings / Updates
+        - Install / first launch
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you saw instead. Screenshots help. Please hide personal file names if you prefer.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Activity log (optional)
+      description: "The last lines of ~/Library/Application Support/Tidymint/activity.log. It stays on your Mac unless you paste it here; remove anything private first."
+      render: text
