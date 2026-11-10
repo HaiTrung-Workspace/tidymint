@@ -1957,7 +1957,7 @@ GUIDES.append(dict(
   crumb="An toàn và minh bạch",
   h1="Tidymint có an toàn không? Đây là bằng chứng, và cách bạn tự kiểm",
   tldr="Các app dọn máy được đọc cả ổ đĩa, nên bạn - người dùng ứng dụng có quyền và đồng thời cũng cần hiểu, nắm rõ mọi thông tin và cách hoạt động của chúng. Bài viết này gom mọi thứ Tidymint đã, đang và sẽ tiếp tục thực hiện để bạn yên tâm sử dụng: <b>5 lời hứa</b> kèm cách tự kiểm tra, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 65 phần mềm diệt virus cùng quét và không phần mềm nào phát hiện vấn đề), <b>các bước mỗi bản cập nhật mới đều phải đi qua</b>. Không cần rành công nghệ để biết, Tidymint sẽ giải thích và hướng dẫn bạn chi tiết.",
-  toc=[("loi-hua", "5 lời hứa của Tidymint, và cách kiểm tra"), ("ai-da-kiem", "Những ai đã kiểm tra Tidymint"), ("quy-trinh", "Một bản mới phải qua những bước nào"), ("tu-kiem-file", "Cách bạn tự kiểm file vừa tải về"), ("chua-co", "Tidymint chưa có gì?"), ("nhat-ky", "Nhật ký minh bạch"), ("bao-loi", "Thấy lỗi bảo mật?"), ("faq", "Câu hỏi thường gặp")],
+  toc=[("loi-hua", "5 lời hứa của Tidymint, và cách kiểm tra"), ("ai-da-kiem", "Những ai đã kiểm tra Tidymint"), ("quy-trinh", "Một bản mới phải qua những bước nào"), ("tu-kiem-file", "Cách bạn tự kiểm file vừa tải về"), ("khong-dung", "Những thứ Tidymint không bao giờ đụng"), ("chua-co", "Tidymint chưa có gì?"), ("nhat-ky", "Nhật ký minh bạch"), ("bao-loi", "Thấy lỗi bảo mật?"), ("faq", "Câu hỏi thường gặp")],
   body="""
 <h2 id="loi-hua">5 lời hứa của Tidymint, và cách kiểm tra</h2>
 <p>Không chỉ nghe lời nói, hãy nhìn vào hành động.</p>
@@ -1997,6 +1997,9 @@ GUIDES.append(dict(
 <li><b>So mã kiểm tra</b>: bấm <b>Cmd + Space</b>, gõ <b>Terminal</b>, nhấn Enter. Dán dòng dưới rồi nhấn Enter:<br><code>shasum -a 256 ~/Downloads/Tidymint.zip</code><br>Máy in ra một dãy 64 ký tự. So với dòng <b>SHA-256</b> trên trang phát hành: khớp từng ký tự là file không bị ai sửa.</li>
 <li><b>Xem kết quả quét virus</b>: mở link VirusTotal trên trang phát hành, hoặc tự kéo file vào <a href="https://www.virustotal.com/">virustotal.com</a> để tự kiểm chứng.</li>
 </ol>
+
+<h2 id="khong-dung">Những thứ Tidymint không bao giờ đụng, đọc thẳng từ code</h2>
+{SAFETY_RULES}
 
 <h2 id="chua-co">Tidymint chưa có gì?</h2>
 <ul>
@@ -2043,7 +2046,7 @@ GUIDES.append(dict(
   crumb="Safety and transparency",
   h1="Is Tidymint safe? Here is the evidence, and how you can check it yourself",
   tldr="Mac cleaners can read your whole disk, so you have the right, and the need, to understand exactly what they do and how they work. This page gathers everything Tidymint has done, is doing and will keep doing so you can use it with peace of mind: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 65 antivirus engines scanned it and none found a problem), and <b>the steps every new update goes through</b>. You don't need to be technical: Tidymint explains and walks you through each part.",
-  toc=[("promises", "Tidymint's 5 promises, and how to check them"), ("checked-by", "Who has checked Tidymint"), ("release-steps", "What every new version goes through"), ("verify-download", "How to check the file you downloaded"), ("not-yet", "What Tidymint doesn't have yet"), ("log", "Transparency log"), ("report", "Found a security issue?"), ("faq", "FAQ")],
+  toc=[("promises", "Tidymint's 5 promises, and how to check them"), ("checked-by", "Who has checked Tidymint"), ("release-steps", "What every new version goes through"), ("verify-download", "How to check the file you downloaded"), ("never", "What Tidymint never touches, read from the code"), ("not-yet", "What Tidymint doesn't have yet"), ("log", "Transparency log"), ("report", "Found a security issue?"), ("faq", "FAQ")],
   body="""
 <h2 id="promises">Tidymint's 5 promises, and how to check them</h2>
 <p>Don't just listen to what we say. Look at what we do.</p>
@@ -2083,6 +2086,9 @@ GUIDES.append(dict(
 <li><b>Compare the fingerprint</b>: press <b>Cmd + Space</b>, type <b>Terminal</b>, press Return. Paste the line below and press Return:<br><code>shasum -a 256 ~/Downloads/Tidymint.zip</code><br>You'll see a 64-character string. Compare it with the <b>SHA-256</b> line on the release page: if every character matches, the file hasn't been changed.</li>
 <li><b>See the virus scan</b>: open the VirusTotal link on the release page, or drop the file on <a href="https://www.virustotal.com/">virustotal.com</a> to check it yourself.</li>
 </ol>
+
+<h2 id="never">What Tidymint never touches, read from the code</h2>
+{SAFETY_RULES}
 
 <h2 id="not-yet">What Tidymint doesn't have yet</h2>
 <ul>
