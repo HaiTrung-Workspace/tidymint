@@ -111,7 +111,11 @@ def guide(g):
         vh, vrows = VS[k]
         cta = ('<div class="mvt"><h3>%s</h3><div class="tbl"><table><tr><th></th><th>%s</th><th>Tidymint</th></tr>%s</table></div></div>'
                % (vh, vrows[0], "".join('<tr><td><b>%s</b></td><td data-l="%s">%s</td><td class="y" data-l="Tidymint">%s</td></tr>' % (r[0], vrows[0], r[1], r[2]) for r in vrows[1:]))) + cta
-    body = g["body"].replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
+    body = g["body"]
+    if "{SAFETY_RULES}" in body:
+        import safety_gen
+        body = body.replace("{SAFETY_RULES}", safety_gen.html_for(k))
+    body = body.replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
     fcols = "".join('<div><h3>%s</h3>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
     strip = lambda s: html.unescape(__import__("re").sub("<[^>]+>", "", s))
     ld = [
