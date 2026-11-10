@@ -1,0 +1,50 @@
+name: Build check
+
+# Compiles the app on every change to the code, so a build error is caught before a release.
+# Read-only: no secrets, nothing is published. Releases are made by release.yml only.
+on:
+  push:
+    branches: [main, 'release/**']
+    paths: ['Sources/**', 'Resources/**', 'build.sh', 'VERSION', '.github/workflows/build.yml']
+  pull_request:
+    paths: ['Sources/**', 'Resources/**', 'build.sh', 'VERSION', '.github/workflows/build.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      # Pinned to a commit (v4.4.0): a tag can be moved, a commit cannot.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      # Same fixed Xcode as release.yml, so this check compiles with the compiler a release uses.
+      - name: Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+          swiftc --version
+
+      - name: Build (universal, as a release does)
+        run: ./build.sh --release
+
+      - name: Check the app
+        run: |
+          APP="build/Tidymint.app"
+          ARCHS="$(lipo -archs "$APP/Contents/MacOS/Tidymint")"; echo "$ARCHS"
+          [[ "$ARCHS" == *x86_64* && "$ARCHS" == *arm64* ]]
+          codesign --verify --deep --strict "$APP"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist")" = "$(cat VERSION)"
+
+      - name: Project rules
+        run: |
+          # swiftc from the command line has no SwiftUI macro plugin: @State breaks the build on some setups.
+          # (lines that are comments are ignored)
+          ! grep -nE '^[^/]*@State[ (]' Sources/*.swift
