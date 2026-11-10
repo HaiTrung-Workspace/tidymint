@@ -293,6 +293,8 @@ docker system df</pre>
 <ul>
 <li>liệt kê <b>bộ nhớ đệm npm</b> và bộ nhớ đệm của bạn (gồm cả Homebrew, pip) trong <b>Dọn ngay</b>, chia nhóm, giải thích trước khi bạn bấm Dọn;</li>
 <li>dọn thư mục <code>_to_delete</code>, <code>_tmp</code> trong các <b>thư mục dự án</b> bạn khai ở Cài đặt;</li>
+<li>tìm <b>thư viện của dự án bỏ yên 6 tháng</b> (node_modules, môi trường Python, thư mục build) trong các thư mục dự án đó, cùng các bản sao làm việc Git do Git hoặc công cụ AI viết code bỏ lại. Không tick sẵn, và Tidymint kiểm lại ngay lúc bạn bấm Dọn (từ bản 0.5.2);</li>
+<li>liệt kê <b>mô hình AI chạy trên máy</b> (Ollama, Hugging Face, LM Studio) trong <b>Dọn theo ứng dụng</b>, mỗi mô hình một dòng. File dùng chung giữa các mô hình hiện riêng và chỉ đi khi mọi mô hình dùng nó đều được chọn. Khoá và mã đăng nhập luôn bị khoá (từ bản 0.5.2);</li>
 <li>ghi chú dễ hiểu trong <b>Bản đồ ổ đĩa</b> cho DerivedData, CoreSimulator, node_modules, iOS DeviceSupport, <code>.ollama</code>, Hugging Face, để biết bong bóng to là gì trước khi xử lý;</li>
 <li>kiểm thư mục dự án trước khi xoá <a href="../xoa-file-trung-mac/">file trùng</a> mà script vẫn đang dùng.</li>
 </ul>

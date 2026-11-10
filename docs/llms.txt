@@ -1,6 +1,6 @@
 # Tidymint
 
-> Tidymint is a free, open-source (MIT) disk cleaner for macOS 14+, for Apple silicon and Intel Macs. Clean Now scans, shows what is safe to clean by group, and cleans only when the user presses Clean. It also cleans per app (Zalo, Chrome, Edge, Cốc Cốc, CapCut), uninstalls apps with their leftovers, finds large and duplicate files, maps disk usage, and lists startup items with their code signature. Every clean goes to the Trash and the last one can be undone. Interface in English and Vietnamese, six colour themes including a light one (Star White). Works offline, no tracking.
+> Tidymint is a free, open-source (MIT) disk cleaner for macOS 14+, for Apple silicon and Intel Macs. Clean Now scans, shows what is safe to clean by group, and cleans only when the user presses Clean. It also cleans per app (Zalo, Chrome, Edge, Cốc Cốc, CapCut) and local AI models one model at a time (Ollama, Hugging Face, LM Studio), finds libraries of projects left alone for 6 months (node_modules, Python environments, build folders) and Git working copies left behind, uninstalls apps with their leftovers, finds large and duplicate files, maps disk usage, and lists startup items with their code signature. Every clean goes to the Trash and the last one can be undone. Interface in English and Vietnamese, six colour themes including a light one (Star White). Works offline, no tracking.
 
 - Website (English): https://tidymint.app/
 - Website (Vietnamese): https://tidymint.app/vi/

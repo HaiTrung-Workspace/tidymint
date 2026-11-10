@@ -293,6 +293,8 @@ docker system df</pre>
 <ul>
 <li>lists the <b>npm cache</b> and your user caches (including Homebrew and pip) in <b>Clean Now</b>, grouped and explained before you press Clean;</li>
 <li>clears <code>_to_delete</code> and <code>_tmp</code> folders inside the <b>project folders</b> you add in Settings;</li>
+<li>finds <b>libraries of projects left alone for 6 months</b> (node_modules, Python environments, build folders) in those project folders, plus Git working copies that Git or an AI coding tool left behind. They are never pre-selected, and Tidymint checks them again the moment you press Clean (from 0.5.2);</li>
+<li>lists your <b>local AI models</b> (Ollama, Hugging Face, LM Studio) in <b>Clean by App</b>, one row per model. Files shared between models are shown apart and go only when every model using them is selected. Keys and sign-in tokens stay locked (from 0.5.2);</li>
 <li>shows plain notes in <b>Space Lens</b> for folders like DerivedData, CoreSimulator, node_modules, iOS DeviceSupport, <code>.ollama</code> and Hugging Face, so you know what a big bubble is before you act;</li>
 <li>checks your project folders before removing <a href="../remove-duplicate-files-mac/">duplicate files</a> a script still uses.</li>
 </ul>
