@@ -151,7 +151,7 @@ dict(
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1085" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. App cài từ App Store hay cài cho mọi tài khoản cũng gỡ được: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS, Tidymint không thấy mật khẩu. Mọi thứ chỉ chuyển vào Thùng rác; đổi ý thì bấm Hoàn tác, app và file đi kèm quay về chỗ cũ.</li>
+<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. App cài từ App Store hay cài cho mọi tài khoản cũng gỡ được: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS, Tidymint không thấy mật khẩu. Mọi thứ chỉ chuyển vào Thùng rác; đổi ý thì bấm Hoàn tác, app và file đi kèm quay về chỗ cũ. Bạn quen tự kéo app vào Thùng rác? Từ bản 0.5.2 có thể bật <b>Gợi ý khi bỏ app vào Thùng rác</b> trong Cài đặt (tắt sẵn): khi đó Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá.</li>
 <li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xoá.</li>
 </ul>
 {CTA}
@@ -1194,7 +1194,7 @@ dict(
 <p>Checking every folder by hand takes time and it's easy to pick the wrong one. Tidymint finds the leftovers for you:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Slack together with its leftover files in Library" width="1600" height="1085" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Apps from the App Store or installed for every user can be removed too: macOS asks for an administrator password in its own window, and Tidymint never sees it. Everything always goes to the Trash first, and Undo puts the app and its files back where they were.</li>
+<li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Apps from the App Store or installed for every user can be removed too: macOS asks for an administrator password in its own window, and Tidymint never sees it. Everything always goes to the Trash first, and Undo puts the app and its files back where they were. Prefer dragging apps to the Trash yourself? From 0.5.2 you can turn on <b>Hint when an app goes to the Trash</b> in Settings (off by default): Tidymint then lists what that app left in Library. Nothing is ticked or removed for you.</li>
 <li><b>AppCleaner</b> (free) and <b>Pearcleaner</b> (free, source available): drop an app on the window and they list its related files for you to remove.</li>
 </ul>
 {CTA}
@@ -1351,6 +1351,8 @@ docker system df</pre>
 <ul>
 <li>lists the <b>npm cache</b> and your user caches (including Homebrew and pip) in <b>Clean Now</b>, grouped and explained before you press Clean;</li>
 <li>clears <code>_to_delete</code> and <code>_tmp</code> folders inside the <b>project folders</b> you add in Settings;</li>
+<li>finds <b>libraries of projects left alone for 6 months</b> (node_modules, Python environments, build folders) in those project folders, plus Git working copies that Git or an AI coding tool left behind. They are never pre-selected, and Tidymint checks them again the moment you press Clean (from 0.5.2);</li>
+<li>lists your <b>local AI models</b> (Ollama, Hugging Face, LM Studio) in <b>Clean by App</b>, one row per model. Files shared between models are shown apart and go only when every model using them is selected. Keys and sign-in tokens stay locked (from 0.5.2);</li>
 <li>shows plain notes in <b>Space Lens</b> for folders like DerivedData, CoreSimulator, node_modules, iOS DeviceSupport, <code>.ollama</code> and Hugging Face, so you know what a big bubble is before you act;</li>
 <li>checks your project folders before removing <a href="{HOME}remove-duplicate-files-mac/">duplicate files</a> a script still uses.</li>
 </ul>
@@ -1443,6 +1445,8 @@ docker system df</pre>
 <ul>
 <li>liệt kê <b>bộ nhớ đệm npm</b> và bộ nhớ đệm của bạn (gồm cả Homebrew, pip) trong <b>Dọn ngay</b>, chia nhóm, giải thích trước khi bạn bấm Dọn;</li>
 <li>dọn thư mục <code>_to_delete</code>, <code>_tmp</code> trong các <b>thư mục dự án</b> bạn khai ở Cài đặt;</li>
+<li>tìm <b>thư viện của dự án bỏ yên 6 tháng</b> (node_modules, môi trường Python, thư mục build) trong các thư mục dự án đó, cùng các bản sao làm việc Git do Git hoặc công cụ AI viết code bỏ lại. Không tick sẵn, và Tidymint kiểm lại ngay lúc bạn bấm Dọn (từ bản 0.5.2);</li>
+<li>liệt kê <b>mô hình AI chạy trên máy</b> (Ollama, Hugging Face, LM Studio) trong <b>Dọn theo ứng dụng</b>, mỗi mô hình một dòng. File dùng chung giữa các mô hình hiện riêng và chỉ đi khi mọi mô hình dùng nó đều được chọn. Khoá và mã đăng nhập luôn bị khoá (từ bản 0.5.2);</li>
 <li>ghi chú dễ hiểu trong <b>Bản đồ ổ đĩa</b> cho DerivedData, CoreSimulator, node_modules, iOS DeviceSupport, <code>.ollama</code>, Hugging Face, để biết bong bóng to là gì trước khi xử lý;</li>
 <li>kiểm thư mục dự án trước khi xoá <a href="{HOME}xoa-file-trung-mac/">file trùng</a> mà script vẫn đang dùng.</li>
 </ul>
@@ -1851,6 +1855,11 @@ GUIDES.append(dict(
 <li><b>Tìm file trùng:</b> app so nội dung từng file bằng một phép tính ra \"dấu vân tay\" của file, cũng ngay trên máy. Ảnh thu nhỏ do macOS tạo sẵn.</li>
 <li><b>Dọn:</b> thứ bạn chọn được chuyển vào <b>Thùng rác</b> của macOS. Không có gì bị gửi lên mạng, cũng không có gì bị xoá thẳng. Đổi ý thì bấm Hoàn tác.</li>
 </ol>
+<p>Hai tính năng thêm ở bản 0.5.2 đọc thêm một chút, vẫn chỉ trên máy bạn:</p>
+<ul>
+<li><b>Gợi ý khi bỏ app vào Thùng rác</b> (tắt sẵn): khi bạn bật, Tidymint theo dõi thư mục Thùng rác trong lúc app đang chạy. Có app rơi vào đó thì Tidymint tìm trong Library các thư mục mang mã định danh của app ấy. Thông báo chỉ hiện tên app và nằm trên máy bạn. Không tick sẵn, không chuyển, không gửi đi đâu.</li>
+<li><b>Thư viện dự án cũ:</b> Tidymint đọc tên và ngày của tệp trong các thư mục dự án bạn khai ở Cài đặt, cùng thư mục bản sao làm việc của Codex và Cursor trong thư mục cá nhân, và hỏi macOS xem chương trình đang chạy làm việc ở thư mục nào, để dự án đang dùng được giữ nguyên.</li>
+</ul>
 <p>Tidymint <b>không có tài khoản</b>, <b>không quảng cáo</b>, <b>không gắn công cụ đo lường</b> (kiểu đếm bạn bấm nút nào, mở app bao lâu). Trừ lúc bạn tự gửi góp ý, không có máy chủ nào biết bạn là ai hay máy bạn có gì.</p>
 
 <h2 id="khi-nao-len-mang">Lúc nào Tidymint kết nối mạng</h2>
@@ -1912,6 +1921,11 @@ GUIDES.append(dict(
 <li><b>Find duplicates:</b> the app compares file contents by computing a \"fingerprint\" for each file, also on your Mac. Thumbnails come from macOS itself.</li>
 <li><b>Clean:</b> whatever you select moves to the macOS <b>Trash</b>. Nothing is uploaded, and nothing is deleted outright. Changed your mind? Click Undo.</li>
 </ol>
+<p>Two features added in 0.5.2 read a little more, still only on your Mac:</p>
+<ul>
+<li><b>Hint when an app goes to the Trash</b> (off by default): when you turn it on, Tidymint watches the Trash folder while it is running. When an app lands there, it looks in your Library for folders named after that app's identifier. The notification shows the app's name and stays on your Mac. Nothing is ticked, moved or sent anywhere.</li>
+<li><b>Old project libraries:</b> Tidymint reads file names and dates inside the project folders you set in Settings, plus the working-copy folders of Codex and Cursor in your home folder, and asks macOS which folders running programs are working in, so a project in use is left alone.</li>
+</ul>
 <p>Tidymint has <b>no account</b>, <b>no ads</b> and <b>no analytics</b> (nothing counts which buttons you click or how long the app is open). Unless you choose to send feedback, no server knows who you are or what is on your Mac.</p>
 
 <h2 id="when-online">When Tidymint goes online</h2>
@@ -1974,7 +1988,7 @@ GUIDES.append(dict(
 <p>Đây là những nơi độc lập, không do Tidymint điều hành. Bấm vào để xem tận nơi.</p>
 <div class="tbl"><table>
 <tr><th>Nơi</th><th>Họ làm gì</th><th>Kết quả</th></tr>
-<tr><td><a href="https://www.virustotal.com/gui/file/4b2f53ad6402ca05ce3ca1e2e839361cb026c0a3429d9bc38b60318b8fdacfce">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.5.1: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 06/11/2026)</td></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/a1df64986e6a0fb8f7e903c225d74929ad90dd36bcbe168a6d16c4a2e9d56eed">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.5.2: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 10/11/2026)</td></tr>
 <tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>Trang độc lập chấm các app dọn dẹp theo từng tiêu chí</td><td>Không theo dõi: None. Chạy quyền cao: Never. Mã công khai: Yes. Chưa ký Apple: ghi đỏ, đúng sự thật (xem mục Tidymint chưa có gì?)</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>Danh sách app Mac chọn lọc trên GitHub, người duyệt xem từng đề cử</td><td>Đã nhận Tidymint (26/10/2026)</td></tr>
 <tr><td>Danh bạ phần mềm</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a>, <a href="https://openmacapps.com/apps/tidymint/">OpenMacApps</a></td><td>Đã duyệt và đăng Tidymint (26/10 tới 06/11/2026)</td></tr>
@@ -2011,6 +2025,7 @@ GUIDES.append(dict(
 <h2 id="nhat-ky">Nhật ký minh bạch</h2>
 <p>Mỗi bước làm Tidymint đáng tin hơn đều được ghi ở đây, mới nhất trên cùng.</p>
 <ul>
+<li><b>10/11/2026</b>: Phát hành 0.5.2, VirusTotal quét 0/66. Thêm mô hình AI chạy trên máy vào Dọn theo ứng dụng, thư viện của dự án bỏ yên vào Dọn ngay, và gợi ý (tắt sẵn) khi kéo app vào Thùng rác. Trước khi phát hành, phần thay đổi được các phiên độc lập rà theo 7 cụm: 39 điểm được nêu, 28 điểm sửa ngay trong bản này (trong đó có lỗi Gỡ app tick sẵn thư mục của app khác có mã gần giống, và Hoàn tác thiếu mục khi thư mục cha và con cùng được dọn), các điểm nhỏ còn lại để bản sau. Dựng trên máy của GitHub, tự quét VirusTotal và tự cập nhật Homebrew trong quy trình phát hành.</li>
 <li><b>06/11/2026</b>: Phát hành 0.5.1, VirusTotal quét 0/66. Bản vá 2 lỗi hiển thị (nút Chọn mọi bản thừa ở File trùng, Thùng rác trống vẫn báo vài KB); phần thay đổi được một phiên độc lập rà trước khi phát hành, lỗi duy nhất tìm thấy nằm ở chế độ chụp ảnh minh hoạ và đã sửa. Dựng trên máy của GitHub, tự quét VirusTotal và tự cập nhật Homebrew trong quy trình phát hành.</li>
 <li><b>06/11/2026</b>: Phát hành 0.5.0, VirusTotal quét 0/67. Bản này được rà code theo 7 nhóm file trước khi khoá, rồi một phiên độc lập soát lại từng mục (34 mục báo, không mục nào bị bác; sửa 13 mục mức cao và vừa, các mục nhẹ còn lại để bản sau). Dựng trên máy của GitHub và tự quét VirusTotal trong quy trình phát hành. Mintangle cần quyền Trợ năng, chỉ khi bạn tự bật; chi tiết trong Chính sách quyền riêng tư. Thêm một lớp chặn: Bản đồ ổ đĩa luôn từ chối chuyển vào Thùng rác các thư mục chuẩn của máy (như Library, Documents) và gốc iCloud Drive.</li>
 <li><b>05/11/2026</b>: Phát hành 0.4.0, VirusTotal quét 0/65. Bản này được một phiên rà code độc lập soát trước khi khoá (tìm 9 lỗi, sửa 7 lỗi mức vừa và nhẹ, không lỗi nào phạm lời hứa của app). Máy build của GitHub quá tải nên bản này được build trên máy của nhà phát triển, từ đúng nhãn v0.4.0 trong kho mã, rồi tải lên VirusTotal để quét trước khi công khai. Sửa lỗi có từ bản trước: trang Thùng rác có thể đếm cả một thư mục trên ổ rời mà Finder không coi là Thùng rác.</li>
@@ -2030,7 +2045,7 @@ GUIDES.append(dict(
        ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
        ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu."),
        ("Mintangle xin quyền Trợ năng để làm gì?", "Để dời và đổi cỡ cửa sổ khi bạn bấm phím tắt hoặc kéo cửa sổ vào mép màn hình. Mintangle tắt sẵn, chỉ khi bạn bật thì macOS mới hỏi quyền. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ, không gửi gì đi. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư & Bảo mật › Trợ năng, lúc nào cũng được.")],
-  sources=[("VirusTotal: kết quả quét Tidymint.zip 0.5.1", "https://www.virustotal.com/gui/file/4b2f53ad6402ca05ce3ca1e2e839361cb026c0a3429d9bc38b60318b8fdacfce"),
+  sources=[("VirusTotal: kết quả quét Tidymint.zip 0.5.2", "https://www.virustotal.com/gui/file/a1df64986e6a0fb8f7e903c225d74929ad90dd36bcbe168a6d16c4a2e9d56eed"),
            ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
            ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
            ("Apple: Mở app an toàn trên máy Mac (Vẫn mở)", "https://support.apple.com/vi-vn/102445"),
@@ -2063,7 +2078,7 @@ GUIDES.append(dict(
 <p>These are independent places, not run by Tidymint. Click through and see for yourself.</p>
 <div class="tbl"><table>
 <tr><th>Where</th><th>What they do</th><th>Result</th></tr>
-<tr><td><a href="https://www.virustotal.com/gui/file/4b2f53ad6402ca05ce3ca1e2e839361cb026c0a3429d9bc38b60318b8fdacfce">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 0.5.1 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 6 Nov 2026)</td></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/a1df64986e6a0fb8f7e903c225d74929ad90dd36bcbe168a6d16c4a2e9d56eed">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 0.5.2 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 10 Nov 2026)</td></tr>
 <tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>An independent site that rates disk cleaners on a set of checks</td><td>Telemetry: None. Runs elevated: Never. Source published: Yes. Release signing: marked red, which is accurate (see What Tidymint doesn't have yet)</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>A curated list of Mac apps on GitHub, where maintainers review each submission</td><td>Accepted Tidymint (26 Oct 2026)</td></tr>
 <tr><td>Software directories</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a>, <a href="https://openmacapps.com/apps/tidymint/">OpenMacApps</a></td><td>Reviewed and listed Tidymint (26 Oct to 6 Nov 2026)</td></tr>
@@ -2100,6 +2115,7 @@ GUIDES.append(dict(
 <h2 id="log">Transparency log</h2>
 <p>Every step that makes Tidymint more trustworthy is recorded here, newest first.</p>
 <ul>
+<li><b>10 Nov 2026</b>: Released 0.5.2, VirusTotal scan 0/66. Adds local AI models to Clean by App, libraries of projects left alone to Clean Now, and a hint (off by default) when an app is dragged to the Trash. Before release the changes were reviewed in 7 groups by independent sessions: 39 points were raised and 28 were fixed in this version (among them the Uninstaller ticking folders of another app with a similar identifier, and Undo missing items when a folder and something inside it were cleaned together); the remaining minor ones are left for the next version. Built on GitHub's machines, scanned on VirusTotal and pushed to Homebrew as part of the release workflow.</li>
 <li><b>6 Nov 2026</b>: Released 0.5.1, VirusTotal scan 0/66. A patch for 2 display issues (Select all extra copies in Duplicates, an empty Trash still showing a few KB). The changes were reviewed by an independent session before release; the only issue found was in the screenshot demo mode and was fixed. Built on GitHub's machines, scanned on VirusTotal and pushed to Homebrew as part of the release workflow.</li>
 <li><b>6 Nov 2026</b>: Released 0.5.0, VirusTotal scan 0/67. Before it was locked, the code was reviewed in 7 groups of files, then an independent session re-checked every finding (34 reported, none rejected; 13 high and medium ones fixed, the remaining low ones planned for a later version). Built on GitHub's machines and scanned on VirusTotal as part of the release workflow. Mintangle needs the Accessibility permission, only if you turn it on; details in the Privacy Policy. New safeguard: Space Lens always refuses to move standard folders of your Mac (such as Library or Documents) or the root of iCloud Drive to the Trash.</li>
 <li><b>5 Nov 2026</b>: Released 0.4.0, VirusTotal scan 0/65. This version was reviewed by an independent code-review session before it was locked (9 issues found, 7 medium and low ones fixed, none breaking a promise of the app). GitHub's build machines were overloaded, so this version was built on the developer's Mac from the v0.4.0 tag in the repository, then uploaded to VirusTotal and scanned before going public. Fixes an issue from the previous version: the Trash page could count a folder on an external drive that Finder does not treat as Trash.</li>
@@ -2119,7 +2135,7 @@ GUIDES.append(dict(
        ("Why does macOS say it can't verify the developer?", "Because Tidymint isn't signed by Apple yet (see What Tidymint doesn't have yet). Open it once with Open Anyway in System Settings; after that it opens normally."),
        ("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. Contents are read only when finding duplicates and when checking scripts in project folders you add yourself, all on your Mac, sent nowhere."),
        ("Why does Mintangle ask for Accessibility permission?", "To move and resize windows when you press a shortcut or drag a window to a screen edge. Mintangle is off by default, and macOS asks only when you turn it on. Tidymint does not read what is inside windows, does not record the keys you type, and sends nothing. Turn Mintangle off, or switch Tidymint off in Privacy & Security › Accessibility, at any time.")],
-  sources=[("VirusTotal: scan of Tidymint.zip 0.5.1", "https://www.virustotal.com/gui/file/4b2f53ad6402ca05ce3ca1e2e839361cb026c0a3429d9bc38b60318b8fdacfce"),
+  sources=[("VirusTotal: scan of Tidymint.zip 0.5.2", "https://www.virustotal.com/gui/file/a1df64986e6a0fb8f7e903c225d74929ad90dd36bcbe168a6d16c4a2e9d56eed"),
            ("AreWeCleanYet: Tidymint review page", "https://arewecleanyet.org/apps/tidymint/"),
            ("Tidymint security policy (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
            ("Apple: Safely open apps on your Mac (Open Anyway)", "https://support.apple.com/102445"),

@@ -3,6 +3,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.5.2", date="2026-11-10", status="released",
+         vt=dict(score="0/66", date="2026-11-10", sha="a1df64986e6a0fb8f7e903c225d74929ad90dd36bcbe168a6d16c4a2e9d56eed"),
          en=["New: Clean by App lists local AI models (Ollama, Hugging Face, LM Studio), one row per model. Files shared between models are shown apart and go only when every model using them is selected. Keys and sign-in tokens stay locked",
              "New: Clean Now finds libraries of projects left alone for 6 months (node_modules, Python environments, build folders) and Git working copies that Git or an AI coding tool left behind. Never ticked for you, and checked again the moment you clean",
              "New, off by default: when you drag an app to the Trash, Tidymint lists what the app left in Library. Nothing is ticked or removed for you. Turn it on in Settings",
