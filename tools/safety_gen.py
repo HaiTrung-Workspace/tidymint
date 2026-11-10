@@ -5,8 +5,15 @@ import os, re, html
 SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Sources")
 GH = "https://github.com/HaiTrung-Workspace/tidymint/blob/main/Sources/"
 
+def _path(name):
+    """Path of a source file relative to Sources/ (files live in subfolders, names are unique)."""
+    for d, _, fs in os.walk(SRC):
+        if name in fs:
+            return os.path.relpath(os.path.join(d, name), SRC).replace(os.sep, "/")
+    raise SystemExit("safety_gen: %s not found under Sources/" % name)
+
 def _read(name):
-    with open(os.path.join(SRC, name), encoding="utf-8") as f:
+    with open(os.path.join(SRC, _path(name)), encoding="utf-8") as f:
         return f.read()
 
 def _set(text, name):
@@ -62,7 +69,7 @@ T = {
 
 def html_for(lang):
     t = T[lang]; ti = 1 if lang == "en" else 2
-    def link(f, n): return '<a href="%s%s#L%d" rel="nofollow">%s, %s %d</a>' % (GH, f, n, f, t["line"], n)
+    def link(f, n): return '<a href="%s%s#L%d" rel="nofollow">%s, %s %d</a>' % (GH, _path(f), n, f, t["line"], n)
     rows = "".join('<tr><td data-l="%s"><b>%s</b></td><td data-l="%s">%s</td><td data-l="%s">%s</td></tr>'
                    % (t["th_app"][0], html.escape(", ".join(a)), t["th_app"][1], html.escape(s[ti - 1]), t["th_app"][2], link("AppRules.swift", s[2]))
                    for a, *s in [(x[0], x[1], x[2], x[3]) for x in locked_sections()])

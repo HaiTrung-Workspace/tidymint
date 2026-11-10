@@ -15,7 +15,7 @@ VERSION="$(cat "$ROOT/VERSION" 2>/dev/null || echo 0.1.0)"
 
 rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 build_arch() { swiftc -swift-version 5 -parse-as-library -O -target "$1-apple-macos14" \
-  -o "$2" "$ROOT"/Sources/*.swift -framework SwiftUI -framework AppKit -framework Carbon; }
+  -o "$2" $(find "$ROOT/Sources" -name "*.swift" | sort) -framework SwiftUI -framework AppKit -framework Carbon; }
 if [ "$1" = "--release" ]; then
   build_arch arm64 "$OUT/Tidymint-arm64"; build_arch x86_64 "$OUT/Tidymint-x86_64"
   lipo -create "$OUT/Tidymint-arm64" "$OUT/Tidymint-x86_64" -output "$APP/Contents/MacOS/Tidymint"
