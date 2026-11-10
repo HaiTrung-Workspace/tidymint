@@ -25,6 +25,8 @@ struct AppSection {
     var byAge = false
     /// Skip a matched folder entirely if a database file sits directly inside it.
     var dbGuard = true
+    /// Rows built by code instead of `paths` (AI models: one row per model, see AIModels.swift).
+    var custom: (() -> [AppRow])? = nil
     var title: String { t(titleEN, titleVI) }
     var why: String { t(whyEN, whyVI) }
 }
@@ -36,6 +38,12 @@ struct AppRule: Identifiable {
     /// Folder whose presence means the app has data on this Mac.
     let marker: String
     let sections: [AppSection]
+    /// A command-line tool or a cache with no app bundle: no "App removed" tag when no app is found.
+    var noApp = false
+    /// Present on this Mac when the data folder can move (AI model stores); `marker` is used when nil.
+    var exists: (() -> Bool)? = nil
+    /// Command-line programs that count as "open" (a Homebrew `ollama serve` has no bundle id).
+    var processNames: [String] = []
     var name: String { t(nameEN, nameVI) }
 }
 
@@ -70,7 +78,17 @@ enum AppRules {
         return out.sorted { $0.size > $1.size }
     }
 
-    static func installed() -> [AppRule] { all.filter { Scanner.fm.fileExists(atPath: Scanner.home.appendingPathComponent($0.marker).path) } }
+    static func installed() -> [AppRule] { all.filter { $0.exists?() ?? Scanner.fm.fileExists(atPath: Scanner.home.appendingPathComponent($0.marker).path) } }
+    /// The app, or one of its command-line programs, is running.
+    static func isRunning(_ r: AppRule) -> Bool {
+        if Scanner.running(r.bundleIDs) != nil { return true }
+        return r.processNames.contains { name in
+            let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/bin/pgrep"); p.arguments = ["-x", name]
+            p.standardOutput = Pipe(); p.standardError = Pipe()
+            guard (try? p.run()) != nil else { return false }
+            p.waitUntilExit(); return p.terminationStatus == 0
+        }
+    }
 
     // Rules below were measured on a real Mac (macOS 26, Oct 2026) unless marked "unverified".
     // Chromium browsers keep the HTTP cache under ~/Library/Caches/<vendor>/<profile> and the rest inside the profile.
@@ -249,6 +267,31 @@ enum AppRules {
                        whyEN: "Your mailbox. Tidymint never touches it; to shrink it, use Outlook's own storage settings.",
                        whyVI: "Hộp thư của bạn. Tidymint không bao giờ đụng vào; muốn giảm thì dùng mục lưu trữ trong Outlook.", dbGuard: false),
         ]),
+        // Local AI models: one row per model (AIModels.swift). Never pre-selected.
+        AppRule(id: "ollama", nameEN: "Ollama", nameVI: "Ollama", bundleIDs: ["com.electron.ollama", "com.ollama.ollama"], marker: ".ollama/models", sections: [
+            AppSection(id: "models", titleEN: "AI models", titleVI: "Model AI", paths: [], safety: .review,
+                       whyEN: "Large, and you can download them again. Tick the models you no longer use; they go to the Trash.",
+                       whyVI: "Nặng và tải lại được. Tick model bạn không còn dùng, chúng vào Thùng rác.", dbGuard: false, custom: { AIModels.ollamaRows() }),
+            AppSection(id: "key", titleEN: "Sign-in key", titleVI: "Khoá đăng nhập", paths: [],
+                       safety: .locked, whyEN: "This Mac's private key for ollama.com. Tidymint never touches it.", whyVI: "Khoá riêng của máy này cho ollama.com. Tidymint không bao giờ đụng vào.", dbGuard: false, custom: { AIModels.ollamaKeyRows() }),
+        ], noApp: true, exists: { AIModels.ollamaPresent }, processNames: ["ollama"]),
+        AppRule(id: "huggingface", nameEN: "Hugging Face", nameVI: "Hugging Face", bundleIDs: [], marker: ".cache/huggingface/hub", sections: [
+            AppSection(id: "models", titleEN: "AI models and datasets", titleVI: "Model AI và bộ dữ liệu", paths: [], safety: .review,
+                       whyEN: "Large, and you can download them again. Tick the models you no longer use; they go to the Trash.",
+                       whyVI: "Nặng và tải lại được. Tick model bạn không còn dùng, chúng vào Thùng rác.", dbGuard: false, custom: { AIModels.huggingFaceRows() }),
+            AppSection(id: "token", titleEN: "Sign-in token", titleVI: "Mã đăng nhập", paths: [],
+                       safety: .locked, whyEN: "Your Hugging Face sign-in. Tidymint never touches it.", whyVI: "Đăng nhập Hugging Face của bạn. Tidymint không bao giờ đụng vào.", dbGuard: false, custom: { AIModels.hfTokenRows() }),
+        ], noApp: true, exists: { AIModels.hfPresent }),
+        AppRule(id: "lmstudio", nameEN: "LM Studio", nameVI: "LM Studio", bundleIDs: ["ai.elementlabs.lmstudio"], marker: ".lmstudio", sections: [
+            AppSection(id: "models", titleEN: "AI models", titleVI: "Model AI", paths: [], safety: .review,
+                       whyEN: "Large, and you can download them again. Tick the models you no longer use; they go to the Trash.",
+                       whyVI: "Nặng và tải lại được. Tick model bạn không còn dùng, chúng vào Thùng rác.", dbGuard: false, custom: { AIModels.lmStudioRows() }),
+            AppSection(id: "old-engines", titleEN: "Old engine versions", titleVI: "Bộ máy bản cũ", paths: [], safety: .review,
+                       whyEN: "Left behind when LM Studio updated its engines. The versions in use are kept, so your models still run.",
+                       whyVI: "Còn sót lại sau khi LM Studio cập nhật bộ máy. Bản đang dùng được giữ nguyên nên model vẫn chạy.", dbGuard: false, custom: { AIModels.lmsEngines().old }),
+            AppSection(id: "engines", titleEN: "Engines in use", titleVI: "Bộ máy đang dùng", paths: [],
+                       safety: .locked, whyEN: "LM Studio needs these to run models. Tidymint never touches them.", whyVI: "LM Studio cần chúng để chạy model. Tidymint không bao giờ đụng vào.", dbGuard: false, custom: { AIModels.lmsEngines().kept }),
+        ], noApp: true, exists: { AIModels.lmsPresent }),
     ]
 }
 
@@ -265,6 +308,9 @@ struct AppRow: Identifiable {
     var picked: Set<String>? = nil
     var pickedSize: Int64 = 0
     var pickedCount = 0          // photos picked (a photo may have several copies on disk)
+    /// Data this row shares with other rows of its group (Ollama blobs): key -> (size, files). It is freed only when
+    /// every row that shares it is ticked, and it counts once in the group's totals.
+    var shared: [String: SharedPart] = [:]
     var selSize: Int64 { !selected ? 0 : (picked == nil ? size : pickedSize) }
     var checkState: Int { !selected ? 0 : (picked == nil ? 2 : 1) }
     var selURLs: [URL] { !selected ? [] : (picked.map { p in urls.filter { p.contains($0.path) } } ?? urls) }
@@ -275,13 +321,20 @@ struct AppRow: Identifiable {
         return sub + t(" · \(n) picked (\(z))", " · đã chọn \(n) (\(z))")
     }
 }
+struct SharedPart { let size: Int64; let urls: [URL] }
 struct AppGroup: Identifiable {
     let id: String
     let section: AppSection
     var rows: [AppRow]
     var expanded = false
-    var total: Int64 { rows.reduce(0) { $0 + $1.size } }
-    var selected: Int64 { rows.reduce(0) { $0 + $1.selSize } }
+    /// Shared parts, each once; `freed` keeps only those whose every sharer is ticked.
+    func sharedParts(freed: Bool) -> [SharedPart] {
+        var seen: [String: SharedPart] = [:], blocked: Set<String> = []
+        for r in rows { for (k, p) in r.shared { seen[k] = p; if !r.selected { blocked.insert(k) } } }
+        return seen.filter { !freed || !blocked.contains($0.key) }.map(\.value)
+    }
+    var total: Int64 { rows.reduce(0) { $0 + $1.size } + sharedParts(freed: false).reduce(0) { $0 + $1.size } }
+    var selected: Int64 { rows.reduce(0) { $0 + $1.selSize } + sharedParts(freed: true).reduce(0) { $0 + $1.size } }
     var state: Int {
         if rows.allSatisfy({ $0.checkState == 2 }) { return 2 }
         return rows.contains(where: { $0.checkState > 0 }) ? 1 : 0
@@ -311,6 +364,7 @@ extension AppRules {
     static func rows(_ s: AppSection) -> [AppRow] {
         let home = Scanner.home.path + "/"
         func short(_ u: URL) -> String { u.path.hasPrefix(home) ? "~/" + u.path.dropFirst(home.count) : u.path }
+        if let c = s.custom { return c() }
         if !s.byAge {
             return items(s).map { AppRow(id: $0.url.path, title: $0.name, sub: short($0.url), size: $0.size, count: 1, urls: [$0.url], month: nil, selected: $0.selected) }
         }
@@ -347,7 +401,7 @@ extension AppRules {
         installed().compactMap { rule in
             let groups = rule.sections.map { AppGroup(id: $0.id, section: $0, rows: rows($0)) }.filter { !$0.rows.isEmpty }
             guard groups.contains(where: { $0.section.safety != .locked }) else { return nil }
-            return AppReport(rule: rule, groups: groups, running: Scanner.running(rule.bundleIDs) != nil)
+            return AppReport(rule: rule, groups: groups, running: isRunning(rule))
         }
     }
 }

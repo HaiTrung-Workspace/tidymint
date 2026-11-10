@@ -253,8 +253,8 @@ struct ByAppView: View {
         } else if !vm.appScanned {
             VStack(spacing: 28) {
                 Header(title: t("Clean by App", "Dọn theo ứng dụng"),
-                       sub: t("Zalo, Telegram, WhatsApp, Slack, Outlook, VS Code, CapCut and Chrome, Edge, Cốc Cốc: see what each app keeps on your Mac and clean it by type.\nMessages and logins are never touched.",
-                              "Zalo, Telegram, WhatsApp, Slack, Outlook, VS Code, CapCut và Chrome, Edge, Cốc Cốc: xem từng app đang giữ gì trên máy và dọn theo loại.\nTin nhắn và đăng nhập không bao giờ bị đụng."))
+                       sub: t("Zalo, Telegram, WhatsApp, Slack, Outlook, VS Code, CapCut and Chrome, Edge, Cốc Cốc: see what each app keeps on your Mac and clean it by type.\nAlso the AI models of Ollama, LM Studio and Hugging Face, one by one.\nMessages and logins are never touched.",
+                              "Zalo, Telegram, WhatsApp, Slack, Outlook, VS Code, CapCut và Chrome, Edge, Cốc Cốc: xem từng app đang giữ gì trên máy và dọn theo loại.\nCó cả model AI của Ollama, LM Studio, Hugging Face, hiện từng model một.\nTin nhắn và đăng nhập không bao giờ bị đụng."))
                 BigScanButton(label: t("Scan", "Quét")) { vm.scanByApp() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let id = vm.appSel, let r = vm.appReports.first(where: { $0.id == id }) {
@@ -324,7 +324,7 @@ struct AppList: View {
                                 }
                                 Spacer(minLength: 12)
                                 if r.running { StatusTag(t("Open", "Đang mở"), Theme.warn) }
-                                else if !appInstalled(r.rule.bundleIDs) { StatusTag(t("App removed", "App đã gỡ"), Theme.sub).tip(t("The app is gone but its data is still here.", "App đã gỡ nhưng dữ liệu vẫn còn.")) }
+                                else if !r.rule.noApp && !appInstalled(r.rule.bundleIDs) { StatusTag(t("App removed", "App đã gỡ"), Theme.sub).tip(t("The app is gone but its data is still here.", "App đã gỡ nhưng dữ liệu vẫn còn.")) }
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text(fmt(r.total)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold).monospacedDigit())
                                     Text(t("\(fmt(r.cleanable)) cleanable", "dọn được \(fmt(r.cleanable))")).font(.system(size: fs(11))).foregroundColor(Theme.sub)
@@ -432,6 +432,23 @@ struct AppDetail: View {
                                         } else if let u = row.urls.first { FileMenu(url: u, vm: vm) }
                                     }
                                 }.padding(.leading, 26)
+                                // Data several rows share (Ollama): no tick of its own, it goes when every row that uses it is ticked.
+                                if g.sharedParts(freed: false).reduce(0, { $0 + $1.size }) > 0 {
+                                    let all = g.sharedParts(freed: false).reduce(0) { $0 + $1.size }, going = g.sharedParts(freed: true).reduce(0) { $0 + $1.size }
+                                    HStack(spacing: 12) {
+                                        Image(systemName: going == all ? "checkmark.circle.fill" : "link").foregroundColor(going == all ? Theme.green : Theme.sub).frame(width: 18)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(t("Shared part", "Phần dùng chung")).foregroundColor(Theme.text).font(.system(size: fs(13)))
+                                            Text(going == all ? t("Every model that uses it is ticked: it goes to the Trash with them", "Đã tick hết các model dùng nó: sẽ vào Thùng rác cùng lúc")
+                                                 : going > 0 ? t("\(fmt(going)) of it goes now; the rest waits for the other models that use it", "\(fmt(going)) sẽ được dọn; phần còn lại chờ tick hết các model dùng nó")
+                                                 : t("Used by several models above. It goes only when all of them are ticked", "Nhiều model ở trên cùng dùng. Chỉ được dọn khi tick hết các model đó"))
+                                                .foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(2)
+                                        }
+                                        Spacer()
+                                        Text(fmt(all)).foregroundColor(going == all ? Theme.text : Theme.sub).font(.system(size: fs(13), weight: .medium).monospacedDigit()).frame(width: 80, alignment: .trailing)
+                                    }
+                                    .padding(.vertical, 6).padding(.horizontal, 12).padding(.leading, 26)
+                                }
                             }
                         }
                         .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))

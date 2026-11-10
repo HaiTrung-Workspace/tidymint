@@ -137,6 +137,13 @@ struct SettingsView: View {
                     Toggle("", isOn: Binding(get: { vm.fullDiskAccess }, set: { _ in NSWorkspace.shared.open(VM.fdaSettings) }))
                         .toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
+                settingRow(t("Hint when an app goes to the Trash", "Gợi ý khi bỏ app vào Thùng rác"),
+                           !vm.fullDiskAccess && vm.trashHintOn
+                           ? t("Needs Full Disk Access to see the Trash.", "Cần quyền Truy cập toàn bộ ổ đĩa để thấy Thùng rác.")
+                           : t("While Tidymint is running, drag an app to the Trash and Tidymint lists what it left in Library. Nothing is ticked or removed for you.",
+                               "Khi Tidymint đang chạy, bạn kéo một app vào Thùng rác thì Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá.")) {
+                    Toggle("", isOn: Binding(get: { vm.trashHintOn }, set: { vm.setTrashHint($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
                 VStack(alignment: .leading, spacing: 6) {
                 SettingsBox {
                 VStack(alignment: .leading, spacing: 8) {
@@ -254,7 +261,7 @@ struct SettingsView: View {
                           badge: vm.newVersion != nil ? t("New version", "Có bản mới") : nil, groups: groups) {
                 settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
                            vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
-                                                : (vm.autoUpdateCheck ? t("Checks once a day. Only the app and macOS version are counted; nothing else about your Mac is sent.", "Kiểm mỗi ngày một lần. Chỉ đếm theo phiên bản app và macOS, không gửi gì khác về máy.")
+                                                : vm.updResult ?? (vm.autoUpdateCheck ? t("Checks once a day. Only the app and macOS version are counted; nothing else about your Mac is sent.", "Kiểm mỗi ngày một lần. Chỉ đếm theo phiên bản app và macOS, không gửi gì khác về máy.")
                                                                       : t("Automatic check is off.", "Đã tắt tự kiểm tra.")), attention: vm.newVersion != nil) {
                     HStack(spacing: 10) {
                         if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }

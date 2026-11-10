@@ -294,6 +294,7 @@ enum Phase { case idle, scanning, summary, review, done }
                       (extra.isEmpty ? t("The app (\(fmt(total))) will be moved to the Trash.", "App (\(fmt(total))) sẽ được chuyển vào Thùng rác.") : t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.", "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."))
                         + (a.needsAdmin ? t(" macOS will ask for an administrator password in its own window; Tidymint never sees it.", " macOS sẽ hỏi mật khẩu quản trị trong hộp thoại của macOS; Tidymint không thấy mật khẩu.") : ""),
                       t("Uninstall", "Gỡ")) else { return }
+        TrashHint.uninstalling(a.bundleID)   // the Trash hint stays quiet about an app removed here
         if a.needsAdmin { uninstallWithFinder(a, extra: extra, total: total); return }
         NSWorkspace.shared.recycle([a.url]) { newURLs, err in
             Task { @MainActor in
@@ -343,6 +344,49 @@ enum Phase { case idle, scanning, summary, review, done }
             }
         }
     }
+    /// Apps dragged to the Trash in Finder left these behind (optional hint, see TrashHint). Newest first, a few at most.
+    @Published var trashHints: [TrashHintInfo] = []
+    /// Shown in place of a card when a clicked notification has nothing left to offer.
+    @Published var trashHintNote = ""
+    /// Cards whose full list is open.
+    @Published var trashHintOpen = Set<String>()
+    @Published var trashHintOn: Bool = UserDefaults.standard.bool(forKey: "trashHint")
+    func setTrashHint(_ v: Bool) { trashHintOn = v; UserDefaults.standard.set(v, forKey: "trashHint"); TrashHint.apply(); if !v { TrashHint.forgetAll(); trashHints = []; trashHintNote = "" } }
+    func showTrashHint(_ h: TrashHintInfo, notify: Bool = true) {
+        trashHintNote = ""
+        trashHints.removeAll { $0.id == h.id }
+        trashHints.insert(h, at: 0)
+        while trashHints.count > 3 { TrashHint.forget(trashHints.removeLast().id) }
+        guard notify else { return }
+        let size = h.items.reduce(0) { $0 + $1.size }
+        let c = UNMutableNotificationContent()
+        c.title = t("\(h.name) left \(h.items.count) items behind", "\(h.name) còn để lại \(h.items.count) mục")
+        c.body = t("\(fmt(size)) in Library. Nothing was removed. Open Tidymint to pick what goes.", "\(fmt(size)) trong Library. Chưa có gì bị xoá. Mở Tidymint để chọn mục cần dọn.")
+        c.userInfo = ["page": "trashhint", "id": h.id]
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "trashhint-" + h.id, content: c, trigger: nil))
+    }
+    func cleanTrashHint(_ id: String) {
+        guard let h = trashHints.first(where: { $0.id == id }) else { return }
+        // Checked again right before moving: never while the app is back (Put Back, reinstall) or running.
+        // The same check as when the card was made, plus: the app must still be in the Trash.
+        if TrashHint.stillInstalled(h.bundleID) != nil || !TrashHint.inTrash(h.bundleID) || !NSRunningApplication.runningApplications(withBundleIdentifier: h.bundleID).isEmpty {
+            appsMsg = t("\(h.name) is installed again or no longer in the Trash, nothing was moved.", "\(h.name) đã được cài lại hoặc không còn trong Thùng rác, chưa chuyển gì."); appsMsgErr = true
+            trashHints.removeAll { $0.id == id }; TrashHint.forget(id); return
+        }
+        let sel = h.items.filter { $0.selected && FileManager.default.fileExists(atPath: $0.url.path) }
+        guard !sel.isEmpty else { return }
+        let (ok, fail) = trash(sel.map(\.url), label: h.name, sizes: Dictionary(sel.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a }))
+        appsMsgErr = false
+        appsMsg = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
+        log(appsMsg)
+        finished(.apps, ok, okSize(sel), fail); appsMsg = ""
+        if let a = trashHints.firstIndex(where: { $0.id == id }) {
+            trashHints[a].items.removeAll { lastOK.contains($0.url) }
+            if trashHints[a].items.isEmpty { trashHints.remove(at: a); TrashHint.forget(id) }
+        }
+        refreshTrash(); refreshDisk()
+    }
+
     func cleanList(_ which: Int) {
         let sel = (which == 1 ? leftovers : installers).filter(\.selected)
         let size = sel.reduce(0) { $0 + $1.size }
@@ -401,6 +445,12 @@ enum Phase { case idle, scanning, summary, review, done }
             let ask = dupes[i].isCross && Prefs.crossKeep == "ask"
             for j in dupes[i].items.indices { dupes[i].items[j].selected = all && j > 0 && Dupes.autoPick(dupes[i].items[j], ask: ask) }
         }
+        // Nothing could be picked (every extra copy sits in a project folder, is used by a script, shares its data, or
+        // spans two drives): say so, a button that does nothing reads as broken (seen 08/11/2026).
+        if all && !dupes.isEmpty && !dupes.contains(where: { $0.items.contains(where: \.selected) }) {
+            dupMsg = t("No copy was selected automatically: every extra copy is inside a project folder, used by a script, on another drive, or shares its data with the copy kept (frees nothing). You can still tick copies one by one.",
+                       "Không có bản nào được chọn tự động: mọi bản thừa đều nằm trong thư mục dự án, đang được script dùng, nằm ở ổ khác, hoặc dùng chung dữ liệu với bản giữ lại (xoá không giải phóng chỗ). Bạn vẫn tick tay từng bản được.")
+        } else if dupMsg.hasPrefix(t("No copy was selected", "Không có bản nào được chọn")) { dupMsg = "" }
     }
     @Published var refsBusy = false
 
@@ -860,11 +910,33 @@ enum Phase { case idle, scanning, summary, review, done }
     var failNote: String { lastErr.isEmpty ? "" : t(" Reason: ", " Lý do: ") + lastErr }
 
     func cleanJunk() {
+        // Dependency folders and Git working copies are checked again right now: a project may have come back to life
+        // since the scan. One lsof run serves both groups.
+        var skippedNow = 0
+        let recheck = cats.contains { ["devdeps", "worktrees"].contains($0.id) && $0.items.contains(where: \.selected) }
+        let cwds = recheck ? DevDeps.workingDirs() : nil
+        if let i = cats.firstIndex(where: { $0.id == "devdeps" }) {
+            for j in cats[i].items.indices where cats[i].items[j].selected {
+                if cwds == nil || DevDeps.verdict(cats[i].items[j].url, cwds: cwds ?? []) == nil {
+                    cats[i].items[j].selected = false; skippedNow += 1
+                    cats[i].items[j].reason = t("Skipped: the project changed or is in use now", "Đã bỏ qua: dự án vừa thay đổi hoặc đang được dùng")
+                }
+            }
+        }
+        if let i = cats.firstIndex(where: { $0.id == "worktrees" }) {
+            for j in cats[i].items.indices where cats[i].items[j].selected {
+                if cwds == nil || !DevDeps.orphaned(cats[i].items[j].url, cwds: cwds ?? []) {
+                    cats[i].items[j].selected = false; skippedNow += 1
+                    cats[i].items[j].reason = t("Skipped: git tracks it again or it is in use now", "Đã bỏ qua: git đã theo dõi lại hoặc đang được dùng")
+                }
+            }
+        }
         let sel = cats.flatMap { $0.items.filter(\.selected) }
         let size = sel.reduce(0) { $0 + $1.size }
         let (ok, fail) = trash(sel.map(\.url), label: "cleanup", sizes: Dictionary(sel.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a })); _ = size
         lastFreed = okSize(sel); lastCount = ok
         lastResult = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + failNote : "")
+            + (skippedNow > 0 ? t(" \(skippedNow) project items were left alone: the project changed or is in use since the scan.", " \(skippedNow) mục của dự án được để yên: dự án vừa thay đổi hoặc đang được dùng sau lần quét.") : "")
         log(lastResult)
         phase = .done
         refreshTrash(); refreshDisk()
@@ -978,7 +1050,7 @@ enum Phase { case idle, scanning, summary, review, done }
             await MainActor.run { self.appReports = r; self.appBusy = false; self.appScanned = true; self.appAge = 0; self.markDone(.byapp) }
         }
     }
-    func refreshAppRunning() { for i in appReports.indices { appReports[i].running = Scanner.running(appReports[i].rule.bundleIDs) != nil } }
+    func refreshAppRunning() { for i in appReports.indices { appReports[i].running = AppRules.isRunning(appReports[i].rule) } }
     func quitApp(_ id: String) {
         guard let r = appReports.first(where: { $0.id == id }) else { return }
         Scanner.quit(r.rule.bundleIDs)
@@ -1013,6 +1085,21 @@ enum Phase { case idle, scanning, summary, review, done }
         let on = appReports[i].groups[j].rows[k].checkState != 2
         appReports[i].groups[j].rows[k].selected = on; appReports[i].groups[j].rows[k].picked = nil
     }
+    /// Rows built by code, read again and compared with the scan. Every row counts, ticked or not, and so does a row
+    /// that is new: a model pulled after the scan may share a file with the ticked ones, and that file must then stay
+    /// (found in review 11/2026). Size too: a folder row keeps its path while files are added to it.
+    func customRowsChanged(_ r: AppReport) -> Bool {
+        for g in r.groups where g.section.safety != .locked {
+            guard let build = g.section.custom else { continue }
+            let fresh = Dictionary(build().map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+            if Set(fresh.keys) != Set(g.rows.map(\.id)) { return true }
+            if g.rows.contains(where: { row in
+                guard let f = fresh[row.id] else { return true }
+                return Set(f.urls) != Set(row.urls) || Set(f.shared.keys) != Set(row.shared.keys) || (row.selected && f.size != row.size)
+            }) { return true }
+        }
+        return false
+    }
     func cleanApp(_ id: String) {
         guard let i = appReports.firstIndex(where: { $0.id == id }) else { return }
         let r = appReports[i]
@@ -1020,19 +1107,36 @@ enum Phase { case idle, scanning, summary, review, done }
         if appReports[i].running {
             _ = confirm(t("Quit \(r.rule.name) first", "Tắt \(r.rule.name) trước"), t("The app is open and may be writing these files. Quit it, then clean.", "App đang mở, có thể đang ghi vào các file này. Tắt app rồi dọn."), "OK"); return
         }
+        // Rows built by code (AI models, LM Studio engines) are read again right now: a tool may have changed its files
+        // since the scan (a model pulled, another engine version chosen). Any ticked row that is gone or differs: stop.
+        if customRowsChanged(r) {
+            let a = NSAlert()   // one button: there is nothing to choose
+            a.messageText = t("\(r.rule.name) changed since the scan", "\(r.rule.name) vừa thay đổi sau lần quét")
+            a.informativeText = t("Nothing was moved. The list will refresh; pick again.", "Chưa chuyển gì cả. Danh sách sẽ được quét lại, bạn chọn lại nhé.")
+            a.addButton(withTitle: t("OK", "OK")); a.runModal()
+            scanByApp(); return
+        }
         let rows = r.groups.filter { $0.section.safety != .locked }.flatMap { $0.rows.filter(\.selected) }
-        let urls = rows.flatMap(\.selURLs)
-        let size = rows.reduce(0) { $0 + $1.selSize }
+        // Parts shared between rows (Ollama blobs) go too once every row that shares them is ticked.
+        let freed = r.groups.filter { $0.section.safety != .locked }.flatMap { $0.sharedParts(freed: true) }
+        let urls = rows.flatMap(\.selURLs) + freed.flatMap(\.urls)
+        let size = rows.reduce(0) { $0 + $1.selSize } + freed.reduce(0) { $0 + $1.size }
         let risky = r.groups.contains { $0.section.safety == .review && $0.rows.contains(where: \.selected) }
         let body = risky
-            ? t("\(urls.count) items (\(fmt(size))) go to the Trash. Photos, videos and files you ticked are removed from this Mac; put them back from the Trash if you change your mind.",
-                "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác. Ảnh, video, file đã tick sẽ mất trên máy này; đổi ý thì trả về từ Thùng rác.")
+            ? t("\(urls.count) items (\(fmt(size))) go to the Trash. What you ticked is removed from this Mac; put it back from the Trash if you change your mind.",
+                "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác. Những gì đã tick sẽ mất trên máy này; đổi ý thì trả về từ Thùng rác.")
             : t("\(urls.count) items (\(fmt(size))) go to the Trash.", "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác.")
         guard confirm(t("Clean \(r.rule.name)?", "Dọn \(r.rule.name)?"), body, t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
         let (ok, fail) = trash(urls, label: "app:" + id)
-        appMsg = t("\(r.rule.name): moved \(ok) items (\(fmt(size))) to the Trash.", "\(r.rule.name): đã chuyển \(ok) mục (\(fmt(size))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail).", " Bỏ qua \(fail).") + failNote : "")
+        // Report what really moved: when something was refused, its share of the size is left out (a row with several
+        // files counts by the part of its files that went).
+        var done: Int64 = 0
+        for row in rows { let u = row.selURLs; if !u.isEmpty { done += row.selSize * Int64(u.filter { lastOK.contains($0) }.count) / Int64(u.count) } }
+        for part in freed where !part.urls.isEmpty { done += part.size * Int64(part.urls.filter { lastOK.contains($0) }.count) / Int64(part.urls.count) }
+        if fail == 0 { done = size }
+        appMsg = t("\(r.rule.name): moved \(ok) items (\(fmt(done))) to the Trash.", "\(r.rule.name): đã chuyển \(ok) mục (\(fmt(done))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail).", " Bỏ qua \(fail).") + failNote : "")
         log(appMsg)
-        finished(.byapp, ok, size, fail); appMsg = ""
+        finished(.byapp, ok, done, fail); appMsg = ""
         // Re-measure just this app.
         Task.detached(priority: .userInitiated) {
             let fresh = AppRules.scan().first { $0.id == id }
@@ -1066,12 +1170,26 @@ enum Phase { case idle, scanning, summary, review, done }
 
     // Updates
     @Published var newVersion: String? = nil
+    /// Result line of the last manual "Check Now" when nothing newer was found (nil: show the usual hint).
+    @Published var updResult: String? = nil
     @Published var updChecking = false
     func checkUpdates(force: Bool = false) {
         guard force || !updChecking else { return }
         guard force || autoUpdateCheck else { return }   // automatic check turned off in Settings: no request at all
-        updChecking = true
-        Updates.check(force: force) { v in self.newVersion = v; self.updChecking = false }
+        updChecking = true; if force { updResult = nil }
+        let started = Date()
+        Updates.check(force: force) { v in
+            self.newVersion = v; self.updChecking = false
+            guard force, v == nil else { return }
+            // Manual check with nothing newer: say so, and tell "up to date" apart from "no answer" (record() stamps upd-last).
+            let reached = (UserDefaults.standard.object(forKey: "upd-last") as? Date ?? .distantPast) >= started
+            let f = DateFormatter(); f.dateFormat = "HH:mm"
+            self.updResult = reached
+                ? t("You have the latest version (\(Updates.current)). Checked at \(f.string(from: Date())).",
+                    "Bạn đang dùng bản mới nhất (\(Updates.current)). Đã kiểm lúc \(f.string(from: Date())).")
+                : t("Could not reach the update server. Check your internet connection and try again.",
+                    "Không kết nối được máy chủ cập nhật. Kiểm tra mạng rồi thử lại.")
+        }
     }
 
     func confirm(_ title: String, _ text: String, _ ok: String) -> Bool {

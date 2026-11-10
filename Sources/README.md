@@ -27,6 +27,7 @@ How the app code is organised. Read this before adding a file or a feature.
 | `Model.swift` | `CleanItem`, `Category`, `Safety`, Space Lens nodes |
 | `Prefs.swift` | Settings stored in `UserDefaults`, Ignore list |
 | `Scanner.swift` | Folder scanning, sizes, what is ticked by default and why |
+| `AIModels.swift` | Local AI models for Clean by App (Ollama, Hugging Face, LM Studio): one row per model |
 | `AppRules.swift` | Clean by App rules (Zalo, Telegram, Chrome...) |
 | `Trash.swift` | Move to Trash, Undo journal, safe-area check, iCloud handling, Trash size and Empty Trash |
 | `TrashPage.swift` | Trash page |
@@ -35,6 +36,9 @@ How the app code is organised. Read this before adding a file or a feature.
 | `SpaceLens.swift` | Space Lens page, bubble layout, folder explanations |
 | `SystemData.swift` | System Data explainer |
 | `Apps.swift` | Uninstaller, leftovers, installers, and their page |
+| `DevDeps.swift` | Dependency and build folders of projects left alone (node_modules, venv, target...) for Cleanup |
+| `TrashHint.swift` | Optional hint when an app is dragged to the Trash: lists what it left in Library (off by default) |
+| `SelfTest.swift` | Dev build only: `--selftest` runs clean and Undo on test files without clicking (results to a text file) |
 | `Duplicates.swift` | Duplicate finder and its page |
 | `Cloud.swift` | Cloud folders (remove downloaded copies) and its page |
 | `Startup.swift` | Login items and launch agents, and their page |

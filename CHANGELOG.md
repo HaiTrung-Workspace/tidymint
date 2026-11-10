@@ -2,6 +2,15 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 0.5.2 (2026-11-10)
+
+- New: Clean by App lists local AI models (Ollama, Hugging Face, LM Studio), one row per model. Files shared between models are shown apart and go only when every model using them is selected. Keys and sign-in tokens stay locked
+- New: Clean Now finds libraries of projects left alone for 6 months (node_modules, Python environments, build folders) and Git working copies that Git or an AI coding tool left behind. Never ticked for you, and checked again the moment you clean
+- New, off by default: when you drag an app to the Trash, Tidymint lists what the app left in Library. Nothing is ticked or removed for you. Turn it on in Settings
+- Fix: the Uninstaller no longer ticks folders that belong to another installed app with a similar identifier
+- Fix: Undo puts everything back when a folder and something inside it were cleaned together, and also restores broken shortcuts (symlinks). The Trash page counts hidden folders
+- Fix: in Duplicates, Select all extra copies says why when no copy can be picked, and two extra copies that share their data are picked together. Empty Trash names the app holding files open. Check for Updates confirms when you are on the latest version
+
 ## 0.5.1 (2026-11-06)
 
 - Fix: in Duplicates, Select all extra copies switches to Deselect all again when a group holds copies Tidymint never picks on its own (APFS clones, files in project folders)

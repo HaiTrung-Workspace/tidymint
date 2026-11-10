@@ -122,6 +122,9 @@ enum Scanner {
     /// Folders macOS keeps on every volume (a drive's Trash, Spotlight index, file system events...). Large Files lists hidden
     /// files since 0.5.0, but these are never the user's files and "moving" a file from a drive's Trash to the Trash frees nothing.
     static let systemHiddenDirs: Set<String> = [".Trashes", ".Trash", ".Spotlight-V100", ".fseventsd", ".TemporaryItems", ".DocumentRevisions-V100", "$RECYCLE.BIN"]
+    /// Folders in ~/Library/Caches that hold downloaded AI models (many GB, not rebuilt on their own), so they are
+    /// never part of "User Cache Files": Hugging Face models of Mac apps, GGUF files llama.cpp fetched, Whisper models of Buzz.
+    static let modelCaches: Set<String> = ["huggingface", "llama.cpp", "Buzz"]
     static func make(_ urls: [URL], running: [String], defaultOn: Bool = true, minSize: Int64 = 1) -> [CleanItem] {
         var out: [CleanItem] = []
         for u in urls where !skip(u.path) {
@@ -182,7 +185,7 @@ enum Scanner {
         cats.append(Category(id: "usercache", titleEN: "User Cache Files", titleVI: "Bộ nhớ đệm người dùng", icon: "internaldrive",
                              descEN: "Temporary files apps rebuild on their own", descVI: "File tạm, app tự tạo lại khi cần",
                              whyEN: "Apps rebuild these. The first launch after cleaning may be a little slower.", whyVI: "App tự tạo lại. Lần mở đầu sau khi dọn có thể chậm hơn một chút.",
-                             items: make(children(lib.appendingPathComponent("Caches")), running: run)))
+                             items: make(children(lib.appendingPathComponent("Caches")).filter { !modelCaches.contains($0.lastPathComponent) }, running: run)))
 
         step(1, "~/Library/Application Support, Containers")
         let appCacheNames: Set<String> = ["Cache", "Code Cache", "GPUCache", "DawnCache", "DawnGraphiteCache", "GraphiteDawnCache",
@@ -222,6 +225,26 @@ enum Scanner {
                              descVI: "Thư mục _to_delete, _tmp trong thư mục dự án (chọn ở Cài đặt)",
                              safety: .review, whyEN: "Your own drafts. Check the folder before cleaning.", whyVI: "Nháp của chính bạn. Xem lại thư mục trước khi dọn.",
                              items: make(findDirs(projects, names: ["_to_delete", "_to-delete", "_tmp"], depth: 5), running: run, defaultOn: false, minSize: 1)))
+
+        let deps = DevDeps.scan(projects)
+        if !deps.isEmpty {
+            cats.append(Category(id: "devdeps", titleEN: "Dependencies of Old Projects", titleVI: "Thư viện của dự án lâu không đụng", icon: "shippingbox",
+                                 descEN: "node_modules, Python venv, build folders in projects untouched for \(DevDeps.days / 30)+ months. Not selected by default",
+                                 descVI: "node_modules, venv Python, thư mục build trong dự án không đổi từ \(DevDeps.days / 30) tháng. Mặc định không tick",
+                                 safety: .review, whyEN: "The project's own files say how to rebuild these. Reinstalling takes time and a network connection.",
+                                 whyVI: "Chính file của dự án cho biết cách tạo lại. Cài lại cần thời gian và mạng.",
+                                 items: deps))
+        }
+
+        let trees = DevDeps.worktrees(projects)
+        if !trees.isEmpty {
+            cats.append(Category(id: "worktrees", titleEN: "Git Worktrees Left Behind", titleVI: "Thư mục làm việc Git bị bỏ lại", icon: "arrow.triangle.branch",
+                                 descEN: "Copies of a project made by git or an AI coding tool that git no longer tracks. Not selected by default",
+                                 descVI: "Bản sao dự án do git hoặc công cụ AI tạo ra, git không còn theo dõi. Mặc định không tick",
+                                 safety: .review, whyEN: "Work that was never committed exists only in these folders. Look inside before cleaning.",
+                                 whyVI: "Phần việc chưa commit chỉ nằm trong các thư mục này. Mở xem trước khi dọn.",
+                                 items: trees))
+        }
 
         step(5, "~/Downloads")
         let cutoff = Date().addingTimeInterval(-14 * 86400)

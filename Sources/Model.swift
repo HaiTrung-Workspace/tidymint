@@ -24,6 +24,7 @@ struct CleanItem: Identifiable, Hashable {
     var nameMatch = false          // found by app name, not bundle id: could belong to something else
     var hasDB = false              // a database sits inside: may be the user's own data
     var clone = false              // duplicate copy that shares its data with a copy above it (APFS clone)
+    var cloneOfExtra = false       // clone of another extra copy (not of the kept one): both must go to free the space
     var cross = 0                  // duplicate group spans the Mac and an external drive: 1 = this copy is on the Mac, 2 = on an external drive
     /// Why the row is shown but not ticked, when none of the flags above says it (shared folder, app data, kept on purpose).
     var reason = ""

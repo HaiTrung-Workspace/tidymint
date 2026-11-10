@@ -150,7 +150,8 @@ enum Apps {
 
     /// Files that belong to an app. Bundle-id matches are pre-selected; name matches are listed but left for the user,
     /// and anything holding a database is never pre-selected (the data-loss pattern behind most cleaner complaints).
-    static func related(_ a: AppEntry) -> [CleanItem] {
+    /// `strict` (an app the user trashed in Finder): bundle-id matches only, and nothing is pre-selected.
+    static func related(_ a: AppEntry, strict: Bool = false) -> [CleanItem] {
         let id = a.bundleID, n = a.name
         var byID: [URL] = [
             L.appendingPathComponent("Application Support/\(id)"),
@@ -168,8 +169,10 @@ enum Apps {
             var buf = [CChar](repeating: 0, count: 1024)
             if confstr(key, &buf, buf.count) > 0, !id.isEmpty { byID.append(URL(fileURLWithPath: String(cString: buf)).appendingPathComponent(id)) }
         }
-        byID += Scanner.children(L.appendingPathComponent("Group Containers")).filter { $0.lastPathComponent.hasSuffix(id) }
-        byID += Scanner.children(L.appendingPathComponent("LaunchAgents")).filter { $0.lastPathComponent.hasPrefix(id) }
+        // Whole-id matches only: "com.x.App" must not take "com.x.AppBeta.plist" or "group.com.y.com.x.AppOther"
+        // (seen in review 11/2026: VS Code and VS Code Insiders).
+        byID += Scanner.children(L.appendingPathComponent("Group Containers")).filter { let n = $0.lastPathComponent; return n == id || n.hasSuffix("." + id) }
+        byID += Scanner.children(L.appendingPathComponent("LaunchAgents")).filter { let n = $0.lastPathComponent; return n == id + ".plist" || n.hasPrefix(id + ".") }
         // App extensions (widgets, Safari, share extensions) get sandbox folders under their own bundle ids, which
         // start with the app's id ("app.x.Y.widget"). Read those ids from the app's own .appex bundles, and also match
         // "<id>." in Containers and Application Scripts, so a removed app leaves none of them behind.
@@ -177,7 +180,8 @@ enum Apps {
             var extIDs = Set<String>()
             for dir in ["Contents/PlugIns", "Contents/Extensions"] {
                 for u in Scanner.children(a.url.appendingPathComponent(dir)) where u.pathExtension == "appex" {
-                    if let b = Bundle(url: u)?.bundleIdentifier { extIDs.insert(b) }
+                    // Read from Info.plist: Bundle(url:) caches, and may answer for a copy that has moved.
+                    if let b = TrashHint.plistID(u)?.id { extIDs.insert(b) }
                 }
             }
             for d in ["Containers", "Application Scripts"] {
@@ -187,8 +191,27 @@ enum Apps {
                 }
             }
         }
+        // A folder that is, or sits under, the id of another app still installed ("com.x.App.pro" next to "com.x.App",
+        // an App Store edition "….MacAppStore") belongs to that app: never offered here. Found by the 11/2026 self-test.
+        let others = TrashHint.installedIDs().subtracting([id])
+        byID.removeAll { u in
+            var n = u.lastPathComponent
+            for ext in [".plist", ".savedState", ".binarycookies"] where n.hasSuffix(ext) { n = String(n.dropLast(ext.count)) }
+            // Only ids more specific than this app's: while "com.x.App" is installed, "com.x.App.pro.widget" still goes with "com.x.App.pro".
+            if n == id { return false }
+            if others.contains(where: { n == $0 || ($0.hasPrefix(id + ".") && n.hasPrefix($0 + ".")) }) { return true }
+            // The same for an app installed outside the Applications folders (LaunchServices knows those).
+            guard n.hasPrefix(id + ".") else { return false }
+            var parts = n.split(separator: ".").map(String.init)
+            while parts.count > id.split(separator: ".").count {
+                let cand = parts.joined(separator: ".")
+                if NSWorkspace.shared.urlsForApplications(withBundleIdentifier: cand).contains(where: { !$0.path.contains("/.Trash") && !$0.path.hasPrefix(a.url.path + "/") && FileManager.default.fileExists(atPath: $0.path) }) { return true }
+                parts.removeLast()
+            }
+            return false
+        }
         var byName: [URL] = []
-        if n.count >= 4 && !sharedNames.contains(n.lowercased()) {
+        if !strict && n.count >= 4 && !sharedNames.contains(n.lowercased()) {
             byName = ["Application Support", "Caches", "Logs"].map { L.appendingPathComponent("\($0)/\(n)") }
         }
         var seen = Set<String>(), out: [CleanItem] = []
@@ -202,7 +225,7 @@ enum Apps {
                 let db = deep ? Scanner.holdsDatabaseDeep(u) : Scanner.holdsDatabase(u)
                 // Group Containers are shared by apps of the same developer and macOS never removes them: listed, not ticked.
                 let shared = u.path.hasPrefix(groupRoot)
-                var it = CleanItem(url: u, size: Cloud.localSize(u.path), selected: !weak && !db && !shared)
+                var it = CleanItem(url: u, size: Cloud.localSize(u.path), selected: !strict && !weak && !db && !shared)
                 it.nameMatch = weak; it.hasDB = db
                 if shared && !db { it.reason = t("Shared by apps from the same developer, check first", "Dùng chung cho các app cùng hãng, kiểm tra trước") }
                 out.append(it)
@@ -290,6 +313,7 @@ struct AppsView: View {
                 Button { vm.scanApps() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 6)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 10)
             DoneBanner(vm: vm, page: .apps)
+            TrashHintCard(vm: vm)
             if !vm.appsMsg.isEmpty {
                 Text(vm.appsMsg).font(.system(size: fs(12))).foregroundColor(vm.appsMsgErr ? Theme.warn : Theme.green).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 6)
             }

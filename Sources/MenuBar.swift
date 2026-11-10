@@ -179,7 +179,7 @@ func menuBarImage(free: Double, total: Double, level: Int) -> NSImage {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationDidBecomeActive(_ n: Notification) {
-        if !CommandLine.arguments.contains("--demo") { sharedVM.checkFullDiskAccess() }
+        if !CommandLine.arguments.contains("--demo") { sharedVM.checkFullDiskAccess(); TrashHint.apply() }
         if !CommandLine.arguments.contains("--demo") && Mintangle.shared.enabled { Mintangle.shared.apply() }
     }
 
@@ -233,12 +233,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             exit(0)
         }
+        // `--devdeps <folder>`: print what the old-project dependency check decides for that folder, then quit (test helper).
+        if isDevBuild, let i = a.firstIndex(of: "--devdeps"), i + 1 < a.count {
+            print(DevDeps.report([URL(fileURLWithPath: a[i + 1])])); print("--- worktrees"); print(DevDeps.worktreeReport([URL(fileURLWithPath: a[i + 1])])); exit(0)
+        }
         if a.contains("--demo") { Demo.load(sharedVM) }
+        if isDevBuild, let i = a.firstIndex(of: "--selftest"), i + 1 < a.count { SelfTest.run(Array(a[(i + 1)...])) }
+        if !a.contains("--demo") { TrashHint.apply() }
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
-           let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }) {
+           let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }),
+           true {   // a page that is not released yet cannot be opened from the command line either
             sharedVM.page = pg
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = (a.contains("--done") || a.contains("--demo-done")) ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }
+            if pg == .byapp && !a.contains("--demo") && a.contains("--scan") { sharedVM.scanByApp() }   // test helper
             if pg == .lens && a.contains("--sysdata") { sharedVM.openSys() }
             // `--scan` starts the scan of Duplicates or Large & Old Files right away (test helper).
             if pg == .dupes && a.contains("--scan") {
