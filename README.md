@@ -54,10 +54,10 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 | Area | What it does |
 |---|---|
 | **Clean Now** | One scan finds safe junk, shows it by group with sizes, cleans only when you press Clean |
-| **Clean by App** | Zalo, Telegram, WhatsApp, Slack, Chrome, Edge, Cốc Cốc, CapCut, VS Code, Outlook: caches pre-selected, chat photos in a weekly grid, files by month, messages and logins locked |
+| **Clean by App** | Zalo, Telegram, WhatsApp, Slack, Chrome, Edge, Cốc Cốc, CapCut, VS Code, Outlook: caches pre-selected, chat photos in a weekly grid, files by month, messages and logins locked. Local AI models (Ollama, Hugging Face, LM Studio): one row per model, shared files go only when every model using them is selected, keys and tokens locked |
 | **Undo** | Every clean is journaled; the Trash page puts the last run back |
-| **Cleanup** | User caches, app caches (Chrome, Slack, Notion, VS Code...), logs, npm cache, downloaded aerial wallpapers, old Downloads, `_tmp` / `_to_delete` drafts in your project folders |
-| **Uninstaller** | Search, then remove an app together with its leftovers, including its cache and temp folders in `/private/var/folders` (only bundle-id matches pre-selected, anything holding a database left to you); finds leftovers of apps already removed and old installers |
+| **Cleanup** | User caches, app caches (Chrome, Slack, Notion, VS Code...), logs, npm cache, downloaded aerial wallpapers, old Downloads, `_tmp` / `_to_delete` drafts in your project folders, libraries of projects left alone for 6 months (`node_modules`, Python environments, build folders) and Git working copies left behind (never pre-selected, checked again when you clean) |
+| **Uninstaller** | Search, then remove an app together with its leftovers, including its cache and temp folders in `/private/var/folders` (only bundle-id matches pre-selected, anything holding a database left to you); finds leftovers of apps already removed and old installers. Optional: a hint listing what an app left behind when you drag it to the Trash (off by default) |
 | **Large Files** | Files over 100 MB in your personal folders and on connected external drives, never pre-selected |
 | **Duplicates** | Finds identical files (SHA-256) on your Mac and on connected external drives, lets you pick the copy to keep, and before deleting can check whether a script or skill in your project folders still uses them |
 | **Space Lens** | Bubble map of what takes up space on your Mac or a connected external drive, with plain-language notes for common folders (AI model folders included) |
