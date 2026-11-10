@@ -2,7 +2,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/HaiTrung-Workspace/tidymint?label=release&color=2FD39F)](https://github.com/HaiTrung-Workspace/tidymint/releases/latest) [![Downloads](https://img.shields.io/github/downloads/HaiTrung-Workspace/tidymint/total?color=2FD39F)](https://github.com/HaiTrung-Workspace/tidymint/releases) [![License: MIT](https://img.shields.io/github/license/HaiTrung-Workspace/tidymint?color=2FD39F)](LICENSE) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-2FD39F) [![Homebrew](https://img.shields.io/badge/Homebrew-tap-2FD39F)](#homebrew)
 
-[![Mentioned in Awesome Mac](https://awesome.re/mentioned-badge.svg)](https://github.com/jaywcjlove/awesome-mac) [![As seen on Open Source Alternatives](https://www.opensourcealternatives.to/badge-osa.svg)](https://www.opensourcealternatives.to)
+<a href="https://macpip.com/apps/tidymint?ref=badge"><img src="docs/badge-macpip.svg" height="40" alt="#1 of the day on MacPip, Nov 6, 2026"></a> [![Mentioned in Awesome Mac](https://awesome.re/mentioned-badge.svg)](https://github.com/jaywcjlove/awesome-mac) [![As seen on Open Source Alternatives](https://www.opensourcealternatives.to/badge-osa.svg)](https://www.opensourcealternatives.to)
 
 **Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac.
 
