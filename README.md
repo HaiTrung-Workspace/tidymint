@@ -1,5 +1,7 @@
 # Tidymint
 
+[![Latest release](https://img.shields.io/github/v/release/HaiTrung-Workspace/tidymint?label=release&color=2FD39F)](https://github.com/HaiTrung-Workspace/tidymint/releases/latest) [![Downloads](https://img.shields.io/github/downloads/HaiTrung-Workspace/tidymint/total?color=2FD39F)](https://github.com/HaiTrung-Workspace/tidymint/releases) [![License: MIT](https://img.shields.io/github/license/HaiTrung-Workspace/tidymint?color=2FD39F)](LICENSE) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-2FD39F) [![Homebrew](https://img.shields.io/badge/Homebrew-tap-2FD39F)](#homebrew)
+
 [![Mentioned in Awesome Mac](https://awesome.re/mentioned-badge.svg)](https://github.com/jaywcjlove/awesome-mac) [![As seen on Open Source Alternatives](https://www.opensourcealternatives.to/badge-osa.svg)](https://www.opensourcealternatives.to)
 
 **Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac.
@@ -75,6 +77,14 @@ Also: open any file from the lists (click or Space for Quick Look, double-click 
 
 1. Download **[Tidymint.zip](https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip)** (Apple silicon and Intel, macOS 14 or later), open it and drag **Tidymint** to Applications.
 2. Tidymint is not notarized yet, so macOS blocks the first launch. Click **Done**, open **System Settings > Privacy & Security**, scroll to the **Security** heading (under *Allow applications from*) and click **Open Anyway**, then **Open** ([Apple's guide](https://support.apple.com/102445)). The button only shows for a while after a blocked launch; if it is missing, double-click the app again and come back. Step-by-step guide with screenshots: [tidymint.app/install](https://tidymint.app/install/).
+
+### Homebrew
+
+```sh
+brew install --cask HaiTrung-Workspace/tidymint/tidymint
+```
+
+The cask in [homebrew-tidymint](https://github.com/HaiTrung-Workspace/homebrew-tidymint) is updated by the release workflow and installs the same `Tidymint.zip` as the download above, so the first-launch step in point 2 still applies.
 
 ### Build from source
 

@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest something Tidymint should do, or an app it should learn to clean
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or Tiếng Việt are both fine. Tidymint keeps a few rules: files only go to the Trash, risky items are never pre-selected, nothing leaves your Mac.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: For example "App X keeps 20 GB of cache in ~/Library/..."
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like Tidymint to do?
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version (optional)
