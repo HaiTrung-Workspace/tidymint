@@ -2,6 +2,19 @@
 # Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.5.2", date="2026-11-10", status="released",
+         en=["New: Clean by App lists local AI models (Ollama, Hugging Face, LM Studio), one row per model. Files shared between models are shown apart and go only when every model using them is selected. Keys and sign-in tokens stay locked",
+             "New: Clean Now finds libraries of projects left alone for 6 months (node_modules, Python environments, build folders) and Git working copies that Git or an AI coding tool left behind. Never ticked for you, and checked again the moment you clean",
+             "New, off by default: when you drag an app to the Trash, Tidymint lists what the app left in Library. Nothing is ticked or removed for you. Turn it on in Settings",
+             "Fix: the Uninstaller no longer ticks folders that belong to another installed app with a similar identifier",
+             "Fix: Undo puts everything back when a folder and something inside it were cleaned together, and also restores broken shortcuts (symlinks). The Trash page counts hidden folders",
+             "Fix: in Duplicates, Select all extra copies says why when no copy can be picked, and two extra copies that share their data are picked together. Empty Trash names the app holding files open. Check for Updates confirms when you are on the latest version"],
+         vi=["Mới: Dọn theo ứng dụng liệt kê mô hình AI chạy trên máy (Ollama, Hugging Face, LM Studio), mỗi mô hình một dòng. File dùng chung giữa các mô hình hiện riêng và chỉ đi khi mọi mô hình dùng nó đều được chọn. Khoá và mã đăng nhập luôn bị khoá",
+             "Mới: Dọn ngay tìm thư viện của dự án bỏ yên 6 tháng (node_modules, môi trường Python, thư mục build) và các bản sao làm việc Git do Git hoặc công cụ AI viết code bỏ lại. Không tick sẵn, và kiểm lại ngay lúc bạn bấm Dọn",
+             "Mới, tắt sẵn: khi bạn kéo một app vào Thùng rác, Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá. Bật trong Cài đặt",
+             "Sửa lỗi: Gỡ app không còn tick sẵn thư mục của một app khác còn cài có mã định danh gần giống",
+             "Sửa lỗi: Hoàn tác trả về đủ khi một thư mục và mục nằm trong nó được dọn cùng lúc, và trả cả lối tắt hỏng (symlink). Trang Thùng rác đếm cả thư mục ẩn",
+             "Sửa lỗi: ở File trùng, nút Chọn mọi bản thừa nói rõ lý do khi không bản nào chọn được, và hai bản thừa dùng chung dữ liệu được chọn cùng nhau. Đổ Thùng rác nêu tên app đang giữ file. Kiểm tra cập nhật báo khi bạn đang dùng bản mới nhất"]),
     dict(ver="0.5.1", date="2026-11-06", status="released",
          vt=dict(score="0/66", date="2026-11-06", sha="4b2f53ad6402ca05ce3ca1e2e839361cb026c0a3429d9bc38b60318b8fdacfce"),
          en=["Fix: in Duplicates, Select all extra copies switches to Deselect all again when a group holds copies Tidymint never picks on its own (APFS clones, files in project folders)",

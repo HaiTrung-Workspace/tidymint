@@ -58,7 +58,7 @@ enum Dupes {
     /// "external" keeps the external copy, "mac" keeps the Mac copy, "ask" pre-selects nothing.
     /// Copies inside project folders are never pre-selected.
     /// The protections every automatic pick respects: project folders, cross-drive groups set to "ask", files scripts use.
-    static func autoPick(_ i: CleanItem, ask: Bool) -> Bool { !Prefs.inProject(i.url.path) && !ask && i.refStrong.isEmpty && i.size > 0 }   // a clone frees nothing
+    static func autoPick(_ i: CleanItem, ask: Bool) -> Bool { !Prefs.inProject(i.url.path) && !ask && i.refStrong.isEmpty && (i.size > 0 || i.cloneOfExtra) }   // a clone of the kept copy frees nothing
     static func arrange(_ items: [CleanItem], rule: String) -> [CleanItem] {
         let onExt = { (i: CleanItem) in Prefs.onOtherDrive(i.url.path) }
         let isCross = items.contains(where: onExt) && items.contains { !onExt($0) }
@@ -70,13 +70,19 @@ enum Dupes {
         // APFS clones share their data: in the final order, the first copy of each clone id keeps the size, later ones count 0
         // and are never picked. Done after ordering so the kept copy is never a 0-byte clone (re-run safely by dupApplyCross).
         let full = items.map(\.size).max() ?? 0
+        // Two extra copies that are clones of each other (not of the kept copy) free their space only when both go:
+        // the second one counts 0 too, but is picked together with the first (found in review 11/2026: picking one
+        // of the pair reported the full size and freed nothing).
         var seenClone = Set<UInt64>()
+        let keptClone = out.first.flatMap { cloneID($0.url.path) }
         for i in out.indices {
             if let c = cloneID(out[i].url.path), !seenClone.insert(c).inserted {
-                out[i].size = 0; out[i].clone = true
-                out[i].reason = t("APFS clone of another copy: shares its data, frees nothing", "Bản sao APFS của bản khác: dùng chung dữ liệu, xoá không giải phóng chỗ")
+                out[i].size = 0; out[i].clone = true; out[i].cloneOfExtra = c != keptClone
+                out[i].reason = out[i].cloneOfExtra
+                    ? t("APFS clone of another extra copy: the space is freed only when both go", "Bản sao APFS của một bản thừa khác: phải bỏ cả hai mới giải phóng chỗ")
+                    : t("APFS clone of another copy: shares its data, frees nothing", "Bản sao APFS của bản khác: dùng chung dữ liệu, xoá không giải phóng chỗ")
             } else if out[i].clone {
-                out[i].size = full; out[i].clone = false; out[i].reason = ""
+                out[i].size = full; out[i].clone = false; out[i].cloneOfExtra = false; out[i].reason = ""
             }
         }
         for i in out.indices {

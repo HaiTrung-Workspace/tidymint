@@ -134,7 +134,7 @@ extension NSColor {
     }
 }
 
-let sharedVM = MainActor.assumeIsolated { VM() }
+let sharedVM = MainActor.assumeIsolated { TrashHint.earlyProbe(); return VM() }
 
 @main
 struct DiskCleanupApp: App {

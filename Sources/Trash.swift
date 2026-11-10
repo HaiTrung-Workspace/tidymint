@@ -88,8 +88,10 @@ extension VM {
                 .filter { FileManager.default.fileExists(atPath: $0.path) && VM.isRealDriveTrash($0.deletingLastPathComponent()) }
             // One walk per Trash: (count, size). Both skip hidden files: Finder leaves a .DS_Store in an empty drive Trash
             // (seen 06/11/2026), which made an empty Trash read "8 KB".
+            // Hidden folders count (a trashed .venv or .build is real data, found in review 11/2026); only Finder's own
+            // bookkeeping files are left out.
             let each = trashes.map { tr -> (Int, Int64) in
-                let kids = Scanner.children(tr, hidden: false)
+                let kids = Scanner.children(tr, hidden: true).filter { let n = $0.lastPathComponent; return n != ".DS_Store" && !n.hasPrefix("._") && n != ".localized" }
                 return (kids.count, kids.reduce(Int64(0)) { $0 + Scanner.size($1) })
             }
             let s = each.reduce(Int64(0)) { $0 + $1.1 }, c = each.reduce(0) { $0 + $1.0 }
@@ -111,8 +113,17 @@ extension VM {
         var ok = 0, fail = 0
         var errDetail = ""
         lastOK = []; lastErr = ""
+        TrashHint.quiet()
         if Demo.active { lastErr = t("demo mode, nothing is moved", "chế độ demo, không chuyển gì"); return (0, urls.count) }
         var moved: [Journal.Entry] = alsoUndo
+        // An item inside another item of the same run goes with its parent (a node_modules inside a folder that is
+        // listed too): moved on its own first, Undo would rebuild an empty parent and then skip the real one.
+        let all = Set(urls.map { $0.standardizedFileURL.path })
+        let urls = urls.filter { u in
+            var p = u.standardizedFileURL.deletingLastPathComponent().path
+            while p.count > 1 { if all.contains(p) { return false }; p = (p as NSString).deletingLastPathComponent }
+            return true
+        }
         Scanner.warmProtectedFolders(for: urls)
         for u in urls {
             if IgnoreList.contains(u.path) {
@@ -216,12 +227,53 @@ extension VM {
                     if self.trashCount == 0 { self.undoable = nil; Journal.clear(); return }
                     self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there. Open the Trash in Finder to see them, then empty it again.",
                                            "Finder chưa đổ hết: còn \(self.trashCount) mục. Mở Thùng rác trong Finder để xem, rồi đổ lại.")
+                    // Usually an app still holds a file open (seen 08/11/2026: a virtual machine holding files in the
+                    // iCloud Trash). Name it, so the person knows what to quit.
+                    Task.detached {
+                        let who = trashHolders()
+                        guard !who.isEmpty else { return }
+                        await MainActor.run { [weak self] in
+                            guard let self, self.trashLeftNote != nil, self.trashCount > 0 else { return }
+                            let names = who.prefix(3).joined(separator: ", ")
+                            self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there, held open by \(names). Quit it, then empty the Trash again.",
+                                                   "Finder chưa đổ hết: còn \(self.trashCount) mục, đang bị \(names) giữ. Tắt app đó rồi đổ lại.")
+                        }
+                    }
                 }
             }
         }
         refreshTrash(); refreshDisk()
     }
 
+}
+
+/// Run lsof (read-only) and return its output, or nil when it could not run. A UTF-8 locale is set because without one
+/// lsof prints non-ASCII bytes as \xNN (measured 11/2026 on lsof 4.91: "Dự án" came back as "D\xe1\xbb\xb1 \xc3\xa1n"), and
+/// -n -P -l keep it from looking up host, port and user names (no network lookups, and faster).
+func lsofOutput(_ args: [String]) -> String? {
+    let p = Process(); p.executableURL = URL(fileURLWithPath: "/usr/sbin/lsof")
+    p.arguments = ["-n", "-P", "-l"] + args
+    var env = ProcessInfo.processInfo.environment; env["LC_ALL"] = "en_US.UTF-8"; p.environment = env
+    let out = Pipe(); p.standardOutput = out; p.standardError = FileHandle.nullDevice
+    guard (try? p.run()) != nil else { return nil }
+    let d = out.fileHandleForReading.readDataToEndOfFile(); p.waitUntilExit()
+    return String(data: d, encoding: .utf8)
+}
+
+/// Names of this user's apps that hold a file open inside a Trash folder. Empty when none or unknown.
+func trashHolders() -> [String] {
+    guard let s = lsofOutput(["-u", String(getuid()), "-F", "pcn"]) else { return [] }
+    var pid: pid_t = 0, cmd = "", found: [String] = []
+    for line in s.split(separator: "\n") {
+        if line.hasPrefix("p") { pid = pid_t(line.dropFirst()) ?? 0 }
+        else if line.hasPrefix("c") { cmd = String(line.dropFirst()) }
+        else if line.hasPrefix("n/"), line.contains("/.Trash/") || line.contains("/.Trashes/"), !cmd.isEmpty {
+            // The app's own name when macOS knows it (lsof gives the process name, often cut short).
+            let name = NSRunningApplication(processIdentifier: pid)?.localizedName ?? cmd
+            if !found.contains(name) { found.append(name) }
+        }
+    }
+    return found
 }
 
 /// Move a file into ~/.Trash directly (used when the standard Trash refuses, e.g. iCloud Drive files).
@@ -273,8 +325,16 @@ enum Journal {
     static func restore(_ s: Session) -> (ok: Int, skipped: Int) {
         var ok = 0, skipped = 0
         let fm = FileManager.default
-        for e in s.entries {
-            guard fm.fileExists(atPath: e.to), !fm.fileExists(atPath: e.from) else { skipped += 1; continue }
+        // Parents first: putting a child back creates its parent folder, and the parent's own entry would then be skipped.
+        let entries = s.entries.enumerated().sorted { a, b in
+            let da = a.element.from.split(separator: "/").count, db = b.element.from.split(separator: "/").count
+            return da != db ? da < db : a.offset < b.offset
+        }.map(\.element)
+        for e in entries {
+            // lstat, not fileExists: a relative symlink is dangling while it sits in the Trash, and fileExists follows links
+            // (seen 10/11/2026: Ollama's manifests-v2 link was skipped on Undo).
+            func present(_ p: String) -> Bool { (try? fm.attributesOfItem(atPath: p)) != nil }
+            guard present(e.to), !present(e.from) else { skipped += 1; continue }
             try? fm.createDirectory(atPath: (e.from as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
             do { try fm.moveItem(atPath: e.to, toPath: e.from); ok += 1 } catch {
                 // An app owned by root needs a password to go back too: Finder moves it and macOS asks. Same name only.
