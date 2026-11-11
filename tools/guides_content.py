@@ -846,7 +846,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 
 <h2 id="faster">The faster way: let Tidymint find it</h2>
 <p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you:</p>
-<figure class="fig-app"><img src="../sysdata.jpg" alt="Tidymint's What is in System Data page: caches and logs, browser temporary copies at 7.6 GB, Time Machine snapshots, each with a note" width="1600" height="1085" loading="lazy"><figcaption>What is in System Data: each part shows its size and where to handle it, or that macOS takes care of it.</figcaption></figure>
+<figure class="fig-app"><img src="../sysdata.jpg" alt="Tidymint's What is in System Data page: Xcode leftovers, caches and logs, browser temporary copies at 4.6 GB, Time Machine snapshots, each with a note" width="1600" height="1044" loading="lazy"><figcaption>What is in System Data: each part shows its size and where to handle it, or that macOS takes care of it.</figcaption></figure>
 <ul>
 <li><b>See what is in System Data.</b> In Space Lens, click <b>Disk full of "System Data"? See what is in it</b>. Tidymint lists the hidden space it can measure: iPhone and iPad backups, iOS update files, Xcode build files and simulator caches, Messages attachments, Docker, Time Machine snapshots. Each part has a plain note. Backups, update files and Xcode files can go to the Trash right there (backups are never pre-selected); for the rest it tells you where to handle it.</li>
 <li><b>Browser temporary copies.</b> Chrome, and browsers built on it such as Edge and Brave, put a copy of themselves in a temporary folder when they open. A copy can be left behind, for example when the browser does not quit normally. macOS empties that folder when you restart, so Tidymint shows the size and leaves it to macOS. On our test Mac these copies took 7.6 GB.</li>
@@ -1063,7 +1063,7 @@ dict(
 
 <h2 id="nhanh-hon">Cách nhanh hơn: để Tidymint tìm giúp</h2>
 <p>Bước 2, 4, 6, 7 đều phải lục thư mục ẩn. <a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, tìm giúp bạn:</p>
-<figure class="fig-app"><img src="../sysdata.jpg" alt="Trang System Data gồm những gì của Tidymint: bộ nhớ đệm và nhật ký, bản sao tạm của trình duyệt 7,6 GB, bản chụp Time Machine, mỗi mục có ghi chú" width="1600" height="1085" loading="lazy"><figcaption>System Data gồm những gì: mỗi phần ghi rõ dung lượng, dọn ở đâu hay để macOS lo.</figcaption></figure>
+<figure class="fig-app"><img src="../sysdata.jpg" alt="Trang System Data gồm những gì của Tidymint: phần sót của Xcode, bộ nhớ đệm và nhật ký, bản sao tạm của trình duyệt 4,6 GB, bản chụp Time Machine, mỗi mục có ghi chú" width="1600" height="1044" loading="lazy"><figcaption>System Data gồm những gì: mỗi phần ghi rõ dung lượng, dọn ở đâu hay để macOS lo.</figcaption></figure>
 <ul>
 <li><b>Xem Dữ liệu hệ thống gồm những gì.</b> Trong Bản đồ ổ đĩa, bấm <b>Ổ đầy vì "System Data"? Xem nó gồm những gì</b>. Tidymint liệt kê phần ẩn đo được: bản sao lưu iPhone, iPad, file cập nhật iOS, file build và bộ nhớ đệm máy ảo của Xcode, ảnh và file trong Tin nhắn, Docker, bản chụp Time Machine. Mỗi phần có ghi chú dễ hiểu. Bản sao lưu, file cập nhật và file Xcode chuyển được vào Thùng rác ngay tại đó (bản sao lưu không bao giờ chọn sẵn); phần còn lại ghi rõ xử lý ở đâu.</li>
 <li><b>Bản sao tạm của trình duyệt.</b> Chrome và các trình duyệt cùng lõi như Edge, Brave đặt một bản sao của chính nó vào thư mục tạm mỗi khi mở. Bản sao có thể bị sót lại, ví dụ khi trình duyệt không thoát bình thường. macOS dọn thư mục này khi khởi động lại máy, nên Tidymint chỉ báo dung lượng và để macOS lo. Trên máy thử của chúng tôi, phần này chiếm 7,6 GB.</li>
@@ -2161,6 +2161,7 @@ GUIDES.append(dict(
 <li><b>Gom file thừa</b>: gặp file nào không cần thì thả lên kệ, xong thì chuyển cả nhóm vào Thùng rác một lần.</li></ul>
 <h2 id="bat">Bật Mintdrop</h2>
 <ol class="steps"><li>Mở Tidymint, ở thanh bên chọn nhóm <b>CÔNG CỤ › Mintdrop</b>.</li><li>Bấm <b>Bật Mintdrop</b>. Không cần cấp quyền gì thêm.</li></ol>
+<figure class="fig-app"><img src="../mintdrop.jpg" alt="Trang Mintdrop của Tidymint với chiếc kệ nổi đang giữ bốn file: một ảnh chụp, một ảnh, một PDF và một file chữ" width="1600" height="1044" loading="lazy"><figcaption>Kệ nổi phía trên các cửa sổ. Trang Mintdrop cho biết kệ đang giữ bao nhiêu file.</figcaption></figure>
 <h2 id="mo-ke">Mở kệ: 3 cách</h2>
 <ul><li><b>Lắc chuột khi đang kéo file</b>: kéo một hay nhiều file trong Finder, lắc qua lại vài lần, kệ hiện ngay dưới con trỏ. Thả tay là file nằm trên kệ. Tắt được trong trang Mintdrop.</li>
 <li><b>Phím tắt ⌃⌥S</b> (Control, Option, S): mở hoặc ẩn kệ.</li>
@@ -2216,6 +2217,7 @@ GUIDES.append(dict(
 <li><b>Collect leftovers</b>: drop each file you no longer need on the shelf as you find it, then send the group to the Trash in one go.</li></ul>
 <h2 id="turn-on">Turn on Mintdrop</h2>
 <ol class="steps"><li>Open Tidymint and choose <b>TOOLS › Mintdrop</b> in the sidebar.</li><li>Click <b>Turn on</b>. No extra permission is needed.</li></ol>
+<figure class="fig-app"><img src="../mintdrop.jpg" alt="The Mintdrop page in Tidymint with the floating shelf holding four files: a photo, an image, a PDF and a text file" width="1600" height="1044" loading="lazy"><figcaption>The shelf floats above your windows. The Mintdrop page shows how many files it holds.</figcaption></figure>
 <h2 id="open">Open the shelf: 3 ways</h2>
 <ul><li><b>Shake while dragging files</b>: drag one or more files in Finder and shake the pointer a few times. The shelf appears under the pointer; let go and the files land on it. You can turn this off on the Mintdrop page.</li>
 <li><b>Shortcut ⌃⌥S</b> (Control, Option, S) shows or hides the shelf.</li>
@@ -2281,6 +2283,7 @@ GUIDES.append(dict(
 <ol class="steps"><li>Trong Tidymint, chọn <b>CÔNG CỤ › Mintangle</b> ở thanh bên, bấm <b>Bật và cấp quyền</b>.</li>
 <li>macOS hiện hộp thoại hỏi quyền. Mở <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật › Trợ năng</b> (Accessibility), bật công tắc cạnh Tidymint.</li>
 <li>Quay lại Tidymint: trang Mintangle tự nhận quyền và bắt đầu chạy.</li></ol>
+<figure class="fig-app"><img src="../mintangle.jpg" alt="Trang Mintangle của Tidymint liệt kê phím tắt cho nửa màn hình, góc, chia ba, kích thước và vị trí" width="1600" height="1044" loading="lazy"><figcaption>Mọi phím tắt nằm ngay trên trang Mintangle, kèm hình nhỏ cho biết cửa sổ sẽ về đâu.</figcaption></figure>
 <h2 id="phim-tat">Phím tắt mặc định</h2>
 <p>⌃ là Control, ⌥ là Option, ⇧ là Shift, ⌘ là Command.</p>
 """ + _mt_table(True) + """
@@ -2326,6 +2329,7 @@ GUIDES.append(dict(
 <ol class="steps"><li>In Tidymint, choose <b>TOOLS › Mintangle</b> in the sidebar and click <b>Turn on and grant permission</b>.</li>
 <li>macOS asks for permission. Open <b>System Settings › Privacy &amp; Security › Accessibility</b> and switch Tidymint on.</li>
 <li>Back in Tidymint, the Mintangle page picks up the permission and starts working.</li></ol>
+<figure class="fig-app"><img src="../mintangle.jpg" alt="The Mintangle page in Tidymint listing shortcuts for halves, corners, thirds, size and position" width="1600" height="1044" loading="lazy"><figcaption>Every shortcut is listed on the Mintangle page, with a small picture of where the window goes.</figcaption></figure>
 <h2 id="shortcuts">Default shortcuts</h2>
 <p>⌃ is Control, ⌥ is Option, ⇧ is Shift, ⌘ is Command.</p>
 """ + _mt_table(False) + """
