@@ -4,7 +4,7 @@
 
 <a href="https://macpip.com/apps/tidymint?ref=badge"><img src="docs/badge-macpip.svg" height="40" alt="#1 of the day on MacPip, Nov 6, 2026"></a> [![Mentioned in Awesome Mac](https://awesome.re/mentioned-badge.svg)](https://github.com/jaywcjlove/awesome-mac) [![As seen on Open Source Alternatives](https://www.opensourcealternatives.to/badge-osa.svg)](https://www.opensourcealternatives.to)
 
-**Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac.
+**Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac. Window tiling (Mintangle) and a file shelf (Mintdrop) are built in.
 
 AI work leaves a lot behind: model files, drafts, exported images, duplicate assets, caches from browsers and editors. Tidymint finds that clutter, shows exactly what it is, and moves only what you select to the Trash.
 
@@ -25,7 +25,7 @@ Open **Review every item** to see each category, expand it, and tick or untick s
 ![Cleanup details](docs/cleanup.jpg)
 
 ### 2b. Clean by app
-Zalo, Chrome, Edge, Cốc Cốc and CapCut each get their own page: caches are pre-selected, photos, videos and files are listed by month for you to pick, and messages, logins and projects are locked. Cleaning is refused while the app is open.
+Zalo, Telegram, WhatsApp, Slack, Chrome, Edge, Cốc Cốc, CapCut, VS Code and Outlook each get their own page: caches are pre-selected, photos, videos and files are listed by month for you to pick, and messages, logins and projects are locked. Cleaning is refused while the app is open.
 
 ![Clean by App](docs/byapp.jpg)
 
@@ -49,6 +49,16 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 
 ![Large files](docs/large.jpg)
 
+### 7. Mintangle: put every window in its place
+Snap a window to a half, a corner, a third or two thirds of the screen with one shortcut, or by dragging it to a screen edge. The keys match Rectangle. Off by default; macOS asks for Accessibility permission only when you turn it on. [Guide](https://tidymint.app/mintangle-window-tiling-mac/)
+
+![Mintangle](docs/mintangle.jpg)
+
+### 8. Mintdrop: gather files on one shelf
+A small shelf that floats on your screen. Shake while dragging or press ⌃⌥S, drop files from several folders, then drag them out together, move them to a folder or put them in the Trash, with Undo. The shelf only remembers paths and never copies a file. Off by default, no permission needed. [Guide](https://tidymint.app/mintdrop-drop-shelf-mac/)
+
+![Mintdrop](docs/mintdrop.jpg)
+
 ## Features
 
 | Area | What it does |
@@ -63,6 +73,8 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 | **Space Lens** | Bubble map of what takes up space on your Mac or a connected external drive, with plain-language notes for common folders (AI model folders included) |
 | **Cloud Cleanup** | Shows how much of iCloud Drive, Google Drive, Dropbox... is stored locally |
 | **Startup Items** | Lists background helpers with who signed them, flags unusual locations or names and ones left by removed apps. Facts, not antivirus |
+| **Mintangle** | Window tiling: halves, corners, thirds and two thirds by shortcut or by dragging to a screen edge. Off by default |
+| **Mintdrop** | A floating shelf to gather files from several folders, then drag them out, move them or trash them together, with Undo. Off by default |
 | **Statistics** | Space freed over time and a full activity log |
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance (can be hidden in Settings) |
 | **Contact** | Send feedback or bug reports from inside the app |
