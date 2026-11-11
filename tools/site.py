@@ -139,7 +139,7 @@ HOME_CSS = """
 .fx-i{position:relative}
 .fx-i img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:0 30px 70px #000a}
 .fx-i:before{content:"";position:absolute;inset:10%;background:radial-gradient(closest-side,#2fd39f40,transparent);filter:blur(36px);z-index:-1}
-.strip.two{grid-template-columns:repeat(2,1fr);margin-top:12px}.striph{margin:28px 0 0;font-size:15px;color:var(--mut,inherit);opacity:.8}.strip a{white-space:nowrap}
+.strip.two{grid-template-columns:repeat(2,1fr);margin-top:12px}.striph{margin:28px 0 12px;font-size:15px;color:var(--mut,inherit);opacity:.8}.strip a{white-space:nowrap}
 .strip{display:grid;grid-template-columns:repeat(3,1fr);margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:14px}
 .strip div{display:flex;gap:12px;align-items:flex-start;padding:16px 18px;border-left:1px solid var(--line)}.strip div:first-child{border-left:0}
 .strip p{margin:0}.strip .ico{width:36px;height:36px}.strip b{display:block;color:var(--text);font-size:15px;margin-bottom:2px}.strip p span{display:block;color:var(--sub);font-size:14px;line-height:1.45}
@@ -194,6 +194,8 @@ T = {
       ("dupes","Duplicates","Remove duplicates without breaking projects","Files are matched by content and one copy is always kept. Copies still used by a script in your project folders are flagged and skipped.",["Matched by content, not by name","One copy always kept","Files your projects use are protected"],None,"dupes.jpg","Tidymint duplicate file finder with the copy to keep marked"),
       ("byapp","Clean by App","Clean app by app, keep what matters","Browsers, chat apps and video editors pile up gigabytes of cache. Clean them one app at a time.",["Chrome, Slack, VS Code, Telegram, CapCut, plus local AI models (Ollama, LM Studio, Hugging Face)","Caches ticked, messages and logins never read or touched","Chat photos and files grouped by month, you choose what stays"],None,"byapp.jpg","Clean by App showing browser caches pre-selected and chat photos by month")],
   minis=[("undo","Undo","Every clean is recorded. One click puts the last run back while it is still in the Trash."),("startup","Startup Items","See every app running in the background, with a flag on odd names or locations."),("leaf","Menu bar monitor","A mint leaf in the menu bar fills as your disk fills, next to free GB. Alerts when disk or memory runs low. Light enough to leave running all day.")],
+  tools=[("tiling","Mintangle","Put every window in its place with one shortcut","Snap a window to a half, a corner, a third or two thirds of the screen, by shortcut or by dragging it to a screen edge.",["Keys for corners and thirds, which macOS shortcuts leave out","Same keys as Rectangle","Off by default, asks for Accessibility only when you turn it on"],("mintangle-window-tiling-mac/","How Mintangle works"),"mintangle.jpg","Mintangle page listing window shortcuts for halves, corners and thirds"),
+         ("shelf","Mintdrop","Gather files from anywhere, move them at once","A small shelf that floats on your screen. Drop files from several folders onto it, then handle the whole group in one go.",["Shake while dragging, or press ⌃⌥S","Drag out together, move to a folder or put in the Trash, with Undo","Only remembers paths, never copies a file"],("mintdrop-drop-shelf-mac/","How Mintdrop works"),"mintdrop.jpg","Mintdrop shelf floating over Tidymint with four files on it")],
   more_h="Beyond cleaning: two tools for everyday work, both off until you turn them on",
   more=[("tiling","Mintangle","Arrange windows with shortcuts, or by dragging a window to an edge or corner.","mintangle-window-tiling-mac/","How it works"),("shelf","Mintdrop","A drop shelf: shake the pointer while dragging to collect files from several places, then move them together.","mintdrop-drop-shelf-mac/","How it works")],
   band_h="Eleven tools. One small, free app.", band_p="No account, no subscription, no tracking. Download it, scan, and see what you get back.",
@@ -266,6 +268,8 @@ T = {
       ("large","File lớn","Tìm file lớn bị bỏ quên","File xuất cũ, file ảnh đĩa, đồ tải về rồi quên. Xếp theo dung lượng hoặc theo lần mở cuối.",["Mọi file trên 100 MB trong một danh sách","Không chọn sẵn, bạn tự chọn file nào bỏ","Hiện đường dẫn đầy đủ, biết rõ nguồn gốc từng file"],None,"large.jpg","Danh sách file lớn trên MacBook xếp theo dung lượng, chưa chọn file nào"),
       ("dupes","File trùng","Xoá file trùng mà không lo hỏng dự án","So theo nội dung, luôn giữ lại một bản. Bản nào script trong thư mục dự án còn dùng sẽ được đánh dấu và bỏ qua.",["So nội dung, không so tên","Luôn giữ lại một bản","File dự án còn dùng được bảo vệ"],None,"dupes.jpg","Tìm file trùng trên MacBook, đánh dấu bản giữ lại")],
   minis=[("undo","Hoàn tác","Mỗi lần dọn đều được ghi lại. Đổi ý thì một cú bấm trả lần dọn gần nhất về chỗ cũ."),("startup","Khởi động cùng máy","Biết rõ từng ứng dụng đang chạy ngầm, đánh dấu tên hay vị trí bất thường."),("leaf","Thanh menu","Chiếc lá trên thanh menu đầy dần theo ổ, kèm số GB còn trống. Báo khi ổ hay RAM sắp đầy. Để Tidymint chạy nền không lo ngốn dung lượng.")],
+  tools=[("tiling","Mintangle","Xếp mọi cửa sổ vào đúng chỗ chỉ với một phím bấm","Đặt cửa sổ vào nửa màn hình, một góc, 1/3 hoặc 2/3 bằng một phím tắt, hoặc khi bạn kéo cửa sổ vào mép màn hình.",["Có phím cho bốn góc và chia ba, thứ phím tắt của macOS không có","Bộ phím giống Rectangle","Mặc định tắt, chỉ khi bạn bật thì macOS mới hỏi quyền Trợ năng"],("mintangle-xep-cua-so-mac/","Cách dùng Mintangle"),"mintangle.jpg","Trang Mintangle liệt kê phím tắt xếp cửa sổ: nửa màn hình, góc, chia ba"),
+         ("shelf","Mintdrop","Gom file từ nhiều nơi về một kệ, kéo đi một lần","Một chiếc kệ nhỏ nổi trên màn hình. Thả file từ nhiều thư mục vào, rồi xử lý cả nhóm một lần.",["Lắc chuột khi kéo file, hoặc nhấn ⌃⌥S","Kéo cả nhóm đi, dời vào một thư mục hoặc bỏ Thùng rác, có Hoàn tác","Kệ chỉ nhớ đường dẫn, không chép file nào"],("mintdrop-ke-tha-file-mac/","Cách dùng Mintdrop"),"mintdrop.jpg","Kệ Mintdrop nổi trên Tidymint, đang giữ bốn file")],
   more_h="Ngoài việc dọn: hai công cụ cho việc hằng ngày, tắt sẵn, bạn bật mới chạy",
   more=[("tiling","Mintangle","Xếp cửa sổ bằng phím tắt, hoặc kéo cửa sổ vào cạnh hay góc màn hình.","mintangle-xep-cua-so-mac/","Xem cách dùng"),("shelf","Mintdrop","Kệ thả file: lắc chuột khi đang kéo để gom file từ nhiều nơi, rồi chuyển đi một lượt.","mintdrop-ke-tha-file-mac/","Xem cách dùng")],
   band_h="Mười một công cụ. Một app nhỏ, miễn phí.", band_p="Không tài khoản, không thuê bao, không theo dõi. Tải về, quét thử, xem giải phóng được bao nhiêu.",
@@ -354,10 +358,12 @@ def page(k):
     ok = icon("check", 16)
     trust = "".join('<div><span class="ico">%s</span><b>%s</b>%s</div>' % (icon(a), b, c) for a, b, c in t["trust"])
     pains = "".join('<div class="stat pain"><span class="q">%s</span><b>%s</b><span>%s</span></div>' % x for x in t["pains"])
-    fx = "".join('<div class="fx%s"><div class="fx-t"><span class="ico">%s</span><span class="tag">%s</span><h3>%s</h3><p>%s</p><ul>%s</ul>%s</div><div class="fx-i"><img src="%s%s" alt="%s" loading="lazy" width="1600" height="%d"></div></div>'
+    fxrow = lambda rows, off=0: "".join('<div class="fx%s"><div class="fx-t"><span class="ico">%s</span><span class="tag">%s</span><h3>%s</h3><p>%s</p><ul>%s</ul>%s</div><div class="fx-i"><img src="%s%s" alt="%s" loading="lazy" width="1600" height="%d"></div></div>'
                  % (" flip" if n % 2 else "", icon(ic), tg, h3, p_, "".join("<li>%s<span>%s</span></li>" % (ok, b) for b in bl),
                     ('<a class="more" href="%s">%s <span class="arr r">→</span></a>' % more) if more else "", shot, im, alt, SHOT_H.get(im, 1044))
-                 for n, (ic, tg, h3, p_, bl, more, im, alt) in enumerate(t["fx"]))
+                 for n, (ic, tg, h3, p_, bl, more, im, alt) in enumerate(rows, off))
+    fx = fxrow(t["fx"])
+    tools = fxrow(t["tools"], len(t["fx"]))
     more = "".join('<div><span class="ico">%s</span><p><b>%s</b><span>%s <a href="%s">%s →</a></span></p></div>' % (icon(a), b, c, d, e) for a, b, c, d, e in t["more"])
     minis = "".join('<div><span class="ico">%s</span><p><b>%s</b><span>%s</span></p></div>' % (icon(a), b, c) for a, b, c in t["minis"])
     opn = "".join('<a class="card" href="%s"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span class="small">%s</span></a>' % (h, icon(a), b, c) for a, h, b, c in t["open"])
@@ -428,7 +434,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
   {fx}
   <div class="strip">{minis}</div>
   <p class="striph">{t["more_h"]}</p>
-  <div class="strip two">{more}</div>
+  {tools}
 </section>
 
 <section style="padding-top:24px">
