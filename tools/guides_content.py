@@ -63,7 +63,7 @@ dict(
 
 <h2 id="tidymint-vs-cleanmymac">Tidymint và CleanMyMac khác nhau thế nào</h2>
 <p>Nói thẳng: Tidymint <b>không thay được toàn bộ</b> CleanMyMac. Tidymint tập trung vào một việc là dọn dẹp và lấy lại dung lượng.</p>
-<figure class="fig-app"><img src="../smart.jpg" alt="Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm và ghi dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm, ghi rõ dung lượng.</figcaption></figure>
+<figure class="fig-app"><img src="../smart.jpg" alt="Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm và ghi dung lượng" width="1600" height="1044" loading="lazy"><figcaption>Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm, ghi rõ dung lượng.</figcaption></figure>
 <div class="tbl"><table>
 <tr><th></th><th>Tidymint</th><th>CleanMyMac</th></tr>
 <tr><td>Giá</td><td class="y">Miễn phí, không tài khoản</td><td>Khoảng 40 USD/năm/máy</td></tr>
@@ -149,7 +149,7 @@ dict(
 
 <h2 id="cach-3-app">Cách 3: Gỡ sạch bằng Tidymint (miễn phí)</h2>
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
-<figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1085" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
+<figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1044" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
 <li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. App cài từ App Store hay cài cho mọi tài khoản cũng gỡ được: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS, Tidymint không thấy mật khẩu. Mọi thứ chỉ chuyển vào Thùng rác; đổi ý thì bấm Hoàn tác, app và file đi kèm quay về chỗ cũ. Bạn quen tự kéo app vào Thùng rác? Từ bản 0.5.2 có thể bật <b>Gợi ý khi bỏ app vào Thùng rác</b> trong Cài đặt (tắt sẵn): khi đó Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá.</li>
 <li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xoá.</li>
@@ -223,7 +223,7 @@ dict(
 <h2 id="anh-cu">Bỏ ảnh cũ, giữ ảnh mới</h2>
 <p>Trong <code>ZaloDownloads/picture</code> và <code>resource</code>, file xếp được theo ngày. Trong Finder chọn xem dạng <b>Danh sách</b>, sắp theo <b>Ngày sửa đổi</b>, chọn các file cũ hơn 6 tháng rồi kéo vào Thùng rác. Ảnh nào cần giữ thì lưu ra thư mục Ảnh trước.</p>
 <p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint miễn phí, mã nguồn mở, do một người Việt làm.</p>
-<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1044" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
 {CTA}
 
 <h2 id="zalo-tu-don">Zalo có tự dọn không?</h2>
@@ -435,7 +435,7 @@ dict(
 <li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
 </ol>
 <p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp, và trang <b>Thống kê</b> vẽ biểu đồ dung lượng trống theo từng ngày (7, 30 hay 90 ngày), nên bạn thấy ngay ổ bắt đầu tụt từ hôm nào mà không phải ghi số ra giấy. App miễn phí, mã nguồn mở.</p>
-<figure class="fig-app"><img src="../lens.jpg" alt="Bản đồ ổ đĩa của Tidymint: mỗi thư mục là một bong bóng, to nhỏ theo dung lượng" width="1600" height="1013" loading="lazy"><figcaption>Bản đồ ổ đĩa trong Tidymint: bong bóng càng to, thư mục càng nặng.</figcaption></figure>
+<figure class="fig-app"><img src="../lens.jpg" alt="Bản đồ ổ đĩa của Tidymint: mỗi thư mục là một bong bóng, to nhỏ theo dung lượng" width="1600" height="1044" loading="lazy"><figcaption>Bản đồ ổ đĩa trong Tidymint: bong bóng càng to, thư mục càng nặng.</figcaption></figure>
 
 <h2 id="snapshot">Snapshot Time Machine</h2>
 <ul>
@@ -1192,7 +1192,7 @@ dict(
 
 <h2 id="app">Way 3: Uninstall with Tidymint (free)</h2>
 <p>Checking every folder by hand takes time and it's easy to pick the wrong one. Tidymint finds the leftovers for you:</p>
-<figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Slack together with its leftover files in Library" width="1600" height="1085" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
+<figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Slack together with its leftover files in Library" width="1600" height="1044" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
 <ul>
 <li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Apps from the App Store or installed for every user can be removed too: macOS asks for an administrator password in its own window, and Tidymint never sees it. Everything always goes to the Trash first, and Undo puts the app and its files back where they were. Prefer dragging apps to the Trash yourself? From 0.5.2 you can turn on <b>Hint when an app goes to the Trash</b> in Settings (off by default): Tidymint then lists what that app left in Library. Nothing is ticked or removed for you.</li>
 <li><b>AppCleaner</b> (free) and <b>Pearcleaner</b> (free, source available): drop an app on the window and they list its related files for you to remove.</li>
@@ -1522,7 +1522,7 @@ dict(
 </ol>
 
 <h2 id="tidymint">Do it with Tidymint</h2>
-<figure class="fig-app"><img src="../dupes.jpg" alt="Tidymint's Duplicates page: groups of identical files with one copy kept" width="1600" height="1013" loading="lazy"><figcaption>Duplicates in Tidymint: identical files grouped, one copy always kept.</figcaption></figure>
+<figure class="fig-app"><img src="../dupes.jpg" alt="Tidymint's Duplicates page: groups of identical files with one copy kept" width="1600" height="1044" loading="lazy"><figcaption>Duplicates in Tidymint: identical files grouped, one copy always kept.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner built around those four rules:</p>
 <ul>
 <li>It scans Documents, Downloads, Desktop, Pictures, Movies and Music, plus any external drive or folder you add in Settings, for files of 1 MB or more and <b>matches them by content</b>, not by name. When a file is on both the Mac and a drive, you choose which copy to keep.</li>
@@ -1594,7 +1594,7 @@ dict(
 </ol>
 
 <h2 id="tidymint">Làm bằng Tidymint</h2>
-<figure class="fig-app"><img src="../dupes.jpg" alt="Trang File trùng của Tidymint: các nhóm file giống hệt nhau, luôn giữ một bản" width="1600" height="1013" loading="lazy"><figcaption>File trùng trong Tidymint: gom nhóm file giống hệt nhau, luôn giữ lại một bản.</figcaption></figure>
+<figure class="fig-app"><img src="../dupes.jpg" alt="Trang File trùng của Tidymint: các nhóm file giống hệt nhau, luôn giữ một bản" width="1600" height="1044" loading="lazy"><figcaption>File trùng trong Tidymint: gom nhóm file giống hệt nhau, luôn giữ lại một bản.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm theo đúng bốn luật trên:</p>
 <ul>
 <li>Quét Tài liệu, Tải về, Màn hình nền, Ảnh, Phim, Nhạc, cùng ổ ngoài hay thư mục bạn thêm ở Cài đặt, tìm file từ 1 MB trở lên và <b>so theo nội dung</b>, không theo tên. File có cả trên máy lẫn trên ổ ngoài thì bạn chọn giữ bản nào.</li>
@@ -1803,7 +1803,7 @@ dict(
 </ul>
 
 <h2 id="tidymint">Dọn CapCut bằng Tidymint</h2>
-<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1013" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
+<figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1044" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
 <p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
 <ul>
 <li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký) được chọn sẵn, ghi rõ dung lượng;</li>
