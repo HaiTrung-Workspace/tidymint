@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate guide pages (docs/<lang>/<slug>/index.html) and refresh sitemap.xml.
 Content lives in tools/guides_content.py. Run from the repository root: python3 tools/guides.py"""
+import re
 import importlib.util, json, os, html, datetime
 from stamp import stamp
 
@@ -87,6 +88,23 @@ L = {
             nav=[("../#features","Features"),("../#how","How it works"),("../guides/","Guides"),("../#faq","FAQ"),(S.GH,"GitHub")]),
 }
 
+TLOG_CSS = '.tlog .relv .ver{font-size:16px;white-space:nowrap}.tlog .relv summary{align-items:baseline}.tlog .relv p{margin:0 0 16px}'
+
+def log_details(body):
+    """Transparency log: one closed <details> per entry. Summary = date + first sentence, the rest opens on click."""
+    m = re.search(r'(<h2 id="(?:nhat-ky|log)">.*?</h2>\s*<p>.*?</p>\s*)<ul>(.*?)</ul>', body, re.S)
+    if not m: return body
+    out = []
+    for it in re.split(r'<li>', m.group(2))[1:]:
+        it = it.replace('</li>', '').strip()
+        d = re.match(r'<b>(.*?)</b>:\s*(.*)', it, re.S)
+        if not d: out.append('<p>%s</p>' % it); continue
+        head, _, rest = d.group(2).partition('. ')
+        if head.count('<') != head.count('>') or '<a' in head and '</a>' not in head: head, rest = re.sub(r'<[^>]+>', '', d.group(2))[:90], d.group(2)
+        out.append('<details class="relv"><summary><span class="ver">%s</span><span class="small">%s</span></summary><p>%s</p></details>'
+                   % (d.group(1), head.rstrip('.'), rest.strip() or d.group(2)))
+    return body[:m.start()] + m.group(1) + '<style>' + TLOG_CSS + '</style><div class="tlog">' + ''.join(out) + '</div>' + body[m.end():]
+
 def guide(g):
     k = g["lang"]; t = S.T[k]; l = L[k]
     pre = "vi/" if k == "vi" else ""
@@ -116,6 +134,7 @@ def guide(g):
         import safety_gen
         body = body.replace("{SAFETY_RULES}", safety_gen.html_for(k))
     body = body.replace("{CTA}", cta).replace("{DL}", S.DL).replace("{HOME}", home)
+    if g["slug"] in ("an-toan", "safety"): body = log_details(body)
     fcols = "".join('<div><h3>%s</h3>%s</div>' % (h, "".join('<a href="%s">%s</a>' % ((home + u) if not u.startswith(("http","mailto")) else u, n) for u, n in links)) for h, links in t["f_cols"])
     strip = lambda s: html.unescape(__import__("re").sub("<[^>]+>", "", s))
     ld = [
