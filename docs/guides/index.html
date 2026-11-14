@@ -89,9 +89,11 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-siz
 .mq .dot{color:var(--leaf);display:inline-flex}
 .mq .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--leaf)}
 .mq .r2 .grp{gap:0}.mq .r2 .lbl{margin-right:20px}
-.mq .r2 a{font-size:16px;color:var(--sub);text-decoration:underline;text-decoration-color:#ffffff33;text-underline-offset:4px}
-.mq .r2 a:hover{color:var(--text);text-decoration-color:var(--leaf)}
-.mq .r2 a+a::before{content:"·";display:inline-block;margin:0 16px;color:#ffffff40;text-decoration:none}
+.mq .r2 .grp{align-items:center}
+.mq .r2 a.bdg{display:inline-flex;align-items:center;line-height:0;margin-right:22px;opacity:.88;transition:opacity .15s;text-decoration:none;flex:none}.mq .r2 a.bdg:hover{opacity:1}
+.mq .r2 a.bdg img{height:36px;width:auto;margin:0;border:0;border-radius:4px;box-shadow:none;display:block;max-width:none}
+.mq .r2 a.bdg.sh img{height:22px;border-radius:3px}
+.mq .r2 a.chip{height:36px;box-sizing:border-box;padding:0 14px;gap:6px;border:1px solid #ffffff2e;border-radius:8px;background:#0e1a16;color:var(--text);font-size:15px;font-weight:700;line-height:1;white-space:nowrap}.mq .r2 a.chip span{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--sub)}
 .mq:hover .row{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.mq .row{animation:none}}
