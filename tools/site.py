@@ -34,6 +34,21 @@ def head_icons(root):
     return ('<link rel="icon" href="%sfavicon.ico" sizes="32x32">\n<link rel="icon" href="%sfavicon.svg" type="image/svg+xml">\n'
             '<link rel="apple-touch-icon" href="%sapple-touch-icon.png">\n<link rel="manifest" href="%ssite.webmanifest">\n<meta name="theme-color" content="#030c09">') % (root, root, root, root)
 # Lists that include Tidymint, shown in the 'Listed in' trust card. Add a name only once its listing is live.
+BADGES = [
+    '<a class="bdg"@T@ href="https://macpip.com/apps/tidymint?ref=badge"><img src="{img}badge-macpip.svg" alt="#1 of the day on MacPip, Nov 6, 2026" width="138" height="44" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://alternativeto.net/software/tidymint/about/?utm_source=badge&amp;utm_medium=referral" target="_blank" rel="noopener"><img src="{img}badge-alternativeto.svg" alt="Tidymint | AlternativeTo" width="244" height="83" loading="lazy"></a>',
+    '<a class="bdg sh"@T@ href="https://github.com/jaywcjlove/awesome-mac" target="_blank" rel="noopener"><img src="{img}badge-awesome.svg" alt="Mentioned in awesome-mac" width="110" height="20" loading="lazy"></a>',
+    '<a class="bdg chip"@T@ href="https://tidymint.macupdate.com/" target="_blank" rel="noopener"><span>Listed on</span>MacUpdate</a>',
+    '<a class="bdg sh"@T@ href="https://www.opensourcealternatives.to" target="_blank" rel="noopener"><img src="{img}badge-osa.svg" alt="As seen on Open Source Alternatives" width="270" height="20" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://macnative.io/apps/tidymint?utm_source=macnative-badge&amp;utm_medium=referral" target="_blank" rel="noopener"><img src="https://macnative.io/badge?kind=listed&amp;theme=dark&amp;slug=tidymint&amp;small=1" alt="Listed on MacNative" width="168" height="44" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://www.saashub.com/tidymint" target="_blank" rel="noopener"><img src="{img}badge-saashub.png" alt="Approved on SaaSHub" width="132" height="44" loading="lazy"></a>',
+    '<a class="bdg sh"@T@ href="https://openmacapps.com/apps/tidymint/" target="_blank" rel="noopener"><img src="{img}badge-openmacapps.svg" alt="Listed on OpenMacApps" width="171" height="20" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://justmacapps.com/apps/tidymint" data-justmacapps="ec66c372-c4f8-4d19-a44c-58a1f38c7def" target="_blank" rel="noopener"><img src="{img}badge-justmacapps.svg" alt="Listed on JustMacApps" width="189" height="44" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://megalaun.ch/" target="_blank" rel="noopener"><img src="{img}badge-megalaunch.svg" alt="Featured on MegaLaunch" width="171" height="44" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://toolindex.net/?ref=badge" target="_blank" rel="nofollow noopener"><img src="{img}badge-toolindex.svg" alt="Listed on Tool Index" width="163" height="44" loading="lazy"></a>',
+    '<a class="bdg"@T@ href="https://postyourstartup.com/startup/tidymint?ref=badge" target="_blank" rel="noopener"><img src="{img}badge-postyourstartup.svg" alt="Featured on PostYourStartup" width="170" height="44" loading="lazy"></a>',
+    '<a class="bdg sh"@T@ href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener"><img src="{img}badge-awesome-flat.svg" alt="Mentioned in awesome-swift-macos-apps" width="110" height="20" loading="lazy"></a>',
+]
 LISTED = '<span class="lst"><a href="https://github.com/jaywcjlove/awesome-mac" target="_blank" rel="noopener">awesome-mac</a> · <a href="https://alternativeto.net/software/tidymint/about/" target="_blank" rel="noopener">AlternativeTo</a> · <a href="https://macnative.io/apps/tidymint" target="_blank" rel="noopener">MacNative</a> · <a href="https://tidymint.macupdate.com/" target="_blank" rel="noopener">MacUpdate</a> · <a href="https://openmacapps.com/apps/tidymint/" target="_blank" rel="noopener">OpenMacApps</a> · <a href="https://www.opensourcealternatives.to/item/tidymint" target="_blank" rel="noopener">Open Source <wbr>Alternatives</a> · <a href="https://www.saashub.com/tidymint" target="_blank" rel="noopener">SaaSHub</a> · <a href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener">awesome-swift-<wbr>macos-apps</a></span>'
 ORG = {"@context":"https://schema.org","@type":"Organization","name":"Tidymint","url":"https://tidymint.app/","logo":"https://tidymint.app/icon-512.png","sameAs":[u for _, u, _ in SOCIAL]}
 BASE_CSS = open(os.path.join(ROOT, "tools", "site.css")).read()
@@ -65,7 +80,6 @@ details p{color:var(--sub);margin:0 0 16px}
 .fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px;padding:36px 0 20px;border-top:1px solid var(--line)}
 .fcols h3{margin:0 0 10px;font-size:14px;color:var(--text)}.fcols .brand{display:flex;align-items:center;gap:10px;padding:0;font-size:18px;color:var(--text)}.fcols .brand:hover{text-decoration:none}.fcols a{display:block;color:var(--sub);font-size:14px;padding:3px 0}.fcols p{color:var(--sub);font-size:14px;margin:8px 0 0}
 footer{border-top:0;padding:0 0 28px}
-.fbadges{display:flex;flex-wrap:wrap;align-items:center;gap:12px 14px;padding:0 0 24px}.fbadges a{display:inline-block;line-height:0}.fbadges img{height:36px;width:auto;border-radius:3px}.fbadges img[src*="badge-osa"]{height:20px}
 .soc{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.fcols .soc a{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;padding:0;border-radius:50%;border:1px solid #ffffff26;color:var(--sub)}
 @media (hover:hover){.fcols .soc a:hover{color:var(--leaf);border-color:#2fd39faa;background-color:#ffffff0d;text-decoration:none}}
 @media (max-width:820px){.def,.fcols{grid-template-columns:1fr}.ins{grid-template-columns:1fr;gap:24px}.grid{grid-template-columns:repeat(3,1fr);gap:10px}.grid.uses{grid-template-columns:1fr 1fr}.grid .card{padding:14px}.grid .card span{font-size:14px}.grid .card .hd b{font-size:15px}.vs{gap:12px}.vs .col{padding:18px}.vs h3{font-size:18px}.how{gap:8px}.how .arr{width:26px;height:26px}.how .arr svg{width:14px;height:14px}.how .card{padding:16px}.how .card>span{font-size:14px}.how .n{font-size:30px}.navcta{display:none}}
@@ -328,13 +342,14 @@ T = {
 IDS = {"en": dict(f="features", h="how", q="faq", i="install", s="signup"),
        "vi": dict(f="tinh-nang", h="cach-dung", q="hoi-dap", i="cai-dat", s="dang-ky")}
 
-def marquee(t):
+def marquee(t, img=None):
+    img = t["img"] if img is None else img
     dot = '<span class="dot" aria-hidden="true">%s</span>' % icon("leaf", 20)
     g1 = '<div class="grp"@H@><span class="big">Keep your Mac in <span>mint condition.</span></span>' + dot + "".join('<span class="it"><span class="ic" aria-hidden="true">%s</span>%s</span>' % (icon(k, 20), x) for k, x in zip(("free", "source", "privacy", "undo"), t["mq_items"])) + dot + '</div>'
-    g2 = '<div class="grp"@H@><span class="lbl">' + t["mq_lbl"] + '</span>' + "".join('<a href="%s" target="_blank" rel="noopener"@T@>%s</a>' % (u, n) for n, u in LISTED_LINKS) + '</div>'
+    g2 = '<div class="grp"@H@><span class="lbl">' + t["mq_lbl"] + '</span>' + "".join(b.replace("{img}", img) for b in BADGES) + '</div>'
     hid = lambda g: g.replace("@H@", ' aria-hidden="true"').replace("@T@", ' tabindex="-1"')
     vis = lambda g: g.replace("@H@", "").replace("@T@", "")
-    mq = '<div class="mq"><div class="row">' + vis(g1) + hid(g1) + '</div><div class="row r2">' + vis(g2) + hid(g2) * 3 + '</div></div>'
+    mq = '<div class="mq"><div class="row">' + vis(g1) + hid(g1) + '</div><div class="row r2">' + vis(g2) + hid(g2) * 2 + '</div></div>'
     return mq
 
 def page(k):
@@ -519,7 +534,6 @@ gtag('js',new Date());gtag('config','{GA_ID}');
   <div><a class="brand" href="./"><img src="{img}logo.svg" alt="" width="36" height="36"><span>Tidy<span class="mint">mint</span></span></a><p class="tagline">{t["tagline"]}</p><p>{t["f_blurb"]}</p>{social(t["follow"])}</div>
   {fcols}
 </div>
-<div class="fbadges"><a class="osa" href="https://macpip.com/apps/tidymint?ref=badge"><img src="{img}badge-macpip.svg" alt="#1 of the day on MacPip, Nov 6, 2026" width="138" height="44" loading="lazy"></a><a class="osa" href="https://www.opensourcealternatives.to" target="_blank" rel="noopener"><img src="{img}badge-osa.svg" alt="As seen on Open Source Alternatives" width="270" height="20" loading="lazy"></a><a class="osa" href="https://macnative.io/apps/tidymint?utm_source=macnative-badge&amp;utm_medium=referral" target="_blank" rel="noopener"><img src="https://macnative.io/badge?kind=listed&amp;theme=dark&amp;slug=tidymint&amp;small=1" alt="Listed on MacNative" width="168" height="44" loading="lazy"></a><a class="osa" href="https://www.saashub.com/tidymint" target="_blank" rel="noopener"><img src="{img}badge-saashub.png" alt="Approved on SaaSHub" width="132" height="44" loading="lazy"></a><a class="osa" href="https://justmacapps.com/apps/tidymint" data-justmacapps="ec66c372-c4f8-4d19-a44c-58a1f38c7def" target="_blank" rel="noopener"><img src="{img}badge-justmacapps.svg" alt="Listed on JustMacApps" width="189" height="44" loading="lazy"></a><a class="osa" href="https://megalaun.ch/" target="_blank" rel="noopener"><img src="{img}badge-megalaunch.svg" alt="Featured on MegaLaunch" width="171" height="44" loading="lazy"></a><a class="osa" href="https://toolindex.net/?ref=badge" target="_blank" rel="nofollow noopener"><img src="{img}badge-toolindex.svg" alt="Listed on Tool Index" width="163" height="44" loading="lazy"></a><a class="osa" href="https://postyourstartup.com/startup/tidymint?ref=badge" target="_blank" rel="noopener"><img src="{img}badge-postyourstartup.svg" alt="Featured on PostYourStartup" width="170" height="44" loading="lazy"></a></div>
 <footer><span>{t["copy"]}{t["extra_footer"]} · <button class="linkbtn" id="ckOpen" type="button">{t["ck_link"]}</button></span></footer>
 </div>
 <button class="up" id="up" type="button" aria-label="{t["top"]}" title="{t["top"]}">↑</button>
