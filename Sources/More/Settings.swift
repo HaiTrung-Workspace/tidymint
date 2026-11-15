@@ -96,9 +96,10 @@ struct SettingsBox<Content: View>: View {
     @ViewBuilder let content: () -> Content
     var body: some View {
         VStack(alignment: .leading, spacing: 0) { content() }.padding(.top, -1)
+            // As System Settings draws its groups: a flat patch a little lighter than the page, softly rounded, no outline
+            // (Apple keeps glass out of the content layer; rows are told apart by hairlines only).
             .background(Theme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.ink.opacity(0.06), lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -206,7 +207,7 @@ struct SettingsView: View {
                     }.padding(.top, 4)
                 }.settingFlat()
                 }
-                SettingNote(t("Duplicates and Large & Old Files also scan here. Unplugged drives are skipped; network drives and Time Machine backups are not supported.",
+                SettingNote(t("Duplicates and Large Files also scan here. Unplugged drives are skipped; network drives and Time Machine backups are not supported.",
                                    "File trùng và File lớn và cũ quét thêm ở đây. Ổ chưa cắm thì bỏ qua; chưa hỗ trợ ổ mạng và ổ sao lưu Time Machine."))
                 }
             }
@@ -237,29 +238,27 @@ struct SettingsView: View {
                     Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
             }
+            #if TIDYMINT_PRIVATE
+            if featureMintangle { MintangleSettings(groups: groups, open: { vm.page = .windows }) }
+            if featureShelf { ShelfSettings(groups: groups, open: { vm.page = .shelf }) }
+            MintbarSettings(groups: groups, open: { vm.page = .menubar })
+            #endif
             SettingsGroup(id: "look", icon: "paintpalette", title: t("Appearance", "Giao diện"),
-                          summary: t("Theme, text size", "Màu giao diện, cỡ chữ"), badge: nil, groups: groups) {
+                          summary: t("Theme", "Màu giao diện"), badge: nil, groups: groups) {
                 SettingsBox {
                 settingRow(t("Theme", "Giao diện màu"), "") {
                     HStack(spacing: 12) {
                         ForEach(palettes, id: \.id) { pl in ThemeSwatch(pl: pl, vm: vm, hover: themeHover) }
                     }.contentShape(Rectangle()).onHover { themeHover.inRow = $0; if !$0 { themeHover.id = nil } }
                 }
-                settingRow(t("Text size", "Cỡ chữ"), "") {
-                    Picker("", selection: Binding(get: { vm.textSize }, set: { vm.setTextSize($0) })) {
-                        Text(t("Small", "Nhỏ")).tag("small")
-                        Text(t("Default", "Mặc định")).tag("default")
-                        Text(t("Large", "Lớn")).tag("large")
-                    }.pickerStyle(.segmented).labelsHidden().controlSize(.small).fixedSize()
-                }
                 }
             }
             SettingsGroup(id: "about", icon: "info.circle", title: t("Updates and about", "Cập nhật và thông tin"),
                           summary: t("Version \(Updates.current), update check, privacy, support", "Phiên bản \(Updates.current), kiểm bản mới, quyền riêng tư, ủng hộ"),
                           badge: vm.newVersion != nil ? t("New version", "Có bản mới") : nil, groups: groups) {
-                settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)"),
+                settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)") + privateVersionNote,
                            vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
-                                                : vm.updResult ?? (vm.autoUpdateCheck ? t("Checks once a day. Only the app and macOS version are counted; nothing else about your Mac is sent.", "Kiểm mỗi ngày một lần. Chỉ đếm theo phiên bản app và macOS, không gửi gì khác về máy.")
+                                                : vm.updResult ?? (vm.autoUpdateCheck ? t("Checks once a day. Only the app version and the macOS version are counted; nothing else about your Mac is sent.", "Kiểm mỗi ngày một lần. Chỉ đếm theo phiên bản app và macOS, không gửi gì khác về máy.")
                                                                       : t("Automatic check is off.", "Đã tắt tự kiểm tra.")), attention: vm.newVersion != nil) {
                     HStack(spacing: 10) {
                         if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }
@@ -273,8 +272,8 @@ struct SettingsView: View {
                     Toggle("", isOn: Binding(get: { vm.autoUpdateCheck }, set: { vm.setAutoUpdateCheck($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
                 settingRow(t("Support the project", "Ủng hộ dự án"),
-                           t("Free forever. Sponsorships pay for the Apple Developer account ($99/year), so Apple can verify the app and new users just open it, no trip to Settings > Security.",
-                             "Miễn phí trọn đời. Tiền ủng hộ trả phí tài khoản Apple Developer (99 USD/năm) để Apple xác nhận app, người mới cài mở là chạy, không phải qua Cài đặt > Bảo mật.")) {
+                           t("Free to clean. Sponsorships pay for the Apple Developer account ($99/year), so Apple can verify the app and new users just open it, no trip to Settings > Security.",
+                             "Dọn dẹp miễn phí. Tiền ủng hộ trả phí tài khoản Apple Developer (99 USD/năm) để Apple xác nhận app, người mới cài mở là chạy, không phải qua Cài đặt > Bảo mật.")) {
                     PrimaryButton(title: t("Sponsor", "Ủng hộ"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, compact: true)
                 }
                 settingRow(t("Privacy", "Quyền riêng tư"),
@@ -297,6 +296,9 @@ struct SettingsView: View {
     func openAttention() {
         if !vm.fullDiskAccess { groups.ids.insert("scan") }
         if vm.newVersion != nil { groups.ids.insert("about") }
+        #if TIDYMINT_PRIVATE
+        if featureMintangle && Mintangle.shared.enabled && !Mintangle.shared.trustedNow { groups.ids.insert("mintangle") }
+        #endif
     }
     /// One setting. With a description: its own rounded block, the description as a note under it (System Settings style).
     /// Without: a bare row, to be grouped with others inside a SettingsBox.

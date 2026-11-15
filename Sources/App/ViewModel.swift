@@ -15,7 +15,31 @@ import AVFoundation
 
 enum Page: String, CaseIterable, Identifiable {
     case smart = "Smart Scan", cleanup = "Cleanup", byapp = "Clean by App", large = "Large & Old Files", lens = "Space Lens", trash = "Trash", ignore = "Ignore List", cloud = "Cloud Cleanup", settings = "Settings", apps = "Uninstaller", dupes = "Duplicates", startup = "Startup", stats = "Stats", contact = "Contact"
+    #if TIDYMINT_PRIVATE
+    case menubar = "Mintbar", windows = "Mintangle", shelf = "Mintdrop"
+    #endif
     var id: String { rawValue }
+    /// ⌘ plus this key opens the page from the main window: 1 to 4 for the cleaning pages, 5 to 8 for the tools (fixed
+    /// per tool, so a build without one leaves its digit unused), and the comma every Mac app uses for Settings. Letters
+    /// were tried first and clashed with system-wide shortcuts (⌘D, ⌘B) on the first Mac they ran on.
+    var shortcutKey: String? {
+        switch self {
+        case .smart: return "1"
+        case .byapp: return "2"
+        case .apps: return "3"
+        case .trash: return "4"
+        #if TIDYMINT_PRIVATE
+        case .windows: return featureMintangle ? "5" : nil
+        case .shelf: return featureShelf ? "6" : nil
+        #endif
+        case .settings: return ","
+        default:
+            #if TIDYMINT_PRIVATE
+            if self == .menubar { return "7" }
+            #endif
+            return nil
+        }
+    }
     var label: String {
         switch self {
         case .smart: return t("Clean Now", "Dọn ngay")
@@ -32,6 +56,11 @@ enum Page: String, CaseIterable, Identifiable {
         case .startup: return t("Startup Items", "Khởi động cùng máy")
         case .stats: return t("Statistics", "Thống kê")
         case .contact: return t("Contact", "Liên hệ")
+        #if TIDYMINT_PRIVATE
+        case .windows: return "Mintangle"
+        case .shelf: return "Mintdrop"
+        case .menubar: return "Mintbar"
+        #endif
         }
     }
     var icon: String {
@@ -50,6 +79,11 @@ enum Page: String, CaseIterable, Identifiable {
         case .startup: return "power"
         case .stats: return "chart.bar"
         case .contact: return "envelope"
+        #if TIDYMINT_PRIVATE
+        case .windows: return "rectangle.lefthalf.inset.filled"
+        case .shelf: return "tray"
+        case .menubar: return "ellipsis.rectangle"
+        #endif
         }
     }
 }
@@ -197,7 +231,7 @@ enum Phase { case idle, scanning, summary, review, done }
             switch c {
             case .network:
                 a.messageText = t("Network drives are not supported", "Chưa hỗ trợ ổ mạng")
-                a.informativeText = t("macOS has no Trash on a network drive, so Tidymint could not move files there safely.", "macOS không có Thùng rác trên ổ mạng, nên Tidymint không chuyển file ở đó vào Thùng rác một cách an toàn được.")
+                a.informativeText = t("macOS has no Trash on a network drive, so Tidymint cannot move files there safely.", "macOS không có Thùng rác trên ổ mạng, nên Tidymint không chuyển file ở đó vào Thùng rác một cách an toàn được.")
             case .readOnly:
                 a.messageText = t("This drive is read-only", "Ổ này chỉ đọc")
                 a.informativeText = t("Files on it cannot be moved to the Trash (common for NTFS drives formatted on Windows).", "Không chuyển được file trên ổ này vào Thùng rác (hay gặp với ổ NTFS định dạng trên Windows).")
@@ -342,7 +376,8 @@ enum Phase { case idle, scanning, summary, review, done }
         guard let d = doneInfo else { return }
         let before = undoable
         undoLast()
-        guard undoable == nil, before != nil else { return }
+        // Nothing came back (cancelled, or every move failed): the banner and its Undo stay as they are.
+        guard let before, undoable?.entries.count != before.entries.count else { return }
         doneInfo = nil
         switch d.page {
         case .large: scanLarge()

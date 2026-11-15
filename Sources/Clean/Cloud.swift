@@ -100,7 +100,7 @@ struct CloudView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(t("Cloud Cleanup", "Dữ liệu đám mây")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
+                    Text(t("Cloud", "Dữ liệu đám mây")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                     Text(t("How much of Google Drive, iCloud and other cloud folders is stored on this Mac. Files that live only in the cloud count as 0.",
                            "Google Drive, iCloud và các thư mục mây đang chiếm bao nhiêu trên máy. File chỉ nằm trên mây tính là 0."))
                         .foregroundColor(Theme.sub).font(.system(size: fs(12)))
@@ -153,7 +153,7 @@ struct CloudView: View {
                                     }.padding(.horizontal, 14).padding(.vertical, 6).hoverBG(8, Theme.ink.opacity(0.07))
                                 }
                             }
-                        }.background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+                        }.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
                     }
                 }.padding(.horizontal, 24).padding(.bottom, 16)
             }

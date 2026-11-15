@@ -390,8 +390,8 @@ extension AppRules {
         return bucket.keys.sorted(by: >).map { m in
             let b = bucket[m]!
             let n = b.urls.count - b.index
-            let sub = n > 0 ? t("\(n) files", "\(n) file")
-                            : t("only \(b.index) index files of the app", "chỉ còn \(b.index) tệp chỉ mục của app")
+            let sub = n > 0 ? t("\(plural(n, "file"))", "\(n) file")
+                            : t("only \(plural(b.index, "index file")) of the app", "chỉ còn \(b.index) tệp chỉ mục của app")
             return AppRow(id: s.id + "|" + ISO8601DateFormatter().string(from: m), title: monthLabel(m),
                           sub: sub, size: b.size, count: n, urls: b.urls, month: m, selected: false)
         }.filter { $0.size > 0 }

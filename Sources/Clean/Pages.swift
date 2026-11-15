@@ -43,7 +43,7 @@ struct SmartView: View {
                            "Chưa có quyền Truy cập toàn bộ ổ đĩa, nên Mail, Safari, Tin nhắn và thư viện Ảnh, Nhạc bị ẩn khỏi lượt quét. Bật Tidymint trong Cài đặt hệ thống rồi quay lại."))
                         .font(.system(size: fs(12))).foregroundColor(Theme.text).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
-                    GhostButton(title: t("Open Settings", "Mở Cài đặt")) { NSWorkspace.shared.open(VM.fdaSettings) }
+                    GhostButton(title: t("Open System Settings", "Mở Cài đặt")) { NSWorkspace.shared.open(VM.fdaSettings) }
                 }.padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Theme.warn.opacity(0.12))).frame(maxWidth: 620)
             }
             switch vm.phase {
@@ -63,7 +63,6 @@ struct SmartView: View {
                 }
                 BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
                     .onAppear { CheckIn.shared.refresh() }   // the card itself is empty while hidden, so it cannot carry onAppear
-                Text(t("Nothing is moved until you press Clean.", "Chưa dọn gì cho tới khi bạn bấm Dọn.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     HomeCard(title: t("Chrome, Slack, Telegram...", "Zalo, Chrome, Telegram..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
                     HomeCard(title: t("Photos, videos, old files", "Ảnh, video, file cũ"), value: t("Large Files", "File lớn"), sub: t("you choose", "bạn tự chọn")) { vm.page = .large }
@@ -74,7 +73,7 @@ struct SmartView: View {
                 Text(vm.lastFreed > 0 ? t("\(fmt(vm.lastFreed)) tidier", "Gọn thêm \(fmt(vm.lastFreed))") : t("Already tidy", "Máy đang gọn rồi"))
                     .font(.system(size: fs(40), weight: .bold)).foregroundColor(Theme.text)
                 Text(vm.lastFreed > 0
-                     ? t("\(vm.lastCount) items moved to the Trash. Nothing is lost yet: empty the Trash to free the space for real, or undo if you change your mind.",
+                     ? t("\(plural(vm.lastCount, "item")) moved to the Trash. Nothing is lost yet: empty the Trash to free the space for real, or undo if you change your mind.",
                          "Đã chuyển \(vm.lastCount) mục vào Thùng rác. Chưa mất gì cả: đổ Thùng rác thì ổ mới trống thật, hoặc bấm Hoàn tác nếu đổi ý.")
                      : t("Nothing safe to clean right now. Try Clean by App or Large Files for things only you can decide on.",
                          "Không có gì an toàn để dọn lúc này. Thử Dọn theo ứng dụng hoặc File lớn, là phần chỉ bạn quyết được."))
@@ -213,7 +212,7 @@ struct ReviewView: View {
                                 }
                                 Spacer()
                                 SafetyBadge(level: cat.safety, why: cat.why)
-                                Text(t("\(cat.items.count) items", "\(cat.items.count) mục")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                                Text(t("\(plural(cat.items.count, "item"))", "\(cat.items.count) mục")).foregroundColor(Theme.sub).font(.system(size: fs(12)))
                                 Text(fmt(cat.selectedSize) + " / " + fmt(cat.total)).foregroundColor(Theme.text)
                                     .font(.system(size: fs(13), weight: .medium).monospacedDigit()).frame(width: 150, alignment: .trailing)
                                 Image(systemName: "chevron.down").rotationEffect(.degrees(cat.expanded ? 0 : -90)).foregroundColor(Theme.sub)
@@ -228,7 +227,7 @@ struct ReviewView: View {
                                 SmallItemsRow(cat: $cat, vm: vm).padding(.leading, 26)
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+                        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
                     }
                 }.padding(.horizontal, 24).padding(.bottom, 16)
             }
@@ -253,8 +252,8 @@ struct ByAppView: View {
         } else if !vm.appScanned {
             VStack(spacing: 28) {
                 Header(title: t("Clean by App", "Dọn theo ứng dụng"),
-                       sub: t("Zalo, Telegram, WhatsApp, Slack, Outlook, VS Code, CapCut and Chrome, Edge, Cốc Cốc: see what each app keeps on your Mac and clean it by type.\nAlso the AI models of Ollama, LM Studio and Hugging Face, one by one.\nMessages and logins are never touched.",
-                              "Zalo, Telegram, WhatsApp, Slack, Outlook, VS Code, CapCut và Chrome, Edge, Cốc Cốc: xem từng app đang giữ gì trên máy và dọn theo loại.\nCó cả model AI của Ollama, LM Studio, Hugging Face, hiện từng model một.\nTin nhắn và đăng nhập không bao giờ bị đụng."))
+                       sub: t("See what each app keeps on your Mac and clean it by type.\nMessages and logins are never touched.",
+                              "Xem từng app đang giữ gì trên máy và dọn theo loại.\nTin nhắn và đăng nhập không bao giờ bị đụng."))
                 BigScanButton(label: t("Scan", "Quét")) { vm.scanByApp() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let id = vm.appSel, let r = vm.appReports.first(where: { $0.id == id }) {
@@ -271,11 +270,30 @@ func externalDrives() -> [URL] {
         .filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
         .sorted { $0.lastPathComponent.localizedCaseInsensitiveCompare($1.lastPathComponent) == .orderedAscending }
 }
+/// `--demo-icons <dir>` (only with `--demo`): `<dir>/<bundle id>.png` stands in for an app the screenshot Mac does not
+/// have, and that app counts as installed, so demo pages show it like any other app. An installed app keeps its own icon.
+let demoIconDir: String? = {
+    let a = CommandLine.arguments
+    guard a.contains("--demo"), let i = a.firstIndex(of: "--demo-icons"), i + 1 < a.count else { return nil }
+    return a[i + 1]
+}()
+func demoIcon(_ bundleID: String) -> NSImage? {
+    guard let dir = demoIconDir else { return nil }
+    return NSImage(contentsOf: URL(fileURLWithPath: dir).appendingPathComponent(bundleID + ".png"))
+}
 func appIcon(_ bundleIDs: [String]) -> NSImage {
     for b in bundleIDs { if let u = NSWorkspace.shared.urlForApplication(withBundleIdentifier: b) { return NSWorkspace.shared.icon(forFile: u.path) } }
+    for b in bundleIDs { if let i = demoIcon(b) { return i } }
     return NSWorkspace.shared.icon(for: .applicationBundle)
 }
-func appInstalled(_ bundleIDs: [String]) -> Bool { bundleIDs.contains { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0) != nil } }
+/// Icon of an app in the Uninstaller list; in a demo, an app that is not on this Mac takes its stand-in icon.
+func appIcon(at url: URL, bundleID: String) -> NSImage {
+    if demoIconDir != nil, !FileManager.default.fileExists(atPath: url.path), let i = demoIcon(bundleID) { return i }
+    return NSWorkspace.shared.icon(forFile: url.path)
+}
+func appInstalled(_ bundleIDs: [String]) -> Bool {
+    bundleIDs.contains { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0) != nil || demoIcon($0) != nil }
+}
 
 /// App icon for a Clean by App rule. The app may be gone while its data stays (e.g. CapCut removed, Movies/CapCut left):
 /// then a neutral tile with the app's initial instead of macOS's blank "application" icon, which looks broken.
@@ -299,7 +317,7 @@ struct AppList: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(t("Clean by App", "Dọn theo ứng dụng")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
-                    Text(t("\(vm.appReports.count) apps, \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })) can be cleaned. Folders with a database inside are always left out.", "\(vm.appReports.count) app, có thể dọn \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })). Thư mục có database bên trong luôn được bỏ qua."))
+                    Text(t("\(plural(vm.appReports.count, "app")), \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })) can be cleaned. Folders with a database inside are always left out.", "\(vm.appReports.count) app, có thể dọn \(fmt(vm.appReports.reduce(0) { $0 + $1.cleanable })). Thư mục có database bên trong luôn được bỏ qua."))
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 }
                 Spacer()
@@ -331,7 +349,7 @@ struct AppList: View {
                                 }.frame(minWidth: 110 * uiScale, alignment: .trailing)
                                 Image(systemName: "chevron.right").foregroundColor(Theme.sub)
                             }
-                            .padding(14).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card)).hoverBG(10, Theme.ink.opacity(0.06))
+                            .padding(14).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card)).hoverBG(10, Theme.ink.opacity(0.06))
                             .contentShape(Rectangle()).onTapGesture { vm.appSel = r.id; vm.appAge = 0 }
                         }
                     }.padding(.horizontal, 24).padding(.bottom, 16)
@@ -451,7 +469,7 @@ struct AppDetail: View {
                                 }
                             }
                         }
-                        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+                        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
                     }
                 }.padding(.horizontal, 24).padding(.bottom, 16)
             }
@@ -477,7 +495,7 @@ struct LargeView: View {
             switch vm.largePhase {
             case .idle:
                 VStack(spacing: 28) {
-                    Header(title: t("Large & Old Files", "File lớn và cũ"), sub: t("Files over 100 MB in your folders and the drives added in Settings, hidden files included. App and library packages are listed whole, not opened.\nNothing is ticked; you choose.", "File trên 100 MB trong các thư mục của bạn và ổ đã thêm ở Cài đặt, gồm cả file ẩn. Gói của app hay thư viện được liệt kê nguyên gói, không mở ra.\nKhông tick sẵn, bạn tự chọn."))
+                    Header(title: t("Large Files", "File lớn và cũ"), sub: t("Files over 100 MB in your folders and the drives added in Settings, hidden files included. App and library packages are listed whole, not opened.\nNothing is ticked; you choose.", "File trên 100 MB trong các thư mục của bạn và ổ đã thêm ở Cài đặt, gồm cả file ẩn. Gói của app hay thư viện được liệt kê nguyên gói, không mở ra.\nKhông tick sẵn, bạn tự chọn."))
                     BigScanButton(label: t("Scan", "Quét")) { vm.scanLarge() }
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             case .scanning:
@@ -486,7 +504,7 @@ struct LargeView: View {
                 HStack {
                     Text(t("Large Files (\(vm.large.count))", "File lớn (\(vm.large.count))")).font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     Spacer()
-                    Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Oldest Opened", "Lâu không mở")).tag(true) }
+                    Picker("", selection: $sortByDate.v) { Text(t("By Size", "Theo dung lượng")).tag(false); Text(t("Least Recently Opened", "Lâu không mở")).tag(true) }
                         .pickerStyle(.segmented).controlSize(.small).fixedSize()
                     Button { vm.scanLarge() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.icon).tip(t("Scan again", "Quét lại"), trailing: true).foregroundColor(Theme.text).padding(.leading, 8)
                 }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 14)
@@ -500,7 +518,7 @@ struct LargeView: View {
                             ForEach(sortedIDs(), id: \.self) { id in
                                 if let i = index[id] {
                                     ItemRow(item: $vm.large[i], vm: vm, showDate: true)
-                                    .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+                                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
                                 }
                             }
                         }.padding(.horizontal, 24)
@@ -549,7 +567,7 @@ struct IgnoreView: View {
                                 TextLink(t("Remove", "Gỡ"), size: 13) { vm.unignore(p) }
                             }
                             .padding(.horizontal, 12).padding(.vertical, 8)
-                            .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+                            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
                             .hoverBG(10, Theme.ink.opacity(0.06))
                         }
                     }.padding(.horizontal, 24)

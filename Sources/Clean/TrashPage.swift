@@ -34,10 +34,10 @@ struct TrashView: View {
                         Image(systemName: vm.trashCount == 0 ? "trash" : "trash.fill").font(.system(size: fs(26))).foregroundStyle(Theme.accent).frame(width: 40)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(fmt(vm.trashSize)).font(.system(size: fs(20), weight: .bold).monospacedDigit()).foregroundColor(Theme.text)
-                            Text(vm.trashCount == 0 ? t("The Trash is empty.", "Thùng rác trống.") : t("\(vm.trashCount) items in the Trash", "\(vm.trashCount) mục trong Thùng rác"))
+                            Text(vm.trashCount == 0 ? t("The Trash is empty.", "Thùng rác trống.") : t("\(plural(vm.trashCount, "item")) in the Trash", "\(vm.trashCount) mục trong Thùng rác"))
                                 .font(.system(size: fs(11))).foregroundColor(Theme.sub)
                             ForEach(vm.trashOnDrives, id: \.0) { d in
-                                Label(t("\(d.1) items, \(fmt(d.2)) on \(d.0)", "\(d.1) mục, \(fmt(d.2)) trên ổ \(d.0)"), systemImage: "externaldrive")
+                                Label(t("\(plural(d.1, "item")), \(fmt(d.2)) on \(d.0)", "\(d.1) mục, \(fmt(d.2)) trên ổ \(d.0)"), systemImage: "externaldrive")
                                     .font(.system(size: fs(11))).foregroundColor(Theme.sub)
                             }
                         }
@@ -61,7 +61,7 @@ struct TrashView: View {
                     SettingsBox {
                         HStack(spacing: 12) {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(t("\(s.entries.count) items, \(fmt(s.size))", "\(s.entries.count) mục, \(fmt(s.size))") + sessionName(s))
+                                Text(t("\(plural(s.entries.count, "item")), \(fmt(s.size))", "\(s.entries.count) mục, \(fmt(s.size))") + sessionName(s))
                                     .font(.system(size: fs(13))).foregroundColor(Theme.text)
                                 Text(ago(s.date)).font(.system(size: fs(11))).foregroundColor(Theme.sub)
                             }

@@ -2,6 +2,19 @@
 # Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
+    dict(ver="0.6.0", date="2026-11-15", status="released",
+         en=["New: Mintbar gathers menu bar icons behind one group icon you choose. Click the group to fan its apps out, click an app to open its menu. Up to 2 groups of 4 apps. Off by default; on macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on",
+             "New look: the app icon is a mint leaf, the sidebar is a glass pane on macOS 26 and later, and Clean Now cards are lighter",
+             "New: switch pages with ⌘1 to ⌘7; the keys are shown in the sidebar",
+             "Mintangle keeps halves, corners, Maximize, Center, Restore and dragging to an edge. Mintdrop holds up to 5 items, dragged out one at a time",
+             "The code of the Mint tools is no longer in the public repository. The cleaning core stays open",
+             "Fix: Undo keeps its record for items that could not be put back (for example when you cancel the password prompt), so you can try again"],
+         vi=["Mới: Mintbar gom icon trên thanh menu vào sau một icon nhóm do bạn chọn. Bấm icon nhóm để xoè các app ra, bấm một app để mở menu của nó. Tối đa 2 nhóm, mỗi nhóm 4 app. Tính năng tắt sẵn; trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình",
+             "Diện mạo mới: icon app là chiếc lá bạc hà, thanh bên dạng kính trên macOS 26 trở lên, thẻ ở Dọn ngay gọn hơn",
+             "Mới: chuyển trang bằng ⌘1 đến ⌘7, phím hiện ngay trên thanh bên",
+             "Mintangle giữ các thao tác nửa màn hình, góc, phóng to, ra giữa, khôi phục và kéo vào mép. Mintdrop giữ tối đa 5 mục, kéo ra từng mục",
+             "Mã của các công cụ Mint không còn nằm trong kho công khai. Lõi dọn dẹp vẫn mở",
+             "Sửa lỗi: Hoàn tác giữ lại sổ ghi cho các mục chưa trả về được (ví dụ khi bạn huỷ ô mật khẩu), để bạn thử lại"]),
     dict(ver="0.5.2", date="2026-11-10", status="released",
          vt=dict(score="0/66", date="2026-11-10", sha="a1df64986e6a0fb8f7e903c225d74929ad90dd36bcbe168a6d16c4a2e9d56eed"),
          en=["New: Clean by App lists local AI models (Ollama, Hugging Face, LM Studio), one row per model. Files shared between models are shown apart and go only when every model using them is selected. Keys and sign-in tokens stay locked",

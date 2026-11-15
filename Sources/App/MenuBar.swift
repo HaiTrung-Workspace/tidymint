@@ -45,6 +45,13 @@ struct Meter: View {
     }
 }
 
+/// The app's own `openWindow`, kept from the main window: a panel shown outside a SwiftUI scene has none that works.
+var sharedOpenWindow: OpenWindowAction?
+struct OpenWindowKeeper: View {
+    @Environment(\.openWindow) var openWindow
+    var body: some View { Color.clear.onAppear { sharedOpenWindow = openWindow } }
+}
+
 struct MenuView: View {
     @ObservedObject var vm: VM
     @Environment(\.openWindow) var openWindow
@@ -70,8 +77,8 @@ struct MenuView: View {
             HStack { Text(t("Trash", "Thùng rác")).foregroundColor(.secondary); Spacer(); Text(fmt(vm.trashSize)).fontWeight(.semibold) }.font(.system(size: fs(12)))
             Divider()
             VStack(spacing: 1) {
-                MenuRow(title: t("Open Tidymint", "Mở Tidymint")) { openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true) }
-                MenuRow(title: t("Clean Now", "Dọn ngay")) { vm.page = .smart; openWindow(id: "main"); NSApp.activate(ignoringOtherApps: true); vm.smartScan() }
+                MenuRow(title: t("Open Tidymint", "Mở Tidymint")) { (sharedOpenWindow ?? openWindow)(id: "main"); NSApp.activate(ignoringOtherApps: true) }
+                MenuRow(title: t("Clean Now", "Dọn ngay")) { vm.page = .smart; (sharedOpenWindow ?? openWindow)(id: "main"); NSApp.activate(ignoringOtherApps: true); vm.smartScan() }
                 MenuRow(title: t("Empty Trash...", "Đổ Thùng rác..."), disabled: vm.trashCount == 0) { NSApp.activate(ignoringOtherApps: true); vm.emptyTrash() }
             }.padding(.horizontal, -8)
             Divider()
@@ -148,7 +155,8 @@ func leafFillHeight(_ area: CGFloat) -> CGFloat {
     return CGFloat(i + 1) / CGFloat(max(1, leafAreaBelow.count))
 }
 
-func menuBarImage(free: Double, total: Double, level: Int) -> NSImage {
+/// `leafOnly`: just the leaf, without the free space next to it.
+func menuBarImage(free: Double, total: Double, level: Int, leafOnly: Bool = false) -> NSImage {
     // The mint leaf, filled (by area) as far as the disk is used, then the free space.
     // 75GB, 123GB, then 1.2TB from 1000 GB up, so the label never grows past 3 digits.
     let text = free >= 999.5 ? String(format: "%.1fTB", free / 1000) : String(format: "%.0fGB", free)
@@ -160,7 +168,7 @@ func menuBarImage(free: Double, total: Double, level: Int) -> NSImage {
     let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium), .foregroundColor: ink]
     let ts = (text as NSString).size(withAttributes: attrs)
     let gw: CGFloat = 12.5, gap: CGFloat = 3, H: CGFloat = 18
-    let W = ceil(gw + gap + ts.width) + 1
+    let W = leafOnly ? ceil(gw) + 2 : ceil(gw + gap + ts.width) + 1
     let used = total > 0 ? CGFloat(max(0, min(1, 1 - free / total))) : 0
     let img = NSImage(size: NSSize(width: W, height: H), flipped: false) { _ in
         // Mint leaf: faint whole leaf, solid part = share of the disk in use (by area).
@@ -169,7 +177,7 @@ func menuBarImage(free: Double, total: Double, level: Int) -> NSImage {
         ink.withAlphaComponent(0.3).setFill(); NSRect(x: 0, y: 0, width: gw, height: H).fill()
         ink.setFill(); NSRect(x: 0, y: 0.5, width: gw, height: 17 * leafFillHeight(used)).fill()
         NSGraphicsContext.restoreGraphicsState()
-        (text as NSString).draw(at: NSPoint(x: gw + gap, y: (H - ts.height) / 2), withAttributes: attrs)
+        if !leafOnly { (text as NSString).draw(at: NSPoint(x: gw + gap, y: (H - ts.height) / 2), withAttributes: attrs) }
         return true
     }
     img.isTemplate = level == 0   // normal: follows the menu bar's colour like Apple's icons
@@ -180,6 +188,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
     func applicationDidBecomeActive(_ n: Notification) {
         if !CommandLine.arguments.contains("--demo") { sharedVM.checkFullDiskAccess(); TrashHint.apply() }
+        #if TIDYMINT_PRIVATE
+        if !CommandLine.arguments.contains("--demo") && Mintangle.shared.enabled { Mintangle.shared.apply() }
+        #endif
     }
 
     func applicationDidFinishLaunching(_ n: Notification) {
@@ -213,6 +224,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         NSApp.applicationIconImage = dockIcon(Theme.p)
         if !a.contains("--demo") { sharedVM.checkFullDiskAccess() }
+        #if TIDYMINT_PRIVATE
+        if !a.contains("--demo") { Mintangle.shared.apply() }   // shortcuts only when the user turned Mintangle on
+        if !a.contains("--demo") && featureShelf { Shelf.shared.apply() }   // shelf only when the user turned it on
+        if !a.contains("--demo") && !a.contains("--selftest") { Mintbar.shared.apply(atLaunch: true) }   // only when the user turned it on
+        if isDevBuild, let i = a.firstIndex(of: "--mintbar-unmatte"), i + 2 < a.count { MintbarGlyphs.unmatteFile(a[i + 1], a[i + 2]); exit(0) }
+        if isDevBuild, let i = a.firstIndex(of: "--mintbar-pick"), i + 1 < a.count { let id = a[i + 1]; DispatchQueue.main.asyncAfter(deadline: .now() + 4) { Mintbar.shared.openFromGroup(id) } }
+        if isDevBuild, a.contains("--mintbar-fan") { let pad = a.firstIndex(of: "--mintbar-fan").flatMap { $0 + 1 < a.count ? Int(a[$0 + 1]) : nil } ?? 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { MintbarFan.shared.openFirstForTest(pad: pad) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) { MintbarFan.shared.hoverForTest(1) } }
+        if isDevBuild, let i = a.firstIndex(of: "--mintbar-test"), i + 1 < a.count { let out = a[i + 1]; DispatchQueue.main.asyncAfter(deadline: .now() + 3) { Mintbar.selfTest(out: out) } }
+        // Helper for screenshots: `--shelf-open path1 path2…` opens the shelf with those files (Dev build, or with `--demo`).
+        if isDevBuild || a.contains("--demo"), let i = a.firstIndex(of: "--shelf-open") {
+            let paths = a[(i + 1)...].prefix { !$0.hasPrefix("--") }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { Shelf.shared.add(paths.map { URL(fileURLWithPath: $0) }); Shelf.shared.show(atPointer: false) }
+        }
+        #endif
         PreviewLinks.clear()   // leftovers from a run that quit with the month viewer open
         if !a.contains("--demo") { _ = CheckIn.shared.firstOpen }   // saved once, on the first launch
         // Developer helper for README screenshots: `--demo` fills every page with sample data (no real files),
@@ -231,10 +258,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if a.contains("--demo") { Demo.load(sharedVM) }
         if isDevBuild, let i = a.firstIndex(of: "--selftest"), i + 1 < a.count { SelfTest.run(Array(a[(i + 1)...])) }
-        if !a.contains("--demo") { TrashHint.apply() }
+        // A self-test only touches its own test files: no Trash watcher and no sorting of the real Downloads meanwhile.
+        let testing = a.contains("--selftest")
+        if !a.contains("--demo") && !testing { TrashHint.apply() }
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }),
-           true {   // a page that is not released yet cannot be opened from the command line either
+           pageAvailable(pg) {   // a page that is not released yet cannot be opened from the command line either
             sharedVM.page = pg
             if pg == .cleanup && a.contains("--demo") { sharedVM.phase = (a.contains("--done") || a.contains("--demo-done")) ? .done : .review }
             if pg == .byapp && a.contains("--demo") { Demo.apps(sharedVM, detail: a.contains("--detail")) }

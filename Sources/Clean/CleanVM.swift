@@ -45,7 +45,7 @@ extension VM {
         }
     }
     private func evictDone(_ u: URL, ok: Int, fail: Int) {
-        cloudMsg = t("Removed local copies of \(ok) files (still in iCloud).", "Đã xoá bản trên máy của \(ok) file (vẫn còn trên iCloud).") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") : "")
+        cloudMsg = t("Removed local copies of \(plural(ok, "file")) (still in iCloud).", "Đã xoá bản trên máy của \(ok) file (vẫn còn trên iCloud).") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") : "")
         log(t("Cloud: removed local copy of \(u.path), ok \(ok), failed \(fail)", "Đám mây: gỡ bản tải về của \(u.path), được \(ok), lỗi \(fail)"))
         scanCloud(); refreshDisk()
     }
@@ -128,7 +128,7 @@ extension VM {
         let size = sel.reduce(0) { $0 + $1.size }
         let (ok, fail) = trash(sel.map(\.url), label: "cleanup", sizes: Dictionary(sel.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a })); _ = size
         lastFreed = okSize(sel); lastCount = ok
-        lastResult = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail) items.", " Bỏ qua \(fail) mục.") + failNote : "")
+        lastResult = t("Moved \(plural(ok, "item")) (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(plural(fail, "item")).", " Bỏ qua \(fail) mục.") + failNote : "")
             + (skippedNow > 0 ? t(" \(skippedNow) project items were left alone: the project changed or is in use since the scan.", " \(skippedNow) mục của dự án được để yên: dự án vừa thay đổi hoặc đang được dùng sau lần quét.") : "")
         log(lastResult)
         phase = .done

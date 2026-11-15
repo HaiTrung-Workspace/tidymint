@@ -57,7 +57,8 @@ var appTextSize: String = ["small", "default", "large"].contains(UserDefaults.st
 /// "Default" follows the Mac's own text size (System Settings > Accessibility > Display > Text size): body text is 13 pt
 /// unless the user enlarged it there. Small and Large are 20% steps from that.
 var systemTextScale: CGFloat { min(1.4, max(0.9, NSFont.preferredFont(forTextStyle: .body).pointSize / 13)) }
-var uiScale: CGFloat { systemTextScale * (appTextSize == "small" ? 0.8 : (appTextSize == "large" ? 1.2 : 1.0)) }
+/// The app's own Small / Large choice was removed (14/11/2026): one size, the Mac's.
+var uiScale: CGFloat { systemTextScale }
 func fs(_ v: CGFloat) -> CGFloat { v * uiScale }
 /// Sponsor page on the website (not GitHub directly), so the destination can change without a new app release.
 /// Sponsor page with UTM so GA4 can tell clicks from the app (place: "button" or "menubar").
@@ -125,6 +126,8 @@ func selLabel(_ n: Int, _ size: Int64) -> String { n == 0 ? t("Nothing selected"
 var appLang: String = UserDefaults.standard.string(forKey: "lang")
     ?? ((Locale.preferredLanguages.first ?? "en").hasPrefix("vi") ? "vi" : "en")
 func t(_ en: String, _ vi: String) -> String { appLang == "vi" ? vi : en }
+/// A count with its English noun: "1 item", "3 items" (the plural adds "s" unless given). Vietnamese nouns do not change.
+func plural(_ count: Int, _ one: String, _ many: String? = nil) -> String { "\(count) \(count == 1 ? one : many ?? one + "s")" }
 /// Date in the app language (e.g. "Sep 15, 2026" / "15 thg 9, 2026").
 /// "Last opened Oct 29, 2026" / "Mở lần cuối 29/10/2026": the date column of file rows (fixed width, so kept short).
 // Formatters are costly to create and rows redraw often: one per format and language, made once.

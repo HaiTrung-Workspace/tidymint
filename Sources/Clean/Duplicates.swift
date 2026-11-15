@@ -177,7 +177,7 @@ struct DupesView: View {
                     Text(t("Files inside your project folders are never pre-selected.", "File trong thư mục dự án không bao giờ được tick sẵn.")).font(.system(size: fs(12))).foregroundColor(Theme.sub)
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                Text(t("\(vm.dupes.count) groups, \(fmt(vm.dupWasted)) taken by extra copies. The first file of each group is the one suggested to keep.",
+                Text(t("\(plural(vm.dupes.count, "group")), \(fmt(vm.dupWasted)) taken by extra copies. The first file of each group is the one suggested to keep.",
                        "\(vm.dupes.count) nhóm, \(fmt(vm.dupWasted)) bị chiếm bởi các bản thừa. File đầu tiên mỗi nhóm là bản đề xuất giữ lại."))
                     .font(.system(size: fs(12))).foregroundColor(Theme.sub).frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 8)
                 ScrollView {
@@ -189,7 +189,7 @@ struct DupesView: View {
                                     FileThumb(url: g.items[0].url, side: 30 * uiScale)
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(g.items[0].name).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold)).lineLimit(1)
-                                        Text(t("\(g.items.count) copies × \(fmt(g.size))", "\(g.items.count) bản × \(fmt(g.size))") + (g.isCross ? t(" · on this Mac and an external drive", " · trên máy và ổ cứng rời") : ""))
+                                        Text(t("\(plural(g.items.count, "copy", "copies")) × \(fmt(g.size))", "\(g.items.count) bản × \(fmt(g.size))") + (g.isCross ? t(" · on this Mac and an external drive", " · trên máy và ổ cứng rời") : ""))
                                             .foregroundColor(Theme.sub).font(.system(size: fs(11)))
                                     }
                                     Spacer()
@@ -204,7 +204,7 @@ struct DupesView: View {
                                         ItemRow(item: $it, vm: vm, showDate: true, keep: idx == 0, keepColumn: true)
                                     }.padding(.leading, 14)
                                 }
-                            }.background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+                            }.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
                         }
                     }.padding(.horizontal, 24).padding(.bottom, 16)
                 }

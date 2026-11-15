@@ -171,6 +171,28 @@ extension VM {
         return (ok, fail)
     }
 
+    /// One item to the Trash for a feature that keeps its own record of where things went and puts them back itself.
+    /// Same guards as `trash` (demo mode, Ignore list, safe area, iCloud Drive fallback), but the clean journal is left
+    /// alone, so the Undo of the last clean stays. Says where the item went, or why it was refused.
+    enum QuietTrash { case moved(URL?), refused(String) }
+    static func trashQuiet(_ u: URL) -> QuietTrash {
+        if Demo.active { return .refused(t("demo mode, nothing is moved", "chế độ demo, không chuyển gì")) }
+        if IgnoreList.contains(u.path) { return .refused(t("in the Ignore list", "nằm trong danh sách Bỏ qua")) }
+        guard Scanner.safeToTrash(u) else { return .refused(t("refused, path is outside the safe area", "từ chối, đường dẫn nằm ngoài vùng an toàn")) }
+        TrashHint.quiet()
+        Scanner.warmProtectedFolders(for: [u])
+        var dest: NSURL?
+        do { try FileManager.default.trashItem(at: u, resultingItemURL: &dest); return .moved(dest as URL?) }
+        catch {
+            // Same fallback as `trash`: an iCloud Drive item on the startup volume the standard Trash refused.
+            if isICloudDriveOnHomeVolume(u), FileManager.default.fileExists(atPath: u.path), let d = try? moveToUserTrash(u) { return .moved(d) }
+            let ns = error as NSError
+            if !FileManager.default.fileExists(atPath: u.path) { return .refused(t("file no longer exists", "file không còn ở đó")) }
+            if ns.code == NSFileWriteNoPermissionError || ns.code == 513 || ns.code == 257 { return .refused(t("no permission to move it to the Trash", "không có quyền chuyển vào Thùng rác")) }
+            return .refused(ns.localizedDescription)
+        }
+    }
+
     /// Put everything from the last run back where it was (only items still sitting in the Trash).
     func undoLast() {
         guard let s = undoable else { return }
@@ -178,19 +200,22 @@ extension VM {
         if Demo.active { undoable = nil; return }
         let needsPassword = s.entries.contains { ((try? FileManager.default.attributesOfItem(atPath: $0.to)[.ownerAccountID] as? NSNumber)?.intValue) == 0 }
         guard confirm(t("Undo the last clean\(sessionName(s))?", "Hoàn tác lần dọn vừa rồi\(sessionName(s))?"),
-                      t("\(s.entries.count) items (\(fmt(s.size))) go back to where they were.", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ.")
+                      t("\(plural(s.entries.count, "item")) (\(fmt(s.size))) \(s.entries.count == 1 ? "goes back to where it was" : "go back to where they were").", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ.")
                         + (needsPassword ? t(" An app installed for every user goes back through Finder: macOS asks for an administrator password in its own window.", " App cài cho mọi tài khoản được Finder trả về: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS.") : ""),
                       t("Put Back", "Trả về chỗ cũ")) else { return }
         let r = Journal.restore(s)
-        lastResult = t("Put back \(r.ok) items\(sessionName(s)).", "Đã trả về \(r.ok) mục\(sessionName(s)).") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+        lastResult = t("Put back \(plural(r.ok, "item"))\(sessionName(s)).", "Đã trả về \(r.ok) mục\(sessionName(s)).") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
+            + (r.failed.isEmpty ? "" : t(" \(r.failed.count) could not be put back and are still in the Trash. Undo is still there for them on the Trash page.", " \(r.failed.count) mục chưa trả về được, vẫn nằm trong Thùng rác. Vẫn Hoàn tác được các mục này ở trang Thùng rác."))
         undoNote = (page == .trash ? .trash : (doneInfo?.page ?? page), lastResult)
-        log(t("Undo: put back \(r.ok) items, skipped \(r.skipped).", "Hoàn tác: đã trả về \(r.ok) mục, bỏ qua \(r.skipped)."))
-        undoable = nil; Journal.clear()
+        log(t("Undo: put back \(plural(r.ok, "item")), skipped \(r.skipped), failed \(r.failed.count).", "Hoàn tác: đã trả về \(r.ok) mục, bỏ qua \(r.skipped), chưa trả được \(r.failed.count)."))
+        // What could not be moved back (a cancelled password prompt, for one) keeps its record, so Undo can be tried again.
+        if r.failed.isEmpty { undoable = nil; Journal.clear() }
+        else { undoable = Journal.save(Journal.Session(date: s.date, label: s.label, entries: r.failed)) }
         refreshTrash(); refreshDisk()
     }
 
     func emptyTrash() {
-        guard confirm(t("Empty Trash?", "Đổ Thùng rác?"), t("\(trashCount) items, \(fmt(trashSize)). This cannot be undone.", "\(trashCount) mục, \(fmt(trashSize)). Đổ rồi không lấy lại được."), t("Empty Trash", "Đổ Thùng rác")) else { return }
+        guard confirm(t("Empty Trash?", "Đổ Thùng rác?"), t("\(plural(trashCount, "item")), \(fmt(trashSize)). This cannot be undone.", "\(trashCount) mục, \(fmt(trashSize)). Đổ rồi không lấy lại được."), t("Empty Trash", "Đổ Thùng rác")) else { return }
         // Off the main thread with a long timeout: a large Trash can take Finder minutes, and a 60 s Apple event timeout (-1712)
         // used to be shown as a missing Automation permission while Finder kept emptying.
         let before = trashSize
@@ -225,7 +250,7 @@ extension VM {
                 self?.refreshTrash { [weak self] in
                     guard let self else { return }
                     if self.trashCount == 0 { self.undoable = nil; Journal.clear(); return }
-                    self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there. Open the Trash in Finder to see them, then empty it again.",
+                    self.trashLeftNote = t("Finder did not empty everything: \(plural(self.trashCount, "item")) \(self.trashCount == 1 ? "is" : "are") still there. Open the Trash in Finder to have a look, then empty it again.",
                                            "Finder chưa đổ hết: còn \(self.trashCount) mục. Mở Thùng rác trong Finder để xem, rồi đổ lại.")
                     // Usually an app still holds a file open (seen 08/11/2026: a virtual machine holding files in the
                     // iCloud Trash). Name it, so the person knows what to quit.
@@ -235,7 +260,7 @@ extension VM {
                         await MainActor.run { [weak self] in
                             guard let self, self.trashLeftNote != nil, self.trashCount > 0 else { return }
                             let names = who.prefix(3).joined(separator: ", ")
-                            self.trashLeftNote = t("Finder did not empty everything: \(self.trashCount) items are still there, held open by \(names). Quit it, then empty the Trash again.",
+                            self.trashLeftNote = t("Finder did not empty everything: \(plural(self.trashCount, "item")) \(self.trashCount == 1 ? "is" : "are") still there, held open by \(names). Quit \(who.count == 1 ? "it" : "them"), then empty the Trash again.",
                                                    "Finder chưa đổ hết: còn \(self.trashCount) mục, đang bị \(names) giữ. Tắt app đó rồi đổ lại.")
                         }
                     }
@@ -322,8 +347,10 @@ enum Journal {
         return s
     }
     static func clear() { try? FileManager.default.removeItem(atPath: path) }
-    static func restore(_ s: Session) -> (ok: Int, skipped: Int) {
-        var ok = 0, skipped = 0
+    /// `skipped`: gone from the Trash, or something new sits at the old place. `failed`: still in the Trash with the
+    /// old place free, but the move back did not happen.
+    static func restore(_ s: Session) -> (ok: Int, skipped: Int, failed: [Entry]) {
+        var ok = 0, skipped = 0, failed: [Entry] = []
         let fm = FileManager.default
         // Parents first: putting a child back creates its parent folder, and the parent's own entry would then be skipped.
         let entries = s.entries.enumerated().sorted { a, b in
@@ -340,9 +367,9 @@ enum Journal {
                 // An app owned by root needs a password to go back too: Finder moves it and macOS asks. Same name only.
                 let folder = (e.from as NSString).deletingLastPathComponent
                 if (e.to as NSString).lastPathComponent == (e.from as NSString).lastPathComponent,
-                   case .ok = FinderOps.move(e.to, into: folder), fm.fileExists(atPath: e.from) { ok += 1 } else { skipped += 1 }
+                   case .ok = FinderOps.move(e.to, into: folder), fm.fileExists(atPath: e.from) { ok += 1 } else { failed.append(e) }
             }
         }
-        return (ok, skipped)
+        return (ok, skipped, failed)
     }
 }

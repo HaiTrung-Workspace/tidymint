@@ -248,7 +248,7 @@ struct ConCaoHint: View {
             }
             .font(.system(size: fs(12)))
             .padding(.horizontal, 14).padding(.vertical, 10)
-            .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
             .onAppear { ConCao.markShown() }
         }
     }
@@ -426,7 +426,7 @@ struct InviteCard: View {
                     }
                 }
             }
-            .padding(16).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+            .padding(16).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Theme.ink.opacity(0.12), lineWidth: 1))
         }
     }

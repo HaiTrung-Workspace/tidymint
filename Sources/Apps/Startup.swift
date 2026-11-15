@@ -214,10 +214,10 @@ struct StartupView: View {
                     if vm.launchBusy { ProgressView().controlSize(.small).tint(Theme.text); Text(t("Checking signatures...", "Đang kiểm chữ ký...")).foregroundColor(Theme.sub).font(.system(size: fs(12))) }
                     else if vm.launchAttention > 0 {
                         Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
-                        Text(t("\(vm.launchAttention) items worth a look. Hover a badge to see why.", "\(vm.launchAttention) mục đáng để ý. Rê chuột lên nhãn để xem lý do.")).foregroundColor(Theme.text).font(.system(size: fs(12)))
+                        Text(t("\(plural(vm.launchAttention, "item")) worth a look. Hover a badge to see why.", "\(vm.launchAttention) mục đáng để ý. Rê chuột lên nhãn để xem lý do.")).foregroundColor(Theme.text).font(.system(size: fs(12)))
                     } else if !vm.launch.isEmpty {
                         Image(systemName: "checkmark.shield").foregroundColor(Theme.green)
-                        Text(t("Nothing unusual in \(vm.launch.count) items.", "Không có gì bất thường trong \(vm.launch.count) mục.")).foregroundColor(Theme.text).font(.system(size: fs(12)))
+                        Text(t("Nothing unusual in \(plural(vm.launch.count, "item")).", "Không có gì bất thường trong \(vm.launch.count) mục.")).foregroundColor(Theme.text).font(.system(size: fs(12)))
                     }
                 }.padding(.top, 4)
             }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 12)
@@ -239,7 +239,7 @@ struct StartupView: View {
                 }.padding(.horizontal, 24).padding(.bottom, 12)
             }
             HStack(spacing: 12) {
-                Text(vm.launchMsg.isEmpty ? t("\(vm.launch.count) items", "\(vm.launch.count) mục") : vm.launchMsg)
+                Text(vm.launchMsg.isEmpty ? t("\(plural(vm.launch.count, "item"))", "\(vm.launch.count) mục") : vm.launchMsg)
                     .foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(2)
                 Spacer()
                 GhostButton(title: t("Login Items…", "Mục đăng nhập…")) {
@@ -282,7 +282,7 @@ struct LaunchRow: View {
             TextLink(t("Reveal", "Xem file")) { vm.reveal(e.url) }
         }
         .padding(.horizontal, 12).padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
         .hoverBG(10, Theme.ink.opacity(0.06))
         .tip(e.program)
     }

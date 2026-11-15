@@ -24,12 +24,12 @@ extension VM {
     func trashSys() {
         let picked = sysParts.flatMap { $0.items.filter(\.selected) }.filter { !Scanner.blocked($0.url.path) }
         guard !picked.isEmpty else { return }
-        guard confirm(t("Move \(picked.count) items to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
+        guard confirm(t("Move \(plural(picked.count, "item")) to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
                       picked.prefix(8).map { "• \($0.name), \(fmt($0.size))" }.joined(separator: "\n") + (picked.count > 8 ? "\n…" : ""),
                       t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
         let (ok, fail) = trash(picked.map(\.url), label: "sysdata", sizes: Dictionary(picked.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a }))
         let freed = okSize(picked)
-        log(t("System Data: moved \(ok) items (\(fmt(freed))) to the Trash.", "Dữ liệu hệ thống: đã chuyển \(ok) mục (\(fmt(freed))) vào Thùng rác."))
+        log(t("System Data: moved \(plural(ok, "item")) (\(fmt(freed))) to the Trash.", "Dữ liệu hệ thống: đã chuyển \(ok) mục (\(fmt(freed))) vào Thùng rác."))
         finished(.lens, ok, freed, fail)
         scanSys(); refreshTrash(); refreshDisk()
     }
@@ -39,7 +39,7 @@ extension VM {
         let picked = lensNodes.filter { lensSel.contains($0.url) && !Scanner.blocked($0.url.path) }
         guard !picked.isEmpty else { return }
         let size = picked.reduce(0) { $0 + $1.size }
-        guard confirm(t("Move \(picked.count) items to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
+        guard confirm(t("Move \(plural(picked.count, "item")) to the Trash?", "Chuyển \(picked.count) mục vào Thùng rác?"),
                       picked.prefix(8).map { "• \($0.name), \(fmt($0.size))" }.joined(separator: "\n") + (picked.count > 8 ? "\n…" : ""),
                       t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
         let (ok, fail) = trash(picked.map(\.url), label: "lens", strict: false)
@@ -48,7 +48,7 @@ extension VM {
         lensNodes.removeAll { gone.contains($0.url) }
         for u in gone { sizeCache.removeValue(forKey: u.path) }
         lensSel = []
-        log(t("Space Lens: moved \(ok) items (\(fmt(freed))) to the Trash.", "Bản đồ ổ đĩa: đã chuyển \(ok) mục (\(fmt(freed))) vào Thùng rác.")); _ = size
+        log(t("Space Lens: moved \(plural(ok, "item")) (\(fmt(freed))) to the Trash.", "Bản đồ ổ đĩa: đã chuyển \(ok) mục (\(fmt(freed))) vào Thùng rác.")); _ = size
         finished(.lens, ok, freed, fail)
         refreshTrash(); refreshDisk()
     }

@@ -354,7 +354,7 @@ struct AppsView: View {
                 LazyVStack(spacing: 2) {
                     ForEach(vm.appsShown) { a in
                         HStack(spacing: 10) {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: a.url.path)).resizable().frame(width: 26, height: 26)
+                            Image(nsImage: appIcon(at: a.url, bundleID: a.bundleID)).resizable().frame(width: 26, height: 26)
                             VStack(alignment: .leading, spacing: 1) {
                                 Text(a.name).foregroundColor(Theme.text).font(.system(size: fs(13))).lineLimit(1)
                                 HStack(spacing: 6) {
@@ -385,7 +385,7 @@ struct AppsView: View {
             if let i = vm.apps.firstIndex(where: { $0.id == vm.selApp }) {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 12) {
-                        Image(nsImage: NSWorkspace.shared.icon(forFile: vm.apps[i].url.path)).resizable().frame(width: 48, height: 48)
+                        Image(nsImage: appIcon(at: vm.apps[i].url, bundleID: vm.apps[i].bundleID)).resizable().frame(width: 48, height: 48)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(vm.apps[i].name).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
                             Text(vm.apps[i].bundleID).font(.system(size: fs(11))).foregroundColor(Theme.sub)
@@ -407,7 +407,7 @@ struct AppsView: View {
                         LazyVStack(spacing: 2) {
                             HStack(spacing: 12) {
                                 CheckBox(state: 2)
-                                Image(nsImage: NSWorkspace.shared.icon(forFile: vm.apps[i].url.path)).resizable().frame(width: 22, height: 22)
+                                Image(nsImage: appIcon(at: vm.apps[i].url, bundleID: vm.apps[i].bundleID)).resizable().frame(width: 22, height: 22)
                                 Text(t("Application", "Ứng dụng")).foregroundColor(Theme.text).font(.system(size: fs(13)))
                                 Spacer()
                                 Text(fmt(vm.apps[i].size)).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium).monospacedDigit())
@@ -465,7 +465,7 @@ struct AppsView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 2) {
-                        ForEach(items) { $it in ItemRow(item: $it, vm: vm).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card)) }
+                        ForEach(items) { $it in ItemRow(item: $it, vm: vm).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card)) }
                     }.padding(.horizontal, 24)
                 }
             }

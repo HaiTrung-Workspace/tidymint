@@ -166,7 +166,7 @@ struct MonthViewer: View {
                         RuleIcon(name: report.rule.name, bundleIDs: report.rule.bundleIDs, side: 20)
                         Text("\(report.rule.name) · \(group?.section.title ?? "") · \(row?.title ?? "")").font(.system(size: fs(15), weight: .semibold)).foregroundColor(Theme.text).lineLimit(1)
                     }
-                    Text(t("\(vm.monthItems.count) files · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))", "\(vm.monthItems.count) file · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))"))
+                    Text(t("\(plural(vm.monthItems.count, "file")) · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))", "\(vm.monthItems.count) file · \(fmt(vm.monthItems.reduce(0) { $0 + $1.size }))"))
                         .font(.system(size: fs(12)).monospacedDigit()).foregroundColor(Theme.sub)
                 }
                 Spacer()
@@ -196,7 +196,7 @@ struct MonthViewer: View {
                                     }.contentShape(Rectangle())
                                 }.buttonStyle(.plain).tip(folded ? t("Show this week", "Mở tuần này") : t("Fold this week", "Thu gọn tuần này"))
                                 Spacer()
-                                Text(t("\(items.count) files · \(fmt(items.reduce(0) { $0 + $1.size }))", "\(items.count) file · \(fmt(items.reduce(0) { $0 + $1.size }))"))
+                                Text(t("\(plural(items.count, "file")) · \(fmt(items.reduce(0) { $0 + $1.size }))", "\(items.count) file · \(fmt(items.reduce(0) { $0 + $1.size }))"))
                                     .font(.system(size: fs(12)).monospacedDigit()).foregroundColor(Theme.sub)
                             }.padding(.top, 4)
                             if !folded {
@@ -228,7 +228,7 @@ struct MonthViewer: View {
                                     }.contentShape(Rectangle())
                                 }.buttonStyle(.plain)
                                 Spacer()
-                                Text(t("\(others.count) files · \(fmt(others.reduce(0) { $0 + $1.size }))", "\(others.count) file · \(fmt(others.reduce(0) { $0 + $1.size }))"))
+                                Text(t("\(plural(others.count, "file")) · \(fmt(others.reduce(0) { $0 + $1.size }))", "\(others.count) file · \(fmt(others.reduce(0) { $0 + $1.size }))"))
                                     .font(.system(size: fs(12)).monospacedDigit()).foregroundColor(Theme.sub)
                             }.padding(.top, 8)
                             if open {
@@ -250,7 +250,7 @@ struct MonthViewer: View {
                             }
                         }
                         if !vm.monthExtras.isEmpty {
-                            Text(t("Also in this month: \(vm.monthExtras.count) index files of \(report.rule.name) (\(fmt(vm.monthExtrasSize))), not photos or videos. They go only when the whole month is ticked.",
+                            Text(t("Also in this month: \(plural(vm.monthExtras.count, "index file")) of \(report.rule.name) (\(fmt(vm.monthExtrasSize))), not photos or videos. They go only when the whole month is ticked.",
                                    "Trong tháng còn \(vm.monthExtras.count) tệp chỉ mục của \(report.rule.name) (\(fmt(vm.monthExtrasSize))), không phải ảnh hay video. Chỉ dọn khi tick cả tháng."))
                                 .font(.system(size: fs(11))).foregroundColor(Theme.sub).padding(.top, 6)
                         }

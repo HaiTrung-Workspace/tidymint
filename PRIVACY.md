@@ -26,6 +26,15 @@ You can turn the daily check off in Settings > **Check for new versions automati
 
 Mintangle is off by default. Only when you turn it on does Tidymint ask macOS for Accessibility permission. It uses it to read the position and size of windows and to move or resize them: the front window when you press a Mintangle shortcut, and the window under the pointer when you click and drag it (to know whether it reaches a screen edge). It does not read what is inside windows and does not record the keys you type: shortcuts are registered with macOS, which tells Tidymint only when one of its own shortcuts is pressed. Nothing is sent anywhere. Apple notes that this permission is broad, so you can turn Mintangle off, or switch Tidymint off in System Settings > Privacy & Security > Accessibility, at any time. Mintdrop needs no extra permission: while the mouse button is held it checks whether files are being dragged, and only then follows the pointer, to notice a shake.
 
+## Mintbar: Accessibility and Screen Recording (from 0.6.0)
+
+Mintbar is off by default. On macOS 14 to 26 it needs no permission and reads nothing from the screen. On macOS 27, when you turn it on, Tidymint asks for two permissions:
+
+- **Accessibility**: to see which apps have an icon in the menu bar and where each icon is, and to open the icon you pick from a group. To open it, Tidymint may click that icon for you and then puts the pointer back where it was. A click on the clock is passed on the same way while icons are hidden, because macOS would otherwise ignore it. Tidymint does not read what is inside windows and does not record the keys you type.
+- **Screen Recording**: to take a picture of the menu bar icon of each app you put in a group. Only that icon's own slot in the menu bar is captured, and only while the icon is in view. The pictures are kept in `~/Library/Application Support/Tidymint/mintbar-icons/` and are deleted when the app leaves its last group or when you turn Mintbar off.
+
+Tidymint also reads (and never changes) the macOS Menu Bar settings, to list the apps whose "Allow in the Menu Bar" switch is off. The names of the apps that have menu bar icons are kept in Tidymint's settings. Nothing is sent anywhere.
+
 ## Trash hint and project folders (from 0.5.2)
 
 The hint shown when an app goes to the Trash is off by default. When you turn it on, Tidymint watches the Trash folder while it is running, and when an app lands there it looks in your Library for folders named after that app's identifier. It needs Full Disk Access to see the Trash. The notification shows the app's name and stays on your Mac. Nothing is ticked, moved or sent anywhere.
@@ -44,6 +53,7 @@ The website uses Google Analytics 4 to count visits, see which pages are read, w
 
 - Settings: `~/Library/Preferences/com.haitrung.diskcleanup.plist`
 - Activity log: `~/Library/Application Support/Tidymint/activity.log`
+- Mintbar icon pictures (only while Mintbar is on, macOS 27): `~/Library/Application Support/Tidymint/mintbar-icons/`
 
 ## Contact
 

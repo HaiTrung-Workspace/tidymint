@@ -173,7 +173,7 @@ enum SysData {
             other.append(SysPart(id: "browserclones", icon: "globe", title: t("Browser temporary copies", "Bản sao tạm của trình duyệt"),
                                  note: t("Chrome, and browsers built on it such as Edge and Brave, put a copy of themselves here when they open, so the browser can check its signature while an update waits to install. A copy can be left behind, for example when the browser is closed abruptly. macOS empties this folder when the Mac restarts. Tidymint leaves it alone: the open browser is still using one copy. The size is an upper limit: the copies share data, so they may take less.",
                                          "Chrome và các trình duyệt cùng lõi như Edge, Brave đặt một bản sao của chính nó ở đây khi mở, để kiểm chữ ký khi có bản cập nhật chờ cài. Bản sao có thể bị sót lại, ví dụ khi trình duyệt bị tắt ngang. macOS tự xoá thư mục này khi khởi động lại máy. Tidymint không đụng tới: trình duyệt đang mở vẫn dùng một bản. Con số là mức tối đa: các bản sao dùng chung dữ liệu nên có thể chiếm ít hơn."),
-                                 size: clones.size, kind: .system, detail: t("\(clones.count) copies", "\(clones.count) bản")))
+                                 size: clones.size, kind: .system, detail: t("\(plural(clones.count, "copy", "copies"))", "\(clones.count) bản")))
         }
         let snaps = snapshots()
         let tmURL = URL(string: "x-apple.systempreferences:com.apple.Time-Machine-Settings.extension")!
@@ -185,7 +185,7 @@ enum SysData {
                                 : t("Time Machine takes these every hour while automatic backups are on. Hourly ones are kept for 24 hours, a few for longer, and macOS removes them sooner when it needs space. Tidymint leaves them alone: deleting one is permanent and cannot go to the Trash.",
                                     "Time Machine chụp mỗi giờ khi bật sao lưu tự động. Bản theo giờ giữ 24 giờ, vài bản giữ lâu hơn, và macOS xoá sớm hơn khi cần chỗ. Tidymint không xoá phần này: xoá là mất hẳn, không vào Thùng rác được."),
                              size: -1, kind: snaps.isEmpty ? .system : .elsewhere,
-                             detail: snaps.isEmpty ? "" : t("\(snaps.count) snapshots", "\(snaps.count) bản") + (last.map { t(", newest ", ", mới nhất ") + shortDate($0) } ?? ""),
+                             detail: snaps.isEmpty ? "" : t("\(plural(snaps.count, "snapshot"))", "\(snaps.count) bản") + (last.map { t(", newest ", ", mới nhất ") + shortDate($0) } ?? ""),
                              actionTitle: t("Time Machine Settings", "Mở cài đặt Time Machine"), action: .url(tmURL)))
 
         var vm: Int64 = 0
@@ -234,7 +234,7 @@ struct SysPartCard: View {
                     Text(part.note).font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                     HStack(spacing: 14) {
                         if part.kind == .clean {
-                            TextLink(isOpen ? t("Hide items", "Ẩn danh sách") : t("Show \(part.items.count) items", "Xem \(part.items.count) mục"), size: fs(12), weight: .semibold) {
+                            TextLink(isOpen ? t("Hide items", "Ẩn danh sách") : t(part.items.count == 1 ? "Show 1 item" : "Show \(part.items.count) items", "Xem \(part.items.count) mục"), size: fs(12), weight: .semibold) {
                                 if isOpen { open.v.remove(part.id) } else { open.v.insert(part.id) }
                             }
                         }
@@ -264,7 +264,7 @@ struct SysPartCard: View {
                 }.padding(.horizontal, 8).padding(.bottom, 8)
             }
         }
-        .background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
     }
 }
 

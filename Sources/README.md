@@ -5,8 +5,8 @@ How the app code is organised. Read this before adding a file or a feature.
 ## Rules
 
 1. **One feature per file.** Logic and its page live together (for example `Apps/Apps.swift` holds the Uninstaller model and its page). Shared building blocks go in `UI/Components.swift`.
-2. **Seven folders, one level deep.** `build.sh` compiles every `.swift` file under `Sources/`. File names stay unique across folders (tools look files up by name). A new file goes in the folder of its feature area; do not add a folder for a single file.
-3. **Everything that moves user files goes through `Trash.swift`.** Call `VM.trash(...)`; never call `trashItem` or `removeItem` on a user's file from another file. `removeItem` is only for files the app created itself (its own history, temporary preview links, `.DS_Store`), with a comment saying why.
+2. **Folders one level deep** (six in the public tree, plus `Private/` in the dev repo). `build.sh` compiles every `.swift` file under `Sources/`. File names stay unique across folders (tools look files up by name). A new file goes in the folder of its feature area; do not add a folder for a single file.
+3. **Everything that moves user files goes through `Trash.swift`.** Call `VM.trash(...)` (or `VM.trashQuiet(_:)` for a feature that keeps its own undo record and must not replace the Undo of the last clean); never call `trashItem` or `removeItem` on a user's file from another file. `removeItem` is only for files the app created itself (its own history, temporary preview links, `.DS_Store`), with a comment saying why.
 4. **Network only in `Network.swift` and `Contact.swift`.** Two paths exist: the update check (can be turned off) and the form the user sends. See `PRIVACY.md`.
 5. **Unreleased features** sit behind a `dev-...` flag and in their own file. A hidden flag still publishes the code, so a feature that must stay secret is not in the release branch at all.
 6. **Size.** When a file passes about 800 lines, split it by sub-feature. State of the shared view model (`@Published` properties) stays in `App/ViewModel.swift`; the actions of a feature go in an `extension VM` file next to that feature (`AppsVM.swift`, `DuplicatesVM.swift`...). A `private` member is only visible inside its own file, so keep it in the file that uses it.
@@ -72,10 +72,22 @@ How the app code is organised. Read this before adding a file or a feature.
 | `TrashHint.swift` | Optional hint when an app is dragged to the Trash: lists what it left in Library (off by default) |
 | `Startup.swift` | Login items and launch agents, and their page |
 
-### `Tools/` Tools beyond cleaning
+### `Private/` The Mint tools (dev repo only, never published; see DEV.md rule 1)
+
+Mintangle, Mintdrop and Mintbar live here from 0.6.0: the public tree holds the cleaning app only and builds without this folder. Shared files reach these types only inside `#if TIDYMINT_PRIVATE`. `build-flags.sh` (sourced by build.sh) sets the compiler flags.
 
 | File | What it holds |
 |---|---|
+| `Mintbar.swift` | Tidy menu bar (Mintbar): arrow and separator items, hiding by separator width (macOS 14 to 26) or by the menu bar allow-list (macOS 27), reading which apps have icons, auto-hide, shortcut |
+| `MintbarGroups.swift` | Mintbar groups (macOS 27): apps behind one chosen icon, the fan that opens below it, opening an app picked from the fan |
+| `MintbarFan.swift` | Mintbar groups: the fan under a group's icon (arc or ring of tiles, hover, drag to reorder, picking an app) |
+| `MintbarGlyphs.swift` | Mintbar groups: optional capture of an app's menu bar icon (Screen Recording), cut out from the bar behind it, kept in the app's folder |
+| `MintbarPage.swift` | Mintbar: sidebar page, per-app switches, groups editor, nav badge, Settings switch |
+| `Mintangle.swift` | Window tiling (Mintangle): actions, shortcuts, moving and resizing windows |
+| `MintangleSnap.swift` | Mintangle: drag to snap, footprint, where each action puts a window |
+| `MintanglePage.swift` | Mintangle: sidebar page, shortcut grid, Settings switch |
+| `Shelf.swift` | Drop shelf (Mintdrop): items, panel, shake and shortcut |
+| `ShelfPage.swift` | Mintdrop: dragging files out, panel content, sidebar page, Settings switch |
 
 ### `More/` Settings, Stats and Contact pages
 

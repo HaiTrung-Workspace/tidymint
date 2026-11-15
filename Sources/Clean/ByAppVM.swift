@@ -160,9 +160,9 @@ extension VM {
         let size = rows.reduce(0) { $0 + $1.selSize } + freed.reduce(0) { $0 + $1.size }
         let risky = r.groups.contains { $0.section.safety == .review && $0.rows.contains(where: \.selected) }
         let body = risky
-            ? t("\(urls.count) items (\(fmt(size))) go to the Trash. What you ticked is removed from this Mac; put it back from the Trash if you change your mind.",
+            ? t("\(plural(urls.count, "item")) (\(fmt(size))) \(urls.count == 1 ? "goes" : "go") to the Trash. What you ticked is removed from this Mac; put it back from the Trash if you change your mind.",
                 "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác. Những gì đã tick sẽ mất trên máy này; đổi ý thì trả về từ Thùng rác.")
-            : t("\(urls.count) items (\(fmt(size))) go to the Trash.", "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác.")
+            : t("\(plural(urls.count, "item")) (\(fmt(size))) \(urls.count == 1 ? "goes" : "go") to the Trash.", "\(urls.count) mục (\(fmt(size))) sẽ vào Thùng rác.")
         guard confirm(t("Clean \(r.rule.name)?", "Dọn \(r.rule.name)?"), body, t("Move to Trash", "Chuyển vào Thùng rác")) else { return }
         let (ok, fail) = trash(urls, label: "app:" + id)
         // Report what really moved: when something was refused, its share of the size is left out (a row with several
@@ -171,7 +171,7 @@ extension VM {
         for row in rows { let u = row.selURLs; if !u.isEmpty { done += row.selSize * Int64(u.filter { lastOK.contains($0) }.count) / Int64(u.count) } }
         for part in freed where !part.urls.isEmpty { done += part.size * Int64(part.urls.filter { lastOK.contains($0) }.count) / Int64(part.urls.count) }
         if fail == 0 { done = size }
-        appMsg = t("\(r.rule.name): moved \(ok) items (\(fmt(done))) to the Trash.", "\(r.rule.name): đã chuyển \(ok) mục (\(fmt(done))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail).", " Bỏ qua \(fail).") + failNote : "")
+        appMsg = t("\(r.rule.name): moved \(plural(ok, "item")) (\(fmt(done))) to the Trash.", "\(r.rule.name): đã chuyển \(ok) mục (\(fmt(done))) vào Thùng rác.") + (fail > 0 ? t(" Skipped \(fail).", " Bỏ qua \(fail).") + failNote : "")
         log(appMsg)
         finished(.byapp, ok, done, fail); appMsg = ""
         // Re-measure just this app.

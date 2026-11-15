@@ -3,19 +3,25 @@
 # Usage: ./build.sh            -> build/Tidymint.app
 #        ./build.sh --install  -> also copy it to /Applications
 #        ./build.sh --release  -> universal build (Apple silicon + Intel) zipped as build/Tidymint-<version>.zip
-#        ./build.sh --dev      -> "Tidymint Dev.app" (own bundle id, settings and data, DEV badge) in ~/Applications,
+#        ./build.sh --dev      -> "Tidymint Dev.app" (own bundle id, settings and data, DEV badge) in /Applications,
 #                                 runs beside the official app
 set -e
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 OUT="$ROOT/build"; NAME="Tidymint"
 if [ "$1" = "--dev" ]; then NAME="Tidymint Dev"; BUNDLE_ID="${BUNDLE_ID:-com.haitrung.diskcleanup.dev}"; fi
+# Sources/Private/ exists only in the private dev repo; public builds compile without it.
+# When it is there, its build-flags.sh sets the compiler flags (PRIV) and the folders to leave out (SKIP),
+# and may rename the Dev app (NAME; OLD_APP = an earlier copy to remove on install).
+PRIV=(); SKIP=(); OLD_APP=""
+[ -f "$ROOT/Sources/Private/build-flags.sh" ] && . "$ROOT/Sources/Private/build-flags.sh"
 APP="$OUT/$NAME.app"
 BUNDLE_ID="${BUNDLE_ID:-com.haitrung.diskcleanup}"
 VERSION="$(cat "$ROOT/VERSION" 2>/dev/null || echo 0.1.0)"
 
 rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-build_arch() { swiftc -swift-version 5 -parse-as-library -O -target "$1-apple-macos14" \
-  -o "$2" $(find "$ROOT/Sources" -name "*.swift" | sort) -framework SwiftUI -framework AppKit -framework Carbon; }
+sources() { find "$ROOT/Sources" -name "*.swift" "${SKIP[@]}" | sort; }
+build_arch() { swiftc -swift-version 5 -parse-as-library -O "${PRIV[@]}" -target "$1-apple-macos14" \
+  -o "$2" $(sources) -framework SwiftUI -framework AppKit -framework Carbon; }
 if [ "$1" = "--release" ]; then
   build_arch arm64 "$OUT/Tidymint-arm64"; build_arch x86_64 "$OUT/Tidymint-x86_64"
   lipo -create "$OUT/Tidymint-arm64" "$OUT/Tidymint-x86_64" -output "$APP/Contents/MacOS/Tidymint"
@@ -63,6 +69,8 @@ rm -rf "$T"
 xattr -cr "$APP"
 codesign --force --deep -s - -r="designated => identifier \"$BUNDLE_ID\"" "$APP"
 echo "Built: $APP"
+# Private builds only: a check that build-flags.sh may define (runs on the finished app, stops the build when it fails).
+if type private_check >/dev/null 2>&1; then private_check "$APP" "$1"; fi
 
 if [ "$1" = "--release" ]; then
   ZIP="$OUT/Tidymint-$VERSION.zip"; rm -f "$ZIP"
@@ -76,22 +84,26 @@ if [ "$1" = "--install" ]; then
 fi
 
 if [ "$1" = "--dev" ]; then
-  DEST="$HOME/Applications/$NAME.app"
+  # In /Applications, like the official app: macOS 27 keeps an app's own menu bar icons in view (Mintbar) only for a copy there.
+  DEST="/Applications/$NAME.app"
   # Never replace a newer Dev build with an older branch (e.g. building an old release folder for screenshots).
   # Run the old one from build/ instead, or set FORCE_DEV_INSTALL=1 to replace on purpose.
   NEW_V="$(cat "$ROOT/VERSION")"
-  OLD_V="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$DEST/Contents/Info.plist" 2>/dev/null || true)"
+  OLD_V=""   # PlistBuddy prints a message on stdout for a missing file, so only ask when the copy is there
+  [ -f "$DEST/Contents/Info.plist" ] && OLD_V="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$DEST/Contents/Info.plist" 2>/dev/null || true)"
   if [ -n "$OLD_V" ] && [ "${FORCE_DEV_INSTALL:-0}" != "1" ] && \
      [ "$(printf '%s\n%s\n' "$OLD_V" "$NEW_V" | sort -V | tail -1)" != "$NEW_V" ]; then
     echo "Not installed: $DEST is $OLD_V, newer than this build ($NEW_V)."
     echo "Run it from: $APP   (or FORCE_DEV_INSTALL=1 ./build.sh --dev to replace it)"
     exit 0
   fi
-  mkdir -p "$HOME/Applications"
   # Quit only the Dev copy (by bundle id; both copies are named Tidymint) and reopen it after, so it keeps running in the background.
-  WAS_RUNNING=0; pgrep -f "Tidymint Dev.app/Contents/MacOS" >/dev/null && WAS_RUNNING=1
+  WAS_RUNNING=0; pgrep -f "$NAME.app/Contents/MacOS" >/dev/null && WAS_RUNNING=1
+  if [ -n "$OLD_APP" ] && pgrep -f "$OLD_APP/Contents/MacOS" >/dev/null; then WAS_RUNNING=1; fi
   osascript -e 'tell application id "com.haitrung.diskcleanup.dev" to quit' 2>/dev/null || true
-  rm -rf "$DEST"; cp -R "$APP" "$HOME/Applications/"
+  # A copy under an earlier name has the same bundle id: two of them would fight over settings and permissions.
+  if [ -n "$OLD_APP" ] && [ "$OLD_APP" != "$DEST" ] && [ -d "$OLD_APP" ]; then sleep 1; rm -rf "$OLD_APP"; echo "Removed: $OLD_APP"; fi
+  rm -rf "$DEST"; cp -R "$APP" /Applications/
   # Refresh the icon Finder and the Dock show (they cache the old one otherwise).
   touch "$DEST"
   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST" 2>/dev/null || true

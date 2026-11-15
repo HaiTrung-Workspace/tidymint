@@ -4,7 +4,7 @@
 
 <a href="https://macpip.com/apps/tidymint?ref=badge"><img src="docs/badge-macpip.svg" height="40" alt="#1 of the day on MacPip, Nov 6, 2026"></a> [![Mentioned in Awesome Mac](https://awesome.re/mentioned-badge.svg)](https://github.com/jaywcjlove/awesome-mac) [![As seen on Open Source Alternatives](https://www.opensourcealternatives.to/badge-osa.svg)](https://www.opensourcealternatives.to)
 
-**Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac. Window tiling (Mintangle) and a file shelf (Mintdrop) are built in.
+**Keep your Mac in mint condition.** A free, open-source Mac cleaner, built for people who work with AI tools. A free alternative to CleanMyMac. Window tiling (Mintangle), a file shelf (Mintdrop) and a tidy menu bar (Mintbar) are built in.
 
 AI work leaves a lot behind: model files, drafts, exported images, duplicate assets, caches from browsers and editors. Tidymint finds that clutter, shows exactly what it is, and moves only what you select to the Trash.
 
@@ -50,14 +50,19 @@ Files over 100 MB, sorted by size or by when you last opened them. You pick what
 ![Large files](docs/large.jpg)
 
 ### 7. Mintangle: put every window in its place
-Snap a window to a half, a corner, a third or two thirds of the screen with one shortcut, or by dragging it to a screen edge. The keys match Rectangle. Off by default; macOS asks for Accessibility permission only when you turn it on. [Guide](https://tidymint.app/mintangle-window-tiling-mac/)
+Snap a window to a half or a corner of the screen with one shortcut, or by dragging it to a screen edge. The keys match Rectangle. Off by default; macOS asks for Accessibility permission only when you turn it on. [Guide](https://tidymint.app/mintangle-window-tiling-mac/)
 
 ![Mintangle](docs/mintangle.jpg)
 
 ### 8. Mintdrop: gather files on one shelf
-A small shelf that floats on your screen. Shake while dragging or press ⌃⌥S, drop files from several folders, then drag them out together, move them to a folder or put them in the Trash, with Undo. The shelf only remembers paths and never copies a file. Off by default, no permission needed. [Guide](https://tidymint.app/mintdrop-drop-shelf-mac/)
+A small shelf that floats on your screen. Shake while dragging or press ⌃⌥S, drop up to 5 files from several folders, then drag each one out where it belongs, with Undo. The shelf only remembers paths and never copies a file. Off by default, no permission needed. [Guide](https://tidymint.app/mintdrop-drop-shelf-mac/)
 
 ![Mintdrop](docs/mintdrop.jpg)
+
+### 9. Mintbar: a tidy menu bar
+Gather menu bar icons behind one group icon you choose: click the group to fan its apps out, then click an app to open its menu. Two groups of up to 4 apps. Off by default; on macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on. [Guide](https://tidymint.app/mintbar-tidy-menu-bar-mac/)
+
+![Mintbar](docs/mintbar.jpg)
 
 ## Features
 
@@ -73,8 +78,9 @@ A small shelf that floats on your screen. Shake while dragging or press ⌃⌥S,
 | **Space Lens** | Bubble map of what takes up space on your Mac or a connected external drive, with plain-language notes for common folders (AI model folders included) |
 | **Cloud Cleanup** | Shows how much of iCloud Drive, Google Drive, Dropbox... is stored locally |
 | **Startup Items** | Lists background helpers with who signed them, flags unusual locations or names and ones left by removed apps. Facts, not antivirus |
-| **Mintangle** | Window tiling: halves, corners, thirds and two thirds by shortcut or by dragging to a screen edge. Off by default |
-| **Mintdrop** | A floating shelf to gather files from several folders, then drag them out, move them or trash them together, with Undo. Off by default |
+| **Mintangle** | Window tiling: halves and corners by shortcut or by dragging to a screen edge. Off by default |
+| **Mintdrop** | A floating shelf to gather up to 5 files from several folders, then drag each one out, with Undo. Off by default |
+| **Mintbar** | A tidy menu bar: up to 2 groups of 4 apps behind one icon each. Off by default |
 | **Statistics** | Space freed over time and a full activity log |
 | **Menu bar** | A hard-drive indicator with free space inside, plus disk, RAM and Trash at a glance (can be hidden in Settings) |
 | **Contact** | Send feedback or bug reports from inside the app |
@@ -85,7 +91,7 @@ Also: open any file from the lists (click or Space for Quick Look, double-click 
 
 ### Download
 
-> **Official site:** tidymint.app. Downloads come only from this GitHub repository. There is no other website and no paid version.
+> **Official site:** tidymint.app. Downloads come only from this GitHub repository. There is no other website.
 
 1. Download **[Tidymint.zip](https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip)** (Apple silicon and Intel, macOS 14 or later), open it and drag **Tidymint** to Applications.
 2. Tidymint is not notarized yet, so macOS blocks the first launch. Click **Done**, open **System Settings > Privacy & Security**, scroll to the **Security** heading (under *Allow applications from*) and click **Open Anyway**, then **Open** ([Apple's guide](https://support.apple.com/102445)). The button only shows for a while after a blocked launch; if it is missing, double-click the app again and come back. Step-by-step guide with screenshots: [tidymint.app/install](https://tidymint.app/install/).
@@ -107,6 +113,8 @@ git clone https://github.com/HaiTrung-Workspace/tidymint.git
 cd tidymint
 ./build.sh --install
 ```
+
+This builds the cleaning app. The code of the Mint tools (Mintangle, Mintdrop, Mintbar) is not in this repository; they are part of the released app.
 
 ### First launch
 
@@ -137,7 +145,7 @@ Self-hosting the collector: `backend/Code.gs` is a Google Apps Script that appen
 
 ## Support the project
 
-Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://github.com/sponsors/HaiTrung-Workspace). Sponsorships go toward the Apple Developer account (so the app can be notarized and open without warnings) and time for new features.
+Cleaning with Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://github.com/sponsors/HaiTrung-Workspace). Sponsorships go toward the Apple Developer account (so the app can be notarized and open without warnings) and time for new features.
 
 ## License
 

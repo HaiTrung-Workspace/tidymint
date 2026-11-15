@@ -32,8 +32,8 @@ struct CleanItem: Identifiable, Hashable {
         if running { return t("App is open, quit it first", "App đang mở, tắt app rồi dọn") }
         if hasDB { return t("Has a database inside, may be your data", "Có database bên trong, có thể là dữ liệu của bạn") }
         if nameMatch { return t("Matched by name only, check first", "Khớp theo tên app, kiểm tra trước") }
-        if !refStrong.isEmpty { return t("Used by \(refStrong.count) script/skill", "Script/skill đang dùng (\(refStrong.count))") }
-        if !refWeak.isEmpty { return t("Mentioned in \(refWeak.count) notes", "Được nhắc trong \(refWeak.count) ghi chú") }
+        if !refStrong.isEmpty { return t("Used by \(plural(refStrong.count, "script or skill", "scripts or skills"))", "Script/skill đang dùng (\(refStrong.count))") }
+        if !refWeak.isEmpty { return t("Mentioned in \(plural(refWeak.count, "note"))", "Được nhắc trong \(refWeak.count) ghi chú") }
         if cross == 1 { return t("Same file is on an external drive", "Có bản giống hệt trên ổ ngoài") }
         if cross == 2 { return t("Same file is on this Mac", "Có bản giống hệt trên máy") }
         return reason

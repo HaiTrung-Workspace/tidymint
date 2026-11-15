@@ -55,6 +55,29 @@ struct TrashShape: Shape {
     }
 }
 
+/// ⌘1…⌘8 and ⌘, switch pages while the main window is in front (see `Page.shortcutKey`). A letter is left to
+/// the text field when one is being edited, so ⌘A still selects all there.
+enum PageShortcuts {
+    private static var monitor: Any?
+    static func install(_ vm: VM) {
+        guard monitor == nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { e in
+            guard e.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+                  e.window?.identifier?.rawValue.contains("main") == true,
+                  let key = e.charactersIgnoringModifiers?.lowercased(),
+                  let page = Page.allCases.first(where: { $0.shortcutKey == key }) else { return e }
+            #if TIDYMINT_PRIVATE
+            // A shortcut being recorded on the Mintangle page takes the key press (⌘1 can be a shortcut too).
+            if MTRecorder.shared.action != nil { return e }
+            #endif
+            let typing = e.window?.firstResponder is NSText
+            if typing && key.first?.isLetter == true { return e }
+            vm.page = page
+            return nil
+        }
+    }
+}
+
 struct NavItem: View {
     let p: Page
     @ObservedObject var vm: VM
@@ -74,6 +97,10 @@ struct NavItem: View {
                 Text(p.label).lineLimit(1)
                 Spacer()
                 NavBadge(p: p, vm: vm)
+                if let k = p.shortcutKey {
+                    Text("⌘" + k.uppercased()).font(.system(size: fs(10.5), weight: .regular)).monospacedDigit()
+                        .foregroundColor(selected ? Color.white.opacity(0.7) : Theme.ink.opacity(0.38))
+                }
             }
             .font(.system(size: fs(13), weight: selected ? .semibold : .regular))
             .foregroundColor(selected ? .white : Theme.ink.opacity(0.8))
@@ -96,6 +123,8 @@ struct NavBadge: View {
         let selected = vm.page == p
         if vm.isBusy(p) {
             ProgressView().controlSize(.mini).tint(selected ? .white : Theme.accentSolid)
+        } else if let v = privateNavState(p, selected: selected) {
+            v
         } else if p == .settings {
             // A number only where it counts several pending things.
             if vm.settingsPending > 0 {
@@ -108,7 +137,7 @@ struct NavBadge: View {
             // A new result not seen yet: a small dot. Startup Items with something worth a look: warning colour.
             let warn = p == .startup && vm.launchAttention > 0
             Circle().fill(selected ? Color.white : (warn ? Theme.warn : Theme.accentSolid)).frame(width: 8, height: 8)
-                .tip(warn ? t("\(vm.launchAttention) items worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
+                .tip(warn ? t("\(plural(vm.launchAttention, "item")) worth a look", "\(vm.launchAttention) mục đáng để ý") : t("New results", "Có kết quả mới"))
         }
     }
 }
@@ -145,6 +174,19 @@ final class ScrollEdges: ObservableObject {
     var moreAbove: Bool { view.height > 0 && content.minY < view.minY - 4 }
 }
 
+/// Behind the sidebar: on macOS 26 and later the system's own Liquid Glass, as a pane floating inside the window the way
+/// Apple's sidebars do (its clarity and tint follow System Settings); before that, the flat shade of the theme.
+struct SidebarBack: View {
+    var body: some View {
+        if #available(macOS 26.0, *) {
+            // Corners concentric with the window's own, the way the system shapes its sidebars.
+            Color.clear.glassEffect(.regular, in: ConcentricRectangle(corners: .concentric(minimum: 10), isUniform: true)).padding(8)
+        } else {
+            Theme.sidebar
+        }
+    }
+}
+
 struct Sidebar: View {
     @ObservedObject var vm: VM
     @StateObject private var edges = ScrollEdges()
@@ -152,9 +194,9 @@ struct Sidebar: View {
         VStack(alignment: .leading, spacing: 0) {
             // Fixed header, kept clear of the window's traffic-light buttons.
             HStack(spacing: 8) {
-                Image(nsImage: cachedIcon(Theme.p)).resizable().frame(width: 28, height: 28)
+                Image(nsImage: cachedIcon(Theme.p)).resizable().frame(width: 24, height: 24)
                 (Text("Tidy").foregroundColor(Theme.text) + Text("mint").foregroundColor(Theme.brandMint)).font(.system(size: fs(15), weight: .bold))
-            }.padding(.top, 44).padding(.bottom, 12)
+            }.padding(.leading, 10).padding(.top, 44).padding(.bottom, 12)   // the logo sits on the centre line of the row icons below (row inset 12 + half the 20 pt icon slot)
             // The menu scrolls when the window is short, so nothing overlaps.
             // A fade and a "More" chevron show that items are hidden below (and a fade at the top when scrolled).
             ScrollViewReader { proxy in
@@ -168,12 +210,14 @@ struct Sidebar: View {
             // Advanced pages fold away so the first screen stays simple. The fold opens itself when one of them is active.
             Button { withAnimation(.easeOut(duration: 0.2)) { vm.setAdvanced(!vm.advancedOpen) } } label: {
                 HStack {
-                    SectionTitle(text: t("ADVANCED", "NÂNG CAO"))
+                    // Same look as SectionTitle, but centred in the hover tile (the title's own top gap sits outside it).
+                    Text(t("ADVANCED", "NÂNG CAO")).font(.system(size: fs(10), weight: .semibold)).tracking(0.8)
+                        .foregroundColor(Theme.sub.opacity(0.8)).padding(.horizontal, 12)
                     Spacer()
                     Image(systemName: "chevron.right").font(.system(size: fs(9), weight: .bold)).foregroundColor(Theme.sub)
                         .rotationEffect(.degrees(vm.advancedOpen ? 90 : 0)).padding(.trailing, 10)
-                }.padding(.vertical, 2).hoverTile()
-            }.buttonStyle(.plain)
+                }.padding(.vertical, 7).hoverTile()
+            }.buttonStyle(.plain).padding(.top, 8)
             if vm.advancedOpen {
                 NavItem(p: .lens, vm: vm)
                 NavItem(p: .large, vm: vm)
@@ -184,6 +228,18 @@ struct Sidebar: View {
                 NavItem(p: .ignore, vm: vm)
             }
             // Not cleaning: tools that organize files get their own group, always open.
+            #if TIDYMINT_PRIVATE
+            if featureMintangle || featureShelf {
+            HStack(alignment: .top, spacing: 1) {
+                SectionTitle(text: t("TOOLS", "CÔNG CỤ")).padding(.trailing, -12)
+                Image(systemName: "sparkle").font(.system(size: fs(8), weight: .bold)).foregroundColor(Theme.accentSolid)
+                    .padding(.top, 9)
+            }
+            if featureMintangle { NavItem(p: .windows, vm: vm) }
+            if featureShelf { NavItem(p: .shelf, vm: vm) }
+            NavItem(p: .menubar, vm: vm)
+            }
+            #endif
             SectionTitle(text: "")
             NavItem(p: .settings, vm: vm)
             NavItem(p: .contact, vm: vm)
@@ -201,18 +257,12 @@ struct Sidebar: View {
             })
             .onAppear { DispatchQueue.main.async { proxy.scrollTo(vm.page, anchor: .center) } }
             .onChange(of: vm.page) { _, pg in withAnimation(.easeInOut(duration: 0.25)) { proxy.scrollTo(pg, anchor: .center) } }
-            .overlay(alignment: .top) {
-                if edges.moreAbove {
-                    LinearGradient(colors: [Theme.shade.opacity(0.35), .clear], startPoint: .top, endPoint: .bottom)
-                        .frame(height: 22).allowsHitTesting(false)
-                }
-            }
-            .overlay(alignment: .bottom) {
-                if edges.moreBelow {
-                    LinearGradient(colors: [.clear, Theme.shade.opacity(0.45)], startPoint: .top, endPoint: .bottom)
-                        .frame(height: 28).allowsHitTesting(false)
-                }
-            }
+            // More above or below: the list itself fades out at that edge (no dark band, so nothing square sits on the glass pane).
+            .mask(VStack(spacing: 0) {
+                LinearGradient(colors: [edges.moreAbove ? .clear : .black, .black], startPoint: .top, endPoint: .bottom).frame(height: 22)
+                Color.black
+                LinearGradient(colors: [.black, edges.moreBelow ? .clear : .black], startPoint: .top, endPoint: .bottom).frame(height: 28)
+            })
             // The "More" chip sits in its own row under the list, so it can never cover a menu item.
             if edges.moreBelow {
                 Button { withAnimation(.easeInOut(duration: 0.3)) { proxy.scrollTo(Page.contact, anchor: .bottom) } } label: {
@@ -242,11 +292,37 @@ struct Sidebar: View {
                     .font(.system(size: fs(10))).foregroundColor(Theme.sub)
             }.padding(.bottom, 16)
         }
-        .padding(.horizontal, 14).frame(width: 120 + 140 * uiScale).background(Theme.sidebar)  // fixed parts (padding, icon, badge) do not scale, only the label does
+        .padding(.horizontal, 14).frame(width: 120 + 140 * uiScale).background(SidebarBack())  // fixed parts (padding, icon, badge) do not scale, only the label does
     }
 }
 
 /// Gives the VM the NSWindow that hosts the main view, so window limits can be set on it directly.
+/// On macOS 26 and later the sidebar is a pane of glass set in from the window's edge, and the close, minimise and zoom
+/// buttons belong inside it with room around them, where the system puts them in its own sidebar windows. AppKit puts
+/// them back at the edge whenever it lays the title bar out, so the place is applied again after each such moment.
+enum WindowLights {
+    private static var watching = false
+    static func keep(_ w: NSWindow) {
+        guard #available(macOS 26.0, *) else { return }
+        place(w)
+        guard !watching else { return }
+        watching = true
+        for name in [NSWindow.didResizeNotification, NSWindow.didBecomeKeyNotification, NSWindow.didResignKeyNotification,
+                     NSWindow.didExitFullScreenNotification, NSWindow.didEndLiveResizeNotification] {
+            NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { n in
+                if let w = n.object as? NSWindow, w.identifier?.rawValue.contains("main") == true { place(w); DispatchQueue.main.async { place(w) } }
+            }
+        }
+    }
+    private static func place(_ w: NSWindow) {
+        guard !w.styleMask.contains(.fullScreen) else { return }
+        for (i, kind) in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton].enumerated() {
+            guard let b = w.standardWindowButton(kind), let bar = b.superview else { continue }
+            b.setFrameOrigin(NSPoint(x: 20 + CGFloat(i) * 20, y: (bar.bounds.height - b.frame.height) / 2 - 5))
+        }
+    }
+}
+
 struct WindowGrabber: NSViewRepresentable {
     let vm: VM
     final class V: NSView {
@@ -254,7 +330,7 @@ struct WindowGrabber: NSViewRepresentable {
         override func viewDidMoveToWindow() { super.viewDidMoveToWindow(); if let w = window { onWindow?(w) } }
     }
     func makeNSView(context: Context) -> V {
-        let v = V(); v.onWindow = { w in MainActor.assumeIsolated { vm.mainWindow = w; vm.applyWindowLimits() } }; return v
+        let v = V(); v.onWindow = { w in MainActor.assumeIsolated { vm.mainWindow = w; vm.applyWindowLimits() }; WindowLights.keep(w) }; return v
     }
     func updateNSView(_ v: V, context: Context) {}
 }
@@ -264,7 +340,7 @@ struct RootView: View {
     @StateObject private var keys = KeyTap()
     var body: some View {
         HStack(spacing: 0) {
-            Sidebar(vm: vm)
+            Sidebar(vm: vm).background(OpenWindowKeeper()).onAppear { PageShortcuts.install(vm) }
             Group {
                 switch vm.page {
                 case .smart: SmartView(vm: vm)
@@ -281,6 +357,11 @@ struct RootView: View {
                 case .startup: StartupView(vm: vm)
                 case .stats: StatsView(vm: vm)
                 case .contact: ContactView(vm: vm)
+                #if TIDYMINT_PRIVATE
+                case .windows: MintangleView()
+                case .shelf: ShelfPageView()
+                case .menubar: MintbarPageView()
+                #endif
                 }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -307,4 +388,25 @@ struct RootView: View {
         }
         .onDisappear { vm.windowGone(); keys.stop() }
     }
+}
+
+/// Badge at the right of a sidebar row that belongs to private (Pro) code; nil for every other page and in public builds.
+func privateNavState(_ p: Page, selected: Bool) -> AnyView? {
+    #if TIDYMINT_PRIVATE
+    if p == .windows { return AnyView(MintangleNavState(selected: selected)) }
+    if p == .shelf { return AnyView(ShelfNavState(selected: selected)) }
+    if p == .menubar { return AnyView(MintbarNavState(selected: selected)) }
+    #endif
+    return nil
+}
+
+
+/// False for a private page that is not released yet: it cannot be opened from the command line either.
+func pageAvailable(_ p: Page) -> Bool {
+    return true
+}
+
+/// Text after the version number in Settings while a private feature runs as a preview; empty otherwise.
+var privateVersionNote: String {
+    return ""
 }

@@ -403,7 +403,7 @@ struct DoneBanner: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(d.size > 0 ? t("\(fmt(d.size)) tidier", "Gọn thêm \(fmt(d.size))") : t("Done", "Xong"))
                         .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
-                    Text(t("\(d.count) items moved to the Trash. Empty the Trash to free the space for real.",
+                    Text(t("\(plural(d.count, "item")) moved to the Trash. Empty the Trash to free the space for real.",
                            "\(d.count) mục đã vào Thùng rác. Đổ Thùng rác thì ổ mới trống thật.") + (d.fail > 0 ? t(" \(d.fail) skipped.", " Bỏ qua \(d.fail) mục.") : ""))
                         .font(.system(size: fs(12))).foregroundColor(Theme.sub).fixedSize(horizontal: false, vertical: true)
                 }
@@ -455,7 +455,7 @@ struct ScanSteps: View {
                             .foregroundColor(i <= current ? Theme.text : Theme.sub)
                     }
                 }
-            }.padding(20).frame(width: 340 * uiScale, alignment: .leading).background(RoundedRectangle(cornerRadius: 14).fill(Theme.card))
+            }.padding(20).frame(width: 340 * uiScale, alignment: .leading).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
             Text(detail).font(.system(size: fs(11))).foregroundColor(Theme.sub).lineLimit(1).truncationMode(.middle).frame(maxWidth: 420)
         }
     }
@@ -483,8 +483,7 @@ struct JunkCard: View {
                     .font(.system(size: fs(12), weight: .semibold)).foregroundColor(picked ? Theme.text : Theme.sub)
             }
             .padding(16).frame(maxWidth: .infinity, minHeight: 168 * uiScale, alignment: .topLeading)
-            .background(RoundedRectangle(cornerRadius: 16).fill(hover.v ? Theme.cardHi : Theme.card))
-            .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.accentSolid.opacity(picked ? 0.35 : 0), lineWidth: 1))
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(hover.v ? Theme.cardHi : Theme.card))
         }.buttonStyle(.plain).onHover { hover.v = $0 }
     }
 }

@@ -42,15 +42,21 @@ func rasterIcon(_ img: NSImage, px: Int) -> NSImage {
 /// Dock icon: a 512 px bitmap (1 MB) instead of the 1024 pt drawing.
 func dockIcon(_ p: Palette) -> NSImage { rasterIcon(makeAppIcon(p), px: 512) }
 
-
 /// Dev build (bundle id ending in ".dev", built with `./build.sh --dev`): runs beside the official app with its own
 /// settings, data folder and a "DEV" badge on the icon, and shows every feature still hidden in releases.
 let isDevBuild = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
 
+/// Forget the small icons, after something drawn on the icon changed.
+func resetIconCache() { iconCache = [:] }
+
 func makeAppIcon(_ p: Palette) -> NSImage {
-    let base = makeBaseIcon(p)
-    guard isDevBuild else { return base }
-    return NSImage(size: base.size, flipped: false) { r in
+    let base = makeLeafIcon(p)
+    return isDevBuild ? devBadged(base) : base
+}
+
+/// The icon with the "DEV" pill at the bottom right.
+func devBadged(_ base: NSImage) -> NSImage {
+    NSImage(size: base.size, flipped: false) { r in
         base.draw(in: r)
         let pill = NSBezierPath(roundedRect: NSRect(x: 520, y: 70, width: 430, height: 190), xRadius: 95, yRadius: 95)
         NSColor(hex: 0xa15c00).setFill(); pill.fill()
@@ -61,61 +67,27 @@ func makeAppIcon(_ p: Palette) -> NSImage {
     }
 }
 
-func makeBaseIcon(_ p: Palette) -> NSImage {
-    let img = NSImage(size: NSSize(width: 1024, height: 1024), flipped: true) { _ in
-        // "dark" tints ports, veins and shadows; on a light palette it is a graphite grey, not the pale background.
-        let dark = p.light ? NSColor(hex: 0x2b3431) : NSColor(hex: p.bg[0])
-        // Mac mini body: white on dark palettes, Apple-style silver on light ones so it stands out from the pale tile.
-        let shell = p.light ? NSColor(hex: 0xc9ccd0) : NSColor.white.withAlphaComponent(0.92)
-        let body = NSBezierPath(roundedRect: NSRect(x: 100, y: 100, width: 824, height: 824), xRadius: 190, yRadius: 190)
-        // No drop shadow around the tile: macOS adds its own in the Dock, and in-app the halo shows on light backgrounds.
-        (p.light ? NSColor(hex: p.icon[0]) : dark).setFill(); body.fill()
-        let sh = NSShadow(); sh.shadowOffset = NSSize(width: 0, height: -16); sh.shadowBlurRadius = 40
-        let cols = p.icon.map { NSColor(hex: $0) }
-        let locs = (0..<cols.count).map { CGFloat($0) / CGFloat(max(cols.count - 1, 1)) }
-        NSGradient(colors: cols, atLocations: locs, colorSpace: .sRGB)?.draw(in: body, angle: p.id == "pride" ? 90 : -45)
-        NSGradient(colors: [NSColor.white.withAlphaComponent(0.14), NSColor.white.withAlphaComponent(0)],
-                   atLocations: [0, 0.45], colorSpace: .sRGB)?.draw(in: body, angle: 90)
-        // recessed foot
-        dark.withAlphaComponent(0.55).setFill()
-        NSBezierPath(roundedRect: NSRect(x: 262, y: 688, width: 500, height: 22), xRadius: 10, yRadius: 10).fill()
-        // body (2.54:1)
-        let mini = NSBezierPath(roundedRect: NSRect(x: 222, y: 460, width: 580, height: 228), xRadius: 40, yRadius: 40)
-        NSGraphicsContext.saveGraphicsState(); sh.shadowColor = NSColor.black.withAlphaComponent(0.35); sh.set()
-        shell.setFill(); mini.fill()
-        NSGraphicsContext.restoreGraphicsState()
-        NSGradient(colors: [NSColor.white.withAlphaComponent(p.light ? 0.45 : 0.0), dark.withAlphaComponent(p.light ? 0.22 : 0.18)], atLocations: [0, 1], colorSpace: .sRGB)?
-            .draw(in: mini, angle: -45)
-        NSColor.white.withAlphaComponent(0.8).setFill()
-        NSBezierPath(roundedRect: NSRect(x: 262, y: 466, width: 500, height: 6), xRadius: 3, yRadius: 3).fill()
-        // two USB-C ports (vertical), left
-        dark.withAlphaComponent(0.85).setFill()
-        NSBezierPath(roundedRect: NSRect(x: 304, y: 547, width: 18, height: 56), xRadius: 9, yRadius: 9).fill()
-        NSBezierPath(roundedRect: NSRect(x: 348, y: 547, width: 18, height: 56), xRadius: 9, yRadius: 9).fill()
-        // white status light, just left of the headphone jack
-        dark.withAlphaComponent(0.55).setFill()
-        NSBezierPath(ovalIn: NSRect(x: 656, y: 565, width: 20, height: 20)).fill()
-        NSGraphicsContext.saveGraphicsState()
-        let glow = NSShadow(); glow.shadowBlurRadius = 10; glow.shadowOffset = .zero; glow.shadowColor = NSColor.white; glow.set()
-        NSColor.white.setFill()
-        NSBezierPath(ovalIn: NSRect(x: 660, y: 569, width: 12, height: 12)).fill()
-        NSGraphicsContext.restoreGraphicsState()
-        // headphone jack, right
-        dark.withAlphaComponent(0.85).setFill()
-        NSBezierPath(ovalIn: NSRect(x: 707, y: 560, width: 30, height: 30)).fill()
-        NSColor.black.setFill()
-        NSBezierPath(ovalIn: NSRect(x: 715, y: 568, width: 14, height: 14)).fill()
-        // Mint leaf above the Mac mini (Creative Fabrica leaf approved 28/10, same outline as docs/logo.svg):
-        // the open vein is part of the outline, so the leaf takes the palette colour with no extra strokes.
-        let lp = leafOutline
-        let leaf = NSBezierPath()
-        leaf.move(to: NSPoint(x: lp[0], y: lp[1]))
-        for i in stride(from: 2, to: lp.count, by: 2) { leaf.line(to: NSPoint(x: lp[i], y: lp[i + 1])) }
-        leaf.close()
-        NSColor(hex: p.leaf).setFill(); leaf.fill()
+/// The app icon from 0.6.0 (chosen 15/11/2026): the mint leaf alone on a dark tile, like the favicon, following the theme.
+/// The tile runs from the palette's first icon colour (top right) down to a darker shade of it (bottom left); on the Mint
+/// theme that is the brand tile #0D2B24 to #05110E with the leaf #5FF0C0. A light palette keeps its pale tile, Pride its
+/// rainbow. 1024 x 1024 canvas, macOS icon grid (824 px rounded square); the leaf is 560 tall, centred.
+func makeLeafIcon(_ p: Palette) -> NSImage {
+    NSImage(size: NSSize(width: 1024, height: 1024), flipped: false) { _ in
+        let tile = NSBezierPath(roundedRect: NSRect(x: 100, y: 100, width: 824, height: 824), xRadius: 190, yRadius: 190)
+        if p.id == "pride" {
+            let cols = p.icon.map { NSColor(hex: $0) }
+            let locs = (0..<cols.count).map { CGFloat($0) / CGFloat(max(cols.count - 1, 1)) }
+            NSGradient(colors: cols, atLocations: locs, colorSpace: .sRGB)?.draw(in: tile, angle: -90)
+        } else {
+            let hi = p.icon[0]
+            // 40% of each channel: the same hue, deep enough to sit on a dark Dock and still part from a white one.
+            let dim = (((hi >> 16) & 255) * 2 / 5) << 16 | (((hi >> 8) & 255) * 2 / 5) << 8 | ((hi & 255) * 2 / 5)
+            let lo = p.light ? p.icon[p.icon.count - 1] : dim
+            NSGradient(colors: [NSColor(hex: lo), NSColor(hex: hi)], atLocations: [0, 1], colorSpace: .sRGB)?.draw(in: tile, angle: 45)
+        }
+        NSColor(hex: p.leaf).setFill(); leafPath(x0: 331.6, y0: 232, h: 560).fill()
         return true
     }
-    return img
 }
 
 extension NSBezierPath {

@@ -111,7 +111,7 @@ extension VM {
         let (n, size) = dupPending()
         guard n > 0 else { return }
         let a = NSAlert()
-        a.messageText = t("Move \(n) duplicates (\(fmt(size))) to Trash?", "Chuyển \(n) file trùng (\(fmt(size))) vào Thùng rác?")
+        a.messageText = t("Move \(plural(n, "duplicate")) (\(fmt(size))) to Trash?", "Chuyển \(n) file trùng (\(fmt(size))) vào Thùng rác?")
         a.informativeText = Prefs.projectFolders.isEmpty
             ? t("Tip: add your project folders in Settings to check whether a script still uses these files. One copy of each file is always kept.",
                 "Mẹo: thêm thư mục dự án ở Cài đặt để kiểm tra script nào còn dùng các file này. Mỗi file luôn giữ lại ít nhất một bản.")
@@ -140,7 +140,7 @@ extension VM {
         } }
         let shown = lines.prefix(12).joined(separator: "\n") + (lines.count > 12 ? t("\n...and \(lines.count - 12) more", "\n...và \(lines.count - 12) file khác") : "")
         let a = NSAlert()
-        a.messageText = t("\(hits.count) files are still used by a script/skill", "\(hits.count) file đang được script/skill dùng")
+        a.messageText = t("\(plural(hits.count, "file")) \(hits.count == 1 ? "is" : "are") still used by a script or skill", "\(hits.count) file đang được script/skill dùng")
         a.informativeText = shown + "\n\n" + t("Untick these and delete the rest?", "Bỏ tick các file này và xoá phần còn lại?")
         a.addButton(withTitle: t("Untick & delete the rest", "Bỏ tick, xoá phần còn lại"))
         a.addButton(withTitle: t("Delete all anyway", "Vẫn xoá hết"))
@@ -189,8 +189,8 @@ extension VM {
         }
         let (ok, fail) = trash(picked.map(\.url), sizes: Dictionary(picked.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a }))
         let size = okSize(picked)
-        dupMsg = t("Moved \(ok) duplicates (\(fmt(size))) to the Trash.", "Đã chuyển \(ok) file trùng (\(fmt(size))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") + failNote : "")
-            + (skippedGroups > 0 ? t(" Skipped \(skippedGroups) groups whose kept copy is gone.", " Bỏ qua \(skippedGroups) nhóm vì bản giữ lại không còn.") : "")
+        dupMsg = t("Moved \(plural(ok, "duplicate")) (\(fmt(size))) to the Trash.", "Đã chuyển \(ok) file trùng (\(fmt(size))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) file lỗi.") + failNote : "")
+            + (skippedGroups > 0 ? t(" Skipped \(plural(skippedGroups, "group")) whose kept copy is gone.", " Bỏ qua \(skippedGroups) nhóm vì bản giữ lại không còn.") : "")
         log(dupMsg)
         finished(.dupes, ok, size, fail); dupMsg = ""
         let gone = lastOK

@@ -157,7 +157,7 @@ struct StatsView: View {
             Text(title).font(.system(size: fs(11))).foregroundColor(Theme.sub)
             Text(value).font(.system(size: fs(22), weight: .bold)).foregroundColor(Theme.text)
         }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
-        .background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
         .hoverBG(12, Theme.ink.opacity(0.05))
     }
 }
@@ -227,6 +227,6 @@ struct FreeSpaceChart: View {
                 .chartXSelection(value: $pick.sel)
                 .frame(height: 150)
             }
-        }.padding(14).background(RoundedRectangle(cornerRadius: 10).fill(Theme.card))
+        }.padding(14).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
     }
 }

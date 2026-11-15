@@ -46,7 +46,7 @@ extension VM {
         finished(.apps, ok + 1, moved, fail)
         appsMsgErr = fail > 0
         appsMsg = (ok == 0 ? t("Uninstalled \(a.name) (\(fmt(moved))).", "Đã gỡ \(a.name) (\(fmt(moved))).")
-            : t("Uninstalled \(a.name) and \(ok) related items (\(fmt(moved))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(moved)))."))
+            : t("Uninstalled \(a.name) and \(plural(ok, "related item")) (\(fmt(moved))).", "Đã gỡ \(a.name) và \(ok) mục liên quan (\(fmt(moved)))."))
             + (fail > 0 ? t(" \(fail) could not be moved: \(lastErr).", " \(fail) mục không chuyển được: \(lastErr).") : "")
     }
 
@@ -60,7 +60,7 @@ extension VM {
         let extra = a.related.filter(\.selected)
         let total = a.size + extra.reduce(0) { $0 + $1.size }
         guard confirm(t("Uninstall \(a.name)?", "Gỡ \(a.name)?"),
-                      (extra.isEmpty ? t("The app (\(fmt(total))) will be moved to the Trash.", "App (\(fmt(total))) sẽ được chuyển vào Thùng rác.") : t("The app and \(extra.count) related items (\(fmt(total))) will be moved to the Trash.", "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."))
+                      (extra.isEmpty ? t("The app (\(fmt(total))) will be moved to the Trash.", "App (\(fmt(total))) sẽ được chuyển vào Thùng rác.") : t("The app and \(plural(extra.count, "related item")) (\(fmt(total))) will be moved to the Trash.", "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."))
                         + (a.needsAdmin ? t(" macOS will ask for an administrator password in its own window; Tidymint never sees it.", " macOS sẽ hỏi mật khẩu quản trị trong hộp thoại của macOS; Tidymint không thấy mật khẩu.") : ""),
                       t("Uninstall", "Gỡ")) else { return }
         TrashHint.uninstalling(a.bundleID)   // the Trash hint stays quiet about an app removed here
@@ -122,7 +122,7 @@ extension VM {
         guard notify else { return }
         let size = h.items.reduce(0) { $0 + $1.size }
         let c = UNMutableNotificationContent()
-        c.title = t("\(h.name) left \(h.items.count) items behind", "\(h.name) còn để lại \(h.items.count) mục")
+        c.title = t("\(h.name) left \(plural(h.items.count, "item")) behind", "\(h.name) còn để lại \(h.items.count) mục")
         c.body = t("\(fmt(size)) in Library. Nothing was removed. Open Tidymint to pick what goes.", "\(fmt(size)) trong Library. Chưa có gì bị xoá. Mở Tidymint để chọn mục cần dọn.")
         c.userInfo = ["page": "trashhint", "id": h.id]
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "trashhint-" + h.id, content: c, trigger: nil))
@@ -139,7 +139,7 @@ extension VM {
         guard !sel.isEmpty else { return }
         let (ok, fail) = trash(sel.map(\.url), label: h.name, sizes: Dictionary(sel.map { ($0.url, $0.size) }, uniquingKeysWith: { a, _ in a }))
         appsMsgErr = false
-        appsMsg = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
+        appsMsg = t("Moved \(plural(ok, "item")) (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
         log(appsMsg)
         finished(.apps, ok, okSize(sel), fail); appsMsg = ""
         if let a = trashHints.firstIndex(where: { $0.id == id }) {
@@ -153,7 +153,7 @@ extension VM {
         let sel = (which == 1 ? leftovers : installers).filter(\.selected)
         let size = sel.reduce(0) { $0 + $1.size }
         let (ok, fail) = trash(sel.map(\.url)); _ = size
-        appsMsg = t("Moved \(ok) items (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
+        appsMsg = t("Moved \(plural(ok, "item")) (\(fmt(okSize(sel)))) to the Trash.", "Đã chuyển \(ok) mục (\(fmt(okSize(sel)))) vào Thùng rác.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
         log(appsMsg)
         finished(.apps, ok, okSize(sel), fail); appsMsg = ""
         if which == 1 { leftovers.removeAll { lastOK.contains($0.url) } } else { installers.removeAll { lastOK.contains($0.url) } }
@@ -175,8 +175,9 @@ extension VM {
     }
     func removeLaunch() {
         let sel = launch.filter { $0.selected && $0.scope == 0 }
-        guard !sel.isEmpty, confirm(t("Remove \(sel.count) startup items?", "Gỡ \(sel.count) mục tự chạy?"),
-                                    t("They will be stopped and their files moved to the Trash. The apps themselves are not touched. If an app still needs it, it will re-create it next time it opens.",
+        guard !sel.isEmpty, confirm(t("Remove \(plural(sel.count, "startup item"))?", "Gỡ \(sel.count) mục tự chạy?"),
+                                    t(sel.count == 1 ? "It will be stopped and its file moved to the Trash. The app itself is not touched. If the app still needs it, the app will create it again the next time it opens."
+                                                     : "They will be stopped and their files moved to the Trash. The apps themselves are not touched. An app that still needs its item will create it again the next time it opens.",
                                       "Mục sẽ được dừng và file cấu hình chuyển vào Thùng rác. App gốc không bị đụng tới. Nếu app vẫn cần, lần mở sau app sẽ tự tạo lại."),
                                     t("Remove", "Gỡ")) else { return }
         let uid = getuid()
@@ -187,7 +188,7 @@ extension VM {
             try? p.run(); p.waitUntilExit()
         }
         let (ok, fail) = trash(sel.map(\.url), label: "startup")
-        launchMsg = t("Removed \(ok) startup items.", "Đã gỡ \(ok) mục tự chạy.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
+        launchMsg = t("Removed \(plural(ok, "startup item")).", "Đã gỡ \(ok) mục tự chạy.") + (fail > 0 ? t(" \(fail) failed.", " \(fail) mục lỗi.") + failNote : "")
         log(launchMsg)
         launch.removeAll { lastOK.contains($0.url) }
         refreshTrash()

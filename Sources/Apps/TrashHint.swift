@@ -179,7 +179,7 @@ struct TrashHintCard: View {
                 Spacer()
                 GhostButton(title: t("OK", "Đã hiểu"), action: { vm.trashHintNote = "" }, compact: true)
             }
-            .padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+            .padding(14).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
             .padding(.horizontal, 24).padding(.bottom, 10)
         }
         ForEach(vm.trashHints) { h in card(h) }
@@ -190,7 +190,7 @@ struct TrashHintCard: View {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "trash").foregroundStyle(Theme.accent)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(t("\(h.name) is in the Trash, and it left \(h.items.count) items in Library",
+                    Text(t("\(h.name) is in the Trash, and it left \(plural(h.items.count, "item")) in Library",
                            "\(h.name) đã vào Thùng rác, còn \(h.items.count) mục của app này trong Library"))
                         .font(.system(size: fs(13), weight: .semibold)).foregroundColor(Theme.text)
                     Text(t("Nothing is ticked: pick what to remove. Keep them if you may install the app again.",
@@ -212,7 +212,7 @@ struct TrashHintCard: View {
             }
             if open && h.items.count > 4 { ScrollView { rows }.frame(maxHeight: 300 * uiScale) } else { rows }
             if h.items.count > 4 {
-                TextLink(open ? t("Show fewer", "Thu gọn") : t("Show all \(h.items.count) items", "Hiện cả \(h.items.count) mục")) {
+                TextLink(open ? t("Show fewer", "Thu gọn") : t("Show all \(plural(h.items.count, "item"))", "Hiện cả \(h.items.count) mục")) {
                     if open { vm.trashHintOpen.remove(h.id) } else { vm.trashHintOpen.insert(h.id) }
                 }.padding(.leading, 12)
             }
@@ -223,7 +223,7 @@ struct TrashHintCard: View {
                 PrimaryButton(title: t("Move to Trash", "Chuyển vào Thùng rác"), action: { vm.cleanTrashHint(h.id) }, disabled: sel.isEmpty)
             }
         }
-        .padding(14).background(RoundedRectangle(cornerRadius: 12).fill(Theme.card))
+        .padding(14).background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.card))
         .padding(.horizontal, 24).padding(.bottom, 10)
     }
 }
