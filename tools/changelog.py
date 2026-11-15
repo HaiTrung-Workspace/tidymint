@@ -83,7 +83,7 @@ RELEASES = [
              "Fixed: the Trash page counts drives too, Undo goes away once you empty the Trash, Uninstall waits until related files are listed, and the month viewer frees space right after the Trash is emptied",
              "The daily update check now goes through update.tidymint.app and is counted by app and macOS version only; nothing else about your Mac is sent (see Privacy)"],
          vi=["Mới: File trùng và File lớn quét thêm ổ ngoài và thư mục bạn thêm ở Cài đặt. Một file có cả trên máy lẫn trên ổ ngoài thì bạn chọn giữ bản nào",
-             "Mới: sau hai tuần dùng, trang Dọn ngay hỏi một dòng \"Tidymint có giúp ích cho bạn không?\". Bấm một cái, không cần email, hỏi tối đa hai lần",
+             "Mới: sau hai tuần dùng, trang Dọn ngay hỏi một dòng \"Tidymint có giúp ích cho bạn không?\". Một lần bấm, không cần email, hỏi tối đa hai lần",
              "Nút Quét có diện mạo mới: chiếc lá bạc hà, rê chuột vào thì hiện chữ",
              "Sửa: nút Bỏ qua ở Gỡ app và File trùng trước đây không có tác dụng, file đã bỏ qua vẫn có thể vào Thùng rác",
              "Sửa: trang Thùng rác đếm cả ổ ngoài, nút Hoàn tác tự ẩn sau khi đổ Thùng rác, Gỡ app chờ liệt kê xong file liên quan, và trình xem tháng trả chỗ trống ngay sau khi đổ Thùng rác",

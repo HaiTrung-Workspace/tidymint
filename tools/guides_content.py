@@ -8,7 +8,7 @@ dict(
   desc="CleanMyMac không có bản miễn phí, chỉ dùng thử 7 ngày. Bản crack có rủi ro mã độc. Đây là các cách dọn Mac miễn phí và hợp pháp, kèm bảng so sánh.",
   crumb="CleanMyMac miễn phí",
   h1="CleanMyMac miễn phí: có cách nào hợp pháp không?",
-  tldr="CleanMyMac <b>không có bản miễn phí lâu dài</b>, chỉ cho dùng thử 7 ngày, sau đó phải trả khoảng 40 USD/năm cho một máy. Bản crack trôi nổi trên mạng là con đường lây mã độc quen thuộc trên Mac. Nếu bạn chỉ cần <b>dọn rác, gỡ app sạch và lấy lại dung lượng</b>, có thể dùng công cụ sẵn trong macOS hoặc các app miễn phí, mã nguồn mở như <b>Tidymint</b>.",
+  tldr="CleanMyMac <b>không có bản miễn phí lâu dài</b>, chỉ cho dùng thử 7 ngày, sau đó phải trả khoảng 40 USD/năm cho một máy. Bản crack trôi nổi trên mạng là con đường lây mã độc quen thuộc trên Mac. Nếu bạn chỉ cần <b>dọn rác, gỡ app sạch và lấy lại dung lượng</b>, có thể dùng công cụ sẵn trong macOS hoặc các app miễn phí như <b>Tidymint</b>.",
   toc=[("co-mien-phi-khong","CleanMyMac có miễn phí không?"),("vi-sao-khong-crack","Vì sao không nên dùng bản crack"),
        ("ban-can-gi","Bạn cần CleanMyMac để làm gì?"),("lua-chon-mien-phi","4 lựa chọn miễn phí, hợp pháp"),
        ("tidymint-vs-cleanmymac","Tidymint và CleanMyMac khác nhau thế nào"),("cai-tidymint","Cài Tidymint trong 2 phút"),("faq","Câu hỏi thường gặp")],
@@ -53,8 +53,8 @@ dict(
 <h2 id="lua-chon-mien-phi">4 lựa chọn miễn phí, hợp pháp</h2>
 <h3>1. Công cụ có sẵn trong macOS</h3>
 <p>Vào <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>. macOS sẽ gợi ý tối ưu: tự đổ Thùng rác sau 30 ngày, đưa file lên iCloud, xem danh sách app và tài liệu lớn. Ưu điểm: an toàn tuyệt đối. Nhược điểm: không đụng tới bộ nhớ đệm, không giải thích được "Dữ liệu hệ thống" gồm gì.</p>
-<h3>2. Tidymint: dọn dẹp toàn diện, có tiếng Việt</h3>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac <b>miễn phí, mã nguồn mở</b> (giấy phép MIT), giao diện tiếng Việt. Một lần quét tìm bộ nhớ đệm, nhật ký, Downloads cũ, file lớn, file trùng, cho xem từng nhóm rồi bạn mới bấm Dọn; mục <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, Cốc Cốc, CapCut đang giữ gì (bộ nhớ đệm chọn sẵn, ảnh và file xếp theo tháng để bạn tự chọn, tin nhắn bị khoá); có bản đồ bong bóng cho thấy thư mục nào chiếm ổ; gỡ app kèm phần sót lại. Điểm khác biệt: <b>mọi thứ chỉ chuyển vào Thùng rác</b> và có nút <b>Hoàn tác</b>, nên lỡ chọn nhầm vẫn lấy lại được.</p>
+<h3>2. Tidymint: dọn đủ việc, có tiếng Việt</h3>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac, <b>dọn dẹp miễn phí, lõi mã nguồn mở</b> (giấy phép MIT), giao diện tiếng Việt. Một lần quét tìm bộ nhớ đệm, nhật ký, Downloads cũ, file lớn, file trùng, cho xem từng nhóm rồi bạn mới bấm Dọn; mục <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, Cốc Cốc, CapCut đang giữ gì (bộ nhớ đệm chọn sẵn, ảnh và file xếp theo tháng để bạn tự chọn, tin nhắn bị khoá); có bản đồ bong bóng cho thấy thư mục nào chiếm ổ; gỡ app kèm phần sót lại. Điểm khác biệt: <b>mọi thứ chỉ chuyển vào Thùng rác</b> và có nút <b>Hoàn tác</b>, nên lỡ chọn nhầm vẫn lấy lại được.</p>
 <h3>3. AppCleaner hoặc Pearcleaner: chuyên gỡ app</h3>
 <p>Nếu bạn chỉ cần gỡ app cho sạch, <b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở) làm rất tốt việc này: kéo app vào, chúng liệt kê các file cài đặt, bộ nhớ đệm đi kèm để xoá cùng.</p>
 <h3>4. OnyX: cho người rành máy</h3>
@@ -151,7 +151,7 @@ dict(
 <p>Dò tay từng thư mục khá mất công và dễ nhầm. Tidymint tự tìm phần sót lại giúp bạn:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Trang Gỡ app của Tidymint: app Zalo cùng dữ liệu và bộ nhớ đệm trong Library" width="1600" height="1079" loading="lazy"><figcaption>Gỡ app trong Tidymint: app và mọi file đi kèm hiện ra trước, bạn xem rồi mới chuyển vào Thùng rác.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (miễn phí, mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. App cài từ App Store hay cài cho mọi tài khoản cũng gỡ được: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS, Tidymint không thấy mật khẩu. Mọi thứ chỉ chuyển vào Thùng rác; đổi ý thì bấm Hoàn tác, app và file đi kèm quay về chỗ cũ. Bạn quen tự kéo app vào Thùng rác? Từ bản 0.5.2 có thể bật <b>Gợi ý khi bỏ app vào Thùng rác</b> trong Cài đặt (tắt sẵn): khi đó Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá.</li>
+<li><b>Tidymint</b> (dọn dẹp miễn phí, lõi mã nguồn mở, tiếng Việt): mục <b>Gỡ app</b> liệt kê app kèm bộ nhớ đệm, cài đặt, nhật ký, trạng thái đã lưu. Chỉ chọn sẵn file khớp đúng mã app (bundle id); file khớp theo tên hoặc có cơ sở dữ liệu bên trong thì để bạn tự quyết, tránh xoá nhầm dữ liệu như hộp thư hay ghi chú. Có thêm tab tìm <b>phần sót lại của app đã xoá từ trước</b> và file cài đặt cũ. App cài từ App Store hay cài cho mọi tài khoản cũng gỡ được: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS, Tidymint không thấy mật khẩu. Mọi thứ chỉ chuyển vào Thùng rác; đổi ý thì bấm Hoàn tác, app và file đi kèm quay về chỗ cũ. Bạn quen tự kéo app vào Thùng rác? Từ bản 0.5.2 có thể bật <b>Gợi ý khi bỏ app vào Thùng rác</b> trong Cài đặt (tắt sẵn): khi đó Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá.</li>
 <li><b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở): kéo app vào cửa sổ, app liệt kê các file liên quan để bạn chọn xoá.</li>
 </ul>
 {CTA}
@@ -222,7 +222,7 @@ dict(
 
 <h2 id="anh-cu">Bỏ ảnh cũ, giữ ảnh mới</h2>
 <p>Trong <code>ZaloDownloads/picture</code> và <code>resource</code>, file xếp được theo ngày. Trong Finder chọn xem dạng <b>Danh sách</b>, sắp theo <b>Ngày sửa đổi</b>, chọn các file cũ hơn 6 tháng rồi kéo vào Thùng rác. Ảnh nào cần giữ thì lưu ra thư mục Ảnh trước.</p>
-<p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint miễn phí, mã nguồn mở, do một người Việt làm.</p>
+<p>Cách này hơi mất công vì hàng nghìn file nằm chung một thư mục, tên file không nói lên gì. Đây là lý do tác giả làm trang <b>Dọn theo ứng dụng</b> trong Tidymint: app gom ảnh Zalo theo tháng để bạn tick, chọn sẵn phần bộ nhớ đệm an toàn, khoá phần tin nhắn và đăng nhập, từ chối dọn khi Zalo đang mở, và mọi thứ vào Thùng rác với nút Hoàn tác. Tidymint dọn dẹp miễn phí, lõi mã nguồn mở, do một người Việt làm.</p>
 <figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint đang mở Zalo: bộ nhớ đệm chọn sẵn, ảnh trong tin nhắn chia theo tháng" width="1600" height="1079" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng.</figcaption></figure>
 {CTA}
 
@@ -434,7 +434,7 @@ dict(
 <li>Trong Finder bấm <b>Shift+Cmd+G</b>, gõ <code>~/Library</code>, Enter. Chuyển sang xem dạng danh sách, sắp theo dung lượng (Hiển thị › Hiện tuỳ chọn hiển thị › Tính toán tất cả kích cỡ). <code>Caches</code>, <code>Application Support</code> và <code>Containers</code> thường đứng đầu.</li>
 <li>Trong Terminal, <code>tmutil listlocalsnapshots /</code> liệt kê snapshot Time Machine. Nhiều hơn hai ba dòng là chúng đang giữ chỗ.</li>
 </ol>
-<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp, và trang <b>Thống kê</b> vẽ biểu đồ dung lượng trống theo từng ngày (7, 30 hay 90 ngày), nên bạn thấy ngay ổ bắt đầu tụt từ hôm nào mà không phải ghi số ra giấy. App miễn phí, mã nguồn mở.</p>
+<p>Tidymint có trang <b>Bản đồ ổ đĩa</b> vẽ trực quan mỗi thư mục thành một quả bóng to nhỏ theo dung lượng thật, kèm chú thích dễ hiểu cho các thư mục hay gặp, và trang <b>Thống kê</b> vẽ biểu đồ dung lượng trống theo từng ngày (7, 30 hay 90 ngày), nên bạn thấy ngay ổ bắt đầu tụt từ hôm nào mà không phải ghi số ra giấy. Dọn dẹp miễn phí, lõi mã nguồn mở.</p>
 <figure class="fig-app"><img src="../lens.jpg" alt="Bản đồ ổ đĩa của Tidymint: mỗi thư mục là một bong bóng, to nhỏ theo dung lượng" width="1600" height="1079" loading="lazy"><figcaption>Bản đồ ổ đĩa trong Tidymint: bong bóng càng to, thư mục càng nặng.</figcaption></figure>
 
 <h2 id="snapshot">Snapshot Time Machine</h2>
@@ -477,7 +477,7 @@ dict(
 </ul>
 {CTA}
 <h2 id="chan">Tìm thủ phạm nhanh với Tidymint</h2>
-<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, CapCut giữ gì, ảnh và video Zalo xếp theo tháng. Mọi thứ chỉ vào Thùng rác, có Hoàn tác. Miễn phí, mã nguồn mở, tiếng Việt.</p>
+<p>Sáu chỗ ở trên là đúng những thư mục Tidymint quét: <b>Dọn ngay</b> gom bộ nhớ đệm, nhật ký, file cài đặt cũ thành từng nhóm có nhãn an toàn và chỉ dọn khi bạn bấm; <b>Bản đồ ổ đĩa</b> vẽ snapshot, sao lưu iPhone, thư mục Xcode, Docker, Ollama thành bóng to nhỏ kèm chú thích; <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, CapCut giữ gì, ảnh và video Zalo xếp theo tháng. Mọi thứ chỉ vào Thùng rác, có Hoàn tác. Dọn dẹp miễn phí, lõi mã nguồn mở, tiếng Việt.</p>
 <h3>Để ổ không đầy lại</h3>
 <ul>
 <li><b>Khởi động lại mỗi tuần.</b> macOS dọn file tạm và phần "có thể xoá" khi khởi động lại.</li>
@@ -524,7 +524,7 @@ dict(
 <li>In Finder press <b>Shift+Cmd+G</b>, type <code>~/Library</code> and press Enter. Switch to list view, sort by size (View › Show View Options › Calculate all sizes). <code>Caches</code>, <code>Application Support</code> and <code>Containers</code> are usually the top three.</li>
 <li>In Terminal, <code>tmutil listlocalsnapshots /</code> lists Time Machine snapshots. More than two or three means they are holding space.</li>
 </ol>
-<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones, and its <b>Statistics</b> page charts free space day by day (7, 30 or 90 days), so you can see the day the drop started instead of writing numbers down. It is free and open source.</p>
+<p>Tidymint's <b>Space Lens</b> page draws every folder as a bubble sized by real usage, with plain-language notes on the common ones, and its <b>Statistics</b> page charts free space day by day (7, 30 or 90 days), so you can see the day the drop started instead of writing numbers down. Free to clean, with an open-source core.</p>
 
 <h2 id="snapshots">Time Machine local snapshots</h2>
 <ul>
@@ -566,7 +566,7 @@ dict(
 </ul>
 {CTA}
 <h2 id="stop">Free up the space with Tidymint</h2>
-<p>The six places above are exactly what Tidymint scans: <b>Clean Now</b> groups caches, logs and old installers with a safety label on each group and cleans only when you click; <b>Space Lens</b> draws snapshots, iPhone backups, Xcode, Docker and Ollama folders as bubbles with plain-language notes; <b>Clean by App</b> shows what Zalo, Chrome and CapCut keep, with Zalo media sorted by month. Everything goes to the Trash, with Undo. Free and open source.</p>
+<p>The six places above are exactly what Tidymint scans: <b>Clean Now</b> groups caches, logs and old installers with a safety label on each group and cleans only when you click; <b>Space Lens</b> draws snapshots, iPhone backups, Xcode, Docker and Ollama folders as bubbles with plain-language notes; <b>Clean by App</b> shows what Zalo, Chrome and CapCut keep, with Zalo media sorted by month. Everything goes to the Trash, with Undo. Free to clean, open-source core.</p>
 <h3>Keep it from coming back</h3>
 <ul>
 <li><b>Restart once a week.</b> macOS purges temporary files and purgeable space on restart.</li>
@@ -845,7 +845,7 @@ sudo tmutil deletelocalsnapshots 2026-10-20-101500</pre>
 <p>Also be careful with "one click" cleaners that delete permanently. If something goes wrong, there is no undo.</p>
 
 <h2 id="faster">The faster way: let Tidymint find it</h2>
-<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that does the looking for you:</p>
+<p>Steps 2 to 7 mean digging through hidden folders. <a href="{HOME}">Tidymint</a> is a Mac cleaner, free to clean, with an open-source core, that does the looking for you:</p>
 <figure class="fig-app"><img src="../sysdata.jpg" alt="Tidymint's What is in System Data page: Xcode leftovers, caches and logs, browser temporary copies at 7.7 GB, Time Machine snapshots, each with a note" width="1600" height="1079" loading="lazy"><figcaption>What is in System Data: each part shows its size and where to handle it, or that macOS takes care of it.</figcaption></figure>
 <ul>
 <li><b>See what is in System Data.</b> In Space Lens, click <b>Disk full of "System Data"? See what is in it</b>. Tidymint lists the hidden space it can measure: iPhone and iPad backups, iOS update files, Xcode build files and simulator caches, Messages attachments, Docker, Time Machine snapshots. Each part has a plain note. Backups, update files and Xcode files can go to the Trash right there (backups are never pre-selected); for the rest it tells you where to handle it.</li>
@@ -906,7 +906,7 @@ dict(
 <div class="warn"><p>Clearing caches frees space for a while, but apps rebuild them as you use them. It is maintenance, not a permanent fix. Large files, duplicates and unused apps give longer-lasting results.</p></div>
 
 <h2 id="faster">Do it in one scan with Tidymint</h2>
-<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner that covers most of this list: Clean Now for caches, logs and old downloads (shown by group before you press Clean); Clean by App for Chrome, Edge, Zalo and CapCut; Large Files (never pre-selected); Duplicates that keeps the best copy; an Uninstaller that finds leftovers, even from apps you removed long ago; and Space Lens to see where the space went. Everything goes to the Trash first.</p>
+<p><a href="{HOME}">Tidymint</a> is a Mac cleaner, free to clean, with an open-source core, that covers most of this list: Clean Now for caches, logs and old downloads (shown by group before you press Clean); Clean by App for Chrome, Edge, Zalo and CapCut; Large Files (never pre-selected); Duplicates that keeps the best copy; an Uninstaller that finds leftovers, even from apps you removed long ago; and Space Lens to see where the space went. Everything goes to the Trash first.</p>
 {CTA}
 """,
   faq=[
@@ -930,7 +930,7 @@ dict(
   desc="Free CleanMyMac alternative? Compare Tidymint, AppCleaner, Pearcleaner, OnyX and the tools built into macOS, including what each one can't do.",
   crumb="Free CleanMyMac alternative",
   h1="The best free CleanMyMac alternatives",
-  tldr="CleanMyMac has no free tier, only a <b>7-day trial</b>, then about <b>$40 a year</b> for one Mac. If you mainly need to <b>clear caches, uninstall apps cleanly and get disk space back</b>, free options cover it: <b>Tidymint</b> (free, open source, all-in-one cleaner), <b>AppCleaner</b> and <b>Pearcleaner</b> (uninstallers), <b>OnyX</b> (maintenance for power users) and macOS's own Storage settings. None of them replace CleanMyMac's malware scanner.",
+  tldr="CleanMyMac has no free tier, only a <b>7-day trial</b>, then about <b>$40 a year</b> for one Mac. If you mainly need to <b>clear caches, uninstall apps cleanly and get disk space back</b>, free options cover it: <b>Tidymint</b> (all-in-one, free to clean), <b>AppCleaner</b> and <b>Pearcleaner</b> (uninstallers), <b>OnyX</b> (maintenance for power users) and macOS's own Storage settings. None of them replace CleanMyMac's malware scanner.",
   toc=[("price","What CleanMyMac costs"),("need","What do you actually need?"),("options","5 free alternatives"),("compare","Tidymint vs CleanMyMac"),("faq","FAQ")],
   body="""
 <h2 id="price">What CleanMyMac costs</h2>
@@ -957,7 +957,7 @@ dict(
 </table></div>
 
 <h2 id="options">5 free alternatives</h2>
-<h3>1. Tidymint: free, open-source all-in-one cleaner</h3>
+<h3>1. Tidymint: all-in-one cleaner, free to clean</h3>
 <p><a href="{HOME}">Tidymint</a> covers cleanup, clean-by-app pages for browsers and messengers, duplicates, large files, an uninstaller with undo, a bubble map of your disk and a menu bar indicator. Its defining rule: <b>everything goes to the Trash</b>, nothing is deleted permanently until you empty it. It is MIT-licensed, works offline and is available in English and Vietnamese. Built with AI and developer workflows in mind, it also knows folders like <code>.ollama</code> and project drafts.</p>
 <h3>2. AppCleaner: the classic uninstaller</h3>
 <p>Free. Drag an app onto its window and it lists the related files to remove. Does one thing well.</p>
@@ -1062,7 +1062,7 @@ dict(
 <p>Cẩn thận với các app dọn "một cú click" mà xoá thẳng. Lỡ xoá nhầm thì không có đường lùi.</p>
 
 <h2 id="nhanh-hon">Cách nhanh hơn: để Tidymint tìm giúp</h2>
-<p>Bước 2, 4, 6, 7 đều phải lục thư mục ẩn. <a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, tìm giúp bạn:</p>
+<p>Bước 2, 4, 6, 7 đều phải lục thư mục ẩn. <a href="{HOME}">Tidymint</a> là app dọn Mac, dọn dẹp miễn phí, lõi mã nguồn mở, có tiếng Việt, tìm giúp bạn:</p>
 <figure class="fig-app"><img src="../sysdata.jpg" alt="Trang System Data gồm những gì của Tidymint: phần sót của Xcode, bộ nhớ đệm và nhật ký, bản sao tạm của trình duyệt 7,7 GB, bản chụp Time Machine, mỗi mục có ghi chú" width="1600" height="1079" loading="lazy"><figcaption>System Data gồm những gì: mỗi phần ghi rõ dung lượng, dọn ở đâu hay để macOS lo.</figcaption></figure>
 <ul>
 <li><b>Xem Dữ liệu hệ thống gồm những gì.</b> Trong Bản đồ ổ đĩa, bấm <b>Ổ đầy vì "System Data"? Xem nó gồm những gì</b>. Tidymint liệt kê phần ẩn đo được: bản sao lưu iPhone, iPad, file cập nhật iOS, file build và bộ nhớ đệm máy ảo của Xcode, ảnh và file trong Tin nhắn, Docker, bản chụp Time Machine. Mỗi phần có ghi chú dễ hiểu. Bản sao lưu, file cập nhật và file Xcode chuyển được vào Thùng rác ngay tại đó (bản sao lưu không bao giờ chọn sẵn); phần còn lại ghi rõ xử lý ở đâu.</li>
@@ -1124,7 +1124,7 @@ dict(
 <div class="warn"><p>Xoá bộ nhớ đệm giải phóng được một thời gian, rồi app tạo lại khi bạn dùng. Đây là việc bảo dưỡng, không phải cách chữa tận gốc. File lớn, file trùng và app không dùng mới cho kết quả lâu dài.</p></div>
 
 <h2 id="nhanh-hon">Làm trong một lần quét với Tidymint</h2>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm được phần lớn danh sách trên:</p>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac, dọn dẹp miễn phí, lõi mã nguồn mở, có tiếng Việt, làm được phần lớn danh sách trên:</p>
 <ul>
 <li><b>Dọn ngay</b>: bộ nhớ đệm, nhật ký, file tải về cũ, chia nhóm trước khi bạn bấm Dọn.</li>
 <li><b>Dọn theo ứng dụng</b>: Chrome, Cốc Cốc, Zalo, CapCut; tin nhắn và đăng nhập app thì tuyệt đối không đọc hay đụng tới.</li>
@@ -1155,7 +1155,7 @@ dict(
   desc="Dragging an app to the Trash leaves settings and caches behind. How to uninstall apps on Mac the right way, including macOS 26 Tahoe, and clean up leftovers.",
   crumb="Uninstall apps on Mac",
   h1="How to uninstall apps on Mac completely",
-  tldr="Apple's way: quit the app, find it in <b>Finder › Applications</b>, run its own uninstaller if it has one, otherwise drag it to the <b>Trash</b> and empty the Trash. That usually <b>leaves settings, caches and data</b> behind in your Library folder. To remove an app completely, clean those folders too, or let Tidymint (free, open source) find them for you.",
+  tldr="Apple's way: quit the app, find it in <b>Finder › Applications</b>, run its own uninstaller if it has one, otherwise drag it to the <b>Trash</b> and empty the Trash. That usually <b>leaves settings, caches and data</b> behind in your Library folder. To remove an app completely, clean those folders too, or let Tidymint (free to clean) find them for you.",
   toc=[("finder","Way 1: Delete it in Finder (Apple's way)"),("uninstaller","Way 2: Use the app's own uninstaller"),
        ("tahoe","A note on macOS 26 Tahoe"),("leftovers","Clean up the leftovers"),("app","Way 3: Uninstall with Tidymint (free)"),
        ("stuck","When an app won't delete"),("faq","FAQ")],
@@ -1194,7 +1194,7 @@ dict(
 <p>Checking every folder by hand takes time and it's easy to pick the wrong one. Tidymint finds the leftovers for you:</p>
 <figure class="fig-app"><img src="../apps.jpg" alt="Tidymint's Uninstaller showing Slack together with its leftover files in Library" width="1600" height="1079" loading="lazy"><figcaption>Tidymint's Uninstaller: the app and every related file are listed first, and you review them before anything moves to the Trash.</figcaption></figure>
 <ul>
-<li><b>Tidymint</b> (free, open source): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Apps from the App Store or installed for every user can be removed too: macOS asks for an administrator password in its own window, and Tidymint never sees it. Everything always goes to the Trash first, and Undo puts the app and its files back where they were. Prefer dragging apps to the Trash yourself? From 0.5.2 you can turn on <b>Hint when an app goes to the Trash</b> in Settings (off by default): Tidymint then lists what that app left in Library. Nothing is ticked or removed for you.</li>
+<li><b>Tidymint</b> (free to clean, open-source core): the <b>Uninstaller</b> lists an app with its caches, settings, logs and saved state. Only files that match the app's bundle id are pre-selected; name-only matches and anything holding a database are left to you, so mailboxes and notes don't get removed by mistake. A separate tab finds <b>leftovers from apps you deleted long ago</b> and old installers. Apps from the App Store or installed for every user can be removed too: macOS asks for an administrator password in its own window, and Tidymint never sees it. Everything always goes to the Trash first, and Undo puts the app and its files back where they were. Prefer dragging apps to the Trash yourself? From 0.5.2 you can turn on <b>Hint when an app goes to the Trash</b> in Settings (off by default): Tidymint then lists what that app left in Library. Nothing is ticked or removed for you.</li>
 <li><b>AppCleaner</b> (free) and <b>Pearcleaner</b> (free, source available): drop an app on the window and they list its related files for you to remove.</li>
 </ul>
 {CTA}
@@ -1347,7 +1347,7 @@ docker system df</pre>
 </ul>
 
 <h2 id="tidymint">Where Tidymint helps</h2>
-<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner. For developers it:</p>
+<p><a href="{HOME}">Tidymint</a> is a Mac cleaner, free to clean, with an open-source core. For developers it:</p>
 <ul>
 <li>lists the <b>npm cache</b> and your user caches (including Homebrew and pip) in <b>Clean Now</b>, grouped and explained before you press Clean;</li>
 <li>clears <code>_to_delete</code> and <code>_tmp</code> folders inside the <b>project folders</b> you add in Settings;</li>
@@ -1441,7 +1441,7 @@ docker system df</pre>
 </ul>
 
 <h2 id="tidymint">Tidymint giúp được gì</h2>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Với dân lập trình, Tidymint:</p>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac, dọn dẹp miễn phí, lõi mã nguồn mở, có tiếng Việt. Với dân lập trình, Tidymint:</p>
 <ul>
 <li>liệt kê <b>bộ nhớ đệm npm</b> và bộ nhớ đệm của bạn (gồm cả Homebrew, pip) trong <b>Dọn ngay</b>, chia nhóm, giải thích trước khi bạn bấm Dọn;</li>
 <li>dọn thư mục <code>_to_delete</code>, <code>_tmp</code> trong các <b>thư mục dự án</b> bạn khai ở Cài đặt;</li>
@@ -1523,7 +1523,7 @@ dict(
 
 <h2 id="tidymint">Do it with Tidymint</h2>
 <figure class="fig-app"><img src="../dupes.jpg" alt="Tidymint's Duplicates page: groups of identical files with one copy kept" width="1600" height="1079" loading="lazy"><figcaption>Duplicates in Tidymint: identical files grouped, one copy always kept.</figcaption></figure>
-<p><a href="{HOME}">Tidymint</a> is a free, open-source Mac cleaner built around those four rules:</p>
+<p><a href="{HOME}">Tidymint</a> is a Mac cleaner, free to clean, with an open-source core, built around those four rules:</p>
 <ul>
 <li>It scans Documents, Downloads, Desktop, Pictures, Movies and Music, plus any external drive or folder you add in Settings, for files of 1 MB or more and <b>matches them by content</b>, not by name. When a file is on both the Mac and a drive, you choose which copy to keep.</li>
 <li>It skips folders like <code>.git</code>, <code>node_modules</code>, virtual environments, <code>build</code> and DerivedData.</li>
@@ -1595,7 +1595,7 @@ dict(
 
 <h2 id="tidymint">Làm bằng Tidymint</h2>
 <figure class="fig-app"><img src="../dupes.jpg" alt="Trang File trùng của Tidymint: các nhóm file giống hệt nhau, luôn giữ một bản" width="1600" height="1079" loading="lazy"><figcaption>File trùng trong Tidymint: gom nhóm file giống hệt nhau, luôn giữ lại một bản.</figcaption></figure>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt, làm theo đúng bốn luật trên:</p>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac, dọn dẹp miễn phí, lõi mã nguồn mở, có tiếng Việt, làm theo đúng bốn luật trên:</p>
 <ul>
 <li>Quét Tài liệu, Tải về, Màn hình nền, Ảnh, Phim, Nhạc, cùng ổ ngoài hay thư mục bạn thêm ở Cài đặt, tìm file từ 1 MB trở lên và <b>so theo nội dung</b>, không theo tên. File có cả trên máy lẫn trên ổ ngoài thì bạn chọn giữ bản nào.</li>
 <li>Bỏ qua các thư mục như <code>.git</code>, <code>node_modules</code>, môi trường ảo Python, <code>build</code>, DerivedData.</li>
@@ -1624,7 +1624,7 @@ dict(
   desc="Free RAM does not make a Mac faster. What memory pressure in Activity Monitor tells you, why RAM cleaners can backfire, and what actually helps.",
   crumb="Do RAM cleaners help?",
   h1="Do RAM cleaners help a Mac? What actually works",
-  tldr="Usually not. macOS is designed to <b>use</b> your memory, keeping recently used files cached so apps open faster. Apple says unused memory doesn't make a Mac faster. Check <b>memory pressure</b> in Activity Monitor instead: green is fine, yellow means you may eventually need more RAM, red means you need more. If it is red, quit the apps using the most memory or restart. A cleaner that empties memory throws away that cache.",
+  tldr="Usually not. macOS puts your memory <b>to work</b>, keeping recently used files cached so apps open faster. Apple says unused memory doesn't make a Mac faster. Check <b>memory pressure</b> in Activity Monitor instead: green is fine, yellow means you may eventually need more RAM, red means you need more. If it is red, quit the apps using the most memory or restart. A cleaner that empties memory throws away that cache.",
   toc=[("myth","The myth: free RAM is fast RAM"),("check","What to check instead"),("cleaners","Why RAM cleaners can backfire"),
        ("works","What actually helps"),("tidymint","What Tidymint does with memory"),("faq","FAQ")],
   body="""
@@ -1681,7 +1681,7 @@ dict(
   desc="RAM trống không làm Mac nhanh hơn. Cách đọc Áp lực Bộ nhớ trong Giám sát hoạt động, vì sao app xả RAM có thể phản tác dụng, và việc nào có ích cho máy.",
   crumb="App giải phóng RAM",
   h1="App giải phóng RAM cho Mac có tác dụng không? Việc nào có ích",
-  tldr="Thường là không. macOS được thiết kế để <b>dùng</b> RAM: giữ sẵn file vừa dùng để mở app nhanh hơn. Apple ghi rõ bộ nhớ trống không nhất thiết làm máy nhanh hơn. Hãy xem <b>Áp lực Bộ nhớ</b> trong Giám sát hoạt động: xanh là ổn, vàng là máy có thể cần thêm RAM, đỏ là cần thêm RAM. Đỏ thì tắt app đang ngốn nhiều nhất hoặc khởi động lại. App xả RAM chỉ vứt đi phần bộ nhớ đệm đó.",
+  tldr="Thường là không. macOS chủ động <b>dùng</b> RAM: giữ sẵn file vừa dùng để mở app nhanh hơn. Apple ghi rõ bộ nhớ trống không nhất thiết làm máy nhanh hơn. Hãy xem <b>Áp lực Bộ nhớ</b> trong Giám sát hoạt động: xanh là ổn, vàng là máy có thể cần thêm RAM, đỏ là cần thêm RAM. Đỏ thì tắt app đang ngốn nhiều nhất hoặc khởi động lại. App xả RAM chỉ vứt đi phần bộ nhớ đệm đó.",
   toc=[("lam-tuong","Hiểu lầm: RAM trống là máy nhanh"),("xem-gi","Nên xem chỉ số nào"),("xa-ram","Vì sao xả RAM có thể phản tác dụng"),
        ("cach-dung","Việc có ích cho máy"),("tidymint","Tidymint làm gì với RAM"),("faq","Hỏi đáp")],
   body="""
@@ -1804,7 +1804,7 @@ dict(
 
 <h2 id="tidymint">Dọn CapCut bằng Tidymint</h2>
 <figure class="fig-app"><img src="../byapp.jpg" alt="Trang Dọn theo ứng dụng của Tidymint: bộ nhớ đệm chọn sẵn, dữ liệu của bạn để bạn tự quyết" width="1600" height="1079" loading="lazy"><figcaption>Dọn theo ứng dụng trong Tidymint: mỗi app chia theo loại, phần an toàn chọn sẵn, phần quan trọng được khoá.</figcaption></figure>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac miễn phí, mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac, dọn dẹp miễn phí, lõi mã nguồn mở, có tiếng Việt. Mục <b>Dọn theo ứng dụng › CapCut</b>:</p>
 <ul>
 <li>nhóm <b>File tạm khi dựng video</b> (ảnh thu nhỏ, sóng âm, dữ liệu phân tích, nhật ký) được chọn sẵn, ghi rõ dung lượng;</li>
 <li>nhóm <b>File tạm phụ đề và giọng đọc</b> và nhóm <b>Bản dựng sẵn và proxy</b> hiện ra để bạn tự chọn, không chọn sẵn, vì dự án đang dựng có thể còn dùng;</li>
@@ -1891,7 +1891,7 @@ GUIDES.append(dict(
   faq=[("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Hai chỗ đọc nội dung: tìm file trùng (so nội dung để biết hai file giống hệt nhau) và kiểm script trong thư mục dự án bạn tự khai (tìm xem script còn gọi tên file nào). Cả hai đều chạy trên máy, không gửi đi đâu."),
        ("Có bắt buộc cấp quyền Truy cập toàn bộ ổ đĩa không?", "Không. Không cấp thì Tidymint vẫn chạy, chỉ thấy ít thư mục hơn nên tìm được ít dung lượng hơn. Bạn bật, tắt quyền này lúc nào cũng được trong Cài đặt hệ thống."),
        ("Gỡ Tidymint thì còn lại gì?", "Chỉ có cài đặt và lịch sử dọn lưu trên chính máy bạn (trong thư mục Library của bạn). Không có dữ liệu nào nằm trên máy chủ, vì Tidymint không có máy chủ lưu dữ liệu người dùng."),
-       ("Vì sao miễn phí mà không bán dữ liệu?", "Tidymint không có quảng cáo và không thu thập dữ liệu của bạn. Mã phần dọn dẹp công khai để ai cũng kiểm được.")],
+       ("Vì sao miễn phí mà không bán dữ liệu?", "Tidymint không có quảng cáo và không theo dõi bạn. Mã phần dọn dẹp công khai để ai cũng kiểm được.")],
   sources=[("Apple: Thay đổi cài đặt Quyền riêng tư & Bảo mật trên máy Mac (Truy cập toàn bộ ổ đĩa)", "https://support.apple.com/vi-vn/guide/mac-help/mchl211c911f/mac"),
            ("Apple: Xem hoạt động mạng trong Giám sát hoạt động", "https://support.apple.com/vi-vn/guide/activity-monitor/actmntr1006/mac"),
            ("Mã nguồn Tidymint trên GitHub (giấy phép MIT)", "https://github.com/HaiTrung-Workspace/tidymint")],
@@ -2044,7 +2044,7 @@ GUIDES.append(dict(
 <h2 id="bao-loi">Thấy lỗi bảo mật? Báo cho chúng tôi</h2>
 <p>Gửi email tới <b>hello@tidymint.app</b> (tiêu đề "Security"), hoặc bấm <b>Report a vulnerability</b> trong thẻ Security của <a href="https://github.com/HaiTrung-Workspace/tidymint/security">kho GitHub</a>. Bạn sẽ nhận phản hồi trong 24 giờ.</p>
 """,
-  faq=[("App miễn phí thì kiếm tiền từ đâu?", "Tidymint không bán dữ liệu và không chạy quảng cáo. Chi phí do người làm tự bỏ ra, cộng tiền ủng hộ tự nguyện qua GitHub Sponsors. Mã công khai, nên nếu app lén gửi gì đi thì ai cũng thấy."),
+  faq=[("Dọn dẹp miễn phí thì kiếm tiền từ đâu?", "Tidymint không bán dữ liệu và không chạy quảng cáo. Chi phí do người làm tự bỏ ra, cộng tiền ủng hộ tự nguyện qua GitHub Sponsors. Mã công khai, nên nếu app lén gửi gì đi thì ai cũng thấy."),
        ("Phần mềm diệt virus trên máy tôi báo Tidymint thì sao?", "Hãy gửi email cho chúng tôi kèm tên phần mềm và ảnh chụp thông báo. Bạn cũng có thể so mã SHA-256 và xem kết quả VirusTotal như hướng dẫn ở trên để biết file có đúng là bản chính thức không."),
        ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
        ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu."),
@@ -2160,7 +2160,7 @@ GUIDES.append(dict(
   desc="Mintdrop là kệ thả file nổi trên Mac: lắc chuột khi kéo file hoặc nhấn ⌃⌥S, gom tối đa 5 file từ nhiều nơi rồi kéo từng file ra chỗ cần, có Hoàn tác.",
   crumb="Mintdrop",
   h1="Gom file từ nhiều nơi về một kệ, kéo ra đúng chỗ cần",
-  tldr="Mintdrop là một chiếc kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, <b>tối đa 5 món</b>, rồi <b>kéo từng file ra</b> đúng chỗ cần. Kệ chỉ nhớ đường dẫn, <b>không chép file nào</b>. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
+  tldr="Mintdrop là kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, <b>tối đa 5 món</b>, rồi <b>kéo từng file ra</b> đúng chỗ cần. Kệ chỉ nhớ đường dẫn, <b>không chép file nào</b>. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
   toc=[("khi-nao","Dùng khi nào"),("bat","Bật Mintdrop"),("mo-ke","Mở kệ"),("chon","Chọn nhiều file"),("xu-ly","Kéo file ra"),
        ("chuyen-hay-chep","Kéo ra là chuyển hay chép?"),("hoan-tac","Hoàn tác"),("rieng-tu","Quyền riêng tư"),("faq","Câu hỏi thường gặp")],
   body="""<h2 id="khi-nao">Dùng khi nào</h2>
@@ -2366,7 +2366,7 @@ GUIDES.append(dict(
        ("luu-y","Vài điều cần biết"),("macos-cu","macOS 14 đến 26"),("rieng-tu","Hai quyền dùng để làm gì"),("faq","Câu hỏi thường gặp")],
   body="""<h2 id="khi-nao">Dùng khi nào</h2>
 <ul><li><b>Menu bar chật</b>: app nào cài vào cũng thêm một icon, tới lúc icon bị menu của app đang mở che mất.</li>
-<li><b>Có những icon ít khi bấm</b> nhưng không muốn tắt hẳn: VPN, đồng bộ đám mây, bộ gõ, trợ lý AI.</li>
+<li><b>Icon vẫn dùng nhưng muốn gọn</b>: VPN, đồng bộ đám mây, bộ gõ, trợ lý AI.</li>
 <li><b>Muốn xếp icon theo việc</b>: một nhóm cho công việc, một nhóm cho kết nối.</li></ul>
 <p>Mintbar không tắt app nào. App vẫn chạy như cũ, chỉ có icon của nó lui vào sau icon nhóm.</p>
 <h2 id="bat">Bật Mintbar</h2>
@@ -2382,7 +2382,7 @@ GUIDES.append(dict(
 <p>Dưới icon nhóm có một hàng chấm nhỏ, mỗi chấm là một app trong nhóm. Một app có thể nằm trong cả hai nhóm.</p>
 <h2 id="dung">Mở app trong nhóm</h2>
 <ul><li><b>Bấm icon nhóm</b>: các app mở ra ngay bên dưới. Bấm lần nữa, hoặc nhấn Esc, để đóng.</li>
-<li><b>Bấm một app trong quạt</b>: menu hoặc cửa sổ nhỏ của app đó mở ra. App chưa chạy thì được mở lên.</li>
+<li><b>Bấm một app vừa mở ra</b>: menu hoặc cửa sổ nhỏ của app đó mở ra. App chưa chạy thì được mở lên.</li>
 <li><b>Giữ Option rồi bấm icon nhóm</b>: mở trang Mintbar.</li>
 <li><b>Đổi thứ tự icon</b>: giữ ⌘ rồi kéo icon tới chỗ mới. Đây là tính năng có sẵn của macOS, dùng được cho cả icon nhóm.</li></ul>
 <h2 id="luu-y">Vài điều cần biết</h2>
@@ -2395,11 +2395,11 @@ GUIDES.append(dict(
 <h2 id="rieng-tu">Hai quyền dùng để làm gì</h2>
 <p>Theo Apple, quyền Trợ năng cho phép app điều khiển máy, và bạn chỉ nên cấp cho app mình tin. Trên macOS 27, Mintbar dùng hai quyền như sau:</p>
 <ul><li><b>Trợ năng</b>: để biết app nào có icon trên menu bar, icon nằm ở đâu, và để mở icon bạn chọn trong nhóm. Khi mở, Mintbar có thể bấm chuột hộ vào đúng icon đó rồi đưa con trỏ về chỗ cũ. Mintbar không đọc nội dung cửa sổ, không ghi phím bạn gõ.</li>
-<li><b>Ghi màn hình</b>: để chụp hình icon menu bar của các app trong nhóm, cho quạt hiện đúng icon đó. Mintbar chỉ chụp đúng ô của icon, lúc icon đang hiện. Hình lưu trên máy bạn, và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar.</li></ul>
+<li><b>Ghi màn hình</b>: để chụp hình icon menu bar của các app trong nhóm, để nhóm hiện đúng icon đó. Mintbar chỉ chụp đúng ô của icon, lúc icon đang hiện. Hình lưu trên máy bạn, và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar.</li></ul>
 <p>Không có gì được gửi đi. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
 """,
   faq=[("Mintbar gom được bao nhiêu icon?", "Hai nhóm, mỗi nhóm tối đa 4 app. Một app có thể nằm trong cả hai nhóm."),
-       ("Vì sao Mintbar cần quyền Ghi màn hình?", "Để quạt hiện đúng icon menu bar của từng app. Trên macOS 27, muốn lấy hình icon đó thì cần quyền này. Mintbar chỉ chụp đúng ô của icon trên menu bar. Hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar."),
+       ("Vì sao Mintbar cần quyền Ghi màn hình?", "Để nhóm hiện đúng icon menu bar của từng app. Trên macOS 27, muốn lấy hình icon đó thì cần quyền này. Mintbar chỉ chụp đúng ô của icon trên menu bar. Hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar."),
        ("Bật Mintbar xong, icon Tập trung hay Đang phát biến mất?", "Trên macOS 27, khi có icon đang được giấu, macOS tự cất các icon này. Cho chúng vào một nhóm là bấm tới được."),
        ("Mintbar báo chưa ẩn được icon?", "Kiểm tra Tidymint đang nằm trong thư mục Ứng dụng và đã được bật ở cả hai mục Trợ năng, Ghi màn hình. Cấp quyền Ghi màn hình xong cần mở lại Tidymint."),
        ("Tắt Mintbar thì sao?", "Mọi icon trở lại menu bar ngay, hình icon đã chụp bị xoá. Hai quyền vẫn nằm trong Cài đặt hệ thống cho tới khi bạn tự tắt.")],
@@ -2415,7 +2415,7 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="en", slug="mintbar-tidy-menu-bar-mac", topic="start", date="2026-11-15", read="4 min read",
   title="Tidy a Crowded Mac Menu Bar With Groups: Mintbar | Tidymint",
-  desc="Mintbar gathers Mac menu bar icons behind one group icon: click to fan the apps out, click an app to open its menu. Off by default, 2 groups of 4 apps.",
+  desc="Mintbar gathers Mac menu bar icons behind one group icon: click the group and its apps open right below, click an app to open its menu. Off by default, 2 groups of 4 apps.",
   crumb="Mintbar",
   h1="A Tidy Menu Bar, With Every Icon Still One Click Away",
   tldr="Mintbar gathers several menu bar icons behind <b>one group icon you choose</b>. Click the group and its apps open right below; click an app to open its menu. Up to <b>2 groups of 4 apps</b>. Part of Tidymint from 0.6.0, <b>off by default</b>. On macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on.",
@@ -2423,7 +2423,7 @@ GUIDES.append(dict(
        ("notes","Good to know"),("older","macOS 14 to 26"),("privacy","What the two permissions are for"),("faq","FAQ")],
   body="""<h2 id="when">When to use it</h2>
 <ul><li><b>The menu bar is full</b>: every app adds an icon, until some slide under the menus of the app in front.</li>
-<li><b>Some icons you rarely click</b> but do not want to switch off: a VPN, cloud sync, an input menu, an AI assistant.</li>
+<li><b>Icons you still use but want tidied away</b>: a VPN, cloud sync, an input menu, an AI assistant.</li>
 <li><b>You want icons sorted by job</b>: one group for work, one for connections.</li></ul>
 <p>Mintbar quits nothing. Each app keeps running as before; only its icon moves behind the group icon.</p>
 <h2 id="turn-on">Turn on Mintbar</h2>
@@ -2439,7 +2439,7 @@ GUIDES.append(dict(
 <p>A row of small dots under the group icon shows one dot per app. An app can sit in both groups.</p>
 <h2 id="use">Open an app from a group</h2>
 <ul><li><b>Click the group icon</b>: its apps open right below. Click again, or press Esc, to close.</li>
-<li><b>Click an app in the fan</b>: its menu or panel opens. An app that is not running is started.</li>
+<li><b>Click one of those apps</b>: its menu or panel opens. An app that is not running is started.</li>
 <li><b>Option-click the group icon</b>: opens the Mintbar page.</li>
 <li><b>Reorder icons</b>: hold ⌘ and drag an icon to its new place. This is built into macOS and works for group icons too.</li></ul>
 <h2 id="notes">Good to know</h2>
@@ -2452,11 +2452,11 @@ GUIDES.append(dict(
 <h2 id="privacy">What the two permissions are for</h2>
 <p>Apple says Accessibility lets an app control your Mac, and that you should grant it only to apps you trust. On macOS 27, Mintbar uses the two permissions like this:</p>
 <ul><li><b>Accessibility</b>: to see which apps have a menu bar icon and where it is, and to open the icon you pick from a group. To open it, Mintbar may click that icon for you and then puts the pointer back. It does not read what is inside windows and does not record the keys you type.</li>
-<li><b>Screen Recording</b>: to take a picture of the menu bar icon of each app in a group, so the fan shows that same icon. Only the icon's own slot is captured, and only while the icon is in view. The pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off.</li></ul>
+<li><b>Screen Recording</b>: to take a picture of the menu bar icon of each app in a group, so the group shows that same icon. Only the icon's own slot is captured, and only while the icon is in view. The pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off.</li></ul>
 <p>Nothing is sent anywhere. More: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
 """,
   faq=[("How many icons can Mintbar gather?", "Two groups of up to 4 apps each. An app can sit in both groups."),
-       ("Why does Mintbar need Screen Recording?", "So the fan can show each app's own menu bar icon. On macOS 27, getting that picture takes this permission. Mintbar captures only the icon's slot in the menu bar. The pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off."),
+       ("Why does Mintbar need Screen Recording?", "So the group can show each app's own menu bar icon. On macOS 27, getting that picture takes this permission. Mintbar captures only the icon's slot in the menu bar. The pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off."),
        ("Focus or Now Playing disappeared after I turned Mintbar on?", "On macOS 27, while any icon is hidden, macOS puts these icons away by itself. Add them to a group and you can reach them again."),
        ("Mintbar says it could not hide the icons?", "Check that Tidymint is in the Applications folder and switched on under both Accessibility and Screen Recording. After allowing Screen Recording, reopen Tidymint."),
        ("What happens if I turn Mintbar off?", "Every icon returns to the menu bar at once and the icon pictures are deleted. The two permission switches stay in System Settings until you turn them off yourself.")],
