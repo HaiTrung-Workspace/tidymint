@@ -3,7 +3,7 @@
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.6.0", date="2026-11-15", status="released",
-         vt=dict(score="0/65", date="2026-11-15", sha="4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
+         vt=dict(score="0/66", date="2026-11-15", sha="4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
          en=["New: Mintbar gathers menu bar icons behind one group icon you choose. Click the group to fan its apps out, click an app to open its menu. Up to 2 groups of 4 apps. Off by default; on macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on",
              "New look: the app icon is a mint leaf, the sidebar is a glass pane on macOS 26 and later, and Clean Now cards are lighter",
              "New: switch pages with ⌘1 to ⌘7; the keys are shown in the sidebar",
