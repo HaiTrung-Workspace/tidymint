@@ -145,8 +145,8 @@ HOME_CSS = """
 .stat b{display:block;margin-bottom:4px}@media (min-width:821px){.pain{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;align-content:start}.stats .pain .q{display:flex;flex-direction:column;justify-content:center}}.pain .q{display:block;font-size:17px;font-style:italic;color:var(--text);line-height:1.45;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}.pain b{color:var(--leaf);font-size:18px}.stat span{color:var(--sub);font-size:15px}
 .sechead{text-align:center;max-width:720px;margin:0 auto 48px}.sechead .lead{margin:0 auto}
 .wn{padding-top:8px}
-.wn-box{padding:36px;border:1px solid #2fd39f40;border-radius:20px;background:linear-gradient(135deg,#2fd39f14,#0c231cb3 60%)}
-.wn-t{display:grid;grid-template-columns:1.1fr 1fr;gap:16px 48px;align-items:end;margin-bottom:28px}
+.wn-box{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center;padding:36px;border:1px solid #2fd39f40;border-radius:20px;background:linear-gradient(135deg,#2fd39f14,#0c231cb3 60%)}
+.wn-t ul{margin-top:4px}
 .wn h2{font-size:clamp(26px,3.2vw,36px);line-height:1.15;letter-spacing:-.01em;margin:10px 0 12px;text-wrap:balance}.wn h2 span{color:var(--leaf)}
 .wn p{color:var(--sub);font-size:17px;margin:0 0 14px}
 .wn ul{list-style:none;padding:0;margin:0 0 16px}.wn li{display:flex;gap:10px;align-items:flex-start;color:var(--sub);padding:4px 0}.wn li svg{flex:none;margin-top:4px;color:var(--leaf)}
@@ -155,10 +155,10 @@ HOME_CSS = """
 .wn figure{margin:0 0 18px}.wn figure:last-child{margin:0}
 .wn figcaption{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin:0 0 8px}
 .wn figure.after figcaption{color:var(--leaf)}
-.wn-i figure,.wn-i figure:last-child{max-width:560px;margin-left:auto}
+.wn-i figure{margin:0 0 16px}.wn-i figure:last-child{margin:0}
 .wn figure div{overflow:hidden;border-radius:12px;border:1px solid var(--line);box-shadow:0 20px 50px #0008}
 .wn figure img{display:block;width:100%;height:auto}
-@media (max-width:820px){.wn-box{padding:22px}.wn-t{grid-template-columns:1fr;gap:0}}
+@media (max-width:820px){.wn-box{padding:22px;grid-template-columns:1fr;gap:28px}}
 .fx{display:grid;grid-template-columns:1fr 1.25fr;gap:56px;align-items:center;padding:44px 0;border-top:1px solid #ffffff0d}
 .fx:first-of-type{border-top:0}
 .fx.flip .fx-t{order:2}
@@ -584,11 +584,11 @@ gtag('js',new Date());gtag('config','{GA_ID}');
 
 <section id="{t["new_id"]}" class="wn">
   <div class="wn-box">
-    <div class="wn-t"><div><span class="tag">{t["new_tag"]}</span><h2>{t["new_h"]}</h2><p>{t["new_p"]}</p></div><div><ul>{wn_li}</ul><div class="wn-links">{wn_links}</div><p class="also">{t["new_also"]}</p></div></div>
+    <div class="wn-t"><span class="tag">{t["new_tag"]}</span><h2>{t["new_h"]}</h2><p>{t["new_p"]}</p><ul>{wn_li}</ul><div class="wn-links">{wn_links}</div><p class="also">{t["new_also"]}</p></div>
     <div class="wn-i">
       <figure><figcaption>{t["new_cap"][0]}</figcaption><div><img src="{img}mintbar-before.jpg" alt="{t["new_alt"][0]}" width="900" height="60" loading="lazy"></div></figure>
       <figure class="after"><figcaption>{t["new_cap"][1]}</figcaption><div><img src="{img}mintbar-after.jpg" alt="{t["new_alt"][1]}" width="900" height="60" loading="lazy"></div></figure>
-      <figure class="after fan"><figcaption>{t["new_cap3"]}</figcaption><div><img src="{img}mintbar-fan.jpg" alt="{t["new_alt3"]}" width="900" height="300" loading="lazy"></div></figure>
+      <figure class="after fan"><figcaption>{t["new_cap3"]}</figcaption><div><img src="{img}mintbar-fan.jpg" alt="{t["new_alt3"]}" width="900" height="250" loading="lazy"></div></figure>
     </div>
   </div>
 </section>
