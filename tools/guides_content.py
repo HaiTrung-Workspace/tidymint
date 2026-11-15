@@ -30,7 +30,7 @@ dict(
 <ul>
 <li><b>Quyền đọc toàn bộ ổ đĩa</b> (Full Disk Access): đọc được ảnh, tin nhắn, tài liệu, dữ liệu trình duyệt của bạn.</li>
 <li><b>Mật khẩu quản trị</b>: nhiều thao tác dọn hệ thống đòi bạn nhập mật khẩu máy.</li>
-<li><b>Chạy nền liên tục</b>: biểu tượng trên thanh menu, tự khởi động cùng máy.</li>
+<li><b>Chạy nền liên tục</b>: biểu tượng trên menu bar, tự khởi động cùng máy.</li>
 </ul>
 <p>Một bản crack bị cài thêm mã độc sẽ được bạn tự tay trao đủ cả ba quyền trên. Đây không phải chuyện giả định: tháng 1/2024, nhóm bảo mật Jamf Threat Labs công bố đã tìm thấy <b>nhiều app Mac lậu bị cài cửa hậu</b> (backdoor, đoạn mã cho kẻ gian điều khiển máy từ xa), phát tán qua các trang chia sẻ phần mềm crack.</p>
 <div class="warn"><p>Ngoài mã độc, bản crack không nhận được bản vá lỗi, dễ hỏng sau mỗi lần cập nhật macOS, và là vi phạm bản quyền.</p></div>
@@ -92,7 +92,7 @@ dict(
     ("Dùng CleanMyMac crack có sao không?", "Rủi ro cao. App dọn dẹp cần quyền đọc toàn bộ ổ đĩa và mật khẩu quản trị, nên bản crack bị cài mã độc có thể đọc dữ liệu hoặc điều khiển máy từ xa. Jamf Threat Labs từng phát hiện app Mac lậu bị cài cửa hậu (01/2024)."),
     ("Tidymint có miễn phí không?", "Phần dọn dẹp miễn phí, không cần tài khoản, không thuê bao. Lõi dọn dẹp là mã nguồn mở theo giấy phép MIT, công khai trên GitHub."),
     ("Mac có cần app dọn dẹp không?", "Không bắt buộc. macOS tự quản lý khá tốt. App dọn dẹp hữu ích khi ổ gần đầy, nhất là máy 256 GB, hoặc khi mục Dữ liệu hệ thống phình to mà bạn không biết vì sao."),
-    ("Gỡ CleanMyMac đang cài thế nào cho sạch?", "Thoát CleanMyMac (cả biểu tượng trên thanh menu), rồi dùng tính năng Gỡ app của Tidymint hoặc AppCleaner để xoá app cùng các file đi kèm."),
+    ("Gỡ CleanMyMac đang cài thế nào cho sạch?", "Thoát CleanMyMac (cả biểu tượng trên menu bar), rồi dùng tính năng Gỡ app của Tidymint hoặc AppCleaner để xoá app cùng các file đi kèm."),
   ],
   sources=[
     ("MacPaw: các phiên bản CleanMyMac và thời gian dùng thử", "https://macpaw.com/support/cleanmymac/knowledgebase/editions"),
@@ -119,7 +119,7 @@ dict(
   body="""
 <h2 id="cach-1-finder">Cách 1: Xoá bằng Finder (cách của Apple)</h2>
 <ol class="steps">
-<li><b>Thoát app</b> đang mở (nhấn Cmd+Q). Nếu app có biểu tượng trên thanh menu, thoát cả ở đó.</li>
+<li><b>Thoát app</b> đang mở (nhấn Cmd+Q). Nếu app có biểu tượng trên menu bar, thoát cả ở đó.</li>
 <li>Mở <b>Finder</b>, chọn <b>Ứng dụng</b> (Applications) ở thanh bên.</li>
 <li>Kéo app vào <b>Thùng rác</b>, hoặc chọn app rồi vào <b>Tệp › Chuyển vào Thùng rác</b>. Nếu được hỏi, nhập mật khẩu máy.</li>
 <li><b>Đổ Thùng rác</b> (Finder › Đổ Thùng rác) để lấy lại dung lượng thật sự.</li>
@@ -158,7 +158,7 @@ dict(
 
 <h2 id="khong-xoa-duoc">App không xoá được thì làm sao</h2>
 <ul>
-<li><b>Báo "đang được dùng"</b>: thoát hẳn app, kể cả biểu tượng trên thanh menu. Vẫn không được thì khởi động lại máy rồi thử lại.</li>
+<li><b>Báo "đang được dùng"</b>: thoát hẳn app, kể cả biểu tượng trên menu bar. Vẫn không được thì khởi động lại máy rồi thử lại.</li>
 <li><b>App của Apple</b> như Mail, Nhạc, Sách, Ghi chú, Bản đồ: là một phần của macOS nên không xoá được, và cũng không nên xoá.</li>
 <li><b>App vẫn tự chạy sau khi xoá</b>: còn mục khởi động trong <code>~/Library/LaunchAgents</code> hoặc <b>Cài đặt hệ thống › Cài đặt chung › Mục đăng nhập</b>. Tắt hoặc xoá mục đó.</li>
 </ul>
@@ -213,7 +213,7 @@ dict(
 
 <h2 id="don-tay">Xoá bộ nhớ đệm Zalo bằng tay</h2>
 <ol class="steps">
-<li><b>Thoát Zalo hẳn</b> (Cmd+Q, kể cả biểu tượng trên thanh menu). Zalo đang mở sẽ ghi lại hoặc khoá file.</li>
+<li><b>Thoát Zalo hẳn</b> (Cmd+Q, kể cả biểu tượng trên menu bar). Zalo đang mở sẽ ghi lại hoặc khoá file.</li>
 <li>Mở <code>~/Library/Application Support/ZaloData</code>.</li>
 <li>Kéo các thư mục <code>Cache</code>, <code>Code Cache</code>, <code>GPUCache</code>, <code>DawnCache</code>, <code>resp_cache</code> và <code>media/update</code> vào <b>Thùng rác</b>.</li>
 <li>Mở lại Zalo, dùng vài phút xem có gì lạ không, rồi mới <b>Đổ Thùng rác</b>.</li>
@@ -293,7 +293,7 @@ dict(
 <h2 id="go-tidymint">Gỡ Tidymint</h2>
 <p>Cách nhanh nhất là kéo Tidymint vào Thùng rác. Muốn sạch hẳn thì xoá thêm 4 mục nhỏ trong thư mục Thư viện (dưới 1 MB trên máy thử). Những gì Tidymint đã dọn vẫn nằm nguyên trong Thùng rác; gỡ app chỉ làm mất nút <b>Hoàn tác</b>, muốn lấy lại file thì kéo nó ra khỏi Thùng rác như bình thường.</p>
 <ol>
-<li>Thoát Tidymint (biểu tượng trên thanh menu › Thoát). Mở Finder › <b>Ứng dụng</b>, kéo <b>Tidymint</b> vào Thùng rác.</li>
+<li>Thoát Tidymint (biểu tượng trên menu bar › Thoát). Mở Finder › <b>Ứng dụng</b>, kéo <b>Tidymint</b> vào Thùng rác.</li>
 <li>Muốn sạch hẳn: trong Finder bấm <b>Đi › Đi tới thư mục</b> (Shift‑Cmd‑G), dán từng đường dẫn dưới đây, rồi kéo mục hiện ra vào Thùng rác.</li>
 </ol>
 <div class="tbl"><table>
@@ -1700,7 +1700,7 @@ dict(
 <p>Hai con số nữa cần lưu ý. <b>Tệp được ghi vào Bộ nhớ đệm</b> (Cached Files) là phần RAM giữ file vừa dùng để mở lại nhanh hơn. <b>Mức hoán đổi Được sử dụng</b> (Swap Used) là chỗ trên ổ khởi động macOS mượn khi RAM đầy. Có chút swap là bình thường, swap cứ tăng trong lúc Áp lực Bộ nhớ đỏ mới là dấu hiệu thiếu RAM thật.</p>
 
 <h2 id="xa-ram">Vì sao xả RAM có thể phản tác dụng</h2>
-<p>Phần lớn RAM mà các ứng dụng dọn dẹp khác nói "giải phóng" chính là bộ nhớ đệm file kể trên. Theo Apple, phần này nằm yên trong RAM tới khi bị ghi đè, nhờ vậy mở lại app nhanh hơn. Xả nó đi thì app hay file mở tiếp theo phải đọc lại từ ổ. Con số trên thanh menu đẹp hơn, còn máy vẫn vậy, thậm chí còn chậm hơn.</p>
+<p>Phần lớn RAM mà các ứng dụng dọn dẹp khác nói "giải phóng" chính là bộ nhớ đệm file kể trên. Theo Apple, phần này nằm yên trong RAM tới khi bị ghi đè, nhờ vậy mở lại app nhanh hơn. Xả nó đi thì app hay file mở tiếp theo phải đọc lại từ ổ. Con số trên menu bar đẹp hơn, còn máy vẫn vậy, thậm chí còn chậm hơn.</p>
 <p>Phần còn lại là bộ nhớ app đang dùng thật. Phần này quay lại ngay khi bạn dùng tiếp các app đó.</p>
 
 <h2 id="cach-dung">Việc có ích cho máy</h2>
@@ -1714,7 +1714,7 @@ dict(
 </ol>
 
 <h2 id="tidymint">Tidymint làm gì với RAM</h2>
-<p>Chúng tôi chọn không làm nút giải phóng RAM, vì những lý do trên. Thanh menu của <a href="{HOME}">Tidymint</a> hiện RAM còn trống cạnh dung lượng ổ còn trống, và báo khi RAM dùng trên 90% (tối đa 1 giờ một lần, tắt được ở Cài đặt › Cảnh báo RAM cao), để bạn biết lúc nào nên mở Giám sát hoạt động. Phần còn lại của app lo dung lượng ổ: bộ nhớ đệm, nhật ký, file tải về cũ, phần sót lại của app đã gỡ, file lớn và file trùng. Mọi thứ luôn vào Thùng rác trước.</p>
+<p>Chúng tôi chọn không làm nút giải phóng RAM, vì những lý do trên. Menu bar của <a href="{HOME}">Tidymint</a> hiện RAM còn trống cạnh dung lượng ổ còn trống, và báo khi RAM dùng trên 90% (tối đa 1 giờ một lần, tắt được ở Cài đặt › Cảnh báo RAM cao), để bạn biết lúc nào nên mở Giám sát hoạt động. Phần còn lại của app lo dung lượng ổ: bộ nhớ đệm, nhật ký, file tải về cũ, phần sót lại của app đã gỡ, file lớn và file trùng. Mọi thứ luôn vào Thùng rác trước.</p>
 {CTA}""",
   faq=[
     ("Giải phóng RAM có làm Mac nhanh hơn không?", "Thường là không. Apple ghi rõ bộ nhớ trống không nhất thiết làm máy nhanh hơn. macOS giữ file vừa dùng trong RAM để mở app nhanh hơn."),
@@ -1722,7 +1722,7 @@ dict(
     ("Bộ nhớ Được sử dụng cao có sao không?", "Tự nó thì không. Một phần là file được giữ trong bộ nhớ đệm, macOS nhả ra ngay khi app khác cần chỗ. Chỉ số cần theo dõi là Áp lực Bộ nhớ."),
     ("Có nên cài app giải phóng RAM không?", "Không có nhiều lý do để cài. Xả bộ nhớ đệm file khiến lần mở app sau phải đọc lại từ ổ. Tắt app nặng hoặc khởi động lại mới trả lại phần RAM đang dùng thật."),
     ("Photoshop chiếm 8 GB RAM dù đang rảnh có sao không?", "Bình thường. Photoshop mặc định giữ 70% RAM khả dụng cho riêng nó. Hay chạy thêm app nặng thì giảm ô Let Photoshop Use trong Photoshop › Settings › Performance, rồi mở lại app."),
-    ("Tidymint có giải phóng RAM không?", "Không. Tidymint hiện RAM còn trống trên thanh menu và báo khi RAM dùng trên 90%, nhưng không có nút xả bộ nhớ."),
+    ("Tidymint có giải phóng RAM không?", "Không. Tidymint hiện RAM còn trống trên menu bar và báo khi RAM dùng trên 90%, nhưng không có nút xả bộ nhớ."),
   ],
   sources=[
     ("Apple: Kiểm tra xem máy Mac có cần thêm RAM không trong Giám sát hoạt động", "https://support.apple.com/vi-vn/guide/activity-monitor/actmntr34865/mac"),
@@ -1848,7 +1848,7 @@ GUIDES.append(dict(
 <p>Theo Apple, quyền này cho app <b>truy cập mọi tệp trên máy</b>, kể cả dữ liệu của Mail, Tin nhắn, Safari và bản sao lưu Time Machine. Nói cách khác: <b>chọn app dọn máy cũng là chọn ai được nhìn vào máy mình</b>. Vì vậy câu hỏi \"app này có gửi gì đi không\" rất đáng hỏi.</p>
 
 <p>Từ bản 0.5.0 có thêm một quyền tuỳ chọn: <b>Trợ năng</b> (Accessibility), chỉ dành cho Mintangle (xếp cửa sổ). Mintangle tắt sẵn, bạn không bật thì Tidymint không bao giờ hỏi quyền này. Bật lên, app chỉ dùng quyền để dời và đổi cỡ cửa sổ, không đọc nội dung, không ghi phím gõ.</p>
-<p>Từ bản 0.6.0, <b>Mintbar</b> (thanh menu gọn) cũng tắt sẵn. Trên macOS 27, khi bạn bật, Mintbar xin quyền <b>Trợ năng</b> để biết app nào có icon trên thanh menu và mở icon bạn chọn trong nhóm (có thể bấm chuột hộ vào icon đó rồi đưa con trỏ về chỗ cũ), và quyền <b>Ghi màn hình</b> để chụp hình icon thanh menu của các app trong nhóm. Chỉ chụp đúng ô của icon đó, hình lưu trên máy và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Trên macOS 14 đến 26, Mintbar không cần quyền nào.</p>
+<p>Từ bản 0.6.0, <b>Mintbar</b> (menu bar gọn) cũng tắt sẵn. Trên macOS 27, khi bạn bật, Mintbar xin quyền <b>Trợ năng</b> để biết app nào có icon trên menu bar và mở icon bạn chọn trong nhóm (có thể bấm chuột hộ vào icon đó rồi đưa con trỏ về chỗ cũ), và quyền <b>Ghi màn hình</b> để chụp hình icon menu bar của các app trong nhóm. Chỉ chụp đúng ô của icon đó, hình lưu trên máy và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Trên macOS 14 đến 26, Mintbar không cần quyền nào.</p>
 <h2 id="chay-tren-may">Tidymint làm việc thế nào: mọi thứ chạy ngay trên máy bạn</h2>
 <p>Hình dung Tidymint như <b>người thợ dọn nhà làm việc ngay trong nhà bạn</b>: đi từng phòng, ghi lại thứ gì to, thứ gì cũ, đưa bạn tờ danh sách. Bạn đánh dấu thứ muốn bỏ, thợ mang ra Thùng rác. Thợ không chụp ảnh đồ đạc gửi về công ty, và về tay không.</p>
 <ol class="steps">
@@ -2026,7 +2026,7 @@ GUIDES.append(dict(
 <h2 id="nhat-ky">Nhật ký minh bạch</h2>
 <p>Mỗi bước làm Tidymint đáng tin hơn đều được ghi ở đây, mới nhất trên cùng.</p>
 <ul>
-<li><b>15/11/2026</b>: Phát hành 0.6.0, VirusTotal quét 0/66. Thêm Mintbar (gom icon thanh menu vào nhóm, tắt sẵn), diện mạo mới và phím chuyển trang. Trước khi phát hành, phần thay đổi được các phiên độc lập rà theo 7 cụm rồi một phiên khác soát lại: 17 điểm được nêu, 10 điểm sửa ngay trong bản này (trong đó có Hoàn tác xoá sổ ghi cả khi một mục chưa trả về được), các điểm còn lại để bản sau.</li>
+<li><b>15/11/2026</b>: Phát hành 0.6.0, VirusTotal quét 0/66. Thêm Mintbar (gom icon menu bar vào nhóm, tắt sẵn), diện mạo mới và phím chuyển trang. Trước khi phát hành, phần thay đổi được các phiên độc lập rà theo 7 cụm rồi một phiên khác soát lại: 17 điểm được nêu, 10 điểm sửa ngay trong bản này (trong đó có Hoàn tác xoá sổ ghi cả khi một mục chưa trả về được), các điểm còn lại để bản sau.</li>
 <li><b>15/11/2026</b>: Mã các công cụ Mint (Mintangle, Mintdrop, Mintbar) không còn nằm trong kho công khai, kể cả trong lịch sử các bản 0.5.0 đến 0.5.2. Lõi dọn dẹp vẫn mở. App và file tải của các phiên bản không đổi, mã SHA-256 giữ nguyên. Mã commit của các bản này trong kho thay đổi do việc gỡ.</li>
 <li><b>12/11/2026</b>: Gỡ mã một tính năng chưa phát hành khỏi kho công khai. Phần mã của tính năng sắp xếp thư mục được gỡ khỏi kho mã, kể cả trong lịch sử các bản 0.3.6 đến 0.5.2. Tính năng này luôn bị ẩn trong mọi bản đã phát hành, nên app và file tải của các phiên bản không đổi, mã SHA-256 giữ nguyên. Mã commit của các bản này trong kho thay đổi do việc gỡ.</li>
 <li><b>10/11/2026</b>: Phát hành 0.5.2, VirusTotal quét 0/66. Thêm mô hình AI chạy trên máy vào Dọn theo ứng dụng, thư viện của dự án bỏ yên vào Dọn ngay, và gợi ý (tắt sẵn) khi kéo app vào Thùng rác. Trước khi phát hành, phần thay đổi được các phiên độc lập rà theo 7 cụm: 39 điểm được nêu, 28 điểm sửa ngay trong bản này (trong đó có lỗi Gỡ app tick sẵn thư mục của app khác có mã gần giống, và Hoàn tác thiếu mục khi thư mục cha và con cùng được dọn), các điểm nhỏ còn lại để bản sau. Dựng trên máy của GitHub, tự quét VirusTotal và tự cập nhật Homebrew trong quy trình phát hành.</li>
@@ -2049,7 +2049,7 @@ GUIDES.append(dict(
        ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
        ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu."),
        ("Mintangle xin quyền Trợ năng để làm gì?", "Để dời và đổi cỡ cửa sổ khi bạn bấm phím tắt hoặc kéo cửa sổ vào mép màn hình. Mintangle tắt sẵn, chỉ khi bạn bật thì macOS mới hỏi quyền. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ, không gửi gì đi. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư & Bảo mật › Trợ năng, lúc nào cũng được."),
-       ("Mintbar xin quyền Trợ năng và Ghi màn hình để làm gì?", "Chỉ trên macOS 27, và chỉ khi bạn bật Mintbar. Trợ năng để biết app nào có icon trên thanh menu và mở icon bạn chọn trong nhóm. Ghi màn hình để chụp đúng ô icon thanh menu của các app trong nhóm; hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Không gửi gì đi.")],
+       ("Mintbar xin quyền Trợ năng và Ghi màn hình để làm gì?", "Chỉ trên macOS 27, và chỉ khi bạn bật Mintbar. Trợ năng để biết app nào có icon trên menu bar và mở icon bạn chọn trong nhóm. Ghi màn hình để chụp đúng ô icon menu bar của các app trong nhóm; hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Không gửi gì đi.")],
   sources=[("VirusTotal: kết quả quét Tidymint.zip 0.6.0", "https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
            ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
            ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
@@ -2358,14 +2358,14 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="vi", slug="mintbar-gon-thanh-menu-mac", topic="start", date="2026-11-15", read="4 phút đọc",
   title="Gom icon thanh menu Mac vào một nhóm: Mintbar | Tidymint",
-  desc="Mintbar gom icon trên thanh menu Mac vào sau một icon nhóm: bấm để xoè các app ra, bấm một app để mở menu của nó. Tắt sẵn, 2 nhóm, mỗi nhóm 4 app.",
+  desc="Mintbar gom icon trên thanh menu Mac vào sau một icon nhóm: bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Tắt sẵn, 2 nhóm, mỗi nhóm 4 app.",
   crumb="Mintbar",
-  h1="Thanh menu gọn lại, icon nào cần vẫn chỉ một cú bấm",
-  tldr="Mintbar gom nhiều icon trên thanh menu vào sau <b>một icon nhóm do bạn chọn</b>. Bấm icon nhóm, các app xoè ra; bấm một app để mở menu của nó. Bản miễn phí có <b>2 nhóm, mỗi nhóm 4 app</b>. Có trong Tidymint từ bản 0.6.0, <b>mặc định tắt</b>. Trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình.",
+  h1="Menu bar (thanh menu) gọn lại, icon nào cần vẫn chỉ một cú bấm",
+  tldr="Mintbar gom nhiều icon trên menu bar (thanh menu) vào sau <b>một icon nhóm do bạn chọn</b>. Bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Tối đa <b>2 nhóm, mỗi nhóm 4 app</b>. Có trong Tidymint từ bản 0.6.0, <b>mặc định tắt</b>. Trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình.",
   toc=[("khi-nao","Dùng khi nào"),("bat","Bật Mintbar"),("tao-nhom","Tạo nhóm"),("dung","Mở app trong nhóm"),
        ("luu-y","Vài điều cần biết"),("macos-cu","macOS 14 đến 26"),("rieng-tu","Hai quyền dùng để làm gì"),("faq","Câu hỏi thường gặp")],
   body="""<h2 id="khi-nao">Dùng khi nào</h2>
-<ul><li><b>Thanh menu chật</b>: app nào cài vào cũng thêm một icon, tới lúc icon bị menu của app đang mở che mất.</li>
+<ul><li><b>Menu bar chật</b>: app nào cài vào cũng thêm một icon, tới lúc icon bị menu của app đang mở che mất.</li>
 <li><b>Có những icon ít khi bấm</b> nhưng không muốn tắt hẳn: VPN, đồng bộ đám mây, bộ gõ, trợ lý AI.</li>
 <li><b>Muốn xếp icon theo việc</b>: một nhóm cho công việc, một nhóm cho kết nối.</li></ul>
 <p>Mintbar không tắt app nào. App vẫn chạy như cũ, chỉ có icon của nó lui vào sau icon nhóm.</p>
@@ -2377,32 +2377,32 @@ GUIDES.append(dict(
 <h2 id="tao-nhom">Tạo nhóm</h2>
 <ol class="steps"><li>Ở mục <b>Nhóm</b>, bấm <b>Thêm nhóm</b>.</li>
 <li>Đặt tên và chọn một trong 12 icon cho nhóm.</li>
-<li>Tick các app muốn gom vào. Icon của các app đó rời thanh menu, icon nhóm hiện ra thay chỗ.</li></ol>
-<figure class="fig-app"><img src="../mintbar.jpg" alt="Trang Mintbar của Tidymint: danh sách app có icon trên thanh menu và hai nhóm AI, Kết nối" width="1600" height="1079" loading="lazy"><figcaption>Trang Mintbar: mỗi app nằm trong nhóm nào, và hai nhóm đang dùng.</figcaption></figure>
+<li>Tick các app muốn gom vào. Icon của các app đó rời menu bar, icon nhóm hiện ra thay chỗ.</li></ol>
+<figure class="fig-app"><img src="../mintbar.jpg" alt="Trang Mintbar của Tidymint: danh sách app có icon trên menu bar và hai nhóm AI, Kết nối" width="1600" height="1079" loading="lazy"><figcaption>Trang Mintbar: mỗi app nằm trong nhóm nào, và hai nhóm đang dùng.</figcaption></figure>
 <p>Dưới icon nhóm có một hàng chấm nhỏ, mỗi chấm là một app trong nhóm. Một app có thể nằm trong cả hai nhóm.</p>
 <h2 id="dung">Mở app trong nhóm</h2>
-<ul><li><b>Bấm icon nhóm</b>: các app xoè ra thành hình quạt ngay bên dưới. Bấm lần nữa, hoặc nhấn Esc, để đóng.</li>
+<ul><li><b>Bấm icon nhóm</b>: các app mở ra ngay bên dưới. Bấm lần nữa, hoặc nhấn Esc, để đóng.</li>
 <li><b>Bấm một app trong quạt</b>: menu hoặc cửa sổ nhỏ của app đó mở ra. App chưa chạy thì được mở lên.</li>
 <li><b>Giữ Option rồi bấm icon nhóm</b>: mở trang Mintbar.</li>
 <li><b>Đổi thứ tự icon</b>: giữ ⌘ rồi kéo icon tới chỗ mới. Đây là tính năng có sẵn của macOS, dùng được cho cả icon nhóm.</li></ul>
 <h2 id="luu-y">Vài điều cần biết</h2>
-<ul><li><b>Đồng hồ và Trung tâm điều khiển luôn ở lại</b> trên thanh menu, Mintbar không đưa hai mục này vào nhóm.</li>
+<ul><li><b>Đồng hồ và Trung tâm điều khiển luôn ở lại</b> trên menu bar, Mintbar không đưa hai mục này vào nhóm.</li>
 <li><b>Tập trung, Đang phát, AirDrop và menu người dùng</b>: trên macOS 27, khi Mintbar đang giấu bất kỳ icon nào, macOS tự cất các icon này. Muốn bấm tới chúng, hãy cho vào một nhóm.</li>
 <li><b>Icon bạn đã tắt trong Cài đặt hệ thống › Thanh menu</b> thì Mintbar liệt kê riêng ở mục "Đang tắt trong macOS" (là các app đang tắt ở <b>Cho phép trong thanh menu</b>). Tidymint chỉ đọc danh sách này, không sửa cài đặt của macOS.</li>
-<li><b>Tắt Mintbar</b>: mọi icon trở lại thanh menu ngay.</li></ul>
+<li><b>Tắt Mintbar</b>: mọi icon trở lại menu bar ngay.</li></ul>
 <h2 id="macos-cu">macOS 14 đến 26</h2>
-<p>Các bản macOS này chưa có nhóm. Mintbar thêm một <b>mũi tên</b> và một <b>vạch mảnh</b> vào thanh menu: giữ ⌘ rồi kéo các icon muốn ẩn sang bên trái vạch, bấm mũi tên (hoặc ⌃⌥B) để thu gọn hay hiện lại. Cách này không cần quyền nào.</p>
+<p>Các bản macOS này chưa có nhóm. Mintbar thêm một <b>mũi tên</b> và một <b>vạch mảnh</b> vào menu bar: giữ ⌘ rồi kéo các icon muốn ẩn sang bên trái vạch, bấm mũi tên (hoặc ⌃⌥B) để thu gọn hay hiện lại. Cách này không cần quyền nào.</p>
 <h2 id="rieng-tu">Hai quyền dùng để làm gì</h2>
 <p>Theo Apple, quyền Trợ năng cho phép app điều khiển máy, và bạn chỉ nên cấp cho app mình tin. Trên macOS 27, Mintbar dùng hai quyền như sau:</p>
-<ul><li><b>Trợ năng</b>: để biết app nào có icon trên thanh menu, icon nằm ở đâu, và để mở icon bạn chọn trong nhóm. Khi mở, Mintbar có thể bấm chuột hộ vào đúng icon đó rồi đưa con trỏ về chỗ cũ. Mintbar không đọc nội dung cửa sổ, không ghi phím bạn gõ.</li>
-<li><b>Ghi màn hình</b>: để chụp hình icon thanh menu của các app trong nhóm, cho quạt hiện đúng icon đó. Mintbar chỉ chụp đúng ô của icon, lúc icon đang hiện. Hình lưu trên máy bạn, và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar.</li></ul>
+<ul><li><b>Trợ năng</b>: để biết app nào có icon trên menu bar, icon nằm ở đâu, và để mở icon bạn chọn trong nhóm. Khi mở, Mintbar có thể bấm chuột hộ vào đúng icon đó rồi đưa con trỏ về chỗ cũ. Mintbar không đọc nội dung cửa sổ, không ghi phím bạn gõ.</li>
+<li><b>Ghi màn hình</b>: để chụp hình icon menu bar của các app trong nhóm, cho quạt hiện đúng icon đó. Mintbar chỉ chụp đúng ô của icon, lúc icon đang hiện. Hình lưu trên máy bạn, và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar.</li></ul>
 <p>Không có gì được gửi đi. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
 """,
   faq=[("Mintbar gom được bao nhiêu icon?", "Hai nhóm, mỗi nhóm tối đa 4 app. Một app có thể nằm trong cả hai nhóm."),
-       ("Vì sao Mintbar cần quyền Ghi màn hình?", "Để quạt hiện đúng icon thanh menu của từng app. Trên macOS 27, muốn lấy hình icon đó thì cần quyền này. Mintbar chỉ chụp đúng ô của icon trên thanh menu. Hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar."),
+       ("Vì sao Mintbar cần quyền Ghi màn hình?", "Để quạt hiện đúng icon menu bar của từng app. Trên macOS 27, muốn lấy hình icon đó thì cần quyền này. Mintbar chỉ chụp đúng ô của icon trên menu bar. Hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar."),
        ("Bật Mintbar xong, icon Tập trung hay Đang phát biến mất?", "Trên macOS 27, khi có icon đang được giấu, macOS tự cất các icon này. Cho chúng vào một nhóm là bấm tới được."),
        ("Mintbar báo chưa ẩn được icon?", "Kiểm tra Tidymint đang nằm trong thư mục Ứng dụng và đã được bật ở cả hai mục Trợ năng, Ghi màn hình. Cấp quyền Ghi màn hình xong cần mở lại Tidymint."),
-       ("Tắt Mintbar thì sao?", "Mọi icon trở lại thanh menu ngay, hình icon đã chụp bị xoá. Hai quyền vẫn nằm trong Cài đặt hệ thống cho tới khi bạn tự tắt.")],
+       ("Tắt Mintbar thì sao?", "Mọi icon trở lại menu bar ngay, hình icon đã chụp bị xoá. Hai quyền vẫn nằm trong Cài đặt hệ thống cho tới khi bạn tự tắt.")],
   sources=[("Apple: Thanh menu trên Mac có gì (giữ Command rồi kéo để đổi thứ tự icon)", "https://support.apple.com/guide/mac-help/mchlp1446/mac"),
            ("Apple: Thay đổi cài đặt Thanh menu trên Mac", "https://support.apple.com/guide/mac-help/mchlad96d366/mac"),
            ("Apple: Cho phép app trợ năng truy cập máy Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
@@ -2418,7 +2418,7 @@ GUIDES.append(dict(
   desc="Mintbar gathers Mac menu bar icons behind one group icon: click to fan the apps out, click an app to open its menu. Off by default, 2 groups of 4 apps.",
   crumb="Mintbar",
   h1="A Tidy Menu Bar, With Every Icon Still One Click Away",
-  tldr="Mintbar gathers several menu bar icons behind <b>one group icon you choose</b>. Click the group and its apps fan out; click an app to open its menu. The free app has <b>2 groups of up to 4 apps</b>. Part of Tidymint from 0.6.0, <b>off by default</b>. On macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on.",
+  tldr="Mintbar gathers several menu bar icons behind <b>one group icon you choose</b>. Click the group and its apps open right below; click an app to open its menu. Up to <b>2 groups of 4 apps</b>. Part of Tidymint from 0.6.0, <b>off by default</b>. On macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on.",
   toc=[("when","When to use it"),("turn-on","Turn on Mintbar"),("group","Make a group"),("use","Open an app from a group"),
        ("notes","Good to know"),("older","macOS 14 to 26"),("privacy","What the two permissions are for"),("faq","FAQ")],
   body="""<h2 id="when">When to use it</h2>
@@ -2438,7 +2438,7 @@ GUIDES.append(dict(
 <figure class="fig-app"><img src="../mintbar.jpg" alt="The Mintbar page in Tidymint: the apps with a menu bar icon and two groups, AI and Connection" width="1600" height="1079" loading="lazy"><figcaption>The Mintbar page: which group each app is in, and the two groups in use.</figcaption></figure>
 <p>A row of small dots under the group icon shows one dot per app. An app can sit in both groups.</p>
 <h2 id="use">Open an app from a group</h2>
-<ul><li><b>Click the group icon</b>: its apps fan out just below. Click again, or press Esc, to close.</li>
+<ul><li><b>Click the group icon</b>: its apps open right below. Click again, or press Esc, to close.</li>
 <li><b>Click an app in the fan</b>: its menu or panel opens. An app that is not running is started.</li>
 <li><b>Option-click the group icon</b>: opens the Mintbar page.</li>
 <li><b>Reorder icons</b>: hold ⌘ and drag an icon to its new place. This is built into macOS and works for group icons too.</li></ul>

@@ -16,6 +16,7 @@ ART_CSS = """
 .cpb{position:absolute;top:8px;right:8px;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:#ffffff0d;color:var(--sub);cursor:pointer}
 .cpb:hover{color:var(--leaf);border-color:var(--leaf)}.cpb.ok{color:var(--leaf)}
 .cpi{display:inline-flex;align-items:center;gap:6px}.cpi .cpb{position:static;width:26px;height:26px;border-radius:6px;flex:none}
+.relv .rintro{color:var(--text);margin:4px 0 12px}.relv li .rl{display:inline-block;font-size:12px;font-weight:600;line-height:1;padding:4px 8px;border-radius:999px;margin-right:8px;vertical-align:1px;border:1px solid var(--line);color:var(--sub);white-space:nowrap}.relv li .rl.new{color:var(--leaf);border-color:#2fd39f55;background:#2fd39f14}.relv li .rl.imp{color:var(--text)}
 .relv summary{display:flex;align-items:center;gap:12px}.relv summary:after{margin-left:auto}.relv .ver{font-size:18px}.relv .small{color:var(--sub);font-weight:400}.relv ul{margin:0 0 16px}.relv .vt{color:var(--sub);font-size:14px;margin:-6px 0 18px}
 
 .crumb{font-size:14px;color:var(--sub);margin:28px 0 0}.crumb a{color:var(--sub)}
@@ -330,6 +331,16 @@ CL = {
             h1="Changelog", desc="What changed in each Tidymint release, newest first.",
             next="In progress for", dl="Download the latest", alt="lich-su-cap-nhat"),
 }
+RL = {"new": ("New", "Mới", "New, off by default", "Mới, tắt sẵn"),
+      "imp": ("New look", "Diện mạo mới", "Safer", "An toàn hơn", "Show instead of hide", "Hiện thay vì ẩn"),
+      "fix": ("Fix", "Fixed", "Sửa lỗi", "Sửa")}
+def rlabel(x):
+    # "New: text" -> tag + text; lines without a known label stay as they are.
+    head, sep, rest = x.partition(": ")
+    for c, names in RL.items():
+        if sep and head in names:
+            return '<span class="rl %s">%s</span>%s' % (c, head, rest[:1].upper() + rest[1:])
+    return x
 def changelogpage(k):
     import changelog as CLG
     h = dict(CL[k]); parts = []
@@ -346,8 +357,8 @@ def changelogpage(k):
             short = v["sha"][:8] + "…" + v["sha"][-4:]
             vt = ('<p class="vt">Quét virus: %s, quét %s · SHA-256 <code>%s</code></p>' % (link, vd.strftime("%d/%m/%Y"), short)) if k == "vi" else \
                  ('<p class="vt">Virus scan: %s, scanned %s · SHA-256 <code>%s</code></p>' % (link, vd.strftime("%B %-d, %Y"), short))
-        parts.append('<details class="relv" id="v%s"%s><summary><span class="ver">%s</span><span class="small">%s · %s</span></summary><ul>%s</ul>%s</details>'
-                     % (r["ver"].replace(".", ""), " open" if i == 0 else "", head, ds, cnt, "".join("<li>%s</li>" % x for x in r[k]), vt))
+        parts.append('<details class="relv" id="v%s"%s><summary><span class="ver">%s</span><span class="small">%s · %s</span></summary>%s<ul>%s</ul>%s</details>'
+                     % (r["ver"].replace(".", ""), " open" if i == 0 else "", head, ds, cnt, ('<p class="rintro">%s</p>' % r["intro"][k]) if r.get("intro") else "", "".join("<li>%s</li>" % rlabel(x) for x in r[k]), vt))
     body = "".join(parts) + '<p><a class="btn" href="%s">%s</a></p>' % (S.DL, h["dl"])
     dates = [r["date"] for r in CLG.RELEASES if r["date"]]
     h.update(lang=k, date=max(dates), hub=True, read="", tldr="", toc=[], faq=[], sources=[], body=body, lead="")

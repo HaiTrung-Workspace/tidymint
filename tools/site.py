@@ -144,6 +144,21 @@ HOME_CSS = """
 .stat .big{display:block;font-size:clamp(34px,4.5vw,48px);font-weight:800;letter-spacing:-.02em;line-height:1;background:linear-gradient(90deg,var(--leaf),var(--mint));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
 .stat b{display:block;margin-bottom:4px}@media (min-width:821px){.pain{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;align-content:start}.stats .pain .q{display:flex;flex-direction:column;justify-content:center}}.pain .q{display:block;font-size:17px;font-style:italic;color:var(--text);line-height:1.45;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}.pain b{color:var(--leaf);font-size:18px}.stat span{color:var(--sub);font-size:15px}
 .sechead{text-align:center;max-width:720px;margin:0 auto 48px}.sechead .lead{margin:0 auto}
+.wn{padding-top:8px}
+.wn-box{padding:36px;border:1px solid #2fd39f40;border-radius:20px;background:linear-gradient(135deg,#2fd39f14,#0c231cb3 60%)}
+.wn-t{display:grid;grid-template-columns:1.1fr 1fr;gap:16px 48px;align-items:end;margin-bottom:28px}
+.wn h2{font-size:clamp(26px,3.2vw,36px);line-height:1.15;letter-spacing:-.01em;margin:10px 0 12px;text-wrap:balance}.wn h2 span{color:var(--leaf)}
+.wn p{color:var(--sub);font-size:17px;margin:0 0 14px}
+.wn ul{list-style:none;padding:0;margin:0 0 16px}.wn li{display:flex;gap:10px;align-items:flex-start;color:var(--sub);padding:4px 0}.wn li svg{flex:none;margin-top:4px;color:var(--leaf)}
+.wn-links{display:flex;flex-wrap:wrap;gap:8px 24px;margin:0 0 14px}.wn-links a{font-weight:600;font-size:15px}
+.wn p.also{font-size:14px;margin:0}
+.wn figure{margin:0 0 18px}.wn figure:last-child{margin:0}
+.wn figcaption{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin:0 0 8px}
+.wn figure.after figcaption{color:var(--leaf)}
+.wn-i figure,.wn-i figure:last-child{max-width:560px;margin-left:auto}
+.wn figure div{overflow:hidden;border-radius:12px;border:1px solid var(--line);box-shadow:0 20px 50px #0008}
+.wn figure img{display:block;width:100%;height:auto}
+@media (max-width:820px){.wn-box{padding:22px}.wn-t{grid-template-columns:1fr;gap:0}}
 .fx{display:grid;grid-template-columns:1fr 1.25fr;gap:56px;align-items:center;padding:44px 0;border-top:1px solid #ffffff0d}
 .fx:first-of-type{border-top:0}
 .fx.flip .fx-t{order:2}
@@ -152,6 +167,10 @@ HOME_CSS = """
 .fx p{color:var(--sub);margin:0 0 16px;font-size:17px}
 .fx ul{list-style:none;padding:0;margin:0 0 18px}.fx li{display:flex;gap:10px;align-items:flex-start;color:var(--sub);padding:5px 0}.fx li svg{flex:none;margin-top:4px;color:var(--leaf)}
 .fx .more{font-weight:600;font-size:15px}
+.fx .fine{font-size:14px;margin:0 0 12px;opacity:.85}
+.grid.disk .card .more,.grid.disk .card a{display:block;margin-top:8px;font-weight:600;font-size:14px}
+.grid.uses a.card{text-decoration:none;color:inherit}
+.endcard .cta .btn{white-space:nowrap}
 .fx-i{position:relative}
 .fx-i img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:0 30px 70px #000a}
 .fx-i:before{content:"";position:absolute;inset:10%;background:radial-gradient(closest-side,#2fd39f40,transparent);filter:blur(36px);z-index:-1}
@@ -194,15 +213,25 @@ T = {
   lang="en", path="", other="vi/", title="Free App to Free Up Storage on Mac (Open Source) | Tidymint",
   desc="Free, open-source Mac cleaner with no tracking. See what fills your disk, clear caches, find duplicates, uninstall apps fully. Trash first, with Undo.",
   nav=[("#features","Features"),("#how","How it works"),("guides/","Guides"),("#faq","FAQ"),(GH,"GitHub")], navcta="Download",
-  eyebrow=("changelog/", 'New: version <span class="ver">{v}</span> is out'),
+  eyebrow=("#new", 'New in 0.6.0: Mintbar tidies your menu bar'),
   h1='Your Mac is full.<br><span>Let’s find out why.</span>',
   sub="A free, open-source Mac cleaner that tracks nothing. See exactly what fills your disk, free up gigabytes, and undo any clean: everything goes to the Trash first.",
   cta1="Download free", cta2="How to install", cta_how="See how it works",
   micro='macOS 14 or later · Apple silicon and Intel · Version <span class="ver">{v}</span>{dl}',
   dl_word='downloads', dl_sep=',',
   trust=[("privacy","Privacy protected","Works offline, no account, no tracking"),("free","Free cleaner","No account, no subscription"),("undo","Undo a wrong clean","Everything goes to the Trash, undo in one click"),("source","Open-source core","The cleaning code is public under the MIT licence<br><a href=\"safety/\">See the evidence →</a>"),("listed","Listed in",LISTED)],
+  # "New in" block under the hero. Update by hand at the next feature release (patch releases keep it).
+  new_id="new", new_tag="New in 0.6.0", new_h='Menu bar full of icons? <span>Mintbar tidies it up.</span>',
+  new_p="Pick a few apps and gather them behind one group icon. Click the group to fan the apps out, then click an app to open its own menu.",
+  new_li=["Two groups of up to 4 apps","One of 12 icons for each group","Off by default; macOS asks for permission only when you turn it on"],
+  new_links=[("mintbar-tidy-menu-bar-mac/","How Mintbar works"),("changelog/#v060","Everything new in 0.6.0")],
+  new_also="Also new: a mint leaf app icon, and ⌘1 to ⌘7 to switch pages.",
+  new_cap=("Before","After: gathered into two groups"),
+  new_cap3="Click a group: its apps open right below",
+  new_alt3="Clicking the Tools group opens its four apps right below the menu bar, with the pointer on Google Drive",
+  new_alt=("Mac menu bar crowded with app icons before Mintbar","The same menu bar with Mintbar on: the apps sit behind two group icons, AI and Tools"),
   pain_tag="Sound familiar?", pain_h="Three common worries, and how we solve them",
-  pains=[("“Cleaners want a subscription, and cracked copies carry malware.”","Free to clean","No account, no trial. Download it from GitHub, no crack needed."),("“What if it deletes something I need?”","You get it back, nothing lost","Everything goes to the Trash, nothing is erased. One click puts the whole last clean back where it was."),("“I need four apps just to see what fills my disk.”","One app, eleven tools","Disk map, uninstaller, large files and duplicates in one place, plus window tiling and a drop shelf for files.")],
+  pains=[("“Cleaners want a subscription, and cracked copies carry malware.”","Free to clean","No account, no trial. Download it from GitHub, no crack needed."),("“What if it deletes something I need?”","You get it back, nothing lost","Everything goes to the Trash, nothing is erased. One click puts the whole last clean back where it was."),("“I need four apps just to see what fills my disk.”","One app, twelve tools","Disk map, uninstaller, large files and duplicates in one place, plus window tiling, a drop shelf and a tidy menu bar.")],
   fx=[("smart","Clean Now","Free up space in one click","One scan finds caches, logs, old installers and the libraries of projects you left behind, sorted by size. Nothing moves until you press Clean.",["Grouped and explained in plain words","Safe items pre-selected, the rest left to you","Apple system caches are never touched"],None,"cleanup.jpg","Clean Now scan results grouped by type and size"),
       ("apps","Uninstaller","Uninstall apps, leftovers included","Dragging an app to the Trash leaves its caches and support files behind. Tidymint removes those too.",["Finds caches, preferences and support files","Anything holding a database is left to you","Everything always goes to the Trash first"],None,"apps.jpg","Tidymint uninstaller listing apps with their leftover files"),
       ("lens","Space Lens","See what is really eating your disk","A bubble map of your whole drive. Bigger bubble, bigger folder. Click to dig in.",["Plain notes for common folders","Shows System Data you cannot see in Finder","Great for “full, no idea why”"],("clear-system-data-mac/","What is System Data?"),"lens.jpg","Space Lens bubble map showing which folders fill a Mac disk"),
@@ -245,7 +274,7 @@ T = {
        ("How is it different from CleanMyMac?","Tidymint is free and open source and focuses on cleaning and disk space. It has no scanner of its own and relies on the protection built into macOS (XProtect, Gatekeeper); CleanMyMac bundles its own and charges a subscription."),
        ("Does it have a “free up RAM” button?","No. macOS manages memory on its own, and forcing it empty tends to make a Mac slower, not faster. If you turn it on, the menu bar icon simply tells you when more than 90% of memory is in use."),
        ("Which Macs are supported?","macOS 14 or later, on both Apple silicon and Intel."),
-       ("Is there a Windows or iPhone version?","A Windows version is in development, no release date yet. iPhone: no, iOS does not let apps clean other apps' data.")],
+       ("Is there a Windows or iPhone version?","No. Tidymint is made for macOS only. iPhone: no, iOS does not let apps clean other apps' data.")],
   inst_h="Install", inst_lead="macOS 14 or later, Apple silicon and Intel.",
   inst_note="Tidymint is not notarized by Apple yet, so macOS blocks the first launch, like any app without notarization. <a href=\"sponsor/\">Sponsoring the project</a> pays for the Apple Developer account: then the app just opens and updates arrive faster.",
   inst=[("Download",'Click <a href="%s">Download Tidymint</a>, open <b>Tidymint.zip</b> in Downloads and drag <b>Tidymint</b> to <b>Applications</b>.' % DL),
@@ -269,13 +298,22 @@ T = {
   lang="vi", path="vi/", other="../", title="Dọn dẹp MacBook miễn phí, thay CleanMyMac | Tidymint",
   desc="Dọn dẹp MacBook miễn phí: xoá bộ nhớ đệm Zalo, Chrome, CapCut, gỡ app sạch, tìm file trùng. Mã nguồn mở, tiếng Việt, mọi thứ luôn vào Thùng rác trước.",
   nav=[("#tinh-nang","Tính năng"),("#cach-dung","Cách dùng"),("huong-dan/","Hướng dẫn"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")], navcta="Tải về",
-  eyebrow=("lich-su-cap-nhat/", 'Mới: đã có bản <span class="ver">{v}</span>'),
+  eyebrow=("#moi", 'Mới ở bản 0.6.0: Mintbar gọn menu bar'),
   h1='MacBook đầy ổ?<br><span>Xem ngay thứ gì chiếm chỗ.</span>',
   sub="Zalo, Cốc Cốc, CapCut ngốn hàng GB? Tidymint dọn đúng phần rác, giữ nguyên tin nhắn và file công việc: miễn phí, mã nguồn mở, mọi thứ chỉ vào Thùng rác, có thể hoàn tác.",
   cta1="Tải miễn phí", cta2="Hướng dẫn cài", cta_how="Xem cách dùng",
   micro='macOS 14 trở lên · Chip Apple silicon và Intel · Bản <span class="ver">{v}</span>{dl}',
   dl_word='lượt tải', dl_sep='.',
   trust=[("languages","Tiếng Việt đầy đủ","App, web và hướng dẫn"),("free","Dọn dẹp miễn phí","Không tài khoản, không thuê bao"),("privacy","Bảo vệ quyền riêng tư","Không cần mạng, không tài khoản, không theo dõi"),("undo","Dọn nhầm vẫn lấy lại được","Mọi thứ chỉ vào Thùng rác, hoàn tác bằng một cú bấm"),("source","Lõi mã nguồn mở","Mã phần dọn dẹp công khai theo giấy phép MIT<br><a href=\"an-toan/\">Xem bằng chứng →</a>"),("listed","Có tên trong",LISTED)],
+  new_id="moi", new_tag="Mới trong bản 0.6.0", new_h='Menu bar chật kín icon? <span>Mintbar gom gọn lại.</span>',
+  new_p="Chọn vài app, gom vào sau một icon nhóm. Bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app là mở đúng menu của nó.",
+  new_li=["Hai nhóm, mỗi nhóm tối đa 4 app","Chọn một trong 12 icon cho mỗi nhóm","Mặc định tắt, chỉ khi bạn bật thì macOS mới hỏi quyền"],
+  new_links=[("mintbar-gon-thanh-menu-mac/","Cách dùng Mintbar"),("lich-su-cap-nhat/#v060","Xem mọi thay đổi của 0.6.0")],
+  new_also="Cũng mới: icon lá bạc hà cho app, chuyển trang bằng ⌘1 đến ⌘7.",
+  new_cap=("Trước","Sau: gom vào hai nhóm"),
+  new_cap3="Bấm icon nhóm: app mở ra ngay bên dưới",
+  new_alt3="Bấm nhóm Tools, bốn app mở ra ngay dưới menu bar, con trỏ đang chỉ vào Google Drive",
+  new_alt=("Menu bar Mac chật kín icon app trước khi dùng Mintbar","Cùng menu bar khi bật Mintbar: các app nằm sau hai icon nhóm AI và Tools"),
   pain_tag="Nghe quen không?", pain_h="Ba nỗi lo hay gặp và cách giải quyết",
   pains=[("“Zalo ăn hết ổ, mà xoá thì sợ mất tin nhắn, mất ảnh chứng từ.”","Dọn mà không mất tin nhắn","Chỉ bộ nhớ đệm được chọn sẵn. Tin nhắn, đăng nhập khoá lại; ảnh, file xếp theo tháng để bạn tự chọn."),("“App dọn máy toàn thu phí năm, mà tải bản crack thì sợ dính mã độc.”","Dọn dẹp miễn phí, khỏi crack","Không tài khoản, không dùng thử. Tải thẳng từ GitHub, mã phần dọn dẹp ai cũng xem được."),("“Lỡ xoá nhầm file quan trọng thì sao?”","Lấy lại được, không mất gì","Mọi thứ chỉ vào Thùng rác, không xoá vĩnh viễn. Một cú bấm trả cả lần dọn vừa rồi về chỗ cũ.")],
   fx=[("byapp","Dọn theo ứng dụng","Dọn Zalo, Cốc Cốc, CapCut mà không mất tin nhắn","App chat, trình duyệt, app dựng video tích tụ hàng GB. Tidymint biết từng app cất gì ở đâu, dọn riêng từng app một.",["Zalo, Cốc Cốc, CapCut, Chrome, Telegram, Slack… và mô hình AI chạy trên máy (Ollama, LM Studio)","Bộ nhớ đệm chọn sẵn, tin nhắn và đăng nhập app tuyệt đối không đọc hay đụng tới","Ảnh, file tin nhắn xếp theo tháng, bạn tự chọn bỏ hoặc giữ tháng nào"],("zalo-chiem-dung-luong-macbook/","Zalo chiếm dung lượng MacBook"),"byapp.jpg","Dọn theo ứng dụng: bộ nhớ đệm Zalo chọn sẵn, ảnh tin nhắn xếp theo tháng"),
@@ -284,12 +322,12 @@ T = {
       ("apps","Gỡ app","Gỡ app sạch, cả phần sót lại","Kéo app vào Thùng rác vẫn sót bộ nhớ đệm và file hỗ trợ. Tidymint gỡ luôn phần đó.",["Tìm bộ nhớ đệm, file cài đặt, file hỗ trợ","App có database bên trong thì để bạn quyết","Mọi thứ luôn vào Thùng rác trước"],("xoa-ung-dung-macbook/","Cách xoá app sạch hoàn toàn"),"apps.jpg","Gỡ app Zalo cùng dữ liệu và bộ nhớ đệm trong Library"),
       ("large","File lớn","Tìm file lớn bị bỏ quên","File xuất cũ, file ảnh đĩa, đồ tải về rồi quên. Xếp theo dung lượng hoặc theo lần mở cuối.",["Mọi file trên 100 MB trong một danh sách","Không chọn sẵn, bạn tự chọn file nào bỏ","Hiện đường dẫn đầy đủ, biết rõ nguồn gốc từng file"],None,"large.jpg","Danh sách file lớn trên MacBook xếp theo dung lượng, chưa chọn file nào"),
       ("dupes","File trùng","Xoá file trùng mà không lo hỏng dự án","So theo nội dung, luôn giữ lại một bản. Bản nào script trong thư mục dự án còn dùng sẽ được đánh dấu và bỏ qua.",["So nội dung, không so tên","Luôn giữ lại một bản","File dự án còn dùng được bảo vệ"],None,"dupes.jpg","Tìm file trùng trên MacBook, đánh dấu bản giữ lại")],
-  minis=[("undo","Hoàn tác","Mỗi lần dọn đều được ghi lại. Đổi ý thì một cú bấm trả lần dọn gần nhất về chỗ cũ."),("startup","Khởi động cùng máy","Biết rõ từng ứng dụng đang chạy ngầm, đánh dấu tên hay vị trí bất thường."),("leaf","Thanh menu","Chiếc lá trên thanh menu đầy dần theo ổ, kèm số GB còn trống. Báo khi ổ hay RAM sắp đầy. Để Tidymint chạy nền không lo ngốn dung lượng.")],
+  minis=[("undo","Hoàn tác","Mỗi lần dọn đều được ghi lại. Đổi ý thì một cú bấm trả lần dọn gần nhất về chỗ cũ."),("startup","Khởi động cùng máy","Biết rõ từng ứng dụng đang chạy ngầm, đánh dấu tên hay vị trí bất thường."),("leaf","Menu bar","Chiếc lá trên menu bar đầy dần theo ổ, kèm số GB còn trống. Báo khi ổ hay RAM sắp đầy. Để Tidymint chạy nền không lo ngốn dung lượng.")],
   tools=[("tiling","Mintangle","Xếp mọi cửa sổ vào đúng chỗ chỉ với một phím bấm","Đặt cửa sổ vào nửa màn hình hoặc một góc bằng một phím tắt, hoặc khi bạn kéo cửa sổ vào mép màn hình.",["Có phím cho bốn góc, thứ phím tắt của macOS không có","Bộ phím giống Rectangle","Mặc định tắt, chỉ khi bạn bật thì macOS mới hỏi quyền Trợ năng"],("mintangle-xep-cua-so-mac/","Cách dùng Mintangle"),"mintangle.jpg","Trang Mintangle liệt kê phím tắt xếp cửa sổ: nửa màn hình và góc"),
          ("shelf","Mintdrop","Gom file từ nhiều nơi về một kệ","Một chiếc kệ nhỏ nổi trên màn hình. Thả tối đa 5 file từ nhiều thư mục vào, rồi kéo từng file ra đúng chỗ cần.",["Lắc chuột khi kéo file, hoặc nhấn ⌃⌥S","Kéo file ra đúng chỗ cần, có Hoàn tác","Kệ chỉ nhớ đường dẫn, không chép file nào"],("mintdrop-ke-tha-file-mac/","Cách dùng Mintdrop"),"mintdrop.jpg","Kệ Mintdrop nổi trên Tidymint, đang giữ bốn file"),
-         ("menubar","Mintbar","Thanh menu gọn lại, icon nào cần vẫn chỉ một cú bấm","Gom icon trên thanh menu vào sau một icon nhóm do bạn chọn. Bấm icon nhóm để xoè các app ra, rồi bấm một app để mở menu của nó.",["Hai nhóm, mỗi nhóm tối đa 4 app","Chọn một trong 12 icon cho mỗi nhóm","Mặc định tắt, chỉ khi bạn bật thì macOS mới hỏi quyền"],("mintbar-gon-thanh-menu-mac/","Cách dùng Mintbar"),"mintbar.jpg","Trang Mintbar liệt kê các app trên thanh menu trong hai nhóm AI và Kết nối")],
+         ("menubar","Mintbar","Menu bar gọn lại, icon nào cần vẫn chỉ một cú bấm","Gom icon trên menu bar vào sau một icon nhóm do bạn chọn. Bấm icon nhóm, các app mở ra ngay bên dưới; rồi bấm một app để mở menu của nó.",["Hai nhóm, mỗi nhóm tối đa 4 app","Chọn một trong 12 icon cho mỗi nhóm","Mặc định tắt, chỉ khi bạn bật thì macOS mới hỏi quyền"],("mintbar-gon-thanh-menu-mac/","Cách dùng Mintbar"),"mintbar.jpg","Trang Mintbar liệt kê các app trên menu bar trong hai nhóm AI và Kết nối")],
   more_h="Ngoài việc dọn: ba công cụ cho việc hằng ngày, tắt sẵn, bạn bật mới chạy",
-  more=[("tiling","Mintangle","Xếp cửa sổ bằng phím tắt, hoặc kéo cửa sổ vào cạnh hay góc màn hình.","mintangle-xep-cua-so-mac/","Xem cách dùng"),("shelf","Mintdrop","Kệ thả file: lắc chuột khi đang kéo để gom file từ nhiều nơi, rồi kéo từng file ra chỗ cần.","mintdrop-ke-tha-file-mac/","Xem cách dùng"),("menubar","Mintbar","Thanh menu gọn: gom icon vào sau một icon nhóm, bấm để xoè các app ra.","mintbar-gon-thanh-menu-mac/","Xem cách dùng")],
+  more=[("tiling","Mintangle","Xếp cửa sổ bằng phím tắt, hoặc kéo cửa sổ vào cạnh hay góc màn hình.","mintangle-xep-cua-so-mac/","Xem cách dùng"),("shelf","Mintdrop","Kệ thả file: lắc chuột khi đang kéo để gom file từ nhiều nơi, rồi kéo từng file ra chỗ cần.","mintdrop-ke-tha-file-mac/","Xem cách dùng"),("menubar","Mintbar","Menu bar gọn: gom icon vào sau một icon nhóm, bấm để xoè các app ra.","mintbar-gon-thanh-menu-mac/","Xem cách dùng")],
   band_h="Mười hai công cụ. Một app nhỏ, miễn phí.", band_p="Không tài khoản, không thuê bao, không theo dõi. Tải về, quét thử, xem giải phóng được bao nhiêu.",
   open_tag="Làm công khai", open_h="Không giấu gì, không phải đăng ký", open_lead="Tidymint là một dự án nhỏ, phần dọn dẹp là mã nguồn mở. Bạn đọc được phần code đó, theo dõi từng bản phát hành và báo lỗi công khai.",
   open=[("source",GH,"Mã nguồn","Đọc mã phần dọn dẹp trên GitHub."),("changelog","lich-su-cap-nhat/","Lịch sử cập nhật","Mỗi bản thay đổi những gì."),("privacy",GH+"/blob/main/PRIVACY.md","Quyền riêng tư","Bảo vệ quyền riêng tư: không cần mạng, không tài khoản, không theo dõi."),("bug",GH+"/issues","Báo lỗi","Lỗi được báo công khai và có người trả lời.")],
@@ -319,9 +357,9 @@ T = {
        ("App có gửi dữ liệu của tôi đi không?","Không gửi tệp hay dữ liệu cá nhân nào. Kết nối tự động duy nhất là kiểm tra bản mới mỗi ngày một lần: hỏi update.tidymint.app số phiên bản, chỉ được đếm theo phiên bản app và macOS, không lưu IP hay mã máy. Bạn tắt được trong Cài đặt. Những gì khác chỉ rời máy khi bạn tự gửi, như thư góp ý."),
        ("Kiểm tra file trùng bảo vệ dự án thế nào?","Khai thư mục dự án một lần ở Cài đặt. Trước khi xoá file trùng, Tidymint tìm trong các thư mục đó: file nào còn được script hay skill gọi tên sẽ gắn nhãn đỏ và bỏ tick. Chưa khai thư mục thì app nhắc trước."),
        ("Khác gì CleanMyMac?","Tidymint miễn phí, mã nguồn mở, tập trung vào dọn dẹp và dung lượng ổ. App không có bộ quét riêng mà dựa vào lớp bảo vệ sẵn của macOS (XProtect, Gatekeeper); CleanMyMac có bộ quét riêng và thu phí thuê bao."),
-       ("Có nút “giải phóng RAM” không?","Không. macOS tự quản lý bộ nhớ, ép xả RAM thường làm máy chậm hơn chứ không nhanh hơn. Nếu bật, icon trên thanh menu chỉ báo khi RAM dùng trên 90%."),
+       ("Có nút “giải phóng RAM” không?","Không. macOS tự quản lý bộ nhớ, ép xả RAM thường làm máy chậm hơn chứ không nhanh hơn. Nếu bật, icon trên menu bar chỉ báo khi RAM dùng trên 90%."),
        ("Chạy trên máy nào?","macOS 14 trở lên, cả máy chip Apple silicon lẫn chip Intel."),
-       ("Có bản Windows hay iPhone không?","Bản Windows đang làm, chưa có ngày ra. iPhone: không, iOS không cho app dọn dữ liệu app khác.")],
+       ("Có bản Windows hay iPhone không?","Không. Tidymint chỉ làm cho macOS. iPhone cũng không: iOS không cho app dọn dữ liệu của app khác.")],
   inst_h="Cài đặt", inst_lead="Cần macOS 14 trở lên, chạy được cả máy chip Apple silicon và chip Intel.",
   inst_note="Tidymint chưa được Apple công chứng nên lần mở đầu macOS sẽ chặn, như mọi app chưa công chứng. <a href=\"ung-ho/\">Ủng hộ dự án</a> giúp mua tài khoản Apple Developer: khi đó app mở là chạy, cập nhật tới nhanh hơn.",
   inst=[("Tải về",'Bấm <a href="%s">Tải Tidymint</a>, mở <b>Tidymint.zip</b> trong Downloads, kéo <b>Tidymint</b> vào thư mục <b>Ứng dụng</b> (Applications).' % DL),
@@ -342,6 +380,99 @@ T = {
   src="website-vi", img="../", shot="", aria_lang="Ngôn ngữ", top="Lên đầu trang",
   ck_text="Website dùng cookie Google Analytics để đếm lượt truy cập. Bản thân app Tidymint không theo dõi gì.", ck_yes="Đồng ý", ck_no="Từ chối", ck_link="Cài đặt cookie", ck_more="Quyền riêng tư"),
 }
+# Home page copy rewritten per context/27 (brand voice v2) and context/42 (website writing), approved on canvas 15/11/2026.
+# Mint = tidy in four areas: disk, menu bar, windows, drag and drop.
+T["vi"].update(dict(
+  nav=[("#tinh-nang","Tính năng"),("huong-dan/","Hướng dẫn"),("#hoi-dap","Hỏi đáp"),(GH,"GitHub")],
+  desc="Dọn dẹp MacBook miễn phí: xoá bộ nhớ đệm Zalo, Chrome, CapCut, gỡ app sạch, tìm file trùng. Gom icon menu bar, xếp cửa sổ. Lõi mã nguồn mở, tiếng Việt.",
+  eyebrow=("#moi", "Mới ở 0.6.0: Mintbar gom icon menu bar"),
+  h1='Ổ đĩa thoáng. Gọn menu.<br><span>Cửa sổ đúng chỗ.</span>',
+  sub="Tidymint dọn dung lượng, gom icon menu bar, xếp cửa sổ và giữ file đang làm trong tầm tay. Để MacBook luôn như mới.",
+  cta1="Tải Tidymint", cta_how="Xem cách dùng",
+  reassure="Dọn dẹp miễn phí · Không tài khoản · Có tiếng Việt",
+  trust=[("free","Dọn dẹp miễn phí","Không tài khoản, không thuê bao."),("privacy","Bảo vệ quyền riêng tư","Không cần mạng, không theo dõi."),("undo","Dọn nhầm vẫn lấy lại được","Mọi thứ chỉ vào Thùng rác, hoàn tác bằng một cú bấm."),("source","Lõi mã nguồn mở","Mã phần dọn dẹp công khai theo giấy phép MIT.<br><a href=\"an-toan/\">Xem bằng chứng →</a>"),("listed","Có tên trong",LISTED)],
+  new_h="Gom icon, gọn menu",
+  new_p="Mintbar gom các icon trên menu bar vào nhóm. Cần app nào, bấm là thấy.",
+  new_li=["<b>Hết lo tai thỏ.</b> Gom bớt icon, menu bar lại đủ chỗ.","<b>Bấm là mở.</b> Bấm icon nhóm, các app mở ra ngay dưới menu bar.","<b>Nhóm theo việc.</b> Mỗi nhóm một tên, tìm app là thấy."],
+  new_links=[("mintbar-gon-thanh-menu-mac/","Cách dùng Mintbar")],
+  new_also="2 nhóm, mỗi nhóm 4 app. Bật thì macOS mới hỏi quyền.",
+  new_alt=("Menu bar trên Mac chật kín icon app trước khi dùng Mintbar","Cùng menu bar khi bật Mintbar: các app nằm sau hai icon nhóm AI và Tools"),
+  area_tag="Tính năng", area_h="Gọn từ ổ đĩa tới màn hình", area_lead="Bừa bộn chỗ nào? Gọn gàng chỗ đó.",
+  areas=[("lens","Gọn ổ đĩa","Sáu công cụ dọn, có Hoàn tác.","#don-o-dia"),("menubar","Gọn menu","Mintbar gom icon vào nhóm.","#mintbar"),("tiling","Gọn cửa sổ","Mintangle xếp cửa sổ bằng một phím.","#mintangle"),("shelf","Gọn kéo thả","Mintdrop giữ file tạm trên một chiếc kệ.","#mintdrop")],
+  disk_id="don-o-dia", disk_tag="Gọn ổ đĩa", disk_h="Lấy lại dung lượng", disk_lead="Không gì bị dọn cho tới khi bạn bấm Dọn.",
+  disk=[("byapp","Dọn Zalo mà không mất tin nhắn","Tin nhắn và đăng nhập được khoá, không đụng tới.",("zalo-chiem-dung-luong-macbook/","Zalo chiếm dung lượng MacBook")),
+        ("smart","Quét một lần, thấy hết","Phần an toàn chọn sẵn, còn lại bạn quyết.",None),
+        ("lens","Cả ổ đĩa, một hình","Bong bóng càng to, thư mục càng nặng.",("mac-tu-day-o/","Vì sao Mac tự đầy ổ?")),
+        ("apps","Gỡ app, không sót gì","Gỡ luôn bộ nhớ đệm và file đi kèm.",("xoa-ung-dung-macbook/","Cách xoá app sạch hoàn toàn")),
+        ("large","Tìm thứ đang chiếm ổ","Mọi file trên 100 MB trong một danh sách.",None),
+        ("dupes","Xoá file trùng mà không lo hỏng dự án","Luôn giữ một bản, file dự án được bảo vệ.",None)],
+  minis=[("undo","Hoàn tác","Một cú bấm trả lần dọn về chỗ cũ."),("startup","Khởi động cùng máy","Kiểm tra app nào đang chạy ngầm."),("leaf","Theo dõi ổ đĩa","Icon menu bar cập nhật thực tế tình trạng ổ.")],
+  tools=[("menubar","Gọn menu · Mintbar","Tối ưu menu bar","Mintbar gom icon theo nhóm, một bấm để xem thêm.",["Hết lo tai thỏ","Bấm là mở","Nhóm theo việc"],("mintbar-gon-thanh-menu-mac/","Cách dùng Mintbar"),"mintbar.jpg","Trang Mintbar liệt kê các app trên menu bar trong hai nhóm AI và Kết nối","2 nhóm, mỗi nhóm 4 app. Bật thì macOS mới hỏi quyền.","mintbar"),
+         ("tiling","Gọn cửa sổ · Mintangle","Hết kéo tay chỉnh cỡ","Mintangle xếp cửa sổ bằng một phím tắt hoặc một cú kéo.",["Một phím, nửa màn hình","Kéo vào mép là xếp","4 góc, 4 cửa sổ"],("mintangle-xep-cua-so-mac/","Cách dùng Mintangle"),"mintangle.jpg","Trang Mintangle liệt kê phím tắt xếp cửa sổ: nửa màn hình và góc","11 thao tác cơ bản. Bật thì macOS mới hỏi quyền Trợ năng.","mintangle"),
+         ("shelf","Gọn kéo thả · Mintdrop","Gom một nơi. Thả đúng chỗ.","Kệ nhỏ nổi trên màn hình, thả vào rồi kéo ra nơi cần.",["Lắc là có kệ","Xem nhanh trong kệ","Kéo nhầm? Có thể hoàn tác."],("mintdrop-ke-tha-file-mac/","Cách dùng Mintdrop"),"mintdrop.jpg","Kệ Mintdrop nổi trên Tidymint, đang giữ bốn file","Kệ chỉ nhớ đường dẫn, không chép file.","mintdrop")],
+  pain_h="Ba nỗi lo và cách giải quyết",
+  vs_good=["Dọn dẹp miễn phí, không tài khoản, không thuê bao","Lõi dọn dẹp mã nguồn mở (MIT): ai cũng đọc được","Không hù doạ, không có nút “giải phóng RAM” cho có","Chỉ chuyển vào Thùng rác, bạn tự đổ"],
+  use_h="Ai cần máy gọn nhất",
+  uses=[("office","Dân văn phòng","Zalo, Outlook, Slack đầy ảnh và file đính kèm."),("video","Làm video, ảnh","CapCut, file xuất, bản nháp render, ảnh trùng."),("dev","Lập trình viên","node_modules, Homebrew, bản build cũ, model AI."),("menubar","Làm cả ngày trên Mac","Menu bar chật icon, cửa sổ chồng nhau, file nằm rải rác.")],
+  open=[("source",GH,"Mã nguồn","Đọc mã phần dọn dẹp trên GitHub."),("changelog","lich-su-cap-nhat/","Lịch sử cập nhật","Mỗi bản thay đổi những gì."),("privacy",GH+"/blob/main/PRIVACY.md","Quyền riêng tư","Không cần mạng, không tài khoản, không theo dõi."),("bug",GH+"/issues","Báo lỗi","Lỗi được báo công khai và có người trả lời.")],
+  faq=[("Tidymint có miễn phí không?","Dọn dẹp miễn phí, không tài khoản, không thuê bao. Lõi dọn dẹp là mã nguồn mở theo giấy phép MIT."),
+       ("Có an toàn không?","Tidymint chỉ chuyển vào Thùng rác, không xoá vĩnh viễn. Dọn xong vẫn bấm Hoàn tác được."),
+       ("Dọn Zalo có mất tin nhắn không?","Không. Tin nhắn và đăng nhập bị khoá, Tidymint không đọc hay đụng tới."),
+       ("Sao lần đầu macOS lại chặn?","Tidymint chưa được Apple công chứng, nên lần đầu cần bấm “Vẫn mở” trong Quyền riêng tư & Bảo mật."),
+       T["vi"]["faq"][3], T["vi"]["faq"][5], T["vi"]["faq"][6], T["vi"]["faq"][7],
+       ("Có nút “giải phóng RAM” không?","Không. macOS tự quản lý bộ nhớ, ép xả RAM thường làm máy chậm hơn chứ không nhanh hơn. Nếu bật, icon trên menu bar chỉ báo khi RAM dùng trên 90%."),
+       T["vi"]["faq"][9],
+       ("Có bản Windows hay iPhone không?","Không. Tidymint chỉ làm cho macOS.")],
+  inst_h="Cài đặt", inst_title="Bốn bước, một phút.", inst_sum="Tải về, kéo vào Ứng dụng, mở lần đầu và bấm “Vẫn mở”. Cần macOS 14 trở lên.", inst_link=("cai-dat/","Cài đặt từng bước, có ảnh"),
+  end_p="Dọn dẹp miễn phí, lõi mã nguồn mở, mọi thứ luôn vào Thùng rác trước.", end_btn2="Xem hướng dẫn", end_btn2_href="huong-dan/",
+  f_blurb="App giữ MacBook gọn gàng: dọn dung lượng, gọn menu bar, xếp cửa sổ, kéo thả gọn. Trang chính thức duy nhất: tidymint.app, tải chỉ từ GitHub.",
+  f_cols=[("Sản phẩm",[("#tinh-nang","Tính năng"),("#cai-dat","Cài đặt"),("lich-su-cap-nhat/","Lịch sử cập nhật"),(GH+"/releases","Các phiên bản"),("ung-ho/","Ủng hộ dự án")])] + T["vi"]["f_cols"][1:],
+))
+T["en"].update(dict(
+  nav=[("#features","Features"),("guides/","Guides"),("#faq","FAQ"),(GH,"GitHub")],
+  eyebrow=("#new", "New in 0.6.0: Mintbar groups your menu bar icons"),
+  h1='More space. A calmer menu bar.<br><span>Windows in place.</span>',
+  sub="Tidymint frees up disk space, groups your menu bar icons, snaps windows and keeps the files you’re working on close. One small app to keep your Mac in mint condition.",
+  cta1="Download Tidymint", cta_how="See how it works",
+  reassure="Free to clean · No account · No tracking",
+  trust=[("free","Free to clean","No account, no subscription."),("privacy","Privacy protected","Works offline, no tracking."),("undo","Undo a wrong clean","Everything goes to the Trash, undo in one click."),("source","Open-source core","The cleaning code is public under the MIT licence.<br><a href=\"safety/\">See the proof →</a>"),("listed","Listed in",LISTED)],
+  new_h="Fewer icons. Same menus.",
+  new_p="Mintbar gathers your menu bar icons into groups. Need an app? One click and it’s there.",
+  new_li=["<b>Notch? No problem.</b> Group a few, and everything fits.","<b>Click to open.</b> Click a group, its apps open right below.","<b>Grouped by task.</b> Name each group. Find any app at a glance."],
+  new_links=[("mintbar-tidy-menu-bar-mac/","How Mintbar works")],
+  new_also="2 groups, 4 apps each. macOS asks for permission only when you turn it on.",
+  area_tag="Features", area_h="Tidy from disk to desktop", area_lead="Messy somewhere? Tidy it up.",
+  areas=[("lens","A tidy disk","Six cleaning tools, with Undo.","#disk"),("menubar","A tidy menu bar","Mintbar groups your icons.","#mintbar"),("tiling","Tidy windows","Mintangle snaps windows with one key.","#mintangle"),("shelf","Tidy drag and drop","Mintdrop holds files on a shelf.","#mintdrop")],
+  disk_id="disk", disk_tag="A tidy disk", disk_h="Get your space back", disk_lead="Nothing goes until you click Clean.",
+  disk=[("byapp","Clean apps, keep your chats","Caches go. Chats and logins stay locked.",None),
+        ("smart","One scan, all of it","Safe items pre-selected, you decide the rest.",None),
+        ("lens","Your whole disk, one view","Bigger bubble, heavier folder.",("mac-storage-keeps-filling-up/","Why your Mac fills up")),
+        ("apps","Remove apps, leftovers too","Caches and support files go with it.",None),
+        ("large","Find what fills your disk","Every file over 100 MB in one list.",None),
+        ("dupes","Remove duplicates, keep your projects safe","One copy always kept, project files protected.",None)],
+  minis=[("undo","Undo","One click puts the last clean back."),("startup","Login items","Check what runs in the background."),("leaf","Disk at a glance","The menu bar icon shows live disk status.")],
+  tools=[("menubar","A tidy menu bar · Mintbar","A better menu bar","Mintbar groups your icons. One click shows the rest.",["Notch? No problem","Click to open","Grouped by task"],("mintbar-tidy-menu-bar-mac/","How Mintbar works"),"mintbar.jpg","Mintbar page listing menu bar apps in two groups, AI and Connection","2 groups, 4 apps each. macOS asks for permission only when you turn it on.","mintbar"),
+         ("tiling","Tidy windows · Mintangle","No more dragging to resize","Mintangle snaps windows with one shortcut or one drag.",["One key, half the screen","Drag to the edge, done","4 corners, 4 windows"],("mintangle-window-tiling-mac/","How Mintangle works"),"mintangle.jpg","Mintangle page listing window shortcuts for halves and corners","11 basic actions. macOS asks for Accessibility only when you turn it on.","mintangle"),
+         ("shelf","Tidy drag and drop · Mintdrop","Gather in one place. Drop where it goes.","A small floating shelf. Drop files in, drag them out.",["Shake for a shelf","Quick Look on the shelf","Dropped it wrong? Undo."],("mintdrop-drop-shelf-mac/","How Mintdrop works"),"mintdrop.jpg","Mintdrop shelf floating over Tidymint with four files on it","The shelf remembers paths, it never copies files.","mintdrop")],
+  pain_h="Three worries, and how we solve them",
+  pains=[("“My chat app fills the disk, but I’m scared to lose messages.”","Clean without losing chats","Only caches are pre-selected. Chats and logins stay locked; photos and files are sorted by month so you choose."),
+         ("“Cleaners all want a yearly fee, and cracked copies bring malware.”","Free to clean, no crack needed","No account, no trial. Download it from GitHub; anyone can read the cleaning code."),
+         ("“What if I delete something important?”","Get it back, lose nothing","Everything goes to the Trash, nothing is deleted for good. One click puts the last clean back.")],
+  vs_h="Clean freely, without the fear of deleting the wrong thing",
+  vs_good=["Free to clean, no account, no subscription","Open-source cleaning core (MIT): anyone can read it","No scare tactics, no fake “free up RAM” button","Only moves things to the Trash, you empty it"],
+  use_h="Who needs a tidy Mac most",
+  uses=[("office","Office work","Chat and mail apps full of photos and attachments."),("video","Video and photo","Exports, render drafts, duplicate photos."),("dev","Developers","node_modules, Homebrew, old builds, AI models."),("menubar","All day on a Mac","A crowded menu bar, stacked windows, files everywhere.")],
+  faq=[("Is Tidymint free?","Cleaning is free, with no account and no subscription. The cleaning core is open source under the MIT licence."),
+       ("Is it safe?","Tidymint only moves things to the Trash, never deletes for good. You can Undo after cleaning."),
+       ("Why does macOS block it the first time?","Tidymint isn’t notarized by Apple yet, so the first time you click “Open Anyway” in Privacy & Security."),
+       T["en"]["faq"][2], T["en"]["faq"][4], T["en"]["faq"][5], T["en"]["faq"][6], T["en"]["faq"][7], T["en"]["faq"][8],
+       ("Is there a Windows or iPhone version?","No. Tidymint is made for macOS only.")],
+  inst_h="Install", inst_title="Four steps, one minute.", inst_sum="Download, drag to Applications, open it once and click “Open Anyway”. Needs macOS 14 or later.", inst_link=("install/","Step-by-step install, with screenshots"),
+  end_p="Free to clean, open-source core, and everything goes to the Trash first.", end_btn2="Read the guides", end_btn2_href="guides/",
+  f_blurb="Keeps your Mac tidy: disk space, menu bar, windows, drag and drop. The only official site is tidymint.app; downloads come only from GitHub.",
+  f_cols=[("Product",[("#features","Features"),("#install","Install"),("changelog/","Changelog"),(GH+"/releases","Releases"),("sponsor/","Sponsor")])] + T["en"]["f_cols"][1:],
+))
+
 IDS = {"en": dict(f="features", h="how", q="faq", i="install", s="signup"),
        "vi": dict(f="tinh-nang", h="cach-dung", q="hoi-dap", i="cai-dat", s="dang-ky")}
 
@@ -381,8 +512,13 @@ def page(k):
                  % (" flip" if n % 2 else "", icon(ic), tg, h3, p_, "".join("<li>%s<span>%s</span></li>" % (ok, b) for b in bl),
                     ('<a class="more" href="%s">%s <span class="arr r">→</span></a>' % more) if more else "", shot, im, alt, SHOT_H.get(im, 1079))
                  for n, (ic, tg, h3, p_, bl, more, im, alt) in enumerate(rows, off))
-    fx = fxrow(t["fx"])
-    tools = fxrow(t["tools"], len(t["fx"]))
+    toolrow = lambda rows: "".join('<div class="fx%s" id="%s"><div class="fx-t"><span class="ico">%s</span><span class="tag">%s</span><h3>%s</h3><p>%s</p><ul>%s</ul><p class="fine">%s</p>%s</div><div class="fx-i"><img src="%s%s" alt="%s" loading="lazy" width="1600" height="%d"></div></div>'
+                 % (" flip" if n % 2 else "", aid, icon(ic), tg, h3, p_, "".join("<li>%s<span>%s</span></li>" % (ok, b) for b in bl), fine,
+                    ('<a class="more" href="%s">%s <span class="arr r">→</span></a>' % more) if more else "", shot, im, alt, SHOT_H.get(im, 1079))
+                 for n, (ic, tg, h3, p_, bl, more, im, alt, fine, aid) in enumerate(rows))
+    tools = toolrow(t["tools"])
+    areas = "".join('<a class="card" href="%s"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span>%s</span></a>' % (h, icon(a), b, c) for a, b, c, h in t["areas"])
+    disk = "".join('<div class="card"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span>%s</span>%s</div>' % (icon(a), b, c, ('<a class="more" href="%s">%s →</a>' % l) if l else "") for a, b, c, l in t["disk"])
     more = "".join('<div><span class="ico">%s</span><p><b>%s</b><span>%s <a href="%s">%s →</a></span></p></div>' % (icon(a), b, c, d, e) for a, b, c, d, e in t["more"])
     minis = "".join('<div><span class="ico">%s</span><p><b>%s</b><span>%s</span></p></div>' % (icon(a), b, c) for a, b, c in t["minis"])
     opn = "".join('<a class="card" href="%s"><div class="hd"><span class="ico">%s</span><b>%s</b></div><span class="small">%s</span></a>' % (h, icon(a), b, c) for a, h, b, c in t["open"])
@@ -392,6 +528,8 @@ def page(k):
     arr = '<span class="arr" aria-hidden="true">%s</span>' % icon("arrow", 20)
     how = arr.join('<div class="card"><div class="hd"><span class="n"></span><b>%s</b></div><span>%s</span></div>' % h for h in t["how"])
     mq = marquee(t)
+    wn_li = "".join("<li>%s<span>%s</span></li>" % (ok, b) for b in t["new_li"])
+    wn_links = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % l for l in t["new_links"])
     faq = "".join('<details><summary>%s</summary><p>%s</p></details>' % (html.escape(q), html.escape(a)) for q, a in t["faq"])
     inst = "".join('<li><span class="n">%d</span><h3>%s</h3><p>%s</p></li>' % (k+1, a, b.replace("{img}", img)) for k, (a, b) in enumerate(t["inst"]))
     fcols = "".join('<div><h3>%s</h3>%s</div>' % (h, "".join('<a href="%s">%s</a>' % l for l in links)) for h, links in t["f_cols"])
@@ -437,32 +575,42 @@ gtag('js',new Date());gtag('config','{GA_ID}');
   <a class="eyebrow" href="{t["eyebrow"][0]}"><i></i>{V(t["eyebrow"][1])} <span class="arr r">→</span></a>
   <h1>{t["h1"]}</h1>
   <p>{t["sub"]}</p>
-  <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["h"]}">{t["cta_how"]}</a></div>
+  <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["f"]}">{t["cta_how"]}</a></div>
+  <div class="micro">{t["reassure"]}</div>
   <div class="micro">{V(t["micro"])}</div>
   <div class="trust n{len(t["trust"])}">{trust}</div>
   <div class="shot"><img src="{shot}smart.jpg" alt="{t["shot_alt"]}" width="1600" height="1079"></div>
 </header>
 
-<section>
-  <div class="sechead"><span class="tag">{t["pain_tag"]}</span><h2>{t["pain_h"]}</h2></div>
-  <div class="stats">{pains}</div>
+<section id="{t["new_id"]}" class="wn">
+  <div class="wn-box">
+    <div class="wn-t"><div><span class="tag">{t["new_tag"]}</span><h2>{t["new_h"]}</h2><p>{t["new_p"]}</p></div><div><ul>{wn_li}</ul><div class="wn-links">{wn_links}</div><p class="also">{t["new_also"]}</p></div></div>
+    <div class="wn-i">
+      <figure><figcaption>{t["new_cap"][0]}</figcaption><div><img src="{img}mintbar-before.jpg" alt="{t["new_alt"][0]}" width="900" height="60" loading="lazy"></div></figure>
+      <figure class="after"><figcaption>{t["new_cap"][1]}</figcaption><div><img src="{img}mintbar-after.jpg" alt="{t["new_alt"][1]}" width="900" height="60" loading="lazy"></div></figure>
+      <figure class="after fan"><figcaption>{t["new_cap3"]}</figcaption><div><img src="{img}mintbar-fan.jpg" alt="{t["new_alt3"]}" width="900" height="300" loading="lazy"></div></figure>
+    </div>
+  </div>
 </section>
 
 <section id="{i["f"]}" style="padding-top:24px">
-  <div class="sechead"><span class="tag">{t["feat_tag"]}</span><h2>{t["feat_h"]}</h2><p class="lead">{t["feat_lead"]}</p></div>
-  {fx}
+  <div class="sechead"><span class="tag">{t["area_tag"]}</span><h2>{t["area_h"]}</h2><p class="lead">{t["area_lead"]}</p></div>
+  <div class="grid uses">{areas}</div>
+</section>
+
+<section id="{t["disk_id"]}">
+  <div class="sechead"><span class="tag">{t["disk_tag"]}</span><h2>{t["disk_h"]}</h2><p class="lead">{t["disk_lead"]}</p></div>
+  <div class="grid disk">{disk}</div>
   <div class="strip">{minis}</div>
-  <p class="striph">{t["more_h"]}</p>
-  {tools}
 </section>
 
 <section style="padding-top:24px">
-  <div class="band"><img src="{img}icon.png" alt="" width="72" height="72"><h2>{t["band_h"]}</h2><p>{t["band_p"]}</p><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a></div>
+  {tools}
 </section>
 
-<section id="{i["h"]}">
-  <div class="sechead"><span class="tag">{t["how_tag"]}</span><h2>{t["how_h"]}</h2></div>
-  <div class="how">{how}</div>
+<section>
+  <div class="sechead"><span class="tag">{t["pain_tag"]}</span><h2>{t["pain_h"]}</h2></div>
+  <div class="stats">{pains}</div>
 </section>
 
 <section class="mqs">{mq}</section>
@@ -486,32 +634,14 @@ gtag('js',new Date());gtag('config','{GA_ID}');
   <div class="open">{opn}</div>
 </section>
 
-<section style="padding-top:24px">
-  <div class="def">
-    <div><span class="tag">{t["def_tag"]}</span><h2>{t["def_h"]}</h2><p>{t["def_p"]}</p><ul>{"".join("<li>%s</li>" % x for x in t["def_li"])}</ul><p>{t["def_p2"]}</p></div>
-    <img src="{shot}lens.jpg" alt="{t["lens_alt"]}" loading="lazy" width="1600" height="1079" style="width:100%;height:auto;border-radius:12px;border:1px solid var(--line)">
-  </div>
-</section>
-
 <section id="{i["q"]}">
   <div class="sechead" style="margin-bottom:24px"><span class="tag">{t["faq_tag"]}</span><h2>{t["faq_h"]}</h2></div>
   <div style="margin-top:20px">{faq}</div>
 </section>
 
 <section id="{i["i"]}">
-  <div class="ins">
-    <div>
-      <h2>{t["inst_h"]}</h2>
-      <p class="lead">{t["inst_lead"]}</p>
-      <div class="note">{t["inst_note"]}</div>
-      <p class="small">{t["inst_small"]}</p>
-    </div>
-    <ol class="tl">{inst}</ol>
-  </div>
-</section>
-
-<section style="padding-top:0">
-  <div class="specs">{specs}</div>
+  <div class="sechead"><span class="tag">{t["inst_h"]}</span><h2>{t["inst_title"]}</h2><p class="lead">{t["inst_sum"]}</p></div>
+  <p style="text-align:center"><a class="more" href="{t["inst_link"][0]}">{t["inst_link"][1]} <span class="arr r">→</span></a></p>
 </section>
 
 <section style="padding-top:24px">
@@ -519,7 +649,7 @@ gtag('js',new Date());gtag('config','{GA_ID}');
     <div class="col">
       <div class="ttl"><h2>{t["end_h"]}</h2></div>
       <p>{t["end_p"]}</p>
-      <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="#{i["i"]}">{t["end_btn2"]}</a></div>
+      <div class="cta"><a class="btn primary lg" href="{DL}">{t["cta1"]} <span class="arr">↓</span></a><a class="btn ghost lg" href="{t["end_btn2_href"]}">{t["end_btn2"]}</a></div>
       <div></div>
     </div>
     <div class="sep"></div>

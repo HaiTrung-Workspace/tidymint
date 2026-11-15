@@ -1,8 +1,12 @@
 # Release notes, one entry per version, newest first. Both languages are written by hand.
 # Optional vt=dict(score, date, sha): VirusTotal result of that Tidymint.zip, shown under the release on the website.
+# Optional intro=dict(en, vi): one or two sentences shown above the list on the website (not in CHANGELOG.md).
+# A line that starts with a known label ("New:", "Fix:", "Mới:", "Sửa lỗi:"...) gets that label as a tag on the website.
 # `python3 tools/changelog.py` writes CHANGELOG.md; tools/guides.py renders /changelog/ and /vi/lich-su-cap-nhat/.
 RELEASES = [
     dict(ver="0.6.0", date="2026-11-15", status="released",
+         intro=dict(en="Mintbar arrives: gather menu bar icons into groups and fan them out with one click. The app also gets a mint leaf icon and a shortcut for every page.",
+                    vi="Mintbar ra mắt: gom icon menu bar thành nhóm, bấm là mở. App cũng có icon lá bạc hà mới và phím tắt cho từng trang."),
          vt=dict(score="0/66", date="2026-11-15", sha="4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
          en=["New: Mintbar gathers menu bar icons behind one group icon you choose. Click the group to fan its apps out, click an app to open its menu. Up to 2 groups of 4 apps. Off by default; on macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on",
              "New look: the app icon is a mint leaf, the sidebar is a glass pane on macOS 26 and later, and Clean Now cards are lighter",
@@ -10,7 +14,7 @@ RELEASES = [
              "Mintangle keeps halves, corners, Maximize, Center, Restore and dragging to an edge. Mintdrop holds up to 5 items, dragged out one at a time",
              "The code of the Mint tools is no longer in the public repository. The cleaning core stays open",
              "Fix: Undo keeps its record for items that could not be put back (for example when you cancel the password prompt), so you can try again"],
-         vi=["Mới: Mintbar gom icon trên thanh menu vào sau một icon nhóm do bạn chọn. Bấm icon nhóm để xoè các app ra, bấm một app để mở menu của nó. Tối đa 2 nhóm, mỗi nhóm 4 app. Tính năng tắt sẵn; trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình",
+         vi=["Mới: Mintbar gom icon trên menu bar vào sau một icon nhóm do bạn chọn. Bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Tối đa 2 nhóm, mỗi nhóm 4 app. Tính năng tắt sẵn; trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình",
              "Diện mạo mới: icon app là chiếc lá bạc hà, thanh bên dạng kính trên macOS 26 trở lên, thẻ ở Dọn ngay gọn hơn",
              "Mới: chuyển trang bằng ⌘1 đến ⌘7, phím hiện ngay trên thanh bên",
              "Mintangle giữ các thao tác nửa màn hình, góc, phóng to, ra giữa, khôi phục và kéo vào mép. Mintdrop giữ tối đa 5 mục, kéo ra từng mục",
@@ -67,7 +71,7 @@ RELEASES = [
          vi=["Diện mạo mới: Cài đặt và cả app theo kiểu macOS, nhóm thu gọn được, cỡ chữ và nút chuẩn, cảnh báo xếp thẳng cột riêng. Đổi cỡ chữ thì cửa sổ giữ đúng tỉ lệ",
              "Mới: mở file ngay trong danh sách. Bấm một lần hoặc nhấn Space để xem nhanh, bấm đúp để mở bằng app của nó, chuột phải để Mở bằng, Hiện trong Finder, Chép đường dẫn",
              "Mới: Gỡ app có ô tìm, nhớ cách sắp xếp, và tìm thêm thư mục cache, thư mục tạm của chính app trong /private/var/folders",
-             "Mới: công tắc trong Cài đặt để ẩn biểu tượng trên thanh menu và tắt lần kiểm bản mới hằng ngày (nút Kiểm tra vẫn dùng được). Tự thêm file, thư mục vào Danh sách bỏ qua",
+             "Mới: công tắc trong Cài đặt để ẩn biểu tượng trên menu bar và tắt lần kiểm bản mới hằng ngày (nút Kiểm tra vẫn dùng được). Tự thêm file, thư mục vào Danh sách bỏ qua",
              "Mới: Bản đồ ổ đĩa xem được cả ổ cứng rời đang cắm",
              "Sửa: trang Thùng rác có thể đếm cả một thư mục trên ổ cứng rời mà Finder không coi là Thùng rác, nên đổ xong con số không giảm. Giờ trang ghi rõ còn gì trên từng ổ"]),
     dict(ver="0.3.8", date="2026-11-04", status="released",
@@ -118,7 +122,7 @@ RELEASES = [
              "Dọn theo ứng dụng: thêm bản dựng sẵn và proxy của CapCut, đã kiểm trên Mac thật",
              "Bản đồ ổ đĩa giải thích thêm thư mục: CapCut, Docker, Homebrew, archive Xcode",
              "Icon app mới; nhóm Nâng cao ở menu trái mặc định thu gọn",
-             "Biểu tượng thanh menu mới: lá bạc hà đầy dần theo dung lượng đã dùng, chuyển cam khi chỗ trống gần mức cảnh báo, đỏ khi dưới mức đó",
+             "Biểu tượng menu bar mới: lá bạc hà đầy dần theo dung lượng đã dùng, chuyển cam khi chỗ trống gần mức cảnh báo, đỏ khi dưới mức đó",
              "Gỡ app an toàn hơn: Hoàn tác trả lại cả app, không chỉ file phụ; web app của trình duyệt có nhãn và giải thích",
              "Dọn an toàn hơn: file trên ổ ngoài hay ổ mạng mà Thùng rác từ chối thì báo lỗi, không bị chuyển đi",
              "Gỡ app gỡ được cả app cài cho mọi tài khoản, như app từ App Store: Finder chuyển app vào Thùng rác và macOS hỏi mật khẩu, Tidymint không thấy mật khẩu; báo lỗi ghi rõ bước tiếp theo",
@@ -145,7 +149,7 @@ RELEASES = [
              "Dọn theo ứng dụng thêm Telegram, WhatsApp, Slack, VS Code, Outlook",
              "Cài đặt cho biết đã bật Truy cập toàn bộ ổ đĩa chưa, kèm nút mở đúng chỗ",
              "Menu trái: biểu tượng rõ hơn, chỉ Cài đặt hiện số, tên mục không bị cắt ở mọi cỡ chữ",
-             "Ủng hộ dự án có trong menu ở thanh menu",
+             "Ủng hộ dự án có trong menu của icon Tidymint trên menu bar",
              "Dung lượng hiện một số lẻ, tiếng Việt dùng dấu phẩy"]),
     dict(ver="0.3.4", date="2026-10-27", status="released",
          en=["New: text size (Small, Default, Large) in Settings",
