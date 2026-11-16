@@ -16,8 +16,12 @@ ICONS["tiling"] = '<rect width="7" height="18" x="3" y="3" rx="1"/><rect width="
 ICONS["shelf"] = '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>'
 ICONS["menubar"] = '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/>'
 ICONS["download"] = '<path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/>'  # Lucide download
-LISTED_LINKS = [("awesome-mac", "https://github.com/jaywcjlove/awesome-mac"), ("AlternativeTo", "https://alternativeto.net/software/tidymint/about/"),
-                ("MacNative", "https://macnative.io/apps/tidymint"), ("MacUpdate", "https://tidymint.macupdate.com/"), ("OpenMacApps", "https://openmacapps.com/apps/tidymint/"), ("Open Source Alternatives", "https://www.opensourcealternatives.to/item/tidymint"), ("SaaSHub", "https://www.saashub.com/tidymint"), ("awesome-swift-macos-apps", "https://github.com/jaywcjlove/awesome-swift-macos-apps")]
+# Two rows: row 1 = the most recognised lists (16/11/2026). Add a name only once its listing is live.
+LISTED_LINKS = [[("awesome-mac", "https://github.com/jaywcjlove/awesome-mac"), ("AlternativeTo", "https://alternativeto.net/software/tidymint/about/"),
+                 ("MacUpdate", "https://tidymint.macupdate.com/"), ("SaaSHub", "https://www.saashub.com/tidymint"), ("MacPip", "https://macpip.com/apps/tidymint")],
+                [("MacNative", "https://macnative.io/apps/tidymint"), ("OpenMacApps", "https://openmacapps.com/apps/tidymint/"),
+                 ("Open Source Alternatives", "https://www.opensourcealternatives.to/item/tidymint"), ("JustMacApps", "https://justmacapps.com/apps/tidymint"),
+                 ("awesome-swift-macos-apps", "https://github.com/jaywcjlove/awesome-swift-macos-apps")]]
 def icon(k, size=22):
     return '<svg viewBox="0 0 24 24" width="%d" height="%d" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">%s</svg>' % (size, size, ICONS[k])
 ENDPOINT = "https://script.google.com/macros/s/AKfycbz07aYQ8kI0u0OV842dt-LxeN5TedqfOzNvhmuVAPmgXdcIGtpzI-GNwLE_kiUMiGDKag/exec"
@@ -51,7 +55,7 @@ BADGES = [
     '<a class="bdg"@T@ href="https://saasearch.io/product/tidymint?utm_source=badge&amp;utm_medium=referral&amp;utm_campaign=verified_badge&amp;ref=saasearch" target="_blank" rel="noopener"><img src="{img}badge-saasearch.png" alt="Verified on SaaSearch" width="224" height="44" decoding="async"></a>',
     '<a class="bdg sh"@T@ href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener"><img src="{img}badge-awesome-flat.svg" alt="Mentioned in awesome-swift-macos-apps" width="110" height="20" decoding="async"></a>',
 ]
-LISTED = '<span class="lst"><a href="https://github.com/jaywcjlove/awesome-mac" target="_blank" rel="noopener">awesome-mac</a> · <a href="https://alternativeto.net/software/tidymint/about/" target="_blank" rel="noopener">AlternativeTo</a> · <a href="https://macnative.io/apps/tidymint" target="_blank" rel="noopener">MacNative</a> · <a href="https://tidymint.macupdate.com/" target="_blank" rel="noopener">MacUpdate</a> · <a href="https://openmacapps.com/apps/tidymint/" target="_blank" rel="noopener">OpenMacApps</a> · <a href="https://www.opensourcealternatives.to/item/tidymint" target="_blank" rel="noopener">Open Source <wbr>Alternatives</a> · <a href="https://www.saashub.com/tidymint" target="_blank" rel="noopener">SaaSHub</a> · <a href="https://github.com/jaywcjlove/awesome-swift-macos-apps" target="_blank" rel="noopener">awesome-swift-<wbr>macos-apps</a></span>'
+LISTED = '<span class="lst">' + '<span class="sep"> · </span>'.join('<span class="r">%s</span>' % ' · '.join('<a href="%s" target="_blank" rel="noopener">%s</a>' % (u, n) for n, u in row) for row in LISTED_LINKS) + '</span>'
 ORG = {"@context":"https://schema.org","@type":"Organization","name":"Tidymint","url":"https://tidymint.app/","logo":"https://tidymint.app/icon-512.png","sameAs":[u for _, u, _ in SOCIAL]}
 BASE_CSS = open(os.path.join(ROOT, "tools", "site.css")).read()
 EXTRA_CSS = """
@@ -138,6 +142,8 @@ HOME_CSS = """
 .trust .ico{width:38px;height:38px}
 .trust.n6{grid-template-columns:repeat(3,1fr);max-width:860px}
 .trust .lst a{white-space:nowrap;color:var(--leaf);text-decoration:underline;text-decoration-color:#ffffff40;text-underline-offset:3px}.trust .lst a:hover{text-decoration-color:var(--leaf)}
+.trust.n5{grid-template-columns:repeat(4,1fr);max-width:1040px}.trust.n6{grid-template-columns:repeat(5,1fr);max-width:1040px}
+.trust>div.lstc{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px 12px;padding:22px 20px 20px}.trust>div.lstc .ico{width:30px;height:30px}.trust>div.lstc b{margin-right:4px}.trust>div.lstc .lst{flex-basis:100%;white-space:nowrap;line-height:1.9}.trust>div.lstc .lst .r{display:block}.trust>div.lstc .lst .sep{display:none}
 .shot{position:relative}
 .shot:before{content:"";position:absolute;inset:8% 10% -4%;background:radial-gradient(closest-side,#2fd39f55,transparent);filter:blur(40px);z-index:-1}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -171,7 +177,7 @@ HOME_CSS = """
 .fx .fine{font-size:14px;margin:0 0 12px;opacity:.85}
 .grid.disk .card .more,.grid.disk .card a{display:block;margin-top:8px;font-weight:600;font-size:14px}
 .grid.uses a.card{text-decoration:none;color:inherit}
-.endcard .cta .btn{white-space:nowrap}
+.endcard .cta .btn{white-space:nowrap}.endcard .cta{flex-wrap:nowrap}.endcard .cta .btn.lg{padding:0 22px}
 .fx-i{position:relative}
 .fx-i img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:0 30px 70px #000a}
 .fx-i:before{content:"";position:absolute;inset:10%;background:radial-gradient(closest-side,#2fd39f40,transparent);filter:blur(36px);z-index:-1}
@@ -195,7 +201,8 @@ HOME_CSS = """
 .endcard form .btn{padding:0 26px}
 .endcard input{flex:1;min-width:0;padding:0 18px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
 .endcard .endnote{margin-top:14px}.endcard .endnote .small{margin:0;font-size:14px}.endcard #msg{font-size:15px}.endcard #msg:not(:empty){margin:0 0 8px}
-@media (max-width:820px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px 22px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}.endcard .cta{display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.endcard .cta .ghost{order:-1}.endcard .cta .btn,.endcard form .btn{width:100%;padding:0 12px;font-size:16px;white-space:nowrap;justify-content:center}.endcard .btn.lg,.endcard form .btn,.endcard input{height:52px}.endcard input{width:100%;padding:0 14px;font-size:15px}}
+@media (max-width:820px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px 22px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}.endcard .cta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.endcard .cta .ghost{order:-1}.endcard .cta .btn,.endcard form .btn{width:100%;padding:0 20px;font-size:16px;white-space:nowrap;justify-content:center}.endcard .btn.lg,.endcard form .btn,.endcard input{height:52px}.endcard input{width:100%;padding:0 14px;font-size:15px}}
+@media (max-width:480px){.endcard .cta{grid-template-columns:1fr}.endcard .cta .ghost{order:1}}
 .open{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .open a.card{color:var(--text);display:block}.open a.card:hover{text-decoration:none;border-color:#2fd39f88}
 .open .card>span{display:block;margin-top:4px}
@@ -203,9 +210,9 @@ HOME_CSS = """
 .specs div{padding:18px 16px;border-left:1px solid var(--line)}.specs div:first-child{border-left:0}
 .specs small{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);margin-bottom:4px}
 .specs b{font-size:15px}
-@media (max-width:980px){.trust{grid-template-columns:repeat(3,1fr)}.open{grid-template-columns:1fr 1fr}.specs{grid-template-columns:repeat(3,1fr)}.specs div:nth-child(4){border-left:0}.specs div:nth-child(n+4){border-top:1px solid var(--line)}}
+@media (max-width:980px){.trust.n5{grid-template-columns:repeat(2,1fr);max-width:640px}.trust.n6{grid-template-columns:repeat(3,1fr)}.open{grid-template-columns:1fr 1fr}.specs{grid-template-columns:repeat(3,1fr)}.specs div:nth-child(4){border-left:0}.specs div:nth-child(n+4){border-top:1px solid var(--line)}}
 @media (max-width:820px){.fx{grid-template-columns:1fr;gap:24px;padding:32px 0}.fx.flip .fx-t{order:0}.stats{grid-template-columns:1fr}.strip div{padding:14px}}
-@media (max-width:600px){.trust,.trust.n6{grid-template-columns:repeat(2,minmax(0,1fr))}.trust div:last-child{grid-column:1/-1}.trust.n6 div:last-child{grid-column:auto}.open,.specs{grid-template-columns:1fr 1fr}.specs div{border-left:0;border-top:1px solid var(--line)}.specs div:nth-child(-n+2){border-top:0}.specs div:nth-child(even){border-left:1px solid var(--line)}.band{padding:40px 18px}
+@media (max-width:600px){.trust,.trust.n6{grid-template-columns:repeat(2,minmax(0,1fr))}.trust.n6>div:nth-child(5){grid-column:1/-1}.trust>div.lstc{flex-direction:column;flex-wrap:nowrap;gap:8px;padding:16px 10px}.trust>div.lstc .lst{white-space:normal;flex-basis:auto;line-height:1.6}.trust>div.lstc .lst .r{display:inline}.trust>div.lstc .lst .sep{display:inline}.open,.specs{grid-template-columns:1fr 1fr}.specs div{border-left:0;border-top:1px solid var(--line)}.specs div:nth-child(-n+2){border-top:0}.specs div:nth-child(even){border-left:1px solid var(--line)}.band{padding:40px 18px}
  .strip,.strip.two{grid-template-columns:1fr}.strip div{border-left:0;border-top:1px solid var(--line);padding:12px 14px}.strip div:first-child{border-top:0}}
 """
 
@@ -507,7 +514,7 @@ def page(k):
     dl = (' · <span class="dlc" data-sep="%s">%s<b class="dln">%s</b> %s</span>' % (t["dl_word"] and t["dl_sep"], icon("download", 14), "{:,}".format(int(dln)).replace(",", t["dl_sep"]), t["dl_word"])) if dln.isdigit() else ""
     V = lambda x: x.replace("{v}", ver).replace("{dl}", dl)
     ok = icon("check", 16)
-    trust = "".join('<div><span class="ico">%s</span><b>%s</b>%s</div>' % (icon(a), b, c) for a, b, c in t["trust"])
+    trust = "".join('<div%s><span class="ico">%s</span><b>%s</b>%s</div>' % (' class="lstc"' if a == "listed" else "", icon(a), b, c) for a, b, c in t["trust"])
     pains = "".join('<div class="stat pain"><span class="q">%s</span><b>%s</b><span>%s</span></div>' % x for x in t["pains"])
     fxrow = lambda rows, off=0: "".join('<div class="fx%s"><div class="fx-t"><span class="ico">%s</span><span class="tag">%s</span><h3>%s</h3><p>%s</p><ul>%s</ul>%s</div><div class="fx-i"><img src="%s%s" alt="%s" loading="lazy" width="1600" height="%d"></div></div>'
                  % (" flip" if n % 2 else "", icon(ic), tg, h3, p_, "".join("<li>%s<span>%s</span></li>" % (ok, b) for b in bl),
