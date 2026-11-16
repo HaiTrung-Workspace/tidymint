@@ -177,7 +177,7 @@ HOME_CSS = """
 .fx .fine{font-size:14px;margin:0 0 12px;opacity:.85}
 .grid.disk .card .more,.grid.disk .card a{display:block;margin-top:8px;font-weight:600;font-size:14px}
 .grid.uses a.card{text-decoration:none;color:inherit}
-.endcard .cta .btn{white-space:nowrap}.endcard .cta{flex-wrap:nowrap}.endcard .cta .btn.lg{padding:0 22px}
+.endcard .cta .btn{white-space:nowrap}
 .fx-i{position:relative}
 .fx-i img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:0 30px 70px #000a}
 .fx-i:before{content:"";position:absolute;inset:10%;background:radial-gradient(closest-side,#2fd39f40,transparent);filter:blur(36px);z-index:-1}
@@ -201,8 +201,8 @@ HOME_CSS = """
 .endcard form .btn{padding:0 26px}
 .endcard input{flex:1;min-width:0;padding:0 18px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
 .endcard .endnote{margin-top:14px}.endcard .endnote .small{margin:0;font-size:14px}.endcard #msg{font-size:15px}.endcard #msg:not(:empty){margin:0 0 8px}
-@media (max-width:820px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px 22px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}.endcard .cta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.endcard .cta .ghost{order:-1}.endcard .cta .btn,.endcard form .btn{width:100%;padding:0 20px;font-size:16px;white-space:nowrap;justify-content:center}.endcard .btn.lg,.endcard form .btn,.endcard input{height:52px}.endcard input{width:100%;padding:0 14px;font-size:15px}}
-@media (max-width:480px){.endcard .cta{grid-template-columns:1fr}.endcard .cta .ghost{order:1}}
+@media (max-width:820px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px 22px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}.endcard .cta{display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.endcard .cta .ghost{order:-1}.endcard .cta .btn,.endcard form .btn{width:100%;padding:0 12px;font-size:16px;white-space:nowrap;justify-content:center}.endcard .btn.lg,.endcard form .btn,.endcard input{height:52px}.endcard input{width:100%;padding:0 14px;font-size:15px}}
+@media (max-width:400px){.endcard .cta{grid-template-columns:96px minmax(0,1fr)}.endcard form{grid-template-columns:minmax(0,1fr) 96px}.endcard .cta .btn,.endcard form .btn{font-size:15px;padding:0 8px}}
 .open{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .open a.card{color:var(--text);display:block}.open a.card:hover{text-decoration:none;border-color:#2fd39f88}
 .open .card>span{display:block;margin-top:4px}
@@ -432,7 +432,7 @@ T["vi"].update(dict(
        T["vi"]["faq"][9],
        ("Có bản Windows hay iPhone không?","Không. Tidymint chỉ làm cho macOS.")],
   inst_h="Cài đặt", inst_title="Bốn bước, một phút.", inst_sum="Tải về, kéo vào Ứng dụng, mở lần đầu và bấm “Vẫn mở”. Cần macOS 14 trở lên.", inst_link=("cai-dat/","Cài đặt từng bước, có ảnh"),
-  end_p="Dọn dẹp miễn phí, lõi mã nguồn mở, mọi thứ luôn vào Thùng rác trước.", end_btn2="Xem hướng dẫn", end_btn2_href="huong-dan/",
+  end_p="Dọn dẹp miễn phí, lõi mã nguồn mở, mọi thứ luôn vào Thùng rác trước.", end_btn2="Hướng dẫn", end_btn2_href="huong-dan/",
   f_blurb="App giữ MacBook gọn gàng: dọn dung lượng, gọn menu bar, xếp cửa sổ, kéo thả gọn. Trang chính thức duy nhất: tidymint.app, tải chỉ từ GitHub.",
   f_cols=[("Sản phẩm",[("#tinh-nang","Tính năng"),("#cai-dat","Cài đặt"),("lich-su-cap-nhat/","Lịch sử cập nhật"),(GH+"/releases","Các phiên bản"),("ung-ho/","Ủng hộ dự án")])] + T["vi"]["f_cols"][1:],
 ))
@@ -476,7 +476,7 @@ T["en"].update(dict(
        T["en"]["faq"][2], T["en"]["faq"][4], T["en"]["faq"][5], T["en"]["faq"][6], T["en"]["faq"][7], T["en"]["faq"][8],
        ("Is there a Windows or iPhone version?","No. Tidymint is made for macOS only.")],
   inst_h="Install", inst_title="Four steps, one minute.", inst_sum="Download, drag to Applications, open it once and click “Open Anyway”. Needs macOS 14 or later.", inst_link=("install/","Step-by-step install, with screenshots"),
-  end_p="Free to clean, open-source core, and everything goes to the Trash first.", end_btn2="Read the guides", end_btn2_href="guides/",
+  end_p="Free to clean, open-source core, and everything goes to the Trash first.", end_btn2="Guides", end_btn2_href="guides/",
   f_blurb="Keeps your Mac tidy: disk space, menu bar, windows, drag and drop. The only official site is tidymint.app; downloads come only from GitHub.",
   f_cols=[("Product",[("#features","Features"),("#install","Install"),("changelog/","Changelog"),(GH+"/releases","Releases"),("sponsor/","Sponsor")])] + T["en"]["f_cols"][1:],
 ))
