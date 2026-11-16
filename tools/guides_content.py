@@ -1972,7 +1972,7 @@ GUIDES.append(dict(
   desc="Tidymint chỉ chuyển vào Thùng rác, không gửi dữ liệu đi, mã nguồn công khai. Xem ai đã kiểm, mỗi bản mới qua bước nào, và cách bạn tự kiểm tra.",
   crumb="An toàn và minh bạch",
   h1="Tidymint có an toàn không? Đây là bằng chứng, và cách bạn tự kiểm",
-  tldr="Các app dọn máy được đọc cả ổ đĩa, nên bạn - người dùng ứng dụng có quyền và đồng thời cũng cần hiểu, nắm rõ mọi thông tin và cách hoạt động của chúng. Bài viết này gom mọi thứ Tidymint đã, đang và sẽ tiếp tục thực hiện để bạn yên tâm sử dụng: <b>5 lời hứa</b> kèm cách tự kiểm tra, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 65 phần mềm diệt virus cùng quét và không phần mềm nào phát hiện vấn đề), <b>các bước mỗi bản cập nhật mới đều phải đi qua</b>. Không cần rành công nghệ để biết, Tidymint sẽ giải thích và hướng dẫn bạn chi tiết.",
+  tldr="App dọn máy được đọc cả ổ đĩa, nên bạn cần biết nó làm gì. Bài này gom đủ: <b>5 lời hứa</b> kèm cách tự kiểm, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 65 phần mềm diệt virus cùng quét, không phần mềm nào báo vấn đề) và <b>các bước mỗi bản cập nhật phải đi qua</b>. Không cần rành công nghệ, mỗi mục đều có hướng dẫn từng bước.",
   toc=[("loi-hua", "5 lời hứa của Tidymint, và cách kiểm tra"), ("ai-da-kiem", "Những ai đã kiểm tra Tidymint"), ("quy-trinh", "Một bản mới phải qua những bước nào"), ("tu-kiem-file", "Cách bạn tự kiểm file vừa tải về"), ("khong-dung", "Những thứ Tidymint không bao giờ đụng"), ("chua-co", "Tidymint chưa có gì?"), ("nhat-ky", "Nhật ký minh bạch"), ("bao-loi", "Thấy lỗi bảo mật?"), ("faq", "Câu hỏi thường gặp")],
   body="""
 <h2 id="loi-hua">5 lời hứa của Tidymint, và cách kiểm tra</h2>
@@ -2065,7 +2065,7 @@ GUIDES.append(dict(
   desc="Tidymint only moves files to the Trash, sends no data, and its code is public. See who has checked it, what every update goes through, and how to verify it.",
   crumb="Safety and transparency",
   h1="Is Tidymint safe? Here is the evidence, and how you can check it yourself",
-  tldr="Mac cleaners can read your whole disk, so you have the right, and the need, to understand exactly what they do and how they work. This page gathers everything Tidymint has done, is doing and will keep doing so you can use it with peace of mind: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 65 antivirus engines scanned it and none found a problem), and <b>the steps every new update goes through</b>. You don't need to be technical: Tidymint explains and walks you through each part.",
+  tldr="A Mac cleaner can read your whole disk, so you should know what it does. This page has it all: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 65 antivirus engines scanned it and none found a problem) and <b>the steps every update goes through</b>. No technical knowledge needed: each part walks you through it.",
   toc=[("promises", "Tidymint's 5 promises, and how to check them"), ("checked-by", "Who has checked Tidymint"), ("release-steps", "What every new version goes through"), ("verify-download", "How to check the file you downloaded"), ("never", "What Tidymint never touches, read from the code"), ("not-yet", "What Tidymint doesn't have yet"), ("log", "Transparency log"), ("report", "Found a security issue?"), ("faq", "FAQ")],
   body="""
 <h2 id="promises">Tidymint's 5 promises, and how to check them</h2>
