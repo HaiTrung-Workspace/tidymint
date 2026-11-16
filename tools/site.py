@@ -178,6 +178,7 @@ HOME_CSS = """
 .grid.disk .card .more,.grid.disk .card a{display:block;margin-top:8px;font-weight:600;font-size:14px}
 .grid.uses a.card{text-decoration:none;color:inherit}
 .endcard .cta .btn{white-space:nowrap}
+.endcard .cta{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px}.endcard .cta .ghost{order:-1}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:10px}.endcard .cta .btn,.endcard form .btn{width:100%;justify-content:center;padding:0 12px}.endcard input{width:100%}
 .fx-i{position:relative}
 .fx-i img{width:100%;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:0 30px 70px #000a}
 .fx-i:before{content:"";position:absolute;inset:10%;background:radial-gradient(closest-side,#2fd39f40,transparent);filter:blur(36px);z-index:-1}
@@ -195,12 +196,13 @@ HOME_CSS = """
 .endcard .ttl img{width:48px;height:48px;margin:0}
 .endcard h2{font-size:clamp(26px,3vw,34px);line-height:1.15;margin:0}
 .endcard p{margin:0 0 24px;max-width:none}
-.dlhint{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--sub)}.dlhint a{color:inherit;text-decoration:underline}.endcard .cta,.endcard form{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin:0}
+.dlhint{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--sub)}.dlhint a{color:inherit;text-decoration:underline}.endcard .cta,.endcard form{display:grid;gap:10px;align-items:center;margin:0}
 .endcard .btn.lg,.endcard form .btn,.endcard input{height:56px;box-sizing:border-box}
 .endcard form{flex-wrap:nowrap}
 .endcard form .btn{padding:0 26px}
 .endcard input{flex:1;min-width:0;padding:0 18px;border-radius:999px;border:1px solid #ffffff33;background:#00000040;color:var(--text);font-size:16px}
 .endcard .endnote{margin-top:14px}.endcard .endnote .small{margin:0;font-size:14px}.endcard #msg{font-size:15px}.endcard #msg:not(:empty){margin:0 0 8px}
+@media (max-width:1000px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:40px 44px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}}
 @media (max-width:820px){.endcard{grid-template-columns:minmax(0,1fr);grid-template-rows:none;padding:36px 22px}.endcard .col{display:block;grid-row:auto}.endcard .sep{grid-row:auto;height:1px;margin:32px 0}.endcard .ttl{min-height:0}.endcard .cta{display:grid;grid-template-columns:112px minmax(0,1fr);gap:10px}.endcard form{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px}.endcard .cta .ghost{order:-1}.endcard .cta .btn,.endcard form .btn{width:100%;padding:0 12px;font-size:16px;white-space:nowrap;justify-content:center}.endcard .btn.lg,.endcard form .btn,.endcard input{height:52px}.endcard input{width:100%;padding:0 14px;font-size:15px}}
 @media (max-width:400px){.endcard .cta{grid-template-columns:96px minmax(0,1fr)}.endcard form{grid-template-columns:minmax(0,1fr) 96px}.endcard .cta .btn,.endcard form .btn{font-size:15px;padding:0 8px}}
 .open{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
