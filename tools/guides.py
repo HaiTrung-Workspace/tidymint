@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate guide pages (docs/<lang>/<slug>/index.html) and refresh sitemap.xml.
 Content lives in tools/guides_content.py. Run from the repository root: python3 tools/guides.py"""
-import re
+import re, sys
 import importlib.util, json, os, html, datetime
 from stamp import stamp
 
@@ -126,11 +126,16 @@ def guide(g):
     rel = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
     cta = ('<div class="box"><img class="bico" src="' + root + 'icon.png" alt="" width="56" height="56"><h3>%s</h3><p>%s</p><div class="cta box-cta"><a class="btn primary" href="%s">%s <span class="arr">↓</span></a>'
            '<a class="btn ghost" href="%s%s">%s</a></div></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
+    # "Manual vs Tidymint" box: once per page. It goes where the body has {CTA}; the end-of-page download box (tail) is
+    # the plain box only. Both used to share one variable, so the table showed twice on every disk/apps guide.
+    mvt = ""
     if g.get("topic", "disk") in ("disk", "apps"):
         vh, vrows = VS[k]
-        cta = ('<div class="mvt"><h3>%s</h3><div class="tbl"><table><tr><th></th><th>%s</th><th>Tidymint</th></tr>%s</table></div></div>'
-               % (vh, vrows[0], "".join('<tr><td><b>%s</b></td><td data-l="%s">%s</td><td class="y" data-l="Tidymint">%s</td></tr>' % (r[0], vrows[0], r[1], r[2]) for r in vrows[1:]))) + cta
+        mvt = ('<div class="mvt"><h3>%s</h3><div class="tbl"><table><tr><th></th><th>%s</th><th>Tidymint</th></tr>%s</table></div></div>'
+               % (vh, vrows[0], "".join('<tr><td><b>%s</b></td><td data-l="%s">%s</td><td class="y" data-l="Tidymint">%s</td></tr>' % (r[0], vrows[0], r[1], r[2]) for r in vrows[1:])))
     body = g["body"]
+    tail_cta = cta if "{CTA}" in body else mvt + cta
+    cta = mvt + cta
     if "{SAFETY_RULES}" in body:
         import safety_gen
         body = body.replace("{SAFETY_RULES}", safety_gen.html_for(k))
@@ -151,7 +156,7 @@ def guide(g):
     hub = g.get("hub", False)
     head_extra = g.get("lead", "") if hub else ('<p class="meta">%s: %s · %s</p><div class="tldr"><span class="k">%s</span><p>%s</p></div>'
         '<div class="toc" role="navigation" aria-label="%s"><b>%s</b><ol>%s</ol></div>') % (l["updated"], "{DSTR}", g["read"], l["tldr"], g["tldr"], l["toc"], l["toc"], toc)
-    tail = cta if hub else '<h2 id="faq">%s</h2>%s<div class="mqs">%s</div>%s<h2>%s</h2><ul class="src">%s</ul>' % (l["faq"], faq, S.marquee(t, root), cta, l["src"], srcs)
+    tail = cta if hub else '<h2 id="faq">%s</h2>%s<div class="mqs">%s</div>%s<h2>%s</h2><ul class="src">%s</ul>' % (l["faq"], faq, S.marquee(t, root), tail_cta, l["src"], srcs)
     if hub:
         ld = [ld[2], {"@context":"https://schema.org","@type":"CollectionPage","name":g["h1"],"description":g["desc"],"url":url,"inLanguage":k}]
     hreflang = '<link rel="alternate" hreflang="%s" href="%s">' % (k, url)
@@ -449,7 +454,12 @@ if __name__ == "__main__":
     for g in C.GUIDES:
         out = os.path.join(ROOT, "docs", "vi" if g["lang"] == "vi" else "", g["slug"], "index.html")
         os.makedirs(os.path.dirname(out), exist_ok=True)
-        open(out, "w").write(stamp(guide(g), out, ROOT))
+        page = stamp(guide(g), out, ROOT)
+        # Guard: blocks that must appear once per page. A second copy has slipped in before (manual vs Tidymint box).
+        for mark, name in (('<div class="mvt">', "manual vs Tidymint box"), ('<div class="mqs">', "slogan strip")):
+            if page.count(mark) > 1:
+                sys.exit("STOP: %s appears %d times on %s" % (name, page.count(mark), os.path.relpath(out, ROOT)))
+        open(out, "w").write(page)
         print("wrote", os.path.relpath(out, ROOT))
     open(os.path.join(ROOT, "docs", "sitemap.xml"), "w").write(sitemap(C.GUIDES))
     print("wrote docs/sitemap.xml")
