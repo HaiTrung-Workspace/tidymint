@@ -1150,6 +1150,144 @@ dict(
   alt="free-up-space-mac",
 ),
 dict(
+  lang="vi", slug="xoa-bo-nho-dem-macbook", topic="disk", date="2026-11-17", read="5 phút đọc",
+  title="Cách xoá bộ nhớ đệm trên MacBook an toàn | Tidymint",
+  desc="Cách xoá bộ nhớ đệm (cache) trên MacBook: Safari, Chrome, thư mục Caches của app. Cái gì xoá được, cái gì nên để yên, và cách dọn mà không mất dữ liệu.",
+  crumb="Xoá bộ nhớ đệm",
+  h1="Cách xoá bộ nhớ đệm trên MacBook mà không mất gì",
+  tldr="Bộ nhớ đệm (cache) là file tạm app tự tạo lại, nên xoá được, nhưng không phải thư mục nào tên Caches cũng xoá hết được. Bài này chỉ cách xoá bộ nhớ đệm của Safari, Chrome và từng app trong <code>~/Library/Caches</code>, những thứ nên để yên, và cách để Tidymint chọn sẵn phần an toàn.",
+  toc=[("la-gi","Bộ nhớ đệm là gì, xoá có sao không"),("trinh-duyet","Xoá bộ nhớ đệm trình duyệt"),("app","Xoá bộ nhớ đệm của app bằng tay"),
+       ("de-yen","Những thứ nên để yên"),("tidymint","Cách nhanh hơn: để Tidymint chọn giúp"),("faq","Câu hỏi thường gặp")],
+  body="""
+<h2 id="la-gi">Bộ nhớ đệm là gì, xoá có sao không</h2>
+<p>Bộ nhớ đệm là file app lưu lại để lần sau mở nhanh hơn: ảnh trang web, bản xem trước, dữ liệu tải về. Theo tài liệu của Apple, thư mục <code>Caches</code> chứa dữ liệu <b>tạo lại được khi cần</b>, và app không được dựa vào việc file đệm còn đó. macOS cũng có thể tự xoá thư mục này khi ổ sắp đầy.</p>
+<p>Vì vậy xoá bộ nhớ đệm không làm mất tài liệu của bạn. Đổi lại, lần mở app đầu tiên sau khi xoá có thể chậm hơn một chút, vì app phải tạo lại. Xoá cache giúp lấy lại dung lượng và gỡ lỗi app chạy sai, không phải cách làm máy nhanh hơn lâu dài.</p>
+
+<h2 id="trinh-duyet">Xoá bộ nhớ đệm trình duyệt</h2>
+<p><b>Safari:</b></p>
+<ol class="steps">
+<li>Mở Safari, chọn <b>Safari › Cài đặt</b> (Settings), sang tab <b>Nâng cao</b> (Advanced).</li>
+<li>Bật <b>Hiển thị tính năng cho nhà phát triển web</b> (Show features for web developers). Menu <b>Phát triển</b> (Develop) hiện trên menu bar.</li>
+<li>Chọn <b>Phát triển › Xoá bộ nhớ đệm</b> (Develop › Empty Caches). Apple ghi lệnh này xoá bộ nhớ đệm mạng và các bộ nhớ đệm khác của Safari.</li>
+</ol>
+<p><b>Chrome:</b></p>
+<ol class="steps">
+<li>Mở Chrome, bấm nút ba chấm ở góc trên phải, chọn <b>Xoá dữ liệu duyệt web</b> (Delete browsing data).</li>
+<li>Chọn khoảng thời gian, ví dụ <b>Từ trước đến nay</b> (All time).</li>
+<li>Chỉ tick <b>Hình ảnh và tệp được lưu trong bộ nhớ đệm</b> (Cached images and files), rồi bấm <b>Xoá dữ liệu</b>.</li>
+</ol>
+<div class="warn"><p>Nếu tick cả <b>Cookie</b>, bạn sẽ phải đăng nhập lại nhiều trang web. Chỉ muốn lấy lại dung lượng thì bỏ tick cookie.</p></div>
+
+<h2 id="app">Xoá bộ nhớ đệm của app bằng tay</h2>
+<ol class="steps">
+<li><b>Thoát app</b> muốn dọn (Cmd+Q). Xoá đệm của app đang chạy có thể làm app lỗi.</li>
+<li>Trong Finder chọn <b>Đi › Đi tới thư mục</b> (Go › Go to Folder, Shift+Cmd+G), gõ <code>~/Library/Caches</code>.</li>
+<li>Tìm thư mục mang tên app hoặc mã app, ví dụ <code>com.spotify.client</code>. Chuột phải › <b>Lấy thông tin</b> (Get Info) để xem dung lượng.</li>
+<li>Kéo đúng thư mục đó vào Thùng rác. Mở lại app kiểm tra chạy bình thường rồi mới đổ Thùng rác.</li>
+</ol>
+<p>Một số app lưu bộ nhớ đệm trong <code>~/Library/Application Support</code> (thư mục con tên <code>Cache</code>, <code>Code Cache</code>, <code>GPUCache</code>), nhất là Chrome, Slack, Notion, VS Code. Chỉ xoá đúng các thư mục con đó, không xoá cả thư mục của app.</p>
+
+<h2 id="de-yen">Những thứ nên để yên</h2>
+<div class="tbl"><table>
+<tr><th>Đừng xoá</th><th>Vì sao</th></tr>
+<tr><td>Cả thư mục <code>~/Library/Caches</code> hay <code>Library</code></td><td>Apple ghi rõ không nên xoá các thư mục con chuẩn của Library, hệ thống cần chúng tồn tại</td></tr>
+<tr><td>Thư mục <code>com.apple.…</code></td><td>Bộ nhớ đệm của chính macOS; hệ thống tự quản lý</td></tr>
+<tr><td><code>/Library/Caches</code>, <code>/System</code></td><td>Dùng chung cho cả máy, xoá nhầm dễ gây lỗi</td></tr>
+<tr><td>Model AI trong Caches (<code>huggingface</code>, <code>llama.cpp</code>)</td><td>Mang tên cache nhưng là file vài GB, xoá là phải tải lại từ đầu</td></tr>
+<tr><td><code>Application Support</code> (trừ các thư mục con Cache kể trên)</td><td>Đây là dữ liệu của app: tin nhắn, cài đặt, thư viện</td></tr>
+</table></div>
+
+<h2 id="tidymint">Cách nhanh hơn: để Tidymint chọn giúp</h2>
+<figure class="fig-app"><img src="../cleanup.jpg" alt="Trang Dọn rác chi tiết của Tidymint: bộ nhớ đệm người dùng và bộ nhớ đệm trong app, app Slack đang mở nên không được chọn" width="1600" height="1079" loading="lazy"><figcaption>Dọn rác chi tiết: bộ nhớ đệm chia theo app, app đang mở không được chọn sẵn.</figcaption></figure>
+<ul>
+<li><b>Tidymint</b> (dọn dẹp miễn phí, lõi mã nguồn mở): mở <b>Dọn ngay</b>, bộ nhớ đệm người dùng và bộ nhớ đệm trong app (Chrome, Slack, Notion, VS Code) hiện theo từng app kèm dung lượng. App đang mở không được chọn sẵn. Bộ nhớ đệm của Apple (<code>com.apple.…</code>) không bao giờ được liệt kê, model AI không nằm trong danh sách dọn bộ nhớ đệm. Mọi thứ chỉ vào Thùng rác trước, dọn nhầm thì bấm Hoàn tác.</li>
+<li>Muốn dọn riêng một app (Zalo, Telegram, Chrome) mà không đụng tin nhắn: dùng <b>Dọn theo ứng dụng</b>.</li>
+</ul>
+{CTA}
+""",
+  faq=[("Xoá bộ nhớ đệm có làm máy nhanh hơn không?", "Thường là không lâu dài. Bộ nhớ đệm giúp app mở nhanh hơn, nên ngay sau khi xoá app có thể chậm hơn một chút cho tới khi tạo lại. Xoá cache có ích khi cần lấy lại dung lượng hoặc khi một app chạy sai."),
+       ("Xoá bộ nhớ đệm có mất mật khẩu, đăng nhập không?", "Không, nếu chỉ xoá bộ nhớ đệm. Đăng nhập trang web nằm trong cookie: trong Chrome, đừng tick Cookie khi xoá."),
+       ("Bao lâu nên xoá một lần?", "Không cần theo lịch. Bộ nhớ đệm tự tạo lại và macOS cũng tự dọn khi ổ sắp đầy. Xoá khi ổ đầy hoặc khi một app chạy lỗi."),
+       ("Xoá rồi lấy lại được không?", "Nếu bạn kéo vào Thùng rác thì lấy lại được cho tới khi đổ Thùng rác. Tidymint cũng chỉ chuyển vào Thùng rác và có Hoàn tác.")],
+  sources=[("Apple Developer: thư mục Library trên macOS (Caches)", "https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html"),
+           ("Apple Developer: The Library Directory", "https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFileSystem/Articles/LibraryDirectory.html"),
+           ("Apple Developer: File System Basics", "https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html"),
+           ("Apple Developer: bật tính năng cho nhà phát triển web trong Safari", "https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features"),
+           ("Apple: menu Develop của Safari (Empty Caches)", "https://support.apple.com/guide/safari-developer/dev39df999c1/mac"),
+           ("Google: Xoá bộ nhớ đệm và cookie", "https://support.google.com/accounts/answer/32050")],
+  related=[("Cách giải phóng dung lượng MacBook", "{HOME}giai-phong-dung-luong-macbook/"), ("Dữ liệu hệ thống trên Mac là gì", "{HOME}du-lieu-he-thong-mac/"), ("Zalo chiếm dung lượng MacBook", "{HOME}zalo-chiem-dung-luong-macbook/")],
+  alt="clear-cache-mac",
+),
+dict(
+  lang="en", slug="clear-cache-mac", topic="disk", date="2026-11-17", read="5 min read",
+  title="How to Clear Cache on Mac Without Losing Data | Tidymint",
+  desc="How to clear cache on Mac: Safari, Chrome and app caches in ~/Library/Caches. What is safe to delete, what to leave alone, and how to undo a wrong clean.",
+  crumb="Clear cache on Mac",
+  h1="How to clear cache on Mac without losing anything",
+  tldr="Cache files are temporary data apps rebuild, so you can delete them, but not every folder named Caches is fair game. This guide shows how to clear the cache in Safari, Chrome and individual apps in <code>~/Library/Caches</code>, what to leave alone, and how Tidymint pre-selects only the safe part.",
+  toc=[("what","What cache is, and is it safe to clear"),("browser","Clear your browser cache"),("apps","Clear an app's cache by hand"),
+       ("leave","What to leave alone"),("tidymint","Faster: let Tidymint pick"),("faq","FAQ")],
+  body="""
+<h2 id="what">What cache is, and is it safe to clear</h2>
+<p>Cache is what apps keep so they open faster next time: web page images, previews, downloaded data. Apple's documentation says the <code>Caches</code> folder holds data that <b>can be regenerated as needed</b>, and that apps should never rely on cache files existing. macOS may also clear it on its own when the disk runs low.</p>
+<p>So clearing cache doesn't delete your documents. The trade-off: the first launch after clearing may be a little slower while the app rebuilds it. Clearing cache gets space back and can fix an app that misbehaves; it is not a lasting speed-up.</p>
+
+<h2 id="browser">Clear your browser cache</h2>
+<p><b>Safari:</b></p>
+<ol class="steps">
+<li>Open Safari, choose <b>Safari › Settings</b> and go to <b>Advanced</b>.</li>
+<li>Turn on <b>Show features for web developers</b>. A <b>Develop</b> menu appears in the menu bar.</li>
+<li>Choose <b>Develop › Empty Caches</b>. Apple says it empties the network cache and other Safari caches.</li>
+</ol>
+<p><b>Chrome:</b></p>
+<ol class="steps">
+<li>Open Chrome, click the three dots at the top right and choose <b>Delete browsing data</b>.</li>
+<li>Pick a time range, for example <b>All time</b>.</li>
+<li>Tick only <b>Cached images and files</b>, then click <b>Delete data</b>.</li>
+</ol>
+<div class="warn"><p>Tick <b>Cookies</b> too and you'll be signed out of many sites. If you only want space back, leave cookies unticked.</p></div>
+
+<h2 id="apps">Clear an app's cache by hand</h2>
+<ol class="steps">
+<li><b>Quit the app</b> (Cmd+Q). Clearing the cache of a running app can make it misbehave.</li>
+<li>In Finder choose <b>Go › Go to Folder</b> (Shift+Cmd+G) and type <code>~/Library/Caches</code>.</li>
+<li>Find the folder named after the app or its ID, for example <code>com.spotify.client</code>. Right-click › <b>Get Info</b> to see its size.</li>
+<li>Drag that one folder to the Trash. Open the app to check it works, then empty the Trash.</li>
+</ol>
+<p>Some apps keep cache in <code>~/Library/Application Support</code> instead, in subfolders named <code>Cache</code>, <code>Code Cache</code> or <code>GPUCache</code> (Chrome, Slack, Notion, VS Code). Remove only those subfolders, never the app's whole folder.</p>
+
+<h2 id="leave">What to leave alone</h2>
+<div class="tbl"><table>
+<tr><th>Don't delete</th><th>Why</th></tr>
+<tr><td>The whole <code>~/Library/Caches</code> or <code>Library</code> folder</td><td>Apple says it is never a good idea to delete the standard subfolders of Library; the system expects them</td></tr>
+<tr><td><code>com.apple.…</code> folders</td><td>macOS's own caches; the system manages them</td></tr>
+<tr><td><code>/Library/Caches</code>, <code>/System</code></td><td>Shared by the whole Mac; a wrong delete can break things</td></tr>
+<tr><td>AI models in Caches (<code>huggingface</code>, <code>llama.cpp</code>)</td><td>Called cache but several GB each; delete them and you download again from scratch</td></tr>
+<tr><td><code>Application Support</code> (except the Cache subfolders above)</td><td>This is app data: messages, settings, libraries</td></tr>
+</table></div>
+
+<h2 id="tidymint">Faster: let Tidymint pick</h2>
+<figure class="fig-app"><img src="../cleanup.jpg" alt="Tidymint's Cleanup Details page: user caches and app caches listed by app, with Slack unticked because it is open" width="1600" height="1079" loading="lazy"><figcaption>Cleanup Details: caches listed app by app; apps that are open are not pre-selected.</figcaption></figure>
+<ul>
+<li><b>Tidymint</b> (free to clean, open-source core): open <b>Clean Now</b> and user caches and app caches (Chrome, Slack, Notion, VS Code) are listed app by app with their size. Apps that are open are not pre-selected. Apple's own caches (<code>com.apple.…</code>) are never listed, and AI models are kept out of the cache list. Everything goes to the Trash first, and Undo puts a wrong clean back.</li>
+<li>To clean one app (Telegram, Chrome) without touching its chats, use <b>Clean by App</b>.</li>
+</ul>
+{CTA}
+""",
+  faq=[("Does clearing cache make a Mac faster?", "Usually not for long. Cache helps apps open faster, so right after clearing an app can be a little slower until it rebuilds. Clearing helps when you need space back or an app misbehaves."),
+       ("Will I lose passwords or logins?", "Not if you clear only the cache. Website logins live in cookies: in Chrome, leave Cookies unticked."),
+       ("How often should I clear cache?", "There is no need for a schedule. Caches rebuild, and macOS clears them when the disk runs low. Clear them when your disk is full or an app acts up."),
+       ("Can I get cleared files back?", "If you dragged them to the Trash, yes, until you empty it. Tidymint also moves everything to the Trash and has Undo.")],
+  sources=[("Apple Developer: macOS Library directory details (Caches)", "https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/MacOSXDirectories/MacOSXDirectories.html"),
+           ("Apple Developer: The Library Directory", "https://developer.apple.com/library/archive/documentation/MacOSX/Conceptual/BPFileSystem/Articles/LibraryDirectory.html"),
+           ("Apple Developer: File System Basics", "https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html"),
+           ("Apple Developer: Enabling features for web developers in Safari", "https://developer.apple.com/documentation/safari-developer-tools/enabling-developer-features"),
+           ("Apple: Safari Develop menu (Empty Caches)", "https://support.apple.com/guide/safari-developer/dev39df999c1/mac"),
+           ("Google: Clear cache and cookies", "https://support.google.com/accounts/answer/32050")],
+  related=[("How to free up space on Mac", "{HOME}free-up-space-mac/"), ("How to clear System Data on Mac", "{HOME}clear-system-data-mac/"), ("Why your Mac keeps filling up", "{HOME}mac-storage-keeps-filling-up/")],
+  alt="xoa-bo-nho-dem-macbook",
+),
+dict(
   lang="en", slug="uninstall-apps-mac", topic="disk", date="2026-10-29", read="6 min read",
   title="How to Uninstall Apps on Mac Completely | Tidymint",
   desc="Dragging an app to the Trash leaves settings and caches behind. How to uninstall apps on Mac the right way, including macOS 26 Tahoe, and clean up leftovers.",

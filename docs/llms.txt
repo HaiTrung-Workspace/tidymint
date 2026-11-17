@@ -41,6 +41,7 @@
 - How much space Adobe takes on a Mac and what to delete: https://tidymint.app/adobe-storage-mac/
 - (Vietnamese) Adobe chiếm bao nhiêu GB trên Mac, dọn chỗ nào: https://tidymint.app/vi/adobe-chiem-dung-luong-mac/
 - How to free up space on Mac (incl. clearing cache): https://tidymint.app/free-up-space-mac/
+- How to clear cache on Mac (Safari, Chrome, ~/Library/Caches; what to leave alone): https://tidymint.app/clear-cache-mac/
 - (Vietnamese) 10 cách giải phóng dung lượng MacBook an toàn: https://tidymint.app/vi/giai-phong-dung-luong-macbook/
 - How to uninstall apps on Mac completely: https://tidymint.app/uninstall-apps-mac/
 - Xcode, Docker, node_modules: cleaning developer files on Mac: https://tidymint.app/clean-developer-files-mac/
