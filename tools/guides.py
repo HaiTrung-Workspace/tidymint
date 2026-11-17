@@ -126,15 +126,16 @@ def guide(g):
     rel = "".join('<a href="%s">%s <span class="arr r">→</span></a>' % (u, n) for n, u in g.get("related", [])).replace("{HOME}", home)
     cta = ('<div class="box"><img class="bico" src="' + root + 'icon.png" alt="" width="56" height="56"><h3>%s</h3><p>%s</p><div class="cta box-cta"><a class="btn primary" href="%s">%s <span class="arr">↓</span></a>'
            '<a class="btn ghost" href="%s%s">%s</a></div></div>') % (l["cta_h"], l["cta_p"], S.DL, l["cta_btn"], home, l["inst"], l["cta_more"])
-    # "Manual vs Tidymint" box: once per page. It goes where the body has {CTA}; the end-of-page download box (tail) is
-    # the plain box only. Both used to share one variable, so the table showed twice on every disk/apps guide.
+    # "Manual vs Tidymint" box and the download box: once per page, where the body has {CTA} (or at the end if it has none).
+    # Both used to be added in the body and again at the end, so every disk/apps guide showed them twice.
     mvt = ""
     if g.get("topic", "disk") in ("disk", "apps"):
         vh, vrows = VS[k]
         mvt = ('<div class="mvt"><h3>%s</h3><div class="tbl"><table><tr><th></th><th>%s</th><th>Tidymint</th></tr>%s</table></div></div>'
                % (vh, vrows[0], "".join('<tr><td><b>%s</b></td><td data-l="%s">%s</td><td class="y" data-l="Tidymint">%s</td></tr>' % (r[0], vrows[0], r[1], r[2]) for r in vrows[1:])))
     body = g["body"]
-    tail_cta = cta if "{CTA}" in body else mvt + cta
+    # Download box once per page too: in the body when it has {CTA}, otherwise at the end.
+    tail_cta = "" if "{CTA}" in body else mvt + cta
     cta = mvt + cta
     if "{SAFETY_RULES}" in body:
         import safety_gen
@@ -456,7 +457,7 @@ if __name__ == "__main__":
         os.makedirs(os.path.dirname(out), exist_ok=True)
         page = stamp(guide(g), out, ROOT)
         # Guard: blocks that must appear once per page. A second copy has slipped in before (manual vs Tidymint box).
-        for mark, name in (('<div class="mvt">', "manual vs Tidymint box"), ('<div class="mqs">', "slogan strip")):
+        for mark, name in (('<div class="mvt">', "manual vs Tidymint box"), ('<div class="mqs">', "slogan strip"), ('<img class="bico"', "download box")):
             if page.count(mark) > 1:
                 sys.exit("STOP: %s appears %d times on %s" % (name, page.count(mark), os.path.relpath(out, ROOT)))
         open(out, "w").write(page)
