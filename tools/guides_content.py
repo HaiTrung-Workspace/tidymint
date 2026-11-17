@@ -2155,19 +2155,18 @@ GUIDES.append(dict(
 # --- 0.5.0 tools: Mintdrop and Mintangle (linked from the app's own pages) ---
 
 GUIDES.append(dict(
-  lang="vi", slug="mintdrop-ke-tha-file-mac", topic="start", date="2026-11-06", read="4 phút đọc",
+  lang="vi", slug="mintdrop-ke-tha-file-mac", topic="start", date="2026-11-17", read="4 phút đọc",
   title="Gom file từ nhiều nơi về một kệ nổi: Mintdrop | Tidymint",
-  desc="Mintdrop là kệ thả file nổi trên Mac: lắc chuột khi kéo file hoặc nhấn ⌃⌥S, gom tối đa 5 file từ nhiều nơi rồi kéo từng file ra chỗ cần, có Hoàn tác.",
+  desc="Mintdrop là kệ thả file nổi trên Mac: lắc chuột khi kéo file hoặc nhấn ⌃⌥S, gom file từ nhiều thư mục về một chỗ rồi kéo từng file ra nơi cần, có Hoàn tác.",
   crumb="Mintdrop",
   h1="Gom file từ nhiều nơi về một kệ, kéo ra đúng chỗ cần",
-  tldr="Mintdrop là kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, <b>tối đa 5 món</b>, rồi <b>kéo từng file ra</b> đúng chỗ cần. Kệ chỉ nhớ đường dẫn, <b>không chép file nào</b>. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
+  tldr="Mintdrop là kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, rồi <b>kéo từng file ra</b> đúng chỗ cần. Kệ chỉ nhớ đường dẫn, <b>không chép file nào</b>. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
   toc=[("khi-nao","Dùng khi nào"),("bat","Bật Mintdrop"),("mo-ke","Mở kệ"),("chon","Chọn nhiều file"),("xu-ly","Kéo file ra"),
        ("chuyen-hay-chep","Kéo ra là chuyển hay chép?"),("hoan-tac","Hoàn tác"),("rieng-tu","Quyền riêng tư"),("faq","Câu hỏi thường gặp")],
   body="""<h2 id="khi-nao">Dùng khi nào</h2>
 <ul><li><b>Gom ảnh để gửi</b>: vài ảnh ở Downloads, vài ảnh ở Desktop, một file trong thư mục dự án. Thả lên kệ, mở Zalo hay Mail rồi kéo từng ảnh vào.</li>
 <li><b>Chuyển file giữa hai thư mục xa nhau</b>: thả file lên kệ, mở thư mục đích, kéo ra. Không cần mở hai cửa sổ Finder cạnh nhau. Lỡ tay thì Hoàn tác.</li>
 <li><b>Giữ tạm file</b> trong lúc bạn đổi cửa sổ hay đổi màn hình làm việc.</li></ul>
-<p>Kệ chứa tối đa <b>5 món</b>. Kệ đầy thì lấy bớt ra để thả thêm.</p>
 <h2 id="bat">Bật Mintdrop</h2>
 <ol class="steps"><li>Mở Tidymint, ở thanh bên chọn nhóm <b>CÔNG CỤ › Mintdrop</b>.</li><li>Bấm <b>Bật Mintdrop</b>. Không cần cấp quyền gì thêm.</li></ol>
 <figure class="fig-app"><img src="../mintdrop.jpg" alt="Trang Mintdrop của Tidymint với chiếc kệ nổi đang giữ bốn file: một ảnh chụp, một ảnh, một PDF và một file chữ" width="1600" height="891" loading="lazy"><figcaption>Kệ nổi phía trên các cửa sổ. Trang Mintdrop cho biết kệ đang giữ bao nhiêu file.</figcaption></figure>
@@ -2197,30 +2196,28 @@ GUIDES.append(dict(
 <h2 id="rieng-tu">Quyền riêng tư</h2>
 <p>Mintdrop không cần quyền nào của macOS. Khi bạn giữ chuột, kệ chỉ xem có file đang được kéo hay không, và chỉ khi đó mới theo dõi chuột để nhận ra cú lắc. Kệ không đọc nội dung file, không gửi gì đi. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
 """,
-  faq=[("Kệ chứa được bao nhiêu file?", "Tối đa 5 món. Kệ đầy thì lấy bớt ra để thả thêm."),
-       ("Mintdrop có chép file của tôi không?", "Không. Kệ chỉ nhớ đường dẫn tới file. File chỉ được chép khi bạn kéo nó sang ổ khác hoặc giữ Option khi thả, giống hệt Finder."),
+  faq=[("Mintdrop có chép file của tôi không?", "Không. Kệ chỉ nhớ đường dẫn tới file. File chỉ được chép khi bạn kéo nó sang ổ khác hoặc giữ Option khi thả, giống hệt Finder."),
        ("Lắc chuột không mở được kệ?", "Kiểm tra Mintdrop đang bật và mục Lắc chuột khi kéo file đang bật trong trang Mintdrop. Phải lắc trong lúc vẫn đang giữ chuột kéo file. Cách chắc ăn nhất là nhấn ⌃⌥S."),
        ("Phím ⌃⌥S không chạy?", "Một app khác có thể đang giữ tổ hợp này, trang Mintdrop sẽ báo. Khi đó bạn mở kệ bằng cách lắc chuột, hoặc tắt phím đó ở app kia.")],
   sources=[("Apple: Kéo và thả mục trên Mac (giữ Option để chép)", "https://support.apple.com/guide/mac-help/mh35852/mac"),
            ("Chính sách quyền riêng tư của Tidymint (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
-  related=[("Mintangle: xếp cửa sổ bằng phím tắt", "{HOME}mintangle-xep-cua-so-mac/"), ("Tidymint có an toàn không?", "{HOME}an-toan/"), ("Trang chủ Tidymint", "{HOME}")],
+  related=[("Cách chia đôi màn hình MacBook", "{HOME}mintangle-xep-cua-so-mac/"), ("Tidymint có an toàn không?", "{HOME}an-toan/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="mintdrop-drop-shelf-mac",
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="mintdrop-drop-shelf-mac", topic="start", date="2026-11-06", read="4 min read",
+  lang="en", slug="mintdrop-drop-shelf-mac", topic="start", date="2026-11-17", read="4 min read",
   title="Gather Files From Anywhere on One Floating Shelf | Tidymint",
-  desc="Mintdrop is a floating drop shelf for Mac: shake while dragging or press ⌃⌥S, collect up to 5 files, then drag each one out where it belongs, with Undo.",
+  desc="Mintdrop is a floating drop shelf for Mac: shake while dragging or press ⌃⌥S, gather files from several folders, then drag each one where it goes, with Undo.",
   crumb="Mintdrop",
   h1="Gather Files From Anywhere on One Shelf, Then Drag Them Where They Belong",
-  tldr="Mintdrop is a small shelf that floats on your screen. Drop files from several folders onto it, <b>up to 5 items</b>, then <b>drag each one out</b> where it belongs. The shelf only remembers paths and <b>never copies a file</b>. Part of Tidymint since 0.5.0, off by default, no permission needed.",
+  tldr="Mintdrop is a small shelf that floats on your screen. Drop files from several folders onto it, then <b>drag each one out</b> where it belongs. The shelf only remembers paths and <b>never copies a file</b>. Part of Tidymint since 0.5.0, off by default, no permission needed.",
   toc=[("when","When to use it"),("turn-on","Turn on Mintdrop"),("open","Open the shelf"),("select","Select several files"),("handle","Drag files out"),
        ("move-or-copy","Does dragging out move or copy?"),("undo","Undo"),("privacy","Privacy"),("faq","FAQ")],
   body="""<h2 id="when">When to use it</h2>
 <ul><li><b>Gather photos to send</b>: a few in Downloads, a few on the Desktop, one in a project folder. Drop them on the shelf, open Mail or a chat app, then drag each one in.</li>
 <li><b>Move a file between two distant folders</b>: drop it on the shelf, open the destination, drag it out. No need for two Finder windows side by side. Changed your mind? Undo.</li>
 <li><b>Hold a file for a moment</b> while you switch windows or desktops.</li></ul>
-<p>The shelf holds up to <b>5 items</b>. When it is full, take some off to add more.</p>
 <h2 id="turn-on">Turn on Mintdrop</h2>
 <ol class="steps"><li>Open Tidymint and choose <b>TOOLS › Mintdrop</b> in the sidebar.</li><li>Click <b>Turn on</b>. No extra permission is needed.</li></ol>
 <figure class="fig-app"><img src="../mintdrop.jpg" alt="The Mintdrop page in Tidymint with the floating shelf holding four files: a photo, an image, a PDF and a text file" width="1600" height="891" loading="lazy"><figcaption>The shelf floats above your windows. The Mintdrop page shows how many files it holds.</figcaption></figure>
@@ -2250,13 +2247,12 @@ GUIDES.append(dict(
 <h2 id="privacy">Privacy</h2>
 <p>Mintdrop needs no macOS permission. While a mouse button is held, it only checks whether files are being dragged, and only then follows the pointer to notice a shake. It never reads file contents and sends nothing. Details: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
 """,
-  faq=[("How many files does the shelf hold?", "Up to 5 items. When it is full, take some off to add more."),
-       ("Does Mintdrop copy my files?", "No. The shelf only remembers where files are. A file is copied only when you drag it to another disk or hold Option while dropping, exactly as in Finder."),
+  faq=[("Does Mintdrop copy my files?", "No. The shelf only remembers where files are. A file is copied only when you drag it to another disk or hold Option while dropping, exactly as in Finder."),
        ("Shaking does not open the shelf?", "Check that Mintdrop and Shake while dragging are both on, on the Mintdrop page. Shake while still holding the files. The sure way is ⌃⌥S."),
        ("⌃⌥S does nothing?", "Another app may hold that shortcut; the Mintdrop page says so. Open the shelf by shaking, or free the shortcut in the other app.")],
   sources=[("Apple: Drag and drop items on Mac (hold Option to copy)", "https://support.apple.com/guide/mac-help/mh35852/mac"),
            ("Tidymint privacy policy (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
-  related=[("Mintangle: arrange windows with shortcuts", "{HOME}mintangle-window-tiling-mac/"), ("Is Tidymint safe?", "{HOME}safety/"), ("Tidymint home", "{HOME}")],
+  related=[("How to split screen on Mac", "{HOME}mintangle-window-tiling-mac/"), ("Is Tidymint safe?", "{HOME}safety/"), ("Tidymint home", "{HOME}")],
   alt="mintdrop-ke-tha-file-mac",
 ))
 
@@ -2268,16 +2264,18 @@ def _mt_table(vi):
     return '<div class="tbl"><table>' + head + "".join("<tr><td>%s</td><td><code>%s</code></td></tr>" % (a if vi else b, k) for a, b, k in _MT_KEYS) + "</table></div>"
 
 GUIDES.append(dict(
-  lang="vi", slug="mintangle-xep-cua-so-mac", topic="start", date="2026-11-06", read="4 phút đọc",
-  title="Xếp cửa sổ Mac gọn chỉ với một phím: Mintangle | Tidymint",
-  desc="Mintangle xếp cửa sổ Mac thành nửa màn hình hoặc 1/4 ở góc bằng phím tắt hoặc kéo vào mép màn hình. Mặc định tắt, chỉ hỏi quyền Trợ năng khi bạn bật lên.",
+  lang="vi", slug="mintangle-xep-cua-so-mac", topic="start", date="2026-11-17", read="4 phút đọc",
+  title="Cách chia đôi màn hình MacBook bằng một phím | Tidymint",
+  desc="Cách chia đôi màn hình MacBook bằng Split View có sẵn, hoặc một phím tắt với Mintangle: nửa màn hình, một góc, kéo vào mép. Tắt sẵn, bật mới hỏi quyền.",
   crumb="Mintangle",
-  h1="Xếp mọi cửa sổ vào đúng chỗ chỉ với một phím bấm",
-  tldr="Mintangle đặt cửa sổ vào nửa màn hình hoặc một góc chỉ bằng một phím tắt, hoặc khi bạn kéo cửa sổ vào mép màn hình. Bộ phím giống Rectangle nên ai quen Rectangle dùng được ngay. Có trong Tidymint từ bản 0.5.0, <b>mặc định tắt</b>, chỉ khi bạn bật thì macOS mới hỏi quyền <b>Trợ năng</b>.",
-  toc=[("vi-sao","macOS đã có sẵn, sao cần Mintangle?"),("bat","Bật và cấp quyền"),("phim-tat","Phím tắt mặc định"),("keo","Kéo cửa sổ vào mép"),
+  h1="Cách chia đôi màn hình MacBook: hai cửa sổ cạnh nhau",
+  tldr="Hai cửa sổ cạnh nhau giúp vừa xem vừa làm, khỏi chuyển qua lại. Bài này chỉ hai cách có sẵn của macOS và cách dùng Mintangle: một phím là nửa màn hình hay một góc, bộ phím giống Rectangle. Mintangle <b>tắt sẵn</b>, bạn bật thì macOS mới hỏi quyền <b>Trợ năng</b>.",
+  toc=[("vi-sao","Cách có sẵn của macOS"),("bat","Bật và cấp quyền"),("phim-tat","Phím tắt mặc định"),("keo","Kéo cửa sổ vào mép"),
        ("tuy-chinh","Đổi phím tắt"),("rieng-tu","Quyền Trợ năng dùng để làm gì"),("faq","Câu hỏi thường gặp")],
-  body="""<h2 id="vi-sao">macOS đã có sẵn, sao cần Mintangle?</h2>
-<p>Từ macOS 15, Apple có sẵn xếp cửa sổ: kéo vào mép, menu Cửa sổ, và phím tắt Fn-Control kèm phím mũi tên cho nửa màn hình. Nhưng phím tắt của Apple <b>không có cho 4 góc</b>. Mintangle bổ sung phần đó, và dùng được cả trên macOS 14.</p>
+  body="""<h2 id="vi-sao">Chia đôi màn hình bằng cách có sẵn của macOS</h2>
+<p>macOS có hai cách, không cần cài thêm gì:</p>
+<ol class="steps"><li><b>Split View:</b> rê con trỏ lên nút xanh lá ở góc trên trái cửa sổ, chọn Toàn màn hình › Bên trái màn hình (Full Screen › Left of Screen) hoặc bên phải, rồi bấm cửa sổ thứ hai ở nửa còn lại. Hai app mở toàn màn hình trong một màn hình nền (Space) mới.</li><li><b>Xếp cửa sổ</b> (từ macOS 15): kéo cửa sổ vào mép trái hoặc phải, dùng menu Cửa sổ, hoặc nhấn Fn-Control kèm phím mũi tên. Cửa sổ vẫn nằm trên màn hình nền đang dùng.</li></ol>
+<p>Phím tắt của Apple <b>không có cho 4 góc</b>, và cách xếp cửa sổ không có trên macOS 14. Mintangle bổ sung hai phần đó: một phím là nửa màn hình hay một góc.</p>
 <h2 id="bat">Bật và cấp quyền</h2>
 <ol class="steps"><li>Trong Tidymint, chọn <b>CÔNG CỤ › Mintangle</b> ở thanh bên, bấm <b>Bật và cấp quyền</b>.</li>
 <li>macOS hiện hộp thoại hỏi quyền. Mở <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật › Trợ năng</b> (Accessibility), bật công tắc cạnh Tidymint.</li>
@@ -2302,7 +2300,7 @@ GUIDES.append(dict(
        ("Có cửa sổ không xếp được?", "Một số app đặt cỡ tối thiểu hoặc không cho đổi cỡ, khi đó cửa sổ chỉ được dời, không co lại vừa khung."),
        ("Đã cấp quyền mà vẫn không chạy?", "Vào Quyền riêng tư & Bảo mật › Trợ năng, tắt công tắc Tidymint rồi bật lại, sau đó mở lại Tidymint. macOS đôi khi giữ quyền cũ sau khi app được cập nhật."),
        ("Tắt Mintangle thì sao?", "Phím tắt và kéo xếp ngừng ngay. Quyền Trợ năng vẫn nằm trong Cài đặt cho tới khi bạn tự tắt, Tidymint không dùng tới nó.")],
-  sources=[("Apple: Cho phép app trợ năng truy cập máy Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
+  sources=[("Apple: Dùng app trong Split View trên Mac", "https://support.apple.com/guide/mac-help/mchl4fbe2921/mac"), ("Apple: Cho phép app trợ năng truy cập máy Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
            ("Apple: Xếp cửa sổ trên Mac", "https://support.apple.com/guide/mac-help/mchlef287e5d/mac"),
            ("Apple: Phím tắt xếp cửa sổ", "https://support.apple.com/guide/mac-help/mchl9674d0b0/mac"),
            ("Apple: Cài đặt Màn hình nền & Dock", "https://support.apple.com/guide/mac-help/mchlp1119/mac")],
@@ -2311,16 +2309,18 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="mintangle-window-tiling-mac", topic="start", date="2026-11-06", read="4 min read",
-  title="Snap Mac Windows Into Place With One Key | Tidymint",
-  desc="Mintangle tiles Mac windows into halves and quarters with shortcuts or by dragging to a screen edge. Off by default, asks for Accessibility only when on.",
+  lang="en", slug="mintangle-window-tiling-mac", topic="start", date="2026-11-17", read="4 min read",
+  title="How to Split Screen on Mac, With One Key | Tidymint",
+  desc="How to split screen on Mac with built-in Split View, or one shortcut with Mintangle: halves, corners, drag to an edge. Off by default until you turn it on.",
   crumb="Mintangle",
-  h1="Put Every Window in Its Place With One Shortcut",
-  tldr="Mintangle puts a window in a half or a corner of the screen with one shortcut, or when you drag it to a screen edge. The keys match Rectangle, so Rectangle users feel at home. Part of Tidymint since 0.5.0, <b>off by default</b>; macOS asks for <b>Accessibility</b> permission only when you turn it on.",
-  toc=[("why","macOS has tiling, so why Mintangle?"),("turn-on","Turn on and grant permission"),("shortcuts","Default shortcuts"),("drag","Drag windows to an edge"),
+  h1="How to Split Screen on Mac: Two Windows Side by Side",
+  tldr="Two windows side by side let you read and work without switching back and forth. This guide shows the two built-in ways in macOS, then Mintangle: one key for a half or a corner, with Rectangle-style keys. Mintangle is <b>off by default</b>; macOS asks for <b>Accessibility</b> only when you turn it on.",
+  toc=[("why","What macOS already has"),("turn-on","Turn on and grant permission"),("shortcuts","Default shortcuts"),("drag","Drag windows to an edge"),
        ("customize","Change shortcuts"),("privacy","What the Accessibility permission is for"),("faq","FAQ")],
-  body="""<h2 id="why">macOS has tiling, so why Mintangle?</h2>
-<p>Since macOS 15, Apple tiles windows when you drag them to an edge, from the Window menu, and with Fn-Control plus an arrow key for halves. But Apple's shortcuts have <b>no keys for the four corners</b>. Mintangle adds them, and also works on macOS 14.</p>
+  body="""<h2 id="why">Split screen with what macOS already has</h2>
+<p>macOS has two ways, nothing to install:</p>
+<ol class="steps"><li><b>Split View:</b> hold the pointer over the green button in the top-left corner of a window, choose Full Screen › Left of Screen or Right of Screen, then click the second window on the other side. Both apps go full screen in a new desktop space.</li><li><b>Tiling</b> (macOS 15 and later): drag a window to the left or right edge, use the Window menu, or press Fn-Control with an arrow key. Windows stay on your current desktop.</li></ol>
+<p>Apple's shortcuts have <b>no keys for the four corners</b>, and tiling is not on macOS 14. Mintangle adds both: one key for a half or a corner.</p>
 <h2 id="turn-on">Turn on and grant permission</h2>
 <ol class="steps"><li>In Tidymint, choose <b>TOOLS › Mintangle</b> in the sidebar and click <b>Turn on and grant permission</b>.</li>
 <li>macOS asks for permission. Open <b>System Settings › Privacy &amp; Security › Accessibility</b> and switch Tidymint on.</li>
@@ -2345,7 +2345,7 @@ GUIDES.append(dict(
        ("Some window will not tile?", "Some apps set a minimum size or cannot be resized; then the window is moved but not shrunk to fit."),
        ("Permission granted but nothing happens?", "In Privacy & Security › Accessibility, switch Tidymint off and on again, then reopen Tidymint. macOS sometimes keeps a stale permission after an app update."),
        ("What happens if I turn Mintangle off?", "Shortcuts and drag tiling stop at once. The Accessibility switch stays in System Settings until you turn it off; Tidymint no longer uses it.")],
-  sources=[("Apple: Allow accessibility apps to access your Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
+  sources=[("Apple: Use apps in Split View on Mac", "https://support.apple.com/guide/mac-help/mchl4fbe2921/mac"), ("Apple: Allow accessibility apps to access your Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
            ("Apple: Tile windows on Mac", "https://support.apple.com/guide/mac-help/mchlef287e5d/mac"),
            ("Apple: Window tiling keyboard shortcuts", "https://support.apple.com/guide/mac-help/mchl9674d0b0/mac"),
            ("Apple: Desktop & Dock settings", "https://support.apple.com/guide/mac-help/mchlp1119/mac")],
@@ -2411,7 +2411,7 @@ GUIDES.append(dict(
            ("Apple: Cho phép app trợ năng truy cập máy Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
            ("Apple: Kiểm soát quyền ghi màn hình và âm thanh hệ thống trên Mac", "https://support.apple.com/guide/mac-help/mchld6aa7d23/mac"),
            ("Chính sách quyền riêng tư của Tidymint (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
-  related=[("Mintangle: xếp cửa sổ bằng phím tắt", "{HOME}mintangle-xep-cua-so-mac/"), ("Mintdrop: kệ thả file", "{HOME}mintdrop-ke-tha-file-mac/"), ("Tidymint có an toàn không?", "{HOME}an-toan/")],
+  related=[("Cách chia đôi màn hình MacBook", "{HOME}mintangle-xep-cua-so-mac/"), ("Mintdrop: kệ thả file", "{HOME}mintdrop-ke-tha-file-mac/"), ("Tidymint có an toàn không?", "{HOME}an-toan/")],
   alt="mintbar-tidy-menu-bar-mac",
 ))
 
@@ -2471,6 +2471,6 @@ GUIDES.append(dict(
            ("Apple: Allow accessibility apps to access your Mac", "https://support.apple.com/guide/mac-help/mh43185/mac"),
            ("Apple: Control access to screen and system audio recording on Mac", "https://support.apple.com/guide/mac-help/mchld6aa7d23/mac"),
            ("Tidymint privacy policy (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
-  related=[("Mintangle: arrange windows with shortcuts", "{HOME}mintangle-window-tiling-mac/"), ("Mintdrop: a drop shelf", "{HOME}mintdrop-drop-shelf-mac/"), ("Is Tidymint safe?", "{HOME}safety/")],
+  related=[("How to split screen on Mac", "{HOME}mintangle-window-tiling-mac/"), ("Mintdrop: a drop shelf", "{HOME}mintdrop-drop-shelf-mac/"), ("Is Tidymint safe?", "{HOME}safety/")],
   alt="mintbar-gon-thanh-menu-mac",
 ))
