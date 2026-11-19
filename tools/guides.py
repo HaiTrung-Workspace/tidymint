@@ -187,7 +187,9 @@ def guide(g):
 <meta name="twitter:card" content="summary_large_image">
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}
-var tmC=null;try{{tmC=localStorage.getItem('tm-consent');var nt=new URLSearchParams(location.search).get('notrack');if(nt==='1')localStorage.setItem('tm-notrack','1');if(nt==='0')localStorage.removeItem('tm-notrack');if(localStorage.getItem('tm-notrack')==='1')window['ga-disable-{S.GA_ID}']=true}}catch(e){{}}
+var tmC=null,tmN=false;try{{tmC=localStorage.getItem('tm-consent');var nt=new URLSearchParams(location.search).get('notrack');if(nt==='1')localStorage.setItem('tm-notrack','1');if(nt==='0')localStorage.removeItem('tm-notrack');if(localStorage.getItem('tm-notrack')==='1')tmN=true}}catch(e){{}}
+if(navigator.webdriver)tmN=true;
+if(tmN){{window['ga-disable-{S.GA_ID}']=true;document.addEventListener('DOMContentLoaded',function(){{var b=document.createElement('div');b.id='tm-nt';b.textContent='notrack';b.style.cssText='position:fixed;left:8px;bottom:8px;z-index:9999;font:11px/1 -apple-system,sans-serif;padding:4px 7px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;pointer-events:none';document.body.appendChild(b)}})}}
 gtag('consent','default',{{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:tmC==='yes'?'granted':'denied',wait_for_update:500}});
 gtag('js',new Date());gtag('config','{S.GA_ID}');
 </script>
