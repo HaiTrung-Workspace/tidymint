@@ -3,7 +3,7 @@
 
 GUIDES = [
 dict(
-  lang="vi", slug="cleanmymac-mien-phi", topic="compare", date="2026-10-26", read="8 phút đọc",
+  lang="vi", slug="cleanmymac-mien-phi", topic="compare", date="2026-11-22", read="8 phút đọc",
   title="CleanMyMac miễn phí? Cách thay bản crack hợp pháp | Tidymint",
   desc="CleanMyMac không có bản miễn phí, chỉ dùng thử 7 ngày. Bản crack có rủi ro mã độc. Đây là các cách dọn Mac miễn phí và hợp pháp, kèm bảng so sánh.",
   crumb="CleanMyMac miễn phí",
@@ -252,7 +252,7 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="cai-dat", topic="start", date="2026-11-05", read="3 phút đọc",
+  lang="vi", slug="cai-dat", topic="start", date="2026-11-22", read="3 phút đọc",
   title="Cài Tidymint trên Mac: từng bước có ảnh | Tidymint",
   desc="Tải Tidymint, kéo vào Ứng dụng, bấm Mở và cấp quyền Truy cập toàn bộ ổ đĩa. Bốn bước, có ảnh.",
   crumb="Cài đặt từng bước",
@@ -263,7 +263,6 @@ dict(
   body="""
 <h2 id="b1">Bước 1: Tải và giải nén</h2>
 <p>Bấm <a href="{DL}">Tải Tidymint</a>. File <b>Tidymint.zip</b> nằm trong thư mục <b>Downloads</b>. Nhấp đúp file zip, macOS tự giải nén ra app <b>Tidymint</b> ngay cạnh.</p>
-<img src="../../install-1-download.jpg" alt="Thư mục Downloads với Tidymint.zip và app Tidymint vừa giải nén" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
 <h2 id="b2">Bước 2: Kéo vào Ứng dụng</h2>
 <p>Kéo <b>Tidymint</b> từ Downloads vào thư mục <b>Ứng dụng</b> (Applications) ở thanh bên Finder. Để ở Downloads cũng chạy được, nhưng vào Ứng dụng thì Spotlight tìm thấy, Dock giữ được, và không bị xoá nhầm khi dọn Downloads. File zip xoá được sau khi kéo xong.</p>
 <img src="../../install-2-applications.jpg" alt="Tidymint nằm trong thư mục Ứng dụng" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
@@ -325,7 +324,7 @@ dict(
 ),
 
 dict(
-  lang="en", slug="install", topic="start", date="2026-11-05", read="3 min read",
+  lang="en", slug="install", topic="start", date="2026-11-22", read="3 min read",
   title="How to Install Tidymint on Mac, With Screenshots | Tidymint",
   desc="Download Tidymint, drag it to Applications, click Open and grant Full Disk Access. Four steps with screenshots.",
   crumb="Install step by step",
@@ -336,7 +335,6 @@ dict(
   body="""
 <h2 id="s1">Step 1: Download and unzip</h2>
 <p>Click <a href="{DL}">Download Tidymint</a>. <b>Tidymint.zip</b> lands in <b>Downloads</b>. Double-click it and macOS unzips the <b>Tidymint</b> app next to it.</p>
-<img src="../install-1-download.jpg" alt="Downloads folder with Tidymint.zip and the unzipped Tidymint app" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
 <h2 id="s2">Step 2: Move to Applications</h2>
 <p>Drag <b>Tidymint</b> from Downloads to <b>Applications</b> in the Finder sidebar. It would run from Downloads too, but in Applications Spotlight finds it, the Dock keeps it, and a Downloads cleanup can't delete it by accident. You can delete the zip afterwards.</p>
 <img src="../install-2-applications.jpg" alt="Tidymint inside the Applications folder" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
@@ -909,7 +907,7 @@ dict(
 ),
 
 dict(
-  lang="en", slug="cleanmymac-alternative", topic="compare", date="2026-10-26", read="6 min read",
+  lang="en", slug="cleanmymac-alternative", topic="compare", date="2026-11-22", read="6 min read",
   title="Free CleanMyMac Alternative (Open Source) | Tidymint",
   desc="Free CleanMyMac alternative? Compare Tidymint, AppCleaner, Pearcleaner, OnyX and the tools built into macOS, including what each one can't do.",
   crumb="Free CleanMyMac alternative",
@@ -1956,7 +1954,7 @@ dict(
 ]
 
 GUIDES.append(dict(
-  lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-11-04", read="6 phút đọc",
+  lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-11-22", read="6 phút đọc",
   title="Tidymint có gửi dữ liệu của bạn đi không? | Tidymint",
   desc="App dọn máy được đọc cả ổ đĩa. Tidymint quét và dọn không cần mạng, không tài khoản. Xem app gửi gì, lúc nào, và Plus cần biết gì.",
   crumb="Quyền riêng tư",
@@ -2028,7 +2026,7 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="tidymint-privacy", topic="start", date="2026-11-04", read="6 min read",
+  lang="en", slug="tidymint-privacy", topic="start", date="2026-11-22", read="6 min read",
   title="Does Tidymint Send Your Data Anywhere? | Tidymint",
   desc="A Mac cleaner can read your whole disk. Tidymint scans and cleans offline, with no account. See what the app sends, when, and what Plus needs to know.",
   crumb="Privacy",
@@ -2100,12 +2098,12 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="vi", slug="an-toan", topic="start", date="2026-11-01", read="7 phút đọc",
+  lang="vi", slug="an-toan", topic="start", date="2026-11-22", read="7 phút đọc",
   title="Tidymint có an toàn không? Bằng chứng và cách tự kiểm",
   desc="Tidymint dọn vào Thùng rác, file không rời máy, lõi mã nguồn mở. Xem ai đã kiểm, mỗi bản mới qua bước nào, và cách bạn tự kiểm tra.",
   crumb="An toàn và minh bạch",
   h1="Tidymint có an toàn không? Đây là bằng chứng, và cách bạn tự kiểm",
-  tldr="App dọn máy được đọc cả ổ đĩa, nên bạn cần biết nó làm gì. Bài này gom đủ: <b>5 lời hứa</b> kèm cách tự kiểm, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 65 phần mềm diệt virus cùng quét, không phần mềm nào báo vấn đề) và <b>các bước mỗi bản cập nhật phải đi qua</b>. Không cần rành công nghệ, mỗi mục đều có hướng dẫn từng bước.",
+  tldr="App dọn máy được đọc cả ổ đĩa, nên bạn cần biết nó làm gì. Bài này gom đủ: <b>5 lời hứa</b> kèm cách tự kiểm, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 66 phần mềm diệt virus cùng quét, không phần mềm nào báo vấn đề) và <b>các bước mỗi bản cập nhật phải đi qua</b>. Không cần rành công nghệ, mỗi mục đều có hướng dẫn từng bước.",
   toc=[("loi-hua", "5 lời hứa của Tidymint, và cách kiểm tra"), ("ai-da-kiem", "Những ai đã kiểm tra Tidymint"), ("quy-trinh", "Một bản mới phải qua những bước nào"), ("tu-kiem-file", "Cách bạn tự kiểm file vừa tải về"), ("khong-dung", "Những thứ Tidymint không bao giờ đụng"), ("chua-co", "Tidymint chưa có gì?"), ("nhat-ky", "Nhật ký minh bạch"), ("bao-loi", "Thấy lỗi bảo mật?"), ("faq", "Câu hỏi thường gặp")],
   body="""
 <h2 id="loi-hua">5 lời hứa của Tidymint, và cách kiểm tra</h2>
@@ -2123,7 +2121,7 @@ GUIDES.append(dict(
 <p>Đây là những nơi độc lập, không do Tidymint điều hành. Bấm vào để xem tận nơi.</p>
 <div class="tbl"><table>
 <tr><th>Nơi</th><th>Họ làm gì</th><th>Kết quả</th></tr>
-<tr><td><a href="https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.6.0: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 15/11/2026)</td></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/bdb905c0e96d703447f0bb2ace4dfe0a7854cc6e2b38f1a9e6072384f525fafd">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 1.0.0: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 22/11/2026)</td></tr>
 <tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>Trang độc lập chấm các app dọn dẹp theo từng tiêu chí</td><td>Chạy quyền cao: Never. Mã công khai: Yes</td></tr>
 <tr><td><a href="https://support.apple.com/vi-vn/102445">Apple công chứng</a></td><td>Apple quét tự động tìm mã độc. Đây không phải Apple duyệt hay bảo chứng tính năng</td><td>Từ 1.0.0, app được ký Developer ID và được Apple công chứng</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>Danh sách app Mac chọn lọc trên GitHub, người duyệt xem từng đề cử</td><td>Đã nhận Tidymint (26/10/2026)</td></tr>
@@ -2132,9 +2130,7 @@ GUIDES.append(dict(
 
 <h2 id="quy-trinh">Một bản Tidymint mới phải qua những bước nào</h2>
 <ol class="steps">
-<li><b>Soát từng dòng mã</b> so với bản trước, ghi lại mọi điều thay đổi so với bản cũ.</li>
 <li><b>Không để người dùng "thử nghiệm" tính năng chưa hoàn thiện.</b></li>
-<li><b>Mỗi tính năng mới đều được sử dụng trên máy Mac thật</b> của chính người làm ra nó, nhất là các lời hứa an toàn: Thùng rác, Hoàn tác, mục bị khoá.</li>
 <li><b>Mỗi file cài có một "dấu vân tay"</b> (mã SHA-256) ghi trên trang phát hành. File bị sửa dù chỉ một chút thì dấu vân tay đổi hẳn. So dấu vân tay của file bạn tải với dòng ghi trên trang (cách làm ở mục dưới) là biết file có đúng bản gốc không.</li>
 <li><b>Quét VirusTotal</b> và đưa link kết quả lên trang phát hành (đã áp dụng từ bản 0.3.6).</li>
 <li><b>Ký Developer ID và gửi Apple công chứng</b> (áp dụng từ bản 1.0.0).</li>
@@ -2161,6 +2157,7 @@ GUIDES.append(dict(
 <h2 id="nhat-ky">Nhật ký minh bạch</h2>
 <p>Mỗi bước làm Tidymint đáng tin hơn đều được ghi ở đây, mới nhất trên cùng.</p>
 <ul>
+<li><b>22/11/2026</b>: Phát hành 1.0.0, VirusTotal quét 0/66. Đây là bản đầu tiên ký Developer ID và được Apple công chứng. Build trên máy của nhà phát triển.</li>
 <li><b>15/11/2026</b>: Phát hành 0.6.0, VirusTotal quét 0/66. Thêm Mintbar (gom icon menu bar vào nhóm, tắt sẵn), diện mạo mới và phím chuyển trang. Trước khi phát hành, phần thay đổi được rà theo 7 nhóm, mỗi nhóm kiểm hai lượt độc lập: 17 điểm được nêu, 10 điểm sửa ngay trong bản này (trong đó có Hoàn tác xoá sổ ghi cả khi một mục chưa trả về được), các điểm còn lại để bản sau.</li>
 <li><b>15/11/2026</b>: Mã các công cụ Mint (Mintangle, Mintdrop, Mintbar) không còn nằm trong kho công khai, kể cả trong lịch sử các bản 0.5.0 đến 0.5.2. Lõi dọn dẹp vẫn mở. App và file tải của các phiên bản không đổi, mã SHA-256 giữ nguyên. Mã commit của các bản này trong kho thay đổi do việc gỡ.</li>
 <li><b>12/11/2026</b>: Gỡ mã một tính năng chưa phát hành khỏi kho công khai. Phần mã của tính năng sắp xếp thư mục được gỡ khỏi kho mã, kể cả trong lịch sử các bản 0.3.6 đến 0.5.2. Tính năng này luôn bị ẩn trong mọi bản đã phát hành, nên app và file tải của các phiên bản không đổi, mã SHA-256 giữ nguyên. Mã commit của các bản này trong kho thay đổi do việc gỡ.</li>
@@ -2185,7 +2182,7 @@ GUIDES.append(dict(
        ("Tidymint có đọc nội dung file của tôi không?", "Khi dọn, phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai. Các công cụ Mint đọc nội dung khi làm việc bạn giao, ví dụ tìm chữ trong ảnh hay đổi định dạng. Việc đọc đều diễn ra trên máy."),
        ("Mintangle xin quyền Trợ năng để làm gì?", "Để dời và đổi cỡ cửa sổ khi bạn bấm phím tắt hoặc kéo cửa sổ vào mép màn hình. Mintangle tắt sẵn, chỉ khi bạn bật thì macOS mới hỏi quyền. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ. Vị trí và cỡ cửa sổ không rời máy. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư & Bảo mật › Trợ năng, lúc nào cũng được."),
        ("Mintbar xin quyền Trợ năng và Ghi màn hình để làm gì?", "Chỉ trên macOS 27, và chỉ khi bạn bật Mintbar. Trợ năng để biết app nào có icon trên menu bar và mở icon bạn chọn trong nhóm. Ghi màn hình để chụp đúng ô icon menu bar của các app trong nhóm; hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Hình icon không rời máy.")],
-  sources=[("VirusTotal: kết quả quét Tidymint.zip 0.6.0", "https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
+  sources=[("VirusTotal: kết quả quét Tidymint.zip 1.0.0", "https://www.virustotal.com/gui/file/bdb905c0e96d703447f0bb2ace4dfe0a7854cc6e2b38f1a9e6072384f525fafd"),
            ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
            ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
            ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/vi-vn/102445"),
@@ -2195,12 +2192,12 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="safety", topic="start", date="2026-11-01", read="6 min read",
+  lang="en", slug="safety", topic="start", date="2026-11-22", read="6 min read",
   title="Is Tidymint safe? The evidence, and how to check it",
   desc="Tidymint cleans into the Trash, files stay on your Mac, and the cleaning code is public. See who has checked it, what every update goes through, and how to verify it.",
   crumb="Safety and transparency",
   h1="Is Tidymint safe? Here is the evidence, and how you can check it yourself",
-  tldr="A Mac cleaner can read your whole disk, so you should know what it does. This page has it all: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 65 antivirus engines scanned it and none found a problem) and <b>the steps every update goes through</b>. No technical knowledge needed: each part walks you through it.",
+  tldr="A Mac cleaner can read your whole disk, so you should know what it does. This page has it all: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 66 antivirus engines scanned it and none found a problem) and <b>the steps every update goes through</b>. No technical knowledge needed: each part walks you through it.",
   toc=[("promises", "Tidymint's 5 promises, and how to check them"), ("checked-by", "Who has checked Tidymint"), ("release-steps", "What every new version goes through"), ("verify-download", "How to check the file you downloaded"), ("never", "What Tidymint never touches, read from the code"), ("not-yet", "What Tidymint doesn't have yet"), ("log", "Transparency log"), ("report", "Found a security issue?"), ("faq", "FAQ")],
   body="""
 <h2 id="promises">Tidymint's 5 promises, and how to check them</h2>
@@ -2218,7 +2215,7 @@ GUIDES.append(dict(
 <p>These are independent places, not run by Tidymint. Click through and see for yourself.</p>
 <div class="tbl"><table>
 <tr><th>Where</th><th>What they do</th><th>Result</th></tr>
-<tr><td><a href="https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 0.6.0 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 15 Nov 2026)</td></tr>
+<tr><td><a href="https://www.virustotal.com/gui/file/bdb905c0e96d703447f0bb2ace4dfe0a7854cc6e2b38f1a9e6072384f525fafd">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 1.0.0 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 22 Nov 2026)</td></tr>
 <tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>An independent site that rates disk cleaners on a set of checks</td><td>Runs elevated: Never. Source published: Yes</td></tr>
 <tr><td><a href="https://support.apple.com/102445">Apple notarization</a></td><td>An automatic malware scan by Apple. It is not a review or endorsement of features</td><td>From 1.0.0 the app is signed with Developer ID and notarized by Apple</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>A curated list of Mac apps on GitHub, where maintainers review each submission</td><td>Accepted Tidymint (26 Oct 2026)</td></tr>
@@ -2227,9 +2224,7 @@ GUIDES.append(dict(
 
 <h2 id="release-steps">What every new version goes through</h2>
 <ol class="steps">
-<li><b>Every line of code is reviewed</b> against the previous version, and every change from the old version is written down.</li>
 <li><b>You are never asked to "test" unfinished features.</b></li>
-<li><b>Every new feature is used on a real Mac</b> by the person who built it, above all the safety promises: Trash, Undo, locked items.</li>
 <li><b>Every installer has a "fingerprint"</b> (a SHA-256 checksum) listed on the release page. If the file is changed even slightly, the fingerprint changes completely. Compare the fingerprint of your download with the one on the page (how-to below) to know it's the original.</li>
 <li><b>A VirusTotal scan</b> is linked on the release page (since version 0.3.6).</li>
 <li><b>Signed with Developer ID and notarized by Apple</b> (since version 1.0.0).</li>
@@ -2256,6 +2251,7 @@ GUIDES.append(dict(
 <h2 id="log">Transparency log</h2>
 <p>Every step that makes Tidymint more trustworthy is recorded here, newest first.</p>
 <ul>
+<li><b>22 Nov 2026</b>: Released 1.0.0, VirusTotal scan 0/66. It is the first version signed with Developer ID and notarized by Apple. Built on the developer's Mac.</li>
 <li><b>15 Nov 2026</b>: Released 0.6.0, VirusTotal scan 0/66. Adds Mintbar (menu bar icons gathered into groups, off by default), a new look and page shortcuts. Before release the changes were reviewed in 7 groups, each checked in two independent passes: 17 points were raised and 10 were fixed in this version (among them Undo dropping its record even when an item could not be put back); the rest are left for the next version.</li>
 <li><b>15 Nov 2026</b>: The code of the Mint tools (Mintangle, Mintdrop, Mintbar) is no longer in the public repository, including the history of versions 0.5.0 to 0.5.2. The cleaning core stays open. The app and the download of every version are unchanged and their SHA-256 values stay the same. The commit IDs of those versions changed because of the removal.</li>
 <li><b>12 Nov 2026</b>: Removed the code of an unreleased feature from the public repository. The folder organizing code was taken out, including from the history of versions 0.3.6 to 0.5.2. The feature was always hidden in released versions, so the app and the download of every version are unchanged and their SHA-256 values stay the same. The commit IDs of those versions changed because of the removal.</li>
@@ -2280,7 +2276,7 @@ GUIDES.append(dict(
        ("Does Tidymint read the contents of my files?", "When cleaning, mostly it reads only names, sizes and dates, and contents only when finding duplicates and when checking scripts in project folders you add yourself. The Mint tools read contents to do what you ask, like finding text in an image or converting it. All of that reading happens on your Mac."),
        ("Why does Mintangle ask for Accessibility permission?", "To move and resize windows when you press a shortcut or drag a window to a screen edge. Mintangle is off by default, and macOS asks only when you turn it on. Tidymint does not read what is inside windows and does not record the keys you type. Window positions and sizes never leave your Mac. Turn Mintangle off, or switch Tidymint off in Privacy & Security › Accessibility, at any time."),
        ("Why does Mintbar ask for Accessibility and Screen Recording?", "Only on macOS 27, and only when you turn Mintbar on. Accessibility is used to see which apps have a menu bar icon and to open the one you pick from a group. Screen Recording is used to capture just the menu bar slot of each app in a group; the pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off. They are never sent.")],
-  sources=[("VirusTotal: scan of Tidymint.zip 0.6.0", "https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
+  sources=[("VirusTotal: scan of Tidymint.zip 1.0.0", "https://www.virustotal.com/gui/file/bdb905c0e96d703447f0bb2ace4dfe0a7854cc6e2b38f1a9e6072384f525fafd"),
            ("AreWeCleanYet: Tidymint review page", "https://arewecleanyet.org/apps/tidymint/"),
            ("Tidymint security policy (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
            ("Apple: Safely open apps on your Mac", "https://support.apple.com/102445"),
@@ -2292,7 +2288,7 @@ GUIDES.append(dict(
 # --- 0.5.0 tools: Mintdrop and Mintangle (linked from the app's own pages) ---
 
 GUIDES.append(dict(
-  lang="vi", slug="mintdrop-ke-tha-file-mac", topic="start", date="2026-11-17", read="4 phút đọc",
+  lang="vi", slug="mintdrop-ke-tha-file-mac", topic="start", date="2026-11-22", read="4 phút đọc",
   title="Gom file từ nhiều nơi về một kệ nổi: Mintdrop | Tidymint",
   desc="Mintdrop là kệ thả file nổi trên Mac: lắc chuột khi kéo file hoặc nhấn ⌃⌥S, gom file từ nhiều thư mục về một chỗ rồi kéo từng file ra nơi cần, có Hoàn tác.",
   crumb="Mintdrop",
@@ -2343,7 +2339,7 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="mintdrop-drop-shelf-mac", topic="start", date="2026-11-17", read="4 min read",
+  lang="en", slug="mintdrop-drop-shelf-mac", topic="start", date="2026-11-22", read="4 min read",
   title="Gather Files From Anywhere on One Floating Shelf | Tidymint",
   desc="Mintdrop is a floating drop shelf for Mac: shake while dragging or press ⌃⌥S, gather files from several folders, then drag each one where it goes, with Undo.",
   crumb="Mintdrop",
@@ -2397,7 +2393,7 @@ GUIDES.append(dict(
 # NOT to be published before Mintclip ships in the downloadable app.
 
 GUIDES.append(dict(
-  lang="vi", slug="mintclip-lich-su-clipboard-mac", topic="start", date="2026-11-21", read="5 phút đọc",
+  lang="vi", slug="mintclip-lich-su-clipboard-mac", topic="start", date="2026-11-22", read="5 phút đọc",
   title="Lịch sử clipboard Mac: xem và dán lại thứ đã copy | Tidymint",
   desc="Xem lịch sử clipboard trên Mac (clipboard history mac): Spotlight có sẵn từ macOS 26, hoặc Mintclip giữ chữ, link, ảnh đã copy, gõ để tìm, bấm là dán.",
   crumb="Mintclip",
@@ -2473,7 +2469,7 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="mintclip-clipboard-history-mac", topic="start", date="2026-11-21", read="5 min read",
+  lang="en", slug="mintclip-clipboard-history-mac", topic="start", date="2026-11-22", read="5 min read",
   title="Clipboard History on Mac: Find What You Copied | Tidymint",
   desc="See your clipboard history on Mac: Spotlight has one since macOS 26, or Mintclip keeps the text, links and images you copied, type to find, click to paste.",
   crumb="Mintclip",
@@ -2556,7 +2552,7 @@ def _mt_table(vi):
     return '<div class="tbl"><table>' + head + "".join("<tr><td>%s</td><td><code>%s</code></td></tr>" % (a if vi else b, k) for a, b, k in _MT_KEYS) + "</table></div>"
 
 GUIDES.append(dict(
-  lang="vi", slug="mintangle-xep-cua-so-mac", topic="start", date="2026-11-17", read="4 phút đọc",
+  lang="vi", slug="mintangle-xep-cua-so-mac", topic="start", date="2026-11-22", read="4 phút đọc",
   title="Cách chia đôi màn hình MacBook bằng một phím | Tidymint",
   desc="Cách chia đôi màn hình MacBook bằng Split View có sẵn, hoặc một phím tắt với Mintangle: nửa màn hình, một góc, kéo vào mép. Tắt sẵn, bật mới hỏi quyền.",
   crumb="Mintangle",
@@ -2601,7 +2597,7 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="mintangle-window-tiling-mac", topic="start", date="2026-11-17", read="4 min read",
+  lang="en", slug="mintangle-window-tiling-mac", topic="start", date="2026-11-22", read="4 min read",
   title="How to Split Screen on Mac, With One Key | Tidymint",
   desc="How to split screen on Mac with built-in Split View, or one shortcut with Mintangle: halves, corners, drag to an edge. Off by default until you turn it on.",
   crumb="Mintangle",
@@ -2648,7 +2644,7 @@ GUIDES.append(dict(
 # --- 0.6.0 tool: Mintbar (linked from the home page) ---
 
 GUIDES.append(dict(
-  lang="vi", slug="mintbar-gon-thanh-menu-mac", topic="start", date="2026-11-15", read="4 phút đọc",
+  lang="vi", slug="mintbar-gon-thanh-menu-mac", topic="start", date="2026-11-22", read="4 phút đọc",
   title="Gom icon thanh menu Mac vào một nhóm: Mintbar | Tidymint",
   desc="Mintbar gom icon trên thanh menu Mac vào sau một icon nhóm: bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Miễn phí 2 nhóm, Plus không giới hạn.",
   crumb="Mintbar",
@@ -2708,7 +2704,7 @@ GUIDES.append(dict(
 ))
 
 GUIDES.append(dict(
-  lang="en", slug="mintbar-tidy-menu-bar-mac", topic="start", date="2026-11-15", read="4 min read",
+  lang="en", slug="mintbar-tidy-menu-bar-mac", topic="start", date="2026-11-22", read="4 min read",
   title="Tidy a Crowded Mac Menu Bar With Groups: Mintbar | Tidymint",
   desc="Mintbar gathers Mac menu bar icons behind one group icon: click the group and its apps open right below, click an app to open its menu. 2 groups free, no limit with Plus.",
   crumb="Mintbar",

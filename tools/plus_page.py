@@ -23,7 +23,7 @@ except ModuleNotFoundError as e:
         raise
     BUY = dict.fromkeys(("plus", "mintbar", "mintangle", "mintdrop", "mintclip", "mintsort"), "")   # the public copy
 # The sales switch. Turn it on only with the owner's word, after Polar has approved the account and the 1.0.0 download is out.
-ON_SALE = False
+ON_SALE = True
 READY = ON_SALE and all(BUY.values())
 # Order of demand (Semrush, US and VN, 22/11/2026: research/2026-11-22_thu-tu-tinh-nang-plus.md). In each list below the
 # Plus rows go: the limit it lifts, then pain and search volume, then the finer options. Keep that order when adding.

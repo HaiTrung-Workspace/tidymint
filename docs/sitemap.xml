@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://tidymint.app/</loc><lastmod>2026-11-21</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
-  <url><loc>https://tidymint.app/vi/</loc><lastmod>2026-11-21</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
-  <url><loc>https://tidymint.app/guides/</loc><lastmod>2026-11-21</lastmod></url>
-  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>2026-11-21</lastmod></url>
-  <url><loc>https://tidymint.app/changelog/</loc><lastmod>2026-11-21</lastmod></url>
-  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>2026-11-21</lastmod></url>
+  <url><loc>https://tidymint.app/</loc><lastmod>2026-11-22</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
+  <url><loc>https://tidymint.app/vi/</loc><lastmod>2026-11-22</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
+  <url><loc>https://tidymint.app/guides/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/changelog/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>2026-11-22</lastmod></url>
   <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-30</lastmod></url>
-  <url><loc>https://tidymint.app/vi/cleanmymac-mien-phi/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://tidymint.app/plus/</loc><lastmod>2026-11-22</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/plus/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/plus/"/></url>
+  <url><loc>https://tidymint.app/vi/plus/</loc><lastmod>2026-11-22</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/plus/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/plus/"/></url>
+  <url><loc>https://tidymint.app/vi/cleanmymac-mien-phi/</loc><lastmod>2026-11-22</lastmod></url>
   <url><loc>https://tidymint.app/vi/xoa-ung-dung-macbook/</loc><lastmod>2026-10-26</lastmod></url>
   <url><loc>https://tidymint.app/vi/zalo-chiem-dung-luong-macbook/</loc><lastmod>2026-10-27</lastmod></url>
-  <url><loc>https://tidymint.app/vi/cai-dat/</loc><lastmod>2026-11-05</lastmod></url>
-  <url><loc>https://tidymint.app/install/</loc><lastmod>2026-11-05</lastmod></url>
+  <url><loc>https://tidymint.app/vi/cai-dat/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/install/</loc><lastmod>2026-11-22</lastmod></url>
   <url><loc>https://tidymint.app/vi/mac-tu-day-o/</loc><lastmod>2026-10-27</lastmod></url>
   <url><loc>https://tidymint.app/mac-storage-keeps-filling-up/</loc><lastmod>2026-10-27</lastmod></url>
   <url><loc>https://tidymint.app/vi/adobe-chiem-dung-luong-mac/</loc><lastmod>2026-10-27</lastmod></url>
   <url><loc>https://tidymint.app/adobe-storage-mac/</loc><lastmod>2026-10-27</lastmod></url>
   <url><loc>https://tidymint.app/clear-system-data-mac/</loc><lastmod>2026-10-26</lastmod></url>
   <url><loc>https://tidymint.app/free-up-space-mac/</loc><lastmod>2026-10-26</lastmod></url>
-  <url><loc>https://tidymint.app/cleanmymac-alternative/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://tidymint.app/cleanmymac-alternative/</loc><lastmod>2026-11-22</lastmod></url>
   <url><loc>https://tidymint.app/vi/du-lieu-he-thong-mac/</loc><lastmod>2026-10-29</lastmod></url>
   <url><loc>https://tidymint.app/vi/giai-phong-dung-luong-macbook/</loc><lastmod>2026-10-29</lastmod></url>
   <url><loc>https://tidymint.app/vi/xoa-bo-nho-dem-macbook/</loc><lastmod>2026-11-17</lastmod></url>
@@ -33,16 +35,16 @@
   <url><loc>https://tidymint.app/free-up-ram-mac/</loc><lastmod>2026-10-29</lastmod></url>
   <url><loc>https://tidymint.app/vi/giai-phong-ram-mac/</loc><lastmod>2026-11-03</lastmod></url>
   <url><loc>https://tidymint.app/vi/capcut-chiem-dung-luong-mac/</loc><lastmod>2026-10-29</lastmod></url>
-  <url><loc>https://tidymint.app/vi/quyen-rieng-tu-tidymint/</loc><lastmod>2026-11-04</lastmod></url>
-  <url><loc>https://tidymint.app/tidymint-privacy/</loc><lastmod>2026-11-04</lastmod></url>
-  <url><loc>https://tidymint.app/vi/an-toan/</loc><lastmod>2026-11-01</lastmod></url>
-  <url><loc>https://tidymint.app/safety/</loc><lastmod>2026-11-01</lastmod></url>
-  <url><loc>https://tidymint.app/vi/mintdrop-ke-tha-file-mac/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/mintdrop-drop-shelf-mac/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/vi/mintclip-lich-su-clipboard-mac/</loc><lastmod>2026-11-21</lastmod></url>
-  <url><loc>https://tidymint.app/mintclip-clipboard-history-mac/</loc><lastmod>2026-11-21</lastmod></url>
-  <url><loc>https://tidymint.app/vi/mintangle-xep-cua-so-mac/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/mintangle-window-tiling-mac/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/vi/mintbar-gon-thanh-menu-mac/</loc><lastmod>2026-11-15</lastmod></url>
-  <url><loc>https://tidymint.app/mintbar-tidy-menu-bar-mac/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://tidymint.app/vi/quyen-rieng-tu-tidymint/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/tidymint-privacy/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/an-toan/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/safety/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/mintdrop-ke-tha-file-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/mintdrop-drop-shelf-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/mintclip-lich-su-clipboard-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/mintclip-clipboard-history-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/mintangle-xep-cua-so-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/mintangle-window-tiling-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/vi/mintbar-gon-thanh-menu-mac/</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://tidymint.app/mintbar-tidy-menu-bar-mac/</loc><lastmod>2026-11-22</lastmod></url>
 </urlset>
