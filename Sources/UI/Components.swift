@@ -134,8 +134,10 @@ struct Header: View {
         VStack(spacing: 6) {
             Text(title).font(.system(size: fs(28), weight: .bold)).foregroundColor(Theme.text)
             // Narrow column so lines break evenly instead of running edge to edge with one orphan word.
-            Text(sub).font(.system(size: fs(14))).foregroundColor(Theme.sub).multilineTextAlignment(.center)
-                .frame(maxWidth: 560 * uiScale).fixedSize(horizontal: false, vertical: true)
+            if !sub.isEmpty {
+                Text(sub).font(.system(size: fs(14))).foregroundColor(Theme.sub).multilineTextAlignment(.center)
+                    .frame(maxWidth: 560 * uiScale).fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }
@@ -485,5 +487,31 @@ struct JunkCard: View {
             .padding(16).frame(maxWidth: .infinity, minHeight: 168 * uiScale, alignment: .topLeading)
             .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(hover.v ? Theme.cardHi : Theme.card))
         }.buttonStyle(.plain).onHover { hover.v = $0 }
+    }
+}
+
+/// A click anywhere outside the text field being edited ends the editing (and keeps what was typed), as in System
+/// Settings. SwiftUI on macOS leaves the caret in the field when the click lands on plain content. Installed once for
+/// the whole app at launch (16/11/2026: fields on the Mintbar and Mintangle pages kept the caret after a click outside).
+enum ClickAway {
+    private static var monitor: Any?
+    static func install() {
+        guard monitor == nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { e in
+            guard let w = e.window, let content = w.contentView else { return e }
+            let r = w.firstResponder
+            if isDevBuild {   // Dev build: what had focus at each click, to check this keeps working (SwiftUI may change)
+                let line = "\(Date().timeIntervalSince1970) click responder=\(r.map { String(describing: type(of: $0)) } ?? "nil") key=\(w.isKeyWindow) active=\(NSApp.isActive) at=\(Int(e.locationInWindow.x)),\(Int(w.frame.height - e.locationInWindow.y))\n"
+                if let h = FileHandle(forWritingAtPath: "/tmp/clickaway.log") { h.seekToEndOfFile(); h.write(line.data(using: .utf8)!); h.closeFile() }
+                else { try? line.write(toFile: "/tmp/clickaway.log", atomically: true, encoding: .utf8) }
+            }
+            // The caret sits in the window's field editor (an NSTextView) while an NSTextField is edited.
+            guard let fe = r as? NSTextView, fe.isFieldEditor else { return e }
+            let field = fe.delegate as? NSView
+            let hit = content.hitTest(content.superview?.convert(e.locationInWindow, from: nil) ?? e.locationInWindow)
+            if let hit, hit === fe || (field.map { hit === $0 || hit.isDescendant(of: $0) } ?? false) { return e }
+            w.makeFirstResponder(nil)
+            return e
+        }
     }
 }

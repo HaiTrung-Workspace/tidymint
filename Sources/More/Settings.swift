@@ -83,6 +83,31 @@ struct ThemeSwatch: View {
 }
 
 /// Explanation under a Settings block, outside it (System Settings style).
+/// One tool in Settings › Tools: its name and what it does, its switch, then a note and a link to its page.
+struct ToolSettingRow: View {
+    let name: String, what: String, note: String, link: String
+    var attention = false
+    let on: Binding<Bool>
+    let open: () -> Void
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsBox {
+                HStack {
+                    if attention { Circle().fill(Theme.warn).frame(width: 7, height: 7) }
+                    Text(name).foregroundColor(Theme.text).font(.system(size: fs(13), weight: .medium))
+                    Text(what).foregroundColor(Theme.sub).font(.system(size: fs(12)))
+                    Spacer(minLength: 16)
+                    Toggle("", isOn: on).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }.settingFlat(attention: attention)
+            }
+            HStack(spacing: 4) {
+                if !note.isEmpty { SettingNote(note) }
+                TextLink(link, size: 11) { open() }
+            }.padding(.leading, note.isEmpty ? 14 : 0)
+        }
+    }
+}
+
 struct SettingNote: View {
     let text: String
     init(_ text: String) { self.text = text }
@@ -121,36 +146,72 @@ struct SettingsView: View {
     /// The disk/RAM icon in the menu bar (same key as the MenuBarExtra in the App). Off: no icon; the app stays reachable
     /// from the Dock and Applications, and the low disk / RAM alerts still arrive as notifications.
     @AppStorage("showMenuBar") private var showMenuBar = true
+    @AppStorage(SettingsBackup.permCheckKey) private var permCheck = false
+    #if TIDYMINT_PRIVATE
+    @ObservedObject private var mintbar = Mintbar.shared
+    #endif
+    /// The Mintbar groups holding Tidymint's icon: it is in the menu bar then, inside their fans, though "showMenuBar"
+    /// is off (Mintbar turns the leaf's own item off while it sits in a group; 20/11/2026: the switch read Off, and
+    /// switching it on put a second leaf in the bar).
+    private var ownGroups: [String] {
+        #if TIDYMINT_PRIVATE
+        return mintbar.ownGroupNames
+        #else
+        return []
+        #endif
+    }
     @StateObject private var themeHover = HoveredTheme()
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: 18) {
             Text(t("Settings", "Cài đặt")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text).padding(.top, 34)
             VStack(alignment: .leading, spacing: 14) {
+            if permCheck { permissionsAfterImport }
+            SettingsGroup(id: "general", icon: "gearshape", title: t("General", "Chung"),
+                          summary: t("Open at login, Tidymint icon, theme", "Mở cùng máy, icon Tidymint, màu giao diện"), badge: nil, first: true, groups: groups) {
+                SettingsBox {
+                settingRow(t("Open at login", "Mở cùng máy"), "") {
+                    Toggle("", isOn: Binding(get: { vm.openAtLogin }, set: { vm.setOpenAtLogin($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
+                }
+                settingRow(t("Tidymint icon in the menu bar", "Icon Tidymint trên thanh menu"),
+                           ownGroups.isEmpty
+                           ? t("Free disk space and memory at a glance. It can go into a Mintbar group. Off: alerts still arrive as notifications; open Tidymint from the Dock or Applications.",
+                               "Xem nhanh dung lượng trống và bộ nhớ. Cho vào một nhóm của Mintbar được. Tắt: cảnh báo vẫn hiện thành thông báo; mở Tidymint từ Dock hoặc Applications.")
+                           : String(format: t("In the Mintbar group %@.", "Đang nằm trong nhóm %@ của Mintbar."),
+                                    ownGroups.joined(separator: ", "))) {
+                    Toggle("", isOn: Binding(get: { showMenuBar || !ownGroups.isEmpty }, set: { on in
+                        #if TIDYMINT_PRIVATE
+                        if !on && !ownGroups.isEmpty { mintbar.takeOwnOut() }
+                        if on && mintbar.putOwnBack() { return }   // back in the group it left, not loose in the bar
+                        #endif
+                        showMenuBar = on
+                    })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
+                }
+                SettingsBox {
+                settingRow(t("Theme", "Giao diện màu"), "") {
+                    HStack(spacing: 12) {
+                        ForEach(palettes, id: \.id) { pl in ThemeSwatch(pl: pl, vm: vm, hover: themeHover) }
+                    }.contentShape(Rectangle()).onHover { themeHover.inRow = $0; if !$0 { themeHover.id = nil } }
+                }
+                }
+            }
             SettingsGroup(id: "scan", icon: "magnifyingglass", title: t("Scanning and cleaning", "Quét và dọn"),
-                          summary: t("Full Disk Access, project folders, external drives", "Truy cập toàn bộ ổ đĩa, thư mục dự án, ổ cứng rời"),
-                          badge: vm.fullDiskAccess ? nil : t("Needs Full Disk Access", "Cần bật quyền"), first: true, groups: groups) {
+                          summary: t("Full Disk Access, project folders, external drives, Trash hint", "Truy cập toàn bộ ổ đĩa, thư mục dự án, ổ cứng rời, gợi ý Thùng rác"),
+                          badge: vm.fullDiskAccess ? nil : t("Needs Full Disk Access", "Cần bật quyền"), groups: groups) {
                 settingRow(t("Full Disk Access", "Truy cập toàn bộ ổ đĩa"),
-                           vm.fullDiskAccess ? t("On. Mail, Safari and Messages are measured too.", "Đã bật. Mail, Safari, Tin nhắn cũng được đo.")
-                                             : t("Off: Mail, Safari and Messages are left out of scans. Turn it on in System Settings, then come back.",
-                                                 "Đang tắt: Mail, Safari, Tin nhắn bị bỏ qua khi quét. Bật trong Cài đặt hệ thống rồi quay lại."), attention: !vm.fullDiskAccess) {
+                           vm.fullDiskAccess ? "" : t("Off: Mail, Safari and Messages are left out of scans.", "Đang tắt: Mail, Safari, Tin nhắn bị bỏ qua khi quét."),
+                           attention: !vm.fullDiskAccess, boxed: true) {
                     // The app cannot grant or revoke this itself: the switch shows the real state and opens the
                     // Privacy pane in System Settings; it flips when the user comes back (checked on activation).
                     Toggle("", isOn: Binding(get: { vm.fullDiskAccess }, set: { _ in NSWorkspace.shared.open(VM.fdaSettings) }))
                         .toggleStyle(.switch).labelsHidden().controlSize(.mini)
-                }
-                settingRow(t("Hint when an app goes to the Trash", "Gợi ý khi bỏ app vào Thùng rác"),
-                           !vm.fullDiskAccess && vm.trashHintOn
-                           ? t("Needs Full Disk Access to see the Trash.", "Cần quyền Truy cập toàn bộ ổ đĩa để thấy Thùng rác.")
-                           : t("While Tidymint is running, drag an app to the Trash and Tidymint lists what it left in Library. Nothing is ticked or removed for you.",
-                               "Khi Tidymint đang chạy, bạn kéo một app vào Thùng rác thì Tidymint liệt kê những gì app đó để lại trong Library. Không tick sẵn, không tự xoá.")) {
-                    Toggle("", isOn: Binding(get: { vm.trashHintOn }, set: { vm.setTrashHint($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
                 VStack(alignment: .leading, spacing: 6) {
                 SettingsBox {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(t("Project folders", "Thư mục dự án")).foregroundColor(Theme.text).font(.system(size: fs(13)))
+                            Text(t("Project folders (code, AI)", "Thư mục dự án (code, AI)")).foregroundColor(Theme.text).font(.system(size: fs(13)))
                         }
                         Spacer()
                         GhostButton(title: t("Add…", "Thêm…"), action: { vm.addProjectFolder() }, compact: true)
@@ -165,8 +226,6 @@ struct SettingsView: View {
                     }
                 }.settingFlat()
                 }
-                SettingNote(t("Code or AI work folders. Tidymint finds drafts (_tmp, _to_delete) here, never pre-selects duplicates here, and checks links before deleting.",
-                                   "Thư mục code hoặc làm việc với AI. Tidymint tìm nháp (_tmp, _to_delete) ở đây, không tick sẵn file trùng ở đây và kiểm tra liên kết trước khi xoá."))
                 }
                 VStack(alignment: .leading, spacing: 6) {
                 SettingsBox {
@@ -207,24 +266,19 @@ struct SettingsView: View {
                     }.padding(.top, 4)
                 }.settingFlat()
                 }
-                SettingNote(t("Duplicates and Large Files also scan here. Unplugged drives are skipped; network drives and Time Machine backups are not supported.",
-                                   "File trùng và File lớn và cũ quét thêm ở đây. Ổ chưa cắm thì bỏ qua; chưa hỗ trợ ổ mạng và ổ sao lưu Time Machine."))
+                SettingNote(t("Network drives and Time Machine backups are not supported.", "Chưa hỗ trợ ổ mạng và ổ Time Machine."))
+                }
+                settingRow(t("Hint when an app goes to the Trash", "Gợi ý khi bỏ app vào Thùng rác"),
+                           !vm.fullDiskAccess && vm.trashHintOn
+                           ? t("Needs Full Disk Access to see the Trash.", "Cần quyền Truy cập toàn bộ ổ đĩa để thấy Thùng rác.") : "", boxed: true) {
+                    Toggle("", isOn: Binding(get: { vm.trashHintOn }, set: { vm.setTrashHint($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
             }
-            SettingsGroup(id: "menubar", icon: "bell", title: t("Menu bar and alerts", "Thanh menu và cảnh báo"),
-                          summary: t("Menu bar icon, open at login, low disk space, high memory", "Biểu tượng thanh menu, mở cùng máy, ổ sắp đầy, RAM cao"), badge: nil, groups: groups) {
-                settingRow(t("Show in menu bar", "Hiện trên thanh menu"),
-                           t("Free disk space and RAM at a glance. Off: alerts still arrive as notifications; open Tidymint from the Dock or Applications.",
-                             "Xem nhanh dung lượng trống và RAM. Tắt: cảnh báo vẫn hiện thành thông báo; mở Tidymint từ Dock hoặc Applications.")) {
-                    Toggle("", isOn: $showMenuBar).toggleStyle(.switch).labelsHidden().controlSize(.mini)
-                }
-                settingRow(t("Open at login", "Mở cùng máy"),
-                           t("Keeps the menu bar icon running after a restart.", "Giữ biểu tượng trên thanh menu sau khi khởi động lại máy.")) {
-                    Toggle("", isOn: Binding(get: { vm.openAtLogin }, set: { vm.setOpenAtLogin($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
-                }
+            SettingsGroup(id: "alerts", icon: "bell", title: t("Alerts", "Cảnh báo"),
+                          summary: t("Low disk space, memory", "Ổ sắp đầy, bộ nhớ"), badge: nil, groups: groups) {
                 settingRow(t("Low disk space alert", "Cảnh báo ổ sắp đầy"),
                            vm.lowSpaceGB > 0
-                           ? String(format: t("Alerts when free space drops below %.0f GB, at most every 6 hours. Enter 0 to turn off.", "Báo khi chỗ trống dưới %.0f GB, tối đa 6 giờ một lần. Nhập 0 để tắt."), vm.lowSpaceGB)
+                           ? String(format: t("Below %.0f GB. Enter 0 to turn off.", "Dưới %.0f GB. Nhập 0 để tắt."), vm.lowSpaceGB)
                            : t("Off. Enter a number of GB to turn it on.", "Đang tắt. Nhập số GB để bật.")) {
                     HStack(spacing: 6) {
                         TextField("0", text: Binding(get: { vm.lowSpaceGB > 0 ? String(Int(vm.lowSpaceGB)) : "" },
@@ -233,55 +287,53 @@ struct SettingsView: View {
                         Text("GB").foregroundColor(Theme.sub).font(.system(size: fs(12)))
                     }
                 }
-                settingRow(t("High memory alert", "Cảnh báo RAM cao"),
-                           t("Alerts when over 90% of RAM is in use, at most once an hour.", "Báo khi RAM dùng trên 90%, tối đa 1 giờ một lần.")) {
+                settingRow(t("Memory alert", "Cảnh báo bộ nhớ"), "", boxed: true) {
                     Toggle("", isOn: Binding(get: { vm.ramAlert }, set: { vm.setRamAlert($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
                 }
             }
             #if TIDYMINT_PRIVATE
-            if featureMintangle { MintangleSettings(groups: groups, open: { vm.page = .windows }) }
-            if featureShelf { ShelfSettings(groups: groups, open: { vm.page = .shelf }) }
-            MintbarSettings(groups: groups, open: { vm.page = .menubar })
+            // The tools, one row each in one group (each had a group of its own holding one switch).
+            SettingsGroup(id: "tools", icon: "wrench.and.screwdriver", title: t("Tools", "Công cụ"),
+                          summary: ([featureMintangle ? "Mintangle" : nil, featureShelf ? "Mintdrop" : nil, "Mintbar"] as [String?]).compactMap { $0 }.joined(separator: ", "),
+                          badge: featureMintangle && Mintangle.shared.enabled && !Mintangle.shared.trusted ? t("Needs permission", "Cần cấp quyền") : nil, groups: groups) {
+                if featureMintangle { MintangleSettings(open: { vm.page = .windows }) }
+                if featureShelf { ShelfSettings(open: { vm.page = .shelf }) }
+                MintbarSettings(open: { vm.page = .menubar })
+            }
             #endif
-            SettingsGroup(id: "look", icon: "paintpalette", title: t("Appearance", "Giao diện"),
-                          summary: t("Theme", "Màu giao diện"), badge: nil, groups: groups) {
+            if SettingsBackup.released || isDevBuild {
+            SettingsGroup(id: "backup", icon: "externaldrive.badge.timemachine", title: t("Back up", "Sao lưu"),
+                          summary: t("Settings, history and statistics in one file", "Cài đặt, lịch sử và thống kê trong một file"), badge: nil, groups: groups) {
                 SettingsBox {
-                settingRow(t("Theme", "Giao diện màu"), "") {
-                    HStack(spacing: 12) {
-                        ForEach(palettes, id: \.id) { pl in ThemeSwatch(pl: pl, vm: vm, hover: themeHover) }
-                    }.contentShape(Rectangle()).onHover { themeHover.inRow = $0; if !$0 { themeHover.id = nil } }
-                }
+                    settingRow(t("Backup file", "File sao lưu"), "") {
+                        HStack(spacing: 8) {
+                            GhostButton(title: t("Export…", "Xuất…"), action: { SettingsBackup.export() }, compact: true)
+                            GhostButton(title: t("Import…", "Nhập…"), action: { SettingsBackup.importFile() }, compact: true)
+                        }
+                    }
                 }
             }
+            }
             SettingsGroup(id: "about", icon: "info.circle", title: t("Updates and about", "Cập nhật và thông tin"),
-                          summary: t("Version \(Updates.current), update check, privacy, support", "Phiên bản \(Updates.current), kiểm bản mới, quyền riêng tư, ủng hộ"),
+                          summary: t("Version \(Updates.current), privacy, support", "Phiên bản \(Updates.current), quyền riêng tư, ủng hộ"),
                           badge: vm.newVersion != nil ? t("New version", "Có bản mới") : nil, groups: groups) {
                 settingRow(t("Version \(Updates.current)", "Phiên bản \(Updates.current)") + privateVersionNote,
                            vm.newVersion != nil ? t("Version \(vm.newVersion!) is available on GitHub. Download it and drag it over the old one.", "Đã có bản \(vm.newVersion!) trên GitHub. Tải về rồi kéo đè lên bản cũ.")
-                                                : vm.updResult ?? (vm.autoUpdateCheck ? t("Checks once a day. Only the app version and the macOS version are counted; nothing else about your Mac is sent.", "Kiểm mỗi ngày một lần. Chỉ đếm theo phiên bản app và macOS, không gửi gì khác về máy.")
-                                                                      : t("Automatic check is off.", "Đã tắt tự kiểm tra.")), attention: vm.newVersion != nil) {
+                                                : vm.updResult ?? "", attention: vm.newVersion != nil, boxed: true) {
                     HStack(spacing: 10) {
                         if vm.updChecking { ProgressView().controlSize(.small).tint(Theme.text) }
-                        if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.page) }, compact: true) }
+                        if vm.newVersion != nil { PrimaryButton(title: t("Download", "Tải về"), action: { NSWorkspace.shared.open(Updates.download) }, compact: true) }
                         else { GhostButton(title: t("Check Now", "Kiểm tra"), action: { vm.checkUpdates(force: true) }, compact: true) }
                     }
                 }
-                settingRow(t("Check for new versions automatically", "Tự kiểm tra bản mới"),
-                           t("At most once a day, when the window opens, Tidymint asks update.tidymint.app for the latest version number.\nBackup: tidymint.app, GitHub.",
-                             "Mỗi ngày tối đa một lần, khi mở cửa sổ, Tidymint hỏi update.tidymint.app số phiên bản mới nhất.\nDự phòng: tidymint.app, GitHub.")) {
-                    Toggle("", isOn: Binding(get: { vm.autoUpdateCheck }, set: { vm.setAutoUpdateCheck($0) })).toggleStyle(.switch).labelsHidden().controlSize(.mini)
-                }
-                settingRow(t("Support the project", "Ủng hộ dự án"),
-                           t("Free to clean. Sponsorships pay for the Apple Developer account ($99/year), so Apple can verify the app and new users just open it, no trip to Settings > Security.",
-                             "Dọn dẹp miễn phí. Tiền ủng hộ trả phí tài khoản Apple Developer (99 USD/năm) để Apple xác nhận app, người mới cài mở là chạy, không phải qua Cài đặt > Bảo mật.")) {
-                    PrimaryButton(title: t("Sponsor", "Ủng hộ"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, compact: true)
-                }
-                settingRow(t("Privacy", "Quyền riêng tư"),
-                           t("What Tidymint sends, and what it never sends.", "Tidymint gửi gì đi, và không bao giờ gửi gì.")) {
+                settingRow(t("Privacy", "Quyền riêng tư"), "", boxed: true) {
                     TextLink(t("View", "Xem"), url: URL(string: Backend.privacyURL)!)
                 }
+                settingRow(t("Support the project", "Ủng hộ dự án"), "", boxed: true) {
+                    PrimaryButton(title: t("Sponsor", "Ủng hộ"), action: { NSWorkspace.shared.open(sponsorURL("button")) }, compact: true)
+                }
                 if appLang == "vi" {
-                    settingRow("Cùng tác giả: Cồn Cào", "Kiến thức đồ uống: whisky, sake, cocktail.") {
+                    settingRow("Cùng tác giả: Cồn Cào", "", boxed: true) {
                         TextLink("concao.org", url: ConCao.url("settings"))
                     }
                 }
@@ -293,16 +345,53 @@ struct SettingsView: View {
         .onAppear { openAttention() }
         .onReceive(vm.$newVersion) { v in if v != nil { groups.ids.insert("about") } }   // @Published sends before the value is set
     }
+    /// After loading a backup: the macOS permissions this Mac still lacks (no app can carry them over), each with a
+    /// button to its pane. Gone once all are granted or the person closes it.
+    var missingPermissions: [(name: String, pane: String)] {
+        var out: [(String, String)] = []
+        if !vm.fullDiskAccess { out.append((t("Full Disk Access", "Truy cập toàn bộ ổ đĩa"), "Privacy_AllFiles")) }
+        #if TIDYMINT_PRIVATE
+        let ax = (featureMintangle && Mintangle.shared.enabled) || Mintbar.shared.enabled
+        if ax && !AXIsProcessTrusted() { out.append((t("Accessibility", "Trợ năng"), "Privacy_Accessibility")) }
+        if Mintbar.shared.enabled && !CGPreflightScreenCaptureAccess() { out.append((t("Screen Recording", "Ghi màn hình"), "Privacy_ScreenCapture")) }
+        #endif
+        return out
+    }
+    @ViewBuilder var permissionsAfterImport: some View {
+        let missing = missingPermissions
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsBox {
+                HStack {
+                    Text(missing.isEmpty ? t("All permissions are back", "Đã đủ quyền") : t("Permissions to grant again", "Quyền cần cấp lại"))
+                        .foregroundColor(Theme.text).font(.system(size: fs(13), weight: .semibold))
+                    Spacer()
+                    TextLink(t("Done", "Xong")) { permCheck = false }
+                }.settingFlat(attention: !missing.isEmpty)
+                ForEach(missing, id: \.name) { p in
+                    HStack {
+                        Text(p.name).foregroundColor(Theme.text).font(.system(size: fs(13)))
+                        Spacer()
+                        GhostButton(title: t("Open", "Mở"), action: {
+                            if let u = URL(string: "x-apple.systempreferences:com.apple.preference.security?\(p.pane)") { NSWorkspace.shared.open(u) }
+                        }, compact: true)
+                    }.settingFlat()
+                }
+            }
+            if !missing.isEmpty { SettingNote(t("macOS does not let any app carry these over.", "macOS không cho app nào mang các quyền này theo.")) }
+        }
+    }
+
     func openAttention() {
         if !vm.fullDiskAccess { groups.ids.insert("scan") }
         if vm.newVersion != nil { groups.ids.insert("about") }
         #if TIDYMINT_PRIVATE
-        if featureMintangle && Mintangle.shared.enabled && !Mintangle.shared.trustedNow { groups.ids.insert("mintangle") }
+        if featureMintangle && Mintangle.shared.enabled && !Mintangle.shared.trustedNow { groups.ids.insert("tools") }
         #endif
     }
     /// One setting. With a description: its own rounded block, the description as a note under it (System Settings style).
     /// Without: a bare row, to be grouped with others inside a SettingsBox.
-    func settingRow<C: View>(_ title: String, _ sub: String, attention: Bool = false, @ViewBuilder _ control: () -> C) -> some View {
+    /// `boxed`: with no description, the row still gets its own rounded block (a row that stands alone).
+    func settingRow<C: View>(_ title: String, _ sub: String, attention: Bool = false, boxed: Bool = false, @ViewBuilder _ control: () -> C) -> some View {
         let row = HStack {
             HStack(spacing: 6) {
                 if attention { Circle().fill(Theme.warn).frame(width: 7, height: 7) }
@@ -312,7 +401,7 @@ struct SettingsView: View {
             control()
         }.settingFlat(attention: attention)
         return Group {
-            if sub.isEmpty { row }
+            if sub.isEmpty { if boxed { SettingsBox { row } } else { row } }
             else { VStack(alignment: .leading, spacing: 6) { SettingsBox { row }; SettingNote(sub) } }
         }
     }

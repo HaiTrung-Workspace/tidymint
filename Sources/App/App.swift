@@ -42,9 +42,15 @@ func rasterIcon(_ img: NSImage, px: Int) -> NSImage {
 /// Dock icon: a 512 px bitmap (1 MB) instead of the 1024 pt drawing.
 func dockIcon(_ p: Palette) -> NSImage { rasterIcon(makeAppIcon(p), px: 512) }
 
-/// Dev build (bundle id ending in ".dev", built with `./build.sh --dev`): runs beside the official app with its own
-/// settings, data folder and a "DEV" badge on the icon, and shows every feature still hidden in releases.
+/// Dev build (built with `./build.sh --dev`, bundle id ending in ".dev"): runs beside the official app with its own
+/// settings, data folder and a "DEV" badge on the icon, and has the self-tests and the developer's switches.
+/// Decided when the app is compiled: without `-D TIDYMINT_DEV` this is the constant false, so renaming the bundle
+/// id of a release (and signing it again) changes nothing (22/11/2026: a release tested its bundle id at run time).
+#if TIDYMINT_DEV
 let isDevBuild = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+#else
+let isDevBuild = false
+#endif
 
 /// Forget the small icons, after something drawn on the icon changed.
 func resetIconCache() { iconCache = [:] }
@@ -54,15 +60,16 @@ func makeAppIcon(_ p: Palette) -> NSImage {
     return isDevBuild ? devBadged(base) : base
 }
 
-/// The icon with the "DEV" pill at the bottom right.
+/// The icon with "DEV" written at the bottom right: amber letters only, no pill (17/11/2026: a pill covered the leaf's
+/// tail). Wholly inside the tile (the 824 px rounded square, corners included) and below the leaf: anything reaching
+/// past the tile makes macOS 26 and later treat the icon as off-grid and show it small on a grey plate in Finder.
 func devBadged(_ base: NSImage) -> NSImage {
     NSImage(size: base.size, flipped: false) { r in
         base.draw(in: r)
-        let pill = NSBezierPath(roundedRect: NSRect(x: 520, y: 70, width: 430, height: 190), xRadius: 95, yRadius: 95)
-        NSColor(hex: 0xa15c00).setFill(); pill.fill()
-        NSColor.white.setStroke(); pill.lineWidth = 14; pill.stroke()
-        let t = NSAttributedString(string: "DEV", attributes: [.font: NSFont.systemFont(ofSize: 132, weight: .heavy), .foregroundColor: NSColor.white])
-        let sz = t.size(); t.draw(at: NSPoint(x: 735 - sz.width / 2, y: 165 - sz.height / 2))
+        let shadow = NSShadow(); shadow.shadowColor = NSColor.black.withAlphaComponent(0.45); shadow.shadowBlurRadius = 10; shadow.shadowOffset = NSSize(width: 0, height: -3)
+        let t = NSAttributedString(string: "DEV", attributes: [.font: NSFont.systemFont(ofSize: 104, weight: .heavy), .foregroundColor: NSColor(hex: 0xffb02e),
+                                                              .kern: 2, .shadow: shadow])
+        let sz = t.size(); t.draw(at: NSPoint(x: 730 - sz.width / 2, y: 188 - sz.height / 2))
         return true
     }
 }

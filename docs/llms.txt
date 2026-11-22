@@ -1,18 +1,21 @@
 # Tidymint
 
-> Tidymint is a free, open-source (MIT) disk cleaner for macOS 14+, for Apple silicon and Intel Macs. Clean Now scans, shows what is safe to clean by group, and cleans only when the user presses Clean. It also cleans per app (Zalo, Chrome, Edge, Cốc Cốc, CapCut) and local AI models one model at a time (Ollama, Hugging Face, LM Studio), finds libraries of projects left alone for 6 months (node_modules, Python environments, build folders) and Git working copies left behind, uninstalls apps with their leftovers, finds large and duplicate files, maps disk usage, and lists startup items with their code signature. Every clean goes to the Trash and the last one can be undone. Interface in English and Vietnamese, six colour themes including a light one (Star White). Works offline, no tracking.
+> Tidymint keeps a Mac tidy (disk space, menu bar, windows, drag and drop, clipboard) on macOS 14+, Apple silicon and Intel. Cleaning is free and the cleaning core is open source (MIT); the Mint tools are closed source, with a free part and a paid part, Tidymint Plus. Clean Now scans, shows what is safe to clean by group, and cleans only when the user presses Clean. It also cleans per app (Zalo, Chrome, Edge, Cốc Cốc, CapCut) and local AI models one model at a time (Ollama, Hugging Face, LM Studio), finds libraries of projects left alone for 6 months (node_modules, Python environments, build folders) and Git working copies left behind, uninstalls apps with their leftovers, finds large and duplicate files, maps disk usage, and lists startup items with their code signature. Every clean goes to the Trash and the last one can be undone. Interface in English and Vietnamese, six colour themes including a light one (Star White). Scanning and cleaning work offline; Tidymint never receives your files.
 
 - Website (English): https://tidymint.app/
 - Website (Vietnamese): https://tidymint.app/vi/
 - Download (latest): https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip
 - Source code: https://github.com/HaiTrung-Workspace/tidymint
 - Privacy: https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md
+- Tidymint Plus (prices, Free and Plus compared): https://tidymint.app/plus/ (Vietnamese: https://tidymint.app/vi/plus/)
 - Changelog: https://tidymint.app/changelog/ (Vietnamese: https://tidymint.app/vi/lich-su-cap-nhat/)
 - Latest version number: https://tidymint.app/version.txt
 
 ## Key facts
-- Price: free. No account, no subscription.
-- Safety: never deletes permanently (Trash only, with Undo for the last clean); every cleanup group carries a safety level (safe / review / locked); never touches Photos, Mail, keychains, cloud storage roots or Apple system caches.
+- Price: cleaning is free. Mintangle, Mintclip, Mintbar and Mintdrop have a free part with no time limit. Tidymint Plus is a one-time purchase in USD: 3.99 per tool (Mintangle, Mintclip, Mintbar, Mintdrop, Mintsort) or 10.99 for all five, which also brings Trash rules and settings sync. 14-day trial, no card. Each key works on 2 Macs. No account, no subscription.
+- Free limits: Mintangle 11 actions (Plus 24), Mintclip 100 items (Plus 500), Mintbar 2 groups of 4 apps (Plus no limit), Mintdrop 5 items (Plus no limit). Mintsort (sorts Downloads and Desktop with a preview and Undo) is Plus only.
+- Data: the app checks for updates by itself and adds usage statistics once a day, with no off switch; never files, file names or what is typed or copied. The trial and keys need the internet; Polar handles payment. Details on the privacy page.
+- Safety: cleaning only moves items to the Trash, with Undo for the last clean; items are deleted permanently only when the user empties the Trash or turns on the optional Trash rules of Tidymint Plus (off by default); every cleanup group carries a safety level (safe / review / locked); never touches Photos, Mail, keychains, cloud storage roots or Apple system caches.
 - Duplicates are found by content (SHA-256); before deleting, it checks whether scripts in the user's project folders still reference a file.
 - Clean by App: caches pre-selected, photos and files listed by month for the user to pick, messages and logins locked; refuses to clean while the app is running.
 - Startup Items: shows who signed each login item (Apple, a developer, unsigned) and flags unusual locations. Facts only, not antivirus.
@@ -20,7 +23,7 @@
 - Uninstaller: removes apps with their leftovers, including App Store apps and apps installed for every user (macOS asks for the administrator password in its own window; Tidymint never sees it). Undo puts the app and its files back.
 - Statistics: free space per day (7, 30, 90 days), stored only on the Mac.
 - Menu bar: a mint leaf that fills as the disk fills and shows free space; turns amber when free space nears the user's warning level and red below it.
-- Not notarized by Apple yet: first launch needs System Settings > Privacy & Security > Open Anyway.
+- Signed with Developer ID and notarized by Apple from 1.0.0.
 - Contact: hello@tidymint.app
 
 ## Guides
@@ -28,9 +31,10 @@
 - (Vietnamese) Cài đặt, cập nhật và gỡ từng bước có ảnh: https://tidymint.app/vi/cai-dat/
 - Does Tidymint send your data anywhere (privacy, runs on your Mac): https://tidymint.app/tidymint-privacy/
 - Is Tidymint safe: evidence, who has checked it, release process, how to verify the download: https://tidymint.app/safety/
-- Mintdrop drop shelf (gather files from several folders, drag each one out, Undo; move vs copy explained): https://tidymint.app/mintdrop-drop-shelf-mac/
+- Mintdrop drop shelf (gather files from several folders, drag each one out or all at once with Plus, Undo; move vs copy explained): https://tidymint.app/mintdrop-drop-shelf-mac/
+- Mintclip clipboard history (the built-in Spotlight clipboard on macOS 26, then Mintclip: search what you copied, text in images included, click to paste, password managers skipped, kept on the Mac unless iCloud sync in Plus is turned on): https://tidymint.app/mintclip-clipboard-history-mac/
 - How to split screen on Mac: built-in Split View and tiling, plus Mintangle (shortcuts for halves and corners; drag to edges; Accessibility permission explained): https://tidymint.app/mintangle-window-tiling-mac/
-- Mintbar tidy menu bar (group menu bar icons behind one icon, 2 groups of 4 apps; Accessibility and Screen Recording on macOS 27 explained): https://tidymint.app/mintbar-tidy-menu-bar-mac/
+- Mintbar tidy menu bar (group menu bar icons behind one icon, 2 groups of 4 apps free, no limit with Plus; Accessibility and Screen Recording on macOS 27 explained): https://tidymint.app/mintbar-tidy-menu-bar-mac/
 - (Vietnamese) Tidymint có gửi dữ liệu đi không (quyền riêng tư, chạy trên máy): https://tidymint.app/vi/quyen-rieng-tu-tidymint/
 - (Vietnamese) Tidymint có an toàn không: bằng chứng, ai đã kiểm, quy trình phát hành, cách tự kiểm file tải về: https://tidymint.app/vi/an-toan/
 - How to clear System Data on Mac: https://tidymint.app/clear-system-data-mac/

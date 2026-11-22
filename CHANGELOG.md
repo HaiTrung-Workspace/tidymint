@@ -2,6 +2,16 @@
 
 All notable changes to Tidymint. Dates are release dates.
 
+## 1.0.0 (2026-11-22)
+
+- New: Tidymint is now notarized by Apple, with no "Open Anyway" step
+- New: Tidymint Plus. Try it for 14 days, then buy one tool or the bundle of all five
+- New, off by default: Mintclip keeps what you copy to paste again, 100 items for free. Text over 10,000 characters is cut short
+- New: Mintsort, part of Plus, sorts a folder into groups. You see the plan before it is applied
+- New, off by default: the Plus bundle can empty the Trash by age or size. Those items are deleted for good and Undo can't bring them back
+- The update check now carries usage statistics and a random number for this copy. The automatic check switch is gone, so this can't be turned off. Details in Privacy
+- Fix: no more iCloud Drive permission prompt when you first open the app. The Trash count no longer includes the iCloud Drive Trash
+
 ## 0.6.0 (2026-11-15)
 
 - New: Mintbar gathers menu bar icons behind one group icon you choose. Click the group to fan its apps out, click an app to open its menu. Up to 2 groups of 4 apps. Off by default; on macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on

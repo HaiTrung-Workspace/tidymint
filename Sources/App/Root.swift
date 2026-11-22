@@ -363,7 +363,11 @@ struct RootView: View {
                 case .menubar: MintbarPageView()
                 #endif
                 }
-            }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            // Pages that do not take the view model (Mintangle, Mintdrop, Mintbar) are not redrawn by a language
+            // switch on their own; a new id rebuilds the page in the chosen language (16/11/2026).
+            .id(vm.lang)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(Theme.bg)
         .frame(minWidth: 980 * uiScale, minHeight: 600)
@@ -373,7 +377,7 @@ struct RootView: View {
         .ignoresSafeArea()
         .quickLookPreview(Binding(get: { vm.fileQL }, set: { vm.fileQL = $0 }))
         .onAppear {
-            vm.checkUpdates(); vm.windowShown()
+            vm.checkUpdates(); vm.windowShown(); Usage.count("opens")
             // Space over a file row shows it (Quick Look), Space again closes it, like Finder.
             // Not while typing in a field, and not in the month viewer (it has its own Space).
             keys.start { e in
@@ -407,6 +411,4 @@ func pageAvailable(_ p: Page) -> Bool {
 }
 
 /// Text after the version number in Settings while a private feature runs as a preview; empty otherwise.
-var privateVersionNote: String {
-    return ""
-}
+var privateVersionNote: String { "" }

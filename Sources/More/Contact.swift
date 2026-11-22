@@ -13,8 +13,8 @@ import AVFoundation
 
 // MARK: - Check-in ("Is Tidymint helping you?")
 
-/// A one-line card at the top of Clean Now, asked once: 14 days after the first launch and 2 uses of a main feature
-/// (or 60 days and 1 use). X on the question = later (14 more days, once), then never again.
+/// A one-line card at the top of Clean Now, asked once: 3 days after the first launch and 2 uses of a main feature
+/// (or 14 days and 1 use). X on the question = later (14 more days, once), then never again.
 /// The answer goes to the same form endpoint as Contact: no email, no machine id. The Dev build never asks.
 @MainActor final class CheckIn: ObservableObject {
     static let shared = CheckIn()
@@ -44,14 +44,14 @@ import AVFoundation
     }
     func used() { d.set(uses + 1, forKey: "featureUses") }
 
-    var isDev: Bool { Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true }
+    var isDev: Bool { Uncounted.on }
     func shouldAsk(now: Date = Date()) -> Bool {
         guard !isDev, !Demo.active else { return false }
         let state = d.string(forKey: "checkinState") ?? ""
         if state == "done" { return false }
         if let next = d.object(forKey: "checkinNext") as? Date, now < next { return false }
         let days = now.timeIntervalSince(firstOpen) / 86400, n = uses
-        return (days >= 14 && n >= 2) || (days >= 60 && n >= 1)
+        return (days >= 3 && n >= 2) || (days >= 14 && n >= 1)
     }
     /// Called when the Clean Now page shows.
     func refresh() { if step == .hidden && shouldAsk() { step = .ask }; flushPending() }
@@ -79,6 +79,7 @@ import AVFoundation
         var f = ["source": "checkin", "type": "checkin", "email": "", "newsletter": "no", "message": "",
                  "app": Backend.systemInfo["app"] ?? "?", "lang": appLang]
         f.merge(extra) { _, b in b }
+        if Usage.on { f["usage"] = "tools \(Usage.tools), day \(Usage.days)" }   // only while usage statistics are on
         Backend.send(f) { ok in if !ok { self.queue(f) } }
     }
     /// No network: kept and sent at the next launch.

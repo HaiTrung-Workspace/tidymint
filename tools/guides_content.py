@@ -39,7 +39,7 @@ dict(
 <h2 id="ban-can-gi">Bạn cần CleanMyMac để làm gì?</h2>
 <p>Đối chiếu nhu cầu của bạn với bảng dưới. Nếu nhu cầu nằm ở mấy dòng đầu, bạn không cần trả tiền.</p>
 <div class="tbl"><table>
-<tr><th>Nhu cầu</th><th>Tự làm bằng macOS</th><th>Tidymint (miễn phí)</th><th>CleanMyMac (trả phí)</th></tr>
+<tr><th>Nhu cầu</th><th>Tự làm bằng macOS</th><th>Tidymint (dọn dẹp miễn phí)</th><th>CleanMyMac (trả phí)</th></tr>
 <tr><td>Dọn bộ nhớ đệm, file tạm, nhật ký</td><td class="n">Làm tay, khá mất công</td><td class="y">Có</td><td class="y">Có</td></tr>
 <tr><td>Xem "Dữ liệu hệ thống" gồm những gì</td><td class="n">Khó, phải mò Finder</td><td class="y">Có (bản đồ ổ đĩa)</td><td class="y">Có</td></tr>
 <tr><td>Gỡ app sạch cả phần sót lại</td><td class="n">Kéo vào Thùng rác chỉ xoá app, còn sót cài đặt</td><td class="y">Có</td><td class="y">Có</td></tr>
@@ -54,7 +54,7 @@ dict(
 <h3>1. Công cụ có sẵn trong macOS</h3>
 <p>Vào <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b>. macOS sẽ gợi ý tối ưu: tự đổ Thùng rác sau 30 ngày, đưa file lên iCloud, xem danh sách app và tài liệu lớn. Ưu điểm: an toàn tuyệt đối. Nhược điểm: không đụng tới bộ nhớ đệm, không giải thích được "Dữ liệu hệ thống" gồm gì.</p>
 <h3>2. Tidymint: dọn đủ việc, có tiếng Việt</h3>
-<p><a href="{HOME}">Tidymint</a> là app dọn Mac, <b>dọn dẹp miễn phí, lõi mã nguồn mở</b> (giấy phép MIT), giao diện tiếng Việt. Một lần quét tìm bộ nhớ đệm, nhật ký, Downloads cũ, file lớn, file trùng, cho xem từng nhóm rồi bạn mới bấm Dọn; mục <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, Cốc Cốc, CapCut đang giữ gì (bộ nhớ đệm chọn sẵn, ảnh và file xếp theo tháng để bạn tự chọn, tin nhắn bị khoá); có bản đồ bong bóng cho thấy thư mục nào chiếm ổ; gỡ app kèm phần sót lại. Điểm khác biệt: <b>mọi thứ chỉ chuyển vào Thùng rác</b> và có nút <b>Hoàn tác</b>, nên lỡ chọn nhầm vẫn lấy lại được.</p>
+<p><a href="{HOME}">Tidymint</a> là app dọn Mac, <b>dọn dẹp miễn phí, lõi mã nguồn mở</b> (giấy phép MIT), giao diện tiếng Việt. Một lần quét tìm bộ nhớ đệm, nhật ký, Downloads cũ, file lớn, file trùng, cho xem từng nhóm rồi bạn mới bấm Dọn; mục <b>Dọn theo ứng dụng</b> cho thấy Zalo, Chrome, Cốc Cốc, CapCut đang giữ gì (bộ nhớ đệm chọn sẵn, ảnh và file xếp theo tháng để bạn tự chọn, tin nhắn bị khoá); có bản đồ bong bóng cho thấy thư mục nào chiếm ổ; gỡ app kèm phần sót lại. Điểm khác biệt: <b>dọn thì chỉ chuyển vào Thùng rác</b> và có nút <b>Hoàn tác</b>, nên lỡ chọn nhầm vẫn lấy lại được.</p>
 <h3>3. AppCleaner hoặc Pearcleaner: chuyên gỡ app</h3>
 <p>Nếu bạn chỉ cần gỡ app cho sạch, <b>AppCleaner</b> (miễn phí) và <b>Pearcleaner</b> (miễn phí, mã nguồn mở) làm rất tốt việc này: kéo app vào, chúng liệt kê các file cài đặt, bộ nhớ đệm đi kèm để xoá cùng.</p>
 <h3>4. OnyX: cho người rành máy</h3>
@@ -62,18 +62,18 @@ dict(
 {CTA}
 
 <h2 id="tidymint-vs-cleanmymac">Tidymint và CleanMyMac khác nhau thế nào</h2>
-<p>Nói thẳng: Tidymint <b>không thay được toàn bộ</b> CleanMyMac. Tidymint tập trung vào một việc là dọn dẹp và lấy lại dung lượng.</p>
+<p>Nói thẳng: Tidymint <b>không thay được toàn bộ</b> CleanMyMac. Về dọn máy, Tidymint chỉ lo dọn dẹp và lấy lại dung lượng. Các công cụ Mint (menu bar, cửa sổ, kéo thả, copy) là phần thêm, không có trong bảng này.</p>
 <figure class="fig-app"><img src="../smart.jpg" alt="Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm và ghi dung lượng" width="1600" height="1079" loading="lazy"><figcaption>Trang đầu Tidymint sau khi quét: phần an toàn để dọn, chia nhóm, ghi rõ dung lượng.</figcaption></figure>
 <div class="tbl"><table>
 <tr><th></th><th>Tidymint</th><th>CleanMyMac</th></tr>
-<tr><td>Giá</td><td class="y">Miễn phí, không tài khoản</td><td>Khoảng 40 USD/năm/máy</td></tr>
+<tr><td>Giá</td><td class="y">Dọn dẹp miễn phí, không tài khoản. Plus cho công cụ Mint: mua một lần, từ 3,99 USD</td><td>Khoảng 40 USD/năm/máy</td></tr>
 <tr><td>Mã nguồn</td><td class="y">Lõi dọn dẹp mở (ai cũng đọc được)</td><td>Đóng</td></tr>
-<tr><td>Khi dọn</td><td class="y">Chuyển vào Thùng rác, bạn kiểm tra rồi tự đổ</td><td>Dọn theo thiết lập của app</td></tr>
+<tr><td>Khi dọn</td><td class="y">Chuyển vào Thùng rác, có Hoàn tác</td><td>Dọn theo thiết lập của app</td></tr>
 <tr><td>Bảo vệ khỏi mã độc</td><td>Dựa vào XProtect và Gatekeeper sẵn trong macOS</td><td class="y">Có bộ quét riêng</td></tr>
 <tr><td>Tối ưu hiệu năng, cập nhật app</td><td class="n">Không có</td><td class="y">Có</td></tr>
-<tr><td>Thu thập dữ liệu sử dụng</td><td class="y">Không, không cần tài khoản</td><td>Có (thông tin máy, thống kê sử dụng, nhật ký dọn), theo chính sách riêng tư của MacPaw</td></tr>
+<tr><td>Thu thập dữ liệu sử dụng</td><td>Có (số liệu sử dụng kèm số ngẫu nhiên của bản cài). Không cần tài khoản</td><td>Có (thông tin máy, thống kê sử dụng, nhật ký dọn), theo chính sách riêng tư của MacPaw</td></tr>
 <tr><td>Tiếng Việt</td><td class="y">Có</td><td class="n">Không</td></tr>
-<tr><td>Apple công chứng (notarize)</td><td class="n">Chưa, lần đầu mở phải bấm "Vẫn mở"</td><td class="y">Có</td></tr>
+<tr><td>Apple công chứng (notarize)</td><td class="y">Có, từ 1.0.0</td><td class="y">Có</td></tr>
 <tr><td>Hỗ trợ</td><td>Qua email và GitHub</td><td class="y">Đội hỗ trợ chuyên nghiệp</td></tr>
 </table></div>
 <p><b>Nên chọn CleanMyMac</b> nếu bạn muốn một app trọn gói có bộ quét mã độc riêng và sẵn sàng trả phí. <b>Nên chọn Tidymint</b> nếu bạn chỉ cần máy gọn, ổ trống, và muốn biết chính xác cái gì bị xoá.</p>
@@ -81,16 +81,15 @@ dict(
 <h2 id="cai-tidymint">Cài Tidymint trong 2 phút</h2>
 <ol class="tl">
 <li><span class="n">1</span><h4>Tải về</h4><p>Bấm <a href="{DL}">Tải Tidymint</a>, mở file zip, kéo Tidymint vào thư mục <b>Ứng dụng</b>.</p></li>
-<li><span class="n">2</span><h4>Mở lần đầu</h4><p>macOS báo không mở được vì app chưa được Apple công chứng. Bấm <b>Xong</b>.</p></li>
-<li><span class="n">3</span><h4>Cho phép mở</h4><p>Vào <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, kéo tới mục <b>Bảo mật</b>, bấm <b>Vẫn mở</b> rồi <b>Mở</b>. Không thấy nút thì nhấp đúp app lần nữa rồi quay lại.</p></li>
-<li><span class="n">4</span><h4>Truy cập toàn bộ ổ đĩa <span class="opt">không bắt buộc</span></h4><p>Bật Tidymint trong mục <b>Truy cập toàn bộ ổ đĩa</b> để app đo được mọi thư mục.</p></li>
+<li><span class="n">2</span><h4>Mở và bấm Mở</h4><p>Nhấp đúp Tidymint. macOS hỏi vì app tải từ Internet, bấm <b>Mở</b>.</p></li>
+<li><span class="n">3</span><h4>Truy cập toàn bộ ổ đĩa <span class="opt">không bắt buộc</span></h4><p>Bật Tidymint trong mục <b>Truy cập toàn bộ ổ đĩa</b> để app đo được mọi thư mục.</p></li>
 </ol>
-<p>Hướng dẫn có hình chi tiết ở <a href="{HOME}#cai-dat">trang chủ</a>. Ứng dụng cần macOS 14 trở lên, chạy được trên cả máy chip Apple silicon và chip Intel.</p>
+<p>Hướng dẫn có hình chi tiết ở <a href="{HOME}cai-dat/">trang Cài đặt</a>. Ứng dụng cần macOS 14 trở lên, chạy được trên cả máy chip Apple silicon và chip Intel.</p>
 """,
   faq=[
     ("CleanMyMac dùng thử được bao lâu?", "7 ngày với đầy đủ tính năng, áp dụng cho bản mua trên trang MacPaw, App Store và Setapp. Hết hạn thì phải mua mới dùng tiếp."),
     ("Dùng CleanMyMac crack có sao không?", "Rủi ro cao. App dọn dẹp cần quyền đọc toàn bộ ổ đĩa và mật khẩu quản trị, nên bản crack bị cài mã độc có thể đọc dữ liệu hoặc điều khiển máy từ xa. Jamf Threat Labs từng phát hiện app Mac lậu bị cài cửa hậu (01/2024)."),
-    ("Tidymint có miễn phí không?", "Phần dọn dẹp miễn phí, không cần tài khoản, không thuê bao. Lõi dọn dẹp là mã nguồn mở theo giấy phép MIT, công khai trên GitHub."),
+    ("Tidymint có miễn phí không?", "Có. Dọn dẹp miễn phí trọn vẹn, không cần tài khoản, không thuê bao. Mintangle, Mintclip, Mintbar và Mintdrop có phần miễn phí, không hết hạn. Phần trả tiền là Tidymint Plus. Lõi dọn dẹp là mã nguồn mở theo giấy phép MIT."),
     ("Mac có cần app dọn dẹp không?", "Không bắt buộc. macOS tự quản lý khá tốt. App dọn dẹp hữu ích khi ổ gần đầy, nhất là máy 256 GB, hoặc khi mục Dữ liệu hệ thống phình to mà bạn không biết vì sao."),
     ("Gỡ CleanMyMac đang cài thế nào cho sạch?", "Thoát CleanMyMac (cả biểu tượng trên menu bar), rồi dùng tính năng Gỡ app của Tidymint hoặc AppCleaner để xoá app cùng các file đi kèm."),
   ],
@@ -253,74 +252,66 @@ dict(
 ),
 
 dict(
-  lang="vi", slug="cai-dat", topic="start", date="2026-11-05", read="4 phút đọc",
+  lang="vi", slug="cai-dat", topic="start", date="2026-11-05", read="3 phút đọc",
   title="Cài Tidymint trên Mac: từng bước có ảnh | Tidymint",
-  desc="Tải Tidymint, mở lần đầu khi macOS báo bị chặn, bấm Vẫn mở trong Quyền riêng tư và Bảo mật, cấp quyền Truy cập toàn bộ ổ đĩa. Mỗi bước một ảnh chụp màn hình.",
+  desc="Tải Tidymint, kéo vào Ứng dụng, bấm Mở và cấp quyền Truy cập toàn bộ ổ đĩa. Bốn bước, có ảnh.",
   crumb="Cài đặt từng bước",
   h1="Cài Tidymint trên Mac, từng bước có ảnh",
-  tldr="Tidymint chưa được Apple công chứng, nên lần đầu mở macOS sẽ chặn và bạn phải bấm <b>Vẫn mở</b> (Open Anyway) trong <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b>, mục <b>Bảo mật</b> ở giữa trang. Cả quy trình mất khoảng 2 phút và chỉ làm một lần. Ảnh chụp trên macOS tiếng Anh; máy tiếng Việt có cùng vị trí, tên mục dịch trong ngoặc.",
-  toc=[("b1","Bước 1: Tải và giải nén"),("b2","Bước 2: Kéo vào Ứng dụng"),("b3","Bước 3: Mở lần đầu, bấm Xong"),("b4","Bước 4: Bấm Vẫn mở"),
-       ("b5","Bước 5: Xác nhận và nhập mật khẩu"),("b6","Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa"),("cap-nhat","Cập nhật bản mới"),("go-tidymint","Gỡ Tidymint"),("khong-thay","Không thấy nút Vẫn mở?"),("faq","Câu hỏi thường gặp")],
+  tldr="Từ bản 1.0.0, Tidymint có chữ ký Developer ID và được <b>Apple công chứng</b>. Bạn tải về, kéo vào <b>Ứng dụng</b>, rồi bấm <b>Mở</b> khi macOS hỏi. Quyền Truy cập toàn bộ ổ đĩa không bắt buộc. Ảnh chụp trên macOS tiếng Anh; máy tiếng Việt có cùng vị trí, tên mục dịch trong ngoặc.",
+  toc=[("b1","Bước 1: Tải và giải nén"),("b2","Bước 2: Kéo vào Ứng dụng"),("b3","Bước 3: Mở và bấm Mở"),
+       ("b4","Bước 4: Cấp quyền Truy cập toàn bộ ổ đĩa"),("cap-nhat","Cập nhật bản mới"),("go-tidymint","Gỡ Tidymint"),("khong-thay","Vẫn không mở được?"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="b1">Bước 1: Tải và giải nén</h2>
-<p>Bấm <a href="{DL}">Tải Tidymint</a>. File <b>Tidymint.zip</b> (khoảng 3 MB) nằm trong thư mục <b>Downloads</b>. Nhấp đúp file zip, macOS tự giải nén ra app <b>Tidymint</b> ngay cạnh.</p>
+<p>Bấm <a href="{DL}">Tải Tidymint</a>. File <b>Tidymint.zip</b> nằm trong thư mục <b>Downloads</b>. Nhấp đúp file zip, macOS tự giải nén ra app <b>Tidymint</b> ngay cạnh.</p>
 <img src="../../install-1-download.jpg" alt="Thư mục Downloads với Tidymint.zip và app Tidymint vừa giải nén" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
 <h2 id="b2">Bước 2: Kéo vào Ứng dụng</h2>
 <p>Kéo <b>Tidymint</b> từ Downloads vào thư mục <b>Ứng dụng</b> (Applications) ở thanh bên Finder. Để ở Downloads cũng chạy được, nhưng vào Ứng dụng thì Spotlight tìm thấy, Dock giữ được, và không bị xoá nhầm khi dọn Downloads. File zip xoá được sau khi kéo xong.</p>
 <img src="../../install-2-applications.jpg" alt="Tidymint nằm trong thư mục Ứng dụng" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
-<h2 id="b3">Bước 3: Mở lần đầu, bấm Xong</h2>
-<p>Nhấp đúp Tidymint trong Ứng dụng. macOS hiện hộp <i>"Tidymint" Not Opened</i> (không mở được) vì app chưa được Apple công chứng. Bấm <b>Done</b> (Xong). <b>Đừng</b> bấm Move to Trash.</p>
-<img src="../../install-3-blocked.jpg" alt="Hộp thoại Tidymint Not Opened, bấm Done" width="760" height="630" loading="lazy" style="display:block;max-width:min(380px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid #1c1c1c">
-<h2 id="b4">Bước 4: Bấm Vẫn mở</h2>
-<p>Mở <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b> (System Settings › Privacy &amp; Security). Kéo tới tiêu đề <b>Bảo mật</b> (Security), nằm ở khoảng giữa trang, ngay dưới dòng <i>Allow applications from</i>. Dòng <i>"Tidymint" was blocked to protect your Mac</i> có nút <b>Open Anyway</b> (Vẫn mở). Bấm vào.</p>
-<img src="../../open-anyway.jpg" alt="Mục Bảo mật trong Quyền riêng tư và Bảo mật với nút Open Anyway" width="1200" height="449" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
-<h2 id="b5">Bước 5: Xác nhận và nhập mật khẩu</h2>
-<p>macOS hỏi lại một lần nữa: <i>Open "Tidymint"?</i>. Bấm <b>Open Anyway</b> (nút ở giữa, không phải nút xanh Move to Trash). Sau đó nhập mật khẩu máy hoặc dùng Touch ID, bấm <b>OK</b>. Tidymint mở lên. Từ lần sau nhấp đúp là chạy, không hỏi nữa.</p>
-<div class="pair"><img src="../../install-5-confirm.jpg" alt="Hộp thoại Open Tidymint, bấm Open Anyway" width="760" height="878" loading="lazy" style="display:block;max-width:100%;height:auto;margin:0;border-radius:12px;border:1px solid #1c1c1c"><span class="pair-arrow" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span><img src="../../install-6-password.jpg" alt="Hộp nhập mật khẩu quản trị viên" width="760" height="878" loading="lazy" style="display:block;max-width:100%;height:auto;margin:0;border-radius:12px;border:1px solid #1c1c1c"></div>
-<h2 id="b6">Bước 6: Cấp quyền Truy cập toàn bộ ổ đĩa</h2>
-<p>Bước này không bắt buộc, nhưng thiếu thì Mail, Tin nhắn và một phần thư mục Library sẽ hiện trống khi quét. Trong <b>Quyền riêng tư &amp; Bảo mật</b>, kéo <b>lên</b> danh sách quyền riêng tư (nửa trên của trang), bấm <b>Full Disk Access</b> (Truy cập toàn bộ ổ đĩa). Nhanh hơn: gõ "Full Disk" vào ô tìm kiếm góc trên trái cửa sổ Cài đặt.</p>
+<h2 id="b3">Bước 3: Mở và bấm Mở</h2>
+<p>Nhấp đúp Tidymint trong Ứng dụng. macOS báo app tải từ Internet và Apple đã kiểm, không thấy mã độc. Bấm <b>Mở</b> (Open).</p>
+<h2 id="b4">Bước 4: Cấp quyền Truy cập toàn bộ ổ đĩa</h2>
+<p>Bước này không bắt buộc, nhưng thiếu thì Mail, Tin nhắn và một phần thư mục Library sẽ hiện trống khi quét. Mở <b>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</b> (System Settings › Privacy &amp; Security), bấm <b>Full Disk Access</b> (Truy cập toàn bộ ổ đĩa). Nhanh hơn: gõ "Full Disk" vào ô tìm kiếm góc trên trái cửa sổ Cài đặt.</p>
 <p>Tìm dòng <b>Tidymint</b>, gạt công tắc sang bật. Chưa có dòng này thì bấm <b>+</b> ở cuối danh sách, chọn Tidymint trong Ứng dụng, bấm Mở. Nếu Tidymint đang mở, macOS sẽ yêu cầu thoát và mở lại app, bấm đồng ý.</p>
 <img src="../../install-7-fulldisk.jpg" alt="Danh sách Full Disk Access với công tắc Tidymint bật" width="1000" height="1060" loading="lazy" style="display:block;max-width:min(720px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
-<p>Tidymint chỉ dùng quyền này để đo dung lượng và chuyển file vào Thùng rác. Quét và dọn chạy ngay trên máy, không cần mạng; kết nối tự động duy nhất là kiểm bản mới mỗi ngày một lần (tắt được trong Cài đặt), xem <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">chính sách riêng tư</a>.</p>
+<p>Tidymint dùng quyền này để đo dung lượng, chuyển file vào Thùng rác và đọc Thùng rác (gồm Tự dọn Thùng rác của Plus, nếu bạn bật). Quét và dọn chạy ngay trên máy, không cần mạng; app tự kiểm bản mới, kèm vài số liệu sử dụng, xem <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">chính sách riêng tư</a>.</p>
 {CTA}
 <h2 id="cap-nhat">Cập nhật bản mới</h2>
-<p>Có bản mới, Tidymint hiện một dòng báo kèm nút <b>Tải về</b> trong Cài đặt (app kiểm tra mỗi ngày một lần, hoặc bấm <b>Kiểm tra</b>). Cập nhật chỉ mất khoảng một phút:</p>
+<p>Có bản mới, Tidymint hiện một dòng báo kèm nút <b>Tải về</b> trong Cài đặt (app tự kiểm tra, hoặc bấm <b>Kiểm tra</b>). Cập nhật chỉ mất khoảng một phút:</p>
 <ol>
 <li>Thoát Tidymint. Tải <b>Tidymint.zip</b>, mở ra, kéo <b>Tidymint</b> vào <b>Ứng dụng</b> và bấm <b>Thay thế</b>.</li>
-<li>Mở app. macOS chặn một lần như bước 3, làm lại bước 3 đến 5: bấm Xong, vào Quyền riêng tư &amp; Bảo mật bấm <b>Vẫn mở</b>, nhập mật khẩu.</li>
+<li>Mở app. macOS hỏi thì bấm <b>Mở</b>.</li>
 </ol>
-<p>Không cần cấp lại quyền Truy cập toàn bộ ổ đĩa. Cài đặt, giao diện, thư mục dự án và danh sách bỏ qua vẫn giữ nguyên.</p>
+<p>Lần nâng lên 1.0.0, macOS có thể hỏi lại quyền Ghi màn hình một lần. Cài đặt, giao diện, thư mục dự án và danh sách bỏ qua vẫn giữ nguyên.</p>
 <h2 id="go-tidymint">Gỡ Tidymint</h2>
-<p>Cách nhanh nhất là kéo Tidymint vào Thùng rác. Muốn sạch hẳn thì xoá thêm 4 mục nhỏ trong thư mục Thư viện (dưới 1 MB trên máy thử). Những gì Tidymint đã dọn vẫn nằm nguyên trong Thùng rác; gỡ app chỉ làm mất nút <b>Hoàn tác</b>, muốn lấy lại file thì kéo nó ra khỏi Thùng rác như bình thường.</p>
+<p>Cách nhanh nhất là kéo Tidymint vào Thùng rác. Muốn sạch hẳn thì xoá thêm 4 mục nhỏ trong thư mục Thư viện (dưới 1 MB trên máy thử, nhiều hơn nếu Mintclip giữ ảnh). Những gì Tidymint đã dọn vẫn nằm nguyên trong Thùng rác; gỡ app chỉ làm mất nút <b>Hoàn tác</b>, muốn lấy lại file thì kéo nó ra khỏi Thùng rác như bình thường.</p>
 <ol>
 <li>Thoát Tidymint (biểu tượng trên menu bar › Thoát). Mở Finder › <b>Ứng dụng</b>, kéo <b>Tidymint</b> vào Thùng rác.</li>
 <li>Muốn sạch hẳn: trong Finder bấm <b>Đi › Đi tới thư mục</b> (Shift‑Cmd‑G), dán từng đường dẫn dưới đây, rồi kéo mục hiện ra vào Thùng rác.</li>
 </ol>
 <div class="tbl"><table>
 <tr><th>Đường dẫn</th><th>Là gì</th></tr>
-<tr><td><code class="cp">~/Library/Application Support/Tidymint</code></td><td>Lịch sử dung lượng, ghi chú, nhật ký lần dọn gần nhất</td></tr>
+<tr><td><code class="cp">~/Library/Application Support/Tidymint</code></td><td>Lịch sử dung lượng, ghi chú, nhật ký lần dọn gần nhất, dữ liệu các công cụ Mint (lịch sử và ảnh của Mintclip, kệ Mintdrop)</td></tr>
 <tr><td><code class="cp">~/Library/Preferences/com.haitrung.diskcleanup.plist</code></td><td>Cài đặt: ngôn ngữ, giao diện, cỡ chữ, thư mục dự án, danh sách bỏ qua</td></tr>
 <tr><td><code class="cp">~/Library/Caches/com.haitrung.diskcleanup</code></td><td>Bộ nhớ đệm macOS tạo khi app kiểm bản mới</td></tr>
 <tr><td><code class="cp">~/Library/HTTPStorages/com.haitrung.diskcleanup</code></td><td>Như trên, phần macOS lưu cho kết nối mạng</td></tr>
 </table></div>
-<p><code>com.haitrung.diskcleanup</code> là mã định danh của app từ hồi còn tên "Disk Cleanup", giữ lại để bản cập nhật không bắt bạn cấp lại quyền. macOS còn tạo cho mỗi app một thư mục bộ nhớ đệm và một thư mục file tạm trong <code>/private/var/folders</code>; file tạm macOS tự xoá sau 3 ngày không dùng. Muốn xoá luôn bộ nhớ đệm, dán lệnh dưới đây vào Terminal để mở thư mục đó, rồi kéo thư mục <code>com.haitrung.diskcleanup</code> vào Thùng rác:</p>
+<p>Đã bật đồng bộ iCloud của Plus thì còn thư mục <b>Tidymint</b> trong iCloud Drive, kéo vào Thùng rác nếu không dùng trên máy khác nữa.</p>
+<p><code>com.haitrung.diskcleanup</code> là mã định danh của app từ hồi còn tên "Disk Cleanup", giữ lại để bản cập nhật dùng tiếp cài đặt của bạn. macOS còn tạo cho mỗi app một thư mục bộ nhớ đệm và một thư mục file tạm trong <code>/private/var/folders</code>; file tạm macOS tự xoá sau 3 ngày không dùng. Muốn xoá luôn bộ nhớ đệm, dán lệnh dưới đây vào Terminal để mở thư mục đó, rồi kéo thư mục <code>com.haitrung.diskcleanup</code> vào Thùng rác:</p>
 <pre><code>open "$(getconf DARWIN_USER_CACHE_DIR)"</code></pre>
 <p>Cài bằng Homebrew thì gỡ bằng một trong hai lệnh. Lệnh đầu chỉ gỡ app, giữ cài đặt để sau này cài lại như cũ; lệnh sau gỡ sạch cả 4 mục ở bảng trên:</p>
 <pre><code>brew uninstall --cask tidymint</code></pre>
 <pre><code>brew uninstall --zap --cask tidymint</code></pre>
-<p>Không cần khởi động lại máy: Tidymint không cài tiến trình chạy nền, tiện ích hệ thống hay trình trợ giúp quyền quản trị. Dòng Tidymint trong <b>Truy cập toàn bộ ổ đĩa</b> để nguyên cũng được: không còn app thì quyền đó không có tác dụng, cài lại thì khỏi cấp lại; muốn xoá hẳn thì chọn dòng đó, bấm <b>−</b>. Trang <b>Gỡ ứng dụng</b> trong Tidymint cố ý không liệt kê chính Tidymint, để app không bao giờ tự chuyển mình vào Thùng rác giữa lúc đang dọn.</p>
-<h2 id="khong-thay">Không thấy nút Vẫn mở?</h2>
+<p>Không cần khởi động lại máy: Tidymint không cài tiến trình chạy nền, tiện ích hệ thống hay trình trợ giúp quyền quản trị. Dòng Tidymint trong <b>Truy cập toàn bộ ổ đĩa</b> để nguyên cũng được: không còn app thì quyền đó không có tác dụng; muốn xoá hẳn thì chọn dòng đó, bấm <b>−</b>. Trang <b>Gỡ ứng dụng</b> trong Tidymint cố ý không liệt kê chính Tidymint, để app không bao giờ tự chuyển mình vào Thùng rác giữa lúc đang dọn.</p>
+<h2 id="khong-thay">Vẫn không mở được?</h2>
 <ul>
-<li>Nút chỉ hiện một lúc sau khi macOS vừa chặn. Nhấp đúp Tidymint lần nữa, bấm Done, rồi quay lại Quyền riêng tư &amp; Bảo mật.</li>
-<li>Nút nằm ở mục <b>Bảo mật</b> giữa trang, không phải cuối trang.</li>
-<li>Máy công ty có thể bị quản trị viên khoá mục này; khi đó hỏi IT.</li>
+<li>Tải lại <b>Tidymint.zip</b> từ <a href="{HOME}">tidymint.app</a>, giải nén rồi thay bản trong Ứng dụng.</li>
+<li>Trong <b>Quyền riêng tư &amp; Bảo mật</b>, mục <b>Bảo mật</b>, xem dòng <i>Allow applications from</i> (Cho phép ứng dụng từ). Nếu đang chọn chỉ App Store thì đổi sang <i>App Store &amp; Known Developers</i> (App Store và nhà phát triển đã biết).</li>
+<li>Máy công ty có thể bị quản trị viên khoá; khi đó hỏi IT.</li>
 </ul>
 """,
   faq=[
-    ("Sao macOS lại chặn Tidymint?", "Tidymint chưa mua tài khoản nhà phát triển Apple (99 USD/năm) để công chứng. Mọi app chưa công chứng đều bị chặn kiểu này. Mã phần dọn dẹp công khai trên GitHub để ai cũng kiểm tra được."),
-    ("Bấm Vẫn mở có nguy hiểm không?", "Bạn đang cho phép một app cụ thể, không tắt bảo vệ của máy. Chỉ bấm với app tải từ trang chính thức tidymint.app hoặc GitHub của dự án."),
-    ("Máy tiếng Việt thì các nút tên gì?", "Quyền riêng tư và Bảo mật, mục Bảo mật, nút Vẫn mở, hộp thoại Mở, Truy cập toàn bộ ổ đĩa. Vị trí giống hệt ảnh."),
-    ("Cập nhật bản mới có phải làm lại không?", "Có, mỗi bản tải mới đều bị chặn một lần cho tới khi app được công chứng. Làm lại bước 3 đến 5, mất khoảng một phút. Quyền Truy cập toàn bộ ổ đĩa và cài đặt vẫn giữ nguyên."),
+    ("Lần đầu mở Tidymint thế nào?", "Bấm đúp, rồi bấm Mở khi macOS hỏi. Tidymint có chữ ký Developer ID và được Apple công chứng."),
+    ("Bản cũ báo không mở được?", "Bản 0.6.0 trở về trước chưa được công chứng. Hãy tải bản mới nhất."),
     ("Không cấp Truy cập toàn bộ ổ đĩa thì sao?", "App vẫn chạy và dọn được bộ nhớ đệm, file lớn, file trùng trong thư mục người dùng. Chỉ các thư mục được macOS bảo vệ như Mail, Tin nhắn hiện trống. Lần quét đầu, macOS sẽ hỏi riêng quyền vào Desktop, Documents, Downloads, bấm Cho phép là được; app cũng hiện một dải nhắc trên trang chủ kèm nút mở thẳng mục cài đặt này."),
   ],
   sources=[
@@ -334,73 +325,66 @@ dict(
 ),
 
 dict(
-  lang="en", slug="install", topic="start", date="2026-11-05", read="4 min read",
+  lang="en", slug="install", topic="start", date="2026-11-05", read="3 min read",
   title="How to Install Tidymint on Mac, With Screenshots | Tidymint",
-  desc="Download Tidymint, get past the first-launch block, click Open Anyway in Privacy & Security and grant Full Disk Access. One screenshot per step.",
+  desc="Download Tidymint, drag it to Applications, click Open and grant Full Disk Access. Four steps with screenshots.",
   crumb="Install step by step",
   h1="Install Tidymint on your Mac, step by step",
-  tldr="Tidymint is not notarized by Apple yet, so the first launch is blocked and you need to click <b>Open Anyway</b> in <b>System Settings › Privacy &amp; Security</b>, under the <b>Security</b> heading halfway down the page. The whole thing takes about two minutes and only happens once.",
-  toc=[("s1","Step 1: Download and unzip"),("s2","Step 2: Move to Applications"),("s3","Step 3: First launch, click Done"),("s4","Step 4: Click Open Anyway"),
-       ("s5","Step 5: Confirm and enter your password"),("s6","Step 6: Grant Full Disk Access"),("update","Updating to a new version"),("uninstall","Uninstall Tidymint"),("missing","No Open Anyway button?"),("faq","FAQ")],
+  tldr="From 1.0.0 Tidymint is signed with Developer ID and <b>notarized by Apple</b>. Download it, drag it to <b>Applications</b> and click <b>Open</b> when macOS asks. Full Disk Access is optional.",
+  toc=[("s1","Step 1: Download and unzip"),("s2","Step 2: Move to Applications"),("s3","Step 3: Open it and click Open"),
+       ("s4","Step 4: Grant Full Disk Access"),("update","Updating to a new version"),("uninstall","Uninstall Tidymint"),("missing","Still won't open?"),("faq","FAQ")],
   body="""
 <h2 id="s1">Step 1: Download and unzip</h2>
-<p>Click <a href="{DL}">Download Tidymint</a>. <b>Tidymint.zip</b> (about 3 MB) lands in <b>Downloads</b>. Double-click it and macOS unzips the <b>Tidymint</b> app next to it.</p>
+<p>Click <a href="{DL}">Download Tidymint</a>. <b>Tidymint.zip</b> lands in <b>Downloads</b>. Double-click it and macOS unzips the <b>Tidymint</b> app next to it.</p>
 <img src="../install-1-download.jpg" alt="Downloads folder with Tidymint.zip and the unzipped Tidymint app" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
 <h2 id="s2">Step 2: Move to Applications</h2>
 <p>Drag <b>Tidymint</b> from Downloads to <b>Applications</b> in the Finder sidebar. It would run from Downloads too, but in Applications Spotlight finds it, the Dock keeps it, and a Downloads cleanup can't delete it by accident. You can delete the zip afterwards.</p>
 <img src="../install-2-applications.jpg" alt="Tidymint inside the Applications folder" width="1200" height="800" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
-<h2 id="s3">Step 3: First launch, click Done</h2>
-<p>Double-click Tidymint in Applications. macOS shows <i>"Tidymint" Not Opened</i> because the app is not notarized. Click <b>Done</b>. Do <b>not</b> click Move to Trash.</p>
-<img src="../install-3-blocked.jpg" alt="The Tidymint Not Opened dialog, click Done" width="760" height="630" loading="lazy" style="display:block;max-width:min(380px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid #1c1c1c">
-<h2 id="s4">Step 4: Click Open Anyway</h2>
-<p>Open <b>System Settings › Privacy &amp; Security</b>. Scroll to the <b>Security</b> heading, about halfway down, right under <i>Allow applications from</i>. The line <i>"Tidymint" was blocked to protect your Mac</i> has an <b>Open Anyway</b> button. Click it.</p>
-<img src="../open-anyway.jpg" alt="Security section of Privacy and Security with the Open Anyway button" width="1200" height="449" loading="lazy" style="display:block;max-width:100%;height:auto;margin:12px 0 4px;border-radius:12px;border:1px solid var(--line)">
-<h2 id="s5">Step 5: Confirm and enter your password</h2>
-<p>macOS asks once more: <i>Open "Tidymint"?</i>. Click <b>Open Anyway</b> (the middle button, not the blue Move to Trash). Then enter your Mac password or use Touch ID and click <b>OK</b>. Tidymint opens. From now on a double-click is enough.</p>
-<div class="pair"><img src="../install-5-confirm.jpg" alt="The Open Tidymint dialog, click Open Anyway" width="760" height="878" loading="lazy" style="display:block;max-width:100%;height:auto;margin:0;border-radius:12px;border:1px solid #1c1c1c"><span class="pair-arrow" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span><img src="../install-6-password.jpg" alt="Administrator password prompt" width="760" height="878" loading="lazy" style="display:block;max-width:100%;height:auto;margin:0;border-radius:12px;border:1px solid #1c1c1c"></div>
-<h2 id="s6">Step 6: Grant Full Disk Access</h2>
-<p>Optional, but without it Mail, Messages and parts of Library show as empty in scans. In <b>Privacy &amp; Security</b>, scroll <b>up</b> to the privacy list (top half of the page) and click <b>Full Disk Access</b>. Faster: type "Full Disk" in the search box at the top left of System Settings.</p>
+<h2 id="s3">Step 3: Open it and click Open</h2>
+<p>Double-click Tidymint in Applications. macOS says the app came from the Internet and that Apple found no malware. Click <b>Open</b>.</p>
+<h2 id="s4">Step 4: Grant Full Disk Access</h2>
+<p>Optional, but without it Mail, Messages and parts of Library show as empty in scans. Open <b>System Settings › Privacy &amp; Security</b> and click <b>Full Disk Access</b>. Faster: type "Full Disk" in the search box at the top left of System Settings.</p>
 <p>Find <b>Tidymint</b> and turn its switch on. If it is not listed, click <b>+</b> below the list, pick Tidymint in Applications and click Open. If Tidymint is running, macOS asks you to quit and reopen it; agree.</p>
 <img src="../install-7-fulldisk.jpg" alt="Full Disk Access list with the Tidymint switch on" width="1000" height="1060" loading="lazy" style="display:block;max-width:min(720px,100%);height:auto;margin:12px auto 4px;border-radius:12px;border:1px solid var(--line)">
-<p>Tidymint uses this permission only to measure sizes and move files to the Trash. Scanning and cleaning run offline; the only automatic connection is a once-a-day check for a new version (you can turn it off in Settings), see the <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">privacy policy</a>.</p>
+<p>Tidymint uses this permission to measure sizes, move files to the Trash and read the Trash (Trash rules in Plus included, if you turn them on). Scanning and cleaning run offline; the app checks for new versions by itself, with a few usage statistics, see the <a href="https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md">privacy policy</a>.</p>
 {CTA}
 <h2 id="update">Updating to a new version</h2>
-<p>When a new version is out, Tidymint shows a line with a <b>Download</b> button in Settings (it checks once a day, or click <b>Check Now</b>). Updating takes about a minute:</p>
+<p>When a new version is out, Tidymint shows a line with a <b>Download</b> button in Settings (it checks by itself, or click <b>Check Now</b>). Updating takes about a minute:</p>
 <ol>
 <li>Quit Tidymint. Download <b>Tidymint.zip</b>, open it, drag <b>Tidymint</b> to <b>Applications</b> and click <b>Replace</b>.</li>
-<li>Open the app. macOS blocks it once, as in step 3: repeat steps 3 to 5 (click Done, click <b>Open Anyway</b> in Privacy &amp; Security, enter your password).</li>
+<li>Open the app. If macOS asks, click <b>Open</b>.</li>
 </ol>
-<p>You do not need to grant Full Disk Access again. Your settings, theme, project folders and ignore list stay as they were.</p>
+<p>When you update to 1.0.0, macOS may ask for Screen Recording once more. Your settings, theme, project folders and ignore list stay as they were.</p>
 <h2 id="uninstall">Uninstall Tidymint</h2>
-<p>The quickest way is to drag Tidymint to the Trash. For a clean removal, also delete 4 small items in your Library folder (under 1 MB on our test Mac). Everything Tidymint cleaned stays in the Trash; uninstalling only removes the <b>Undo</b> button, and you can still drag any file back out of the Trash.</p>
+<p>The quickest way is to drag Tidymint to the Trash. For a clean removal, also delete 4 small items in your Library folder (under 1 MB on our test Mac, more if Mintclip keeps images). Everything Tidymint cleaned stays in the Trash; uninstalling only removes the <b>Undo</b> button, and you can still drag any file back out of the Trash.</p>
 <ol>
 <li>Quit Tidymint (menu bar icon › Quit). Open Finder › <b>Applications</b> and drag <b>Tidymint</b> to the Trash.</li>
 <li>For a clean removal: in Finder choose <b>Go › Go to Folder</b> (Shift‑Cmd‑G), paste each path below, and drag the item to the Trash.</li>
 </ol>
 <div class="tbl"><table>
 <tr><th>Path</th><th>What it is</th></tr>
-<tr><td><code class="cp">~/Library/Application Support/Tidymint</code></td><td>Disk usage history, notes, the last clean's log</td></tr>
+<tr><td><code class="cp">~/Library/Application Support/Tidymint</code></td><td>Disk usage history, notes, the last clean's log, data of the Mint tools (Mintclip's history and images, the Mintdrop shelf)</td></tr>
 <tr><td><code class="cp">~/Library/Preferences/com.haitrung.diskcleanup.plist</code></td><td>Settings: language, theme, text size, project folders, ignore list</td></tr>
 <tr><td><code class="cp">~/Library/Caches/com.haitrung.diskcleanup</code></td><td>Cache macOS creates when the app checks for updates</td></tr>
 <tr><td><code class="cp">~/Library/HTTPStorages/com.haitrung.diskcleanup</code></td><td>Same, the part macOS keeps for network connections</td></tr>
 </table></div>
-<p><code>com.haitrung.diskcleanup</code> is the app's identifier from when it was called "Disk Cleanup", kept so updates never ask you to grant permissions again. macOS also gives each app a cache folder and a temporary folder in <code>/private/var/folders</code>; it removes temporary files unused for 3 days. To remove the cache too, paste this into Terminal to open that folder, then drag the <code>com.haitrung.diskcleanup</code> folder to the Trash:</p>
+<p>If you turned on iCloud sync in Plus, a <b>Tidymint</b> folder remains in iCloud Drive: drag it to the Trash if no other Mac uses it.</p>
+<p><code>com.haitrung.diskcleanup</code> is the app's identifier from when it was called "Disk Cleanup", kept so updates go on using your settings. macOS also gives each app a cache folder and a temporary folder in <code>/private/var/folders</code>; it removes temporary files unused for 3 days. To remove the cache too, paste this into Terminal to open that folder, then drag the <code>com.haitrung.diskcleanup</code> folder to the Trash:</p>
 <pre><code>open "$(getconf DARWIN_USER_CACHE_DIR)"</code></pre>
 <p>Installed with Homebrew? Use one of two commands. The first removes the app and keeps your settings for a later reinstall; the second also removes all 4 items in the table:</p>
 <pre><code>brew uninstall --cask tidymint</code></pre>
 <pre><code>brew uninstall --zap --cask tidymint</code></pre>
-<p>No restart needed: Tidymint installs no background process, system extension or privileged helper. The Tidymint line in <b>Full Disk Access</b> can stay: without the app it does nothing, and a reinstall will not ask again; to remove it, select the line and click <b>−</b>. Tidymint's own <b>Uninstall</b> page deliberately leaves Tidymint off the list, so the app never moves itself to the Trash in the middle of a clean.</p>
-<h2 id="missing">No Open Anyway button?</h2>
+<p>No restart needed: Tidymint installs no background process, system extension or privileged helper. The Tidymint line in <b>Full Disk Access</b> can stay: without the app it does nothing; to remove it, select the line and click <b>−</b>. Tidymint's own <b>Uninstall</b> page deliberately leaves Tidymint off the list, so the app never moves itself to the Trash in the middle of a clean.</p>
+<h2 id="missing">Still won't open?</h2>
 <ul>
-<li>The button only appears for a while after a blocked launch. Double-click Tidymint again, click Done, then return to Privacy &amp; Security.</li>
-<li>It sits under the <b>Security</b> heading in the middle of the page, not at the bottom.</li>
+<li>Download <b>Tidymint.zip</b> again from <a href="{HOME}">tidymint.app</a>, unzip it and replace the copy in Applications.</li>
+<li>In <b>Privacy &amp; Security</b>, under <b>Security</b>, look at <i>Allow applications from</i>. If it is set to App Store only, switch to <i>App Store &amp; Known Developers</i>.</li>
 <li>On a managed work Mac an administrator may have locked this; ask IT.</li>
 </ul>
 """,
   faq=[
-    ("Why does macOS block Tidymint?", "Tidymint has no Apple Developer account yet (99 USD a year) and so is not notarized. Every unnotarized app is blocked the same way. The source code of the cleaning core is public on GitHub."),
-    ("Is clicking Open Anyway safe?", "You are allowing one specific app, not switching off protection. Only do it for apps downloaded from the official site tidymint.app or the project's GitHub."),
-    ("Do I have to repeat this for updates?", "Yes, each new download is blocked once until the app is notarized. Repeat steps 3 to 5, about a minute. Full Disk Access and your settings are kept."),
+    ("How do I open Tidymint the first time?", "Double-click it, then click Open when macOS asks. Tidymint is signed with Developer ID and notarized by Apple."),
+    ("An older version won't open?", "Version 0.6.0 and earlier are not notarized. Download the latest version instead."),
     ("What if I skip Full Disk Access?", "The app still runs and cleans caches, large and duplicate files in your home folder. Only macOS-protected folders such as Mail and Messages show as empty. On the first scan macOS asks separately for Desktop, Documents and Downloads: click Allow. The home page also shows a reminder with a button that opens this setting."),
   ],
   sources=[
@@ -610,7 +594,7 @@ dict(
 
 <h2 id="do">Số đo thật trên một máy chỉ có Photoshop</h2>
 <p>Máy đo: Mac mini, chỉ cài Photoshop 2026 và Creative Cloud, không dùng Premiere, Lightroom. Số đo ngày 27/10/2026.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>Chỗ</th><th>Dung lượng</th><th>Dọn được?</th></tr>
 <tr><td><code>/Applications/Adobe Photoshop 2026</code></td><td>6,2 GB</td><td>Không, là app</td></tr>
 <tr><td><code>/Library/Application Support/Adobe/CameraRaw</code> (hồ sơ ống kính, model AI của Camera Raw)</td><td>2,2 GB</td><td>Không nên, Photoshop cần khi mở ảnh RAW</td></tr>
@@ -619,7 +603,7 @@ dict(
 <tr><td><code>~/Library/Application Support/Adobe</code> (cài đặt cá nhân, CoreSync)</td><td>126 MB</td><td>Phần nhỏ</td></tr>
 <tr><td><code>~/Library/Application Support/Adobe/Adobe Photoshop 2021</code></td><td>3 MB</td><td>Sót của bản cũ, xoá được</td></tr>
 <tr><td>Bộ nhớ đệm Camera Raw, Media Cache</td><td>0</td><td>Có, khi tồn tại</td></tr>
-</table>
+</table></div>
 <p>Tổng 11,5 GB, trong đó phần xoá được chỉ vài MB. Máy này không có Premiere và không mở ảnh RAW nên hai thư mục bộ nhớ đệm lớn nhất chưa xuất hiện. Máy dựng video hoặc chỉnh ảnh RAW hằng ngày sẽ có thêm các khoản dưới đây.</p>
 
 <h2 id="media-cache">Media Cache của Premiere và After Effects</h2>
@@ -704,7 +688,7 @@ dict(
 
 <h2 id="measured">Real numbers from a Photoshop-only Mac</h2>
 <p>Machine: a Mac mini with Photoshop 2026 and Creative Cloud only, no Premiere, no Lightroom. Measured 27 Oct 2026.</p>
-<table>
+<div class="tbl"><table>
 <tr><th>Where</th><th>Size</th><th>Can it go?</th></tr>
 <tr><td><code>/Applications/Adobe Photoshop 2026</code></td><td>6.2 GB</td><td>No, it is the app</td></tr>
 <tr><td><code>/Library/Application Support/Adobe/CameraRaw</code> (lens profiles, Camera Raw AI models)</td><td>2.2 GB</td><td>Better not, Photoshop needs it for RAW files</td></tr>
@@ -713,7 +697,7 @@ dict(
 <tr><td><code>~/Library/Application Support/Adobe</code> (your settings, CoreSync)</td><td>126 MB</td><td>Small</td></tr>
 <tr><td><code>~/Library/Application Support/Adobe/Adobe Photoshop 2021</code></td><td>3 MB</td><td>Leftover from an old version, yes</td></tr>
 <tr><td>Camera Raw cache, Media Cache</td><td>0</td><td>Yes, when present</td></tr>
-</table>
+</table></div>
 <p>11.5 GB in total, of which only a few MB can go. This Mac has no Premiere and never opens RAW files, so the two big caches have not appeared yet. A Mac that edits video or RAW photos every day will have the items below on top.</p>
 
 <h2 id="media-cache">Premiere and After Effects Media Cache</h2>
@@ -876,7 +860,7 @@ dict(
   desc="Mac storage almost full? 10 safe ways to free up space on macOS: clear cache, find large and duplicate files, remove unused apps and leftovers.",
   crumb="Free up space on Mac",
   h1="How to free up space on Mac: 10 safe ways",
-  tldr="Start with <b>System Settings › General › Storage</b> to see what is using space. Then work down this list: empty the Trash, clear Downloads, turn on <b>Optimize Storage</b>, <b>clear browser and app caches</b>, remove <b>large and duplicate files</b>, <b>uninstall apps</b> together with their leftovers, and delete old device backups. Tidymint, a free open-source cleaner, can do most of this in one scan.",
+  tldr="Start with <b>System Settings › General › Storage</b> to see what is using space. Then work down this list: empty the Trash, clear Downloads, turn on <b>Optimize Storage</b>, <b>clear browser and app caches</b>, remove <b>large and duplicate files</b>, <b>uninstall apps</b> together with their leftovers, and delete old device backups. Tidymint, free to clean with an open-source core, can do most of this in one scan.",
   toc=[("look","First, see what is using space"),("ways","10 safe ways"),("cache","How to clear cache on Mac"),("faster","Do it in one scan with Tidymint"),("faq","FAQ")],
   body="""
 <h2 id="look">First, see what is using space</h2>
@@ -914,7 +898,7 @@ dict(
     ("Is it safe to clear cache on Mac?", "Yes, for your user caches in ~/Library/Caches and browser caches. Apps rebuild them as needed. Avoid system cache folders under /System or /Library."),
     ("How much free space should a Mac have?", "There is no official number, but keeping at least 10 to 15 percent of the drive free gives macOS room for updates, swap and snapshots."),
     ("Does Optimize Storage delete my files?", "No. Files stay in iCloud and download again when you open them. You need enough iCloud storage for this to work."),
-    ("Is Tidymint free?", "Cleaning is free, with no account and no subscription. The cleaning core is open source under the MIT licence."),
+    ("Is Tidymint free?", "Yes. Cleaning is completely free, with no account and no subscription. Mintangle, Mintclip, Mintbar and Mintdrop each have a free part with no time limit. The paid part is Tidymint Plus. The cleaning core is open source under the MIT licence."),
   ],
   sources=[
     ("Apple: Free up storage space on Mac", "https://support.apple.com/ht206996"),
@@ -958,7 +942,7 @@ dict(
 
 <h2 id="options">5 free alternatives</h2>
 <h3>1. Tidymint: all-in-one cleaner, free to clean</h3>
-<p><a href="{HOME}">Tidymint</a> covers cleanup, clean-by-app pages for browsers and messengers, duplicates, large files, an uninstaller with undo, a bubble map of your disk and a menu bar indicator. Its defining rule: <b>everything goes to the Trash</b>, nothing is deleted permanently until you empty it. It is MIT-licensed, works offline and is available in English and Vietnamese. Built with AI and developer workflows in mind, it also knows folders like <code>.ollama</code> and project drafts.</p>
+<p><a href="{HOME}">Tidymint</a> covers cleanup, clean-by-app pages for browsers and messengers, duplicates, large files, an uninstaller with undo, a bubble map of your disk and a menu bar indicator. Its defining rule: <b>cleaning goes to the Trash</b>, and nothing is deleted permanently until you empty it or turn on Trash rules in Plus (off by default). Its cleaning core is MIT-licensed, cleaning works offline, and the app is in English and Vietnamese. Built with AI and developer workflows in mind, it also knows folders like <code>.ollama</code> and project drafts.</p>
 <h3>2. AppCleaner: the classic uninstaller</h3>
 <p>Free. Drag an app onto its window and it lists the related files to remove. Does one thing well.</p>
 <h3>3. Pearcleaner: open-source uninstaller</h3>
@@ -970,26 +954,27 @@ dict(
 {CTA}
 
 <h2 id="compare">Tidymint vs CleanMyMac</h2>
-<p>To be clear: Tidymint does not replace all of CleanMyMac. It focuses on cleaning and disk space.</p>
+<p>To be clear: Tidymint does not replace all of CleanMyMac. As a cleaner, it focuses on cleaning and disk space. The Mint tools (menu bar, windows, drag and drop, clipboard) are extras, not in this table.</p>
 <div class="tbl"><table>
 <tr><th></th><th>Tidymint</th><th>CleanMyMac</th></tr>
-<tr><td>Price</td><td class="y">Free, no account</td><td>About $40/year per Mac</td></tr>
+<tr><td>Price</td><td class="y">Free to clean, no account. Plus for the Mint tools: one-time, from $3.99</td><td>About $40/year per Mac</td></tr>
 <tr><td>Source code</td><td class="y">Cleaning core open (MIT)</td><td>Closed</td></tr>
-<tr><td>When cleaning</td><td class="y">Moves to Trash, you empty it</td><td>Follows the app's own settings</td></tr>
+<tr><td>When cleaning</td><td class="y">Moves to Trash, with Undo</td><td>Follows the app's own settings</td></tr>
 <tr><td>Malware protection</td><td>Relies on XProtect and Gatekeeper built into macOS</td><td class="y">Own scanner</td></tr>
 <tr><td>Performance tools, app updates</td><td class="n">No</td><td class="y">Yes</td></tr>
-<tr><td>Usage data collection</td><td class="y">None, no account needed</td><td>Yes (device info, usage statistics, cleanup logs), per MacPaw's privacy policy</td></tr>
+<tr><td>Usage data collection</td><td>Yes (usage statistics with a random number for this copy). No account needed</td><td>Yes (device info, usage statistics, cleanup logs), per MacPaw's privacy policy</td></tr>
 <tr><td>Languages</td><td>English, Vietnamese</td><td>12 languages</td></tr>
-<tr><td>Apple notarization</td><td class="n">Not yet, needs "Open Anyway" once</td><td class="y">Yes</td></tr>
+<tr><td>Apple notarization</td><td class="y">Yes, from 1.0.0</td><td class="y">Yes</td></tr>
 <tr><td>Support</td><td>Email and GitHub</td><td class="y">Dedicated support team</td></tr>
 </table></div>
 <p><b>Pick CleanMyMac</b> if you want an all-in-one suite with malware protection and are happy to pay. <b>Pick Tidymint</b> if you want a clean Mac, free disk space and to see exactly what gets removed.</p>
 """,
   faq=[
+    ("Is Tidymint free?", "Yes. Cleaning is completely free, with no account and no subscription. Mintangle, Mintclip, Mintbar and Mintdrop each have a free part with no time limit. The paid part is Tidymint Plus."),
     ("Is there a free version of CleanMyMac?", "No. There is a 7-day free trial with full features, available from the MacPaw Store, the App Store and Setapp. After that you need a subscription or a one-time purchase."),
     ("Is CleanMyMac worth it?", "It is a polished suite with a malware scanner and support. If you only need cleanup and uninstalling, free tools do those jobs."),
-    ("Is Tidymint safe?", "Tidymint only moves items to the Trash, so anything can be put back. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and the code that does the cleaning is public."),
-    ("Why does macOS block Tidymint the first time?", "It is not notarized by Apple yet, which requires a paid developer account. Open it once via System Settings › Privacy & Security › Open Anyway, as Apple describes."),
+    ("Is Tidymint safe?", "Cleaning only moves items to the Trash, with Undo for the last clean. It never touches Photos, Mail, keychains, cloud storage roots or Apple system caches, and the code that does the cleaning is public."),
+    ("How do I open Tidymint the first time?", "Double-click it, then click Open when macOS asks. Tidymint is signed with Developer ID and notarized by Apple."),
     ("Does Tidymint work on Intel Macs?", "Yes. It runs on macOS 14 or later on both Apple silicon and Intel."),
   ],
   sources=[
@@ -1094,7 +1079,7 @@ dict(
   desc="MacBook báo sắp đầy ổ? 10 cách giải phóng dung lượng an toàn: xoá bộ nhớ đệm, tìm file lớn và file trùng, gỡ app không dùng kèm phần sót lại, dọn Zalo.",
   crumb="Giải phóng dung lượng MacBook",
   h1="10 cách giải phóng dung lượng MacBook an toàn",
-  tldr="Bắt đầu từ <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b> để xem thứ gì đang chiếm chỗ. Rồi làm lần lượt: đổ Thùng rác, dọn thư mục Tải về, bật <b>Tối ưu hoá dung lượng</b>, <b>xoá bộ nhớ đệm</b> trình duyệt và app, tìm <b>file lớn và file trùng</b>, <b>gỡ app</b> kèm phần sót lại, dọn <b>dữ liệu Zalo</b>, xoá bản sao lưu iPhone cũ. Tidymint (miễn phí) làm được phần lớn danh sách này trong một lần quét.",
+  tldr="Bắt đầu từ <b>Cài đặt hệ thống › Cài đặt chung › Dung lượng</b> để xem thứ gì đang chiếm chỗ. Rồi làm lần lượt: đổ Thùng rác, dọn thư mục Tải về, bật <b>Tối ưu hoá dung lượng</b>, <b>xoá bộ nhớ đệm</b> trình duyệt và app, tìm <b>file lớn và file trùng</b>, <b>gỡ app</b> kèm phần sót lại, dọn <b>dữ liệu Zalo</b>, xoá bản sao lưu iPhone cũ. Tidymint (dọn dẹp miễn phí) làm được phần lớn danh sách này trong một lần quét.",
   toc=[("xem","Trước hết, xem thứ gì đang chiếm chỗ"),("cach","10 cách an toàn"),("bo-nho-dem","Cách xoá bộ nhớ đệm trên Mac"),("nhanh-hon","Làm trong một lần quét với Tidymint"),("faq","Câu hỏi thường gặp")],
   body="""
 <h2 id="xem">Trước hết, xem thứ gì đang chiếm chỗ</h2>
@@ -1140,7 +1125,7 @@ dict(
     ("Xoá bộ nhớ đệm trên Mac có an toàn không?", "Có, với bộ nhớ đệm của bạn trong ~/Library/Caches và bộ nhớ đệm trình duyệt. App tự tạo lại khi cần. Tránh các thư mục bộ nhớ đệm hệ thống trong /System hay /Library."),
     ("Mac nên chừa trống bao nhiêu?", "Apple không đưa con số chính thức. Kinh nghiệm thường gặp là chừa khoảng 10–15% dung lượng ổ để macOS có chỗ cập nhật và chạy bộ nhớ hoán đổi."),
     ("Tối ưu hoá dung lượng có xoá file của tôi không?", "Không. File nằm trên iCloud và tải lại khi bạn mở. Bạn cần đủ dung lượng iCloud để dùng tính năng này."),
-    ("Tidymint có miễn phí không?", "Phần dọn dẹp miễn phí, không tài khoản, không thuê bao. Lõi dọn dẹp là mã nguồn mở theo giấy phép MIT."),
+    ("Tidymint có miễn phí không?", "Có. Dọn dẹp miễn phí trọn vẹn, không tài khoản, không thuê bao. Mintangle, Mintclip, Mintbar và Mintdrop có phần miễn phí, không hết hạn. Phần trả tiền là Tidymint Plus. Lõi dọn dẹp là mã nguồn mở theo giấy phép MIT."),
   ],
   sources=[
     ("Apple: Giải phóng dung lượng lưu trữ trên Mac", "https://support.apple.com/ht206996"),
@@ -1973,10 +1958,10 @@ dict(
 GUIDES.append(dict(
   lang="vi", slug="quyen-rieng-tu-tidymint", topic="start", date="2026-11-04", read="6 phút đọc",
   title="Tidymint có gửi dữ liệu của bạn đi không? | Tidymint",
-  desc="App dọn máy được đọc cả ổ đĩa. Tidymint chạy ngay trên máy: không cần mạng, không tài khoản, không theo dõi. Giải thích dễ hiểu.",
+  desc="App dọn máy được đọc cả ổ đĩa. Tidymint quét và dọn không cần mạng, không tài khoản. Xem app gửi gì, lúc nào, và Plus cần biết gì.",
   crumb="Quyền riêng tư",
-  h1="Tidymint làm gì với dữ liệu của bạn? Câu trả lời ngắn: không gì cả",
-  tldr="Tidymint quét và dọn <b>ngay trên máy bạn</b>, giống người thợ dọn nhà làm việc trong nhà bạn rồi về tay không. App không có tài khoản, không quảng cáo, không gắn công cụ đo lường, và <b>tắt mạng vẫn quét, dọn bình thường</b>. App chỉ lên mạng trong hai trường hợp: <b>kiểm tra bản mới</b> (đọc một con số phiên bản, mỗi ngày tối đa một lần) và khi <b>bạn tự bấm gửi góp ý</b>. Mã phần dọn dẹp công khai, ai cũng kiểm được.",
+  h1="Tidymint làm gì với dữ liệu của bạn? File ở lại trên máy",
+  tldr="Tidymint quét và dọn <b>ngay trên máy bạn</b>, giống người thợ dọn nhà làm việc trong nhà bạn, không mang món đồ nào về. App không có tài khoản, không quảng cáo, và <b>tắt mạng vẫn quét, dọn bình thường</b>. Tidymint không nhận file, tên file hay nội dung file của bạn. App lên mạng để <b>kiểm tra bản mới</b> kèm vài số liệu sử dụng, khi <b>bạn gửi góp ý</b>, và khi bạn dùng <b>Tidymint Plus</b>: dùng thử, key, đồng bộ iCloud. Mã phần dọn dẹp công khai, ai cũng kiểm được.",
   toc=[("vi-sao-can-quyen","Vì sao app dọn máy cần quyền đọc cả ổ"),("chay-tren-may","Tidymint làm việc thế nào"),
        ("khi-nao-len-mang","Lúc nào Tidymint kết nối mạng"),("tu-kiem","Tự kiểm chứng trong 2 phút"),
        ("web","Còn trang web tidymint.app?"),("faq","Câu hỏi thường gặp")],
@@ -1987,8 +1972,9 @@ GUIDES.append(dict(
 
 <p>Từ bản 0.5.0 có thêm một quyền tuỳ chọn: <b>Trợ năng</b> (Accessibility), chỉ dành cho Mintangle (xếp cửa sổ). Mintangle tắt sẵn, bạn không bật thì Tidymint không bao giờ hỏi quyền này. Bật lên, app chỉ dùng quyền để dời và đổi cỡ cửa sổ, không đọc nội dung, không ghi phím gõ.</p>
 <p>Từ bản 0.6.0, <b>Mintbar</b> (menu bar gọn) cũng tắt sẵn. Trên macOS 27, khi bạn bật, Mintbar xin quyền <b>Trợ năng</b> để biết app nào có icon trên menu bar và mở icon bạn chọn trong nhóm (có thể bấm chuột hộ vào icon đó rồi đưa con trỏ về chỗ cũ), và quyền <b>Ghi màn hình</b> để chụp hình icon menu bar của các app trong nhóm. Chỉ chụp đúng ô của icon đó, hình lưu trên máy và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Trên macOS 14 đến 26, Mintbar không cần quyền nào.</p>
+<p><b>Mintclip</b> (lịch sử copy) cũng tắt sẵn. Khi bạn bật, Mintclip đọc những gì bạn copy và lưu trên máy. macOS hỏi quyền dán từ app khác, và muốn bấm là dán thẳng thì cần thêm quyền <b>Trợ năng</b>. Trình quản lý mật khẩu và app bạn chọn được bỏ qua.</p>
 <h2 id="chay-tren-may">Tidymint làm việc thế nào: mọi thứ chạy ngay trên máy bạn</h2>
-<p>Hình dung Tidymint như <b>người thợ dọn nhà làm việc ngay trong nhà bạn</b>: đi từng phòng, ghi lại thứ gì to, thứ gì cũ, đưa bạn tờ danh sách. Bạn đánh dấu thứ muốn bỏ, thợ mang ra Thùng rác. Thợ không chụp ảnh đồ đạc gửi về công ty, và về tay không.</p>
+<p>Hình dung Tidymint như <b>người thợ dọn nhà làm việc ngay trong nhà bạn</b>: đi từng phòng, ghi lại thứ gì to, thứ gì cũ, đưa bạn tờ danh sách. Bạn đánh dấu thứ muốn bỏ, thợ mang ra Thùng rác. Thợ không chụp ảnh đồ đạc gửi về công ty, và không mang món đồ nào về.</p>
 <ol class="steps">
 <li><b>Quét:</b> Tidymint đọc <b>tên, kích thước, ngày</b> của các tệp trong những thư mục nó biết là hay đầy. Việc tính toán dùng chính bộ xử lý của máy bạn, không cần internet.</li>
 <li><b>Tìm file trùng:</b> app so nội dung từng file bằng một phép tính ra \"dấu vân tay\" của file, cũng ngay trên máy. Ảnh thu nhỏ do macOS tạo sẵn.</li>
@@ -1999,18 +1985,22 @@ GUIDES.append(dict(
 <li><b>Gợi ý khi bỏ app vào Thùng rác</b> (tắt sẵn): khi bạn bật, Tidymint theo dõi thư mục Thùng rác trong lúc app đang chạy. Có app rơi vào đó thì Tidymint tìm trong Library các thư mục mang mã định danh của app ấy. Thông báo chỉ hiện tên app và nằm trên máy bạn. Không tick sẵn, không chuyển, không gửi đi đâu.</li>
 <li><b>Thư viện dự án cũ:</b> Tidymint đọc tên và ngày của tệp trong các thư mục dự án bạn khai ở Cài đặt, cùng thư mục bản sao làm việc của Codex và Cursor trong thư mục cá nhân, và hỏi macOS xem chương trình đang chạy làm việc ở thư mục nào, để dự án đang dùng được giữ nguyên.</li>
 </ul>
-<p>Tidymint <b>không có tài khoản</b>, <b>không quảng cáo</b>, <b>không gắn công cụ đo lường</b> (kiểu đếm bạn bấm nút nào, mở app bao lâu). Trừ lúc bạn tự gửi góp ý, không có máy chủ nào biết bạn là ai hay máy bạn có gì.</p>
+<p>Tidymint <b>không có tài khoản</b> và <b>không quảng cáo</b>. Không máy chủ nào nhận file hay tên file của bạn.</p>
 
 <h2 id="khi-nao-len-mang">Lúc nào Tidymint kết nối mạng</h2>
 <p>Chỉ có các trường hợp dưới đây, và bạn biết rõ từng cái:</p>
-<div class="tbl"><table>
+<div class="tbl sends"><table>
 <tr><th>Khi nào</th><th>Tidymint làm gì</th><th>Gửi đi thông tin gì</th></tr>
-<tr><td>Kiểm tra bản mới</td><td>Hỏi update.tidymint.app số phiên bản mới nhất (ví dụ 0.3.8), mỗi ngày tối đa một lần. Máy chủ đó cộng 1 vào số đếm trong ngày theo phiên bản app và phiên bản macOS, đọc từ dòng yêu cầu chuẩn mà mọi app Mac đều gửi. Không lưu địa chỉ IP, không có mã máy, mã nguồn công khai trong kho. Tắt được trong Cài đặt > Tự kiểm tra bản mới (từ 0.4.0)</td><td>Chỉ những gì yêu cầu chuẩn vốn có: phiên bản app và macOS. Không gửi thông tin máy hay tệp nào</td></tr>
-<tr><td>Bạn trả lời "Tidymint có giúp ích cho bạn không?" ở trang Dọn ngay</td><td>Gửi câu trả lời (hữu ích, bình thường, chưa hữu ích), lý do bạn tick và dòng bạn gõ thêm nếu có</td><td>Những thứ đó, cùng phiên bản app và ngôn ngữ. Không email, không đời máy, không mã máy. Hỏi tối đa hai lần</td></tr>
-<tr><td>Bạn bấm Gửi trong mục Liên hệ</td><td>Gửi góp ý cho người làm app</td><td>Email và nội dung bạn tự gõ. Nếu bạn tick ô kèm thông tin máy: phiên bản app, phiên bản macOS, đời máy</td></tr>
-<tr><td>Bạn bấm một đường link</td><td>Mở trình duyệt tới trang web, GitHub, mạng xã hội</td><td>Như mọi lần bạn tự mở web</td></tr>
+<tr><td>Kiểm tra bản mới</td><td>Hỏi update.tidymint.app số phiên bản mới nhất (dự phòng: tidymint.app, GitHub). Mỗi ngày một lần kèm vài số liệu sử dụng. Việc này tự chạy, không có nút tắt. Yêu cầu gửi tới máy chủ của Tidymint được lưu kèm địa chỉ IP trong tối đa ba tháng. Mã nguồn phần nhận công khai trong kho</td><td>Phiên bản app và macOS, quốc gia, ngôn ngữ, app cài được bao lâu, công cụ nào đang bật, có mở cùng máy không, có hiện trên menu bar không, có phải lần gửi đầu không, có phải app tự gửi theo giờ không, số lần dùng, dung lượng đã dọn, bản miễn phí, dùng thử hay đã mua, và một số ngẫu nhiên của bản cài. Không có tệp, tên tệp hay thứ bạn gõ</td></tr>
+<tr><td>Bạn trả lời "Tidymint có giúp ích cho bạn không?" ở trang Dọn ngay</td><td>Gửi câu trả lời (hữu ích, bình thường, chưa hữu ích), lý do bạn tick và dòng bạn gõ thêm nếu có</td><td>Những thứ đó, cùng phiên bản app, ngôn ngữ và công cụ đang bật. Không email, không đời máy. Hỏi tối đa hai lần</td></tr>
+<tr><td>Bạn bấm Gửi trong mục Liên hệ</td><td>Gửi góp ý cho người làm app, lưu trong một Google Sheet riêng</td><td>Email và nội dung bạn tự gõ. Nếu bạn tick ô kèm thông tin máy: phiên bản app, phiên bản macOS, đời máy</td></tr>
+<tr><td>Bạn đăng ký nhận bản tin</td><td>Ghi lại đăng ký của bạn</td><td>Email và câu đồng ý bạn đã bấm. Không ô nào tick sẵn</td></tr>
+<tr><td>Bạn dùng thử hoặc dùng key Plus</td><td>Kiểm quyền dùng Plus với máy chủ của Tidymint, lúc bạn bấm và định kỳ sau đó</td><td>Key nếu có và mã máy. Polar kiểm key. Ngày dùng thử giữ không thời hạn, danh sách máy giữ tới khi bạn gỡ. Mã thêm máy gửi tới email qua Resend, lưu ở Mỹ 30 ngày.</td></tr>
+<tr><td>Bạn mua Plus</td><td>Mở trang thanh toán của Polar trong trình duyệt. Polar xử lý thanh toán</td><td>Tidymint thấy thông tin đơn hàng như email, tên, địa chỉ và món bạn mua, không thấy đủ số thẻ. Dùng để hỗ trợ và thống kê.</td></tr>
+<tr><td>Bạn bật đồng bộ iCloud của Plus (tắt sẵn)</td><td>Ghi cài đặt, hoặc lịch sử Mintclip, vào iCloud Drive của bạn</td><td>Dữ liệu đó đi tới iCloud của bạn, không qua máy chủ của Tidymint</td></tr>
+<tr><td>Bạn bấm một đường link hay nút Tải về</td><td>Mở trình duyệt tới trang web, GitHub, mạng xã hội</td><td>Như mọi lần bạn tự mở web. Nút Tải về kèm số phiên bản đang dùng</td></tr>
 </table></div>
-<p>Ngoài ba trường hợp trên, Tidymint không kết nối đi đâu. <b>Rút mạng, tắt Wi-Fi, quét và dọn vẫn chạy bình thường.</b></p>
+<p>Ngoài các trường hợp trên, Tidymint không tự kết nối đi đâu. Script hay Phím tắt bạn tự thêm vào app thì làm đúng việc bạn viết trong đó. <b>Rút mạng, tắt Wi-Fi, quét và dọn vẫn chạy bình thường.</b></p>
 
 <h2 id="tu-kiem">Tự kiểm chứng trong 2 phút</h2>
 <p>Không cần tin lời, bạn tự kiểm được:</p>
@@ -2020,16 +2010,16 @@ GUIDES.append(dict(
 <li><b>Đọc mã nguồn</b>: mã phần dọn dẹp của Tidymint công khai trên <a href=\"https://github.com/HaiTrung-Workspace/tidymint\">GitHub</a>, giấy phép MIT. Bạn không đọc code cũng không sao: ai rành đọc được, và có chuyện gì thì cộng đồng sẽ thấy.</li>
 <li><b>Thu hồi quyền bất cứ lúc nào</b>: vào Quyền riêng tư &amp; Bảo mật › Truy cập toàn bộ ổ đĩa, tắt Tidymint. App vẫn chạy, chỉ thấy ít thư mục hơn.</li>
 </ol>
-<p>Một lưu ý thật: Tidymint <b>chưa được Apple công chứng</b> (notarize), nên lần đầu mở phải bấm \"Vẫn mở\". Công chứng là Apple quét app tìm mã độc trước khi cho phép. Trong lúc chưa có, mã phần dọn dẹp công khai là một cách để bạn kiểm. Các bước mở app có ảnh ở <a href=\"{HOME}cai-dat/\">hướng dẫn cài đặt</a>.</p>
+<p><b>Từ bản 1.0.0, Tidymint được Apple công chứng</b>: Apple quét app tìm mã độc trước khi phát hành. Công chứng không phải kiểm toán quyền riêng tư.</p>
 
 <h2 id="web">Còn trang web tidymint.app thì sao?</h2>
-<p>Nói rõ cho minh bạch: <b>trang web</b> dùng Google Analytics để đếm lượt xem, và <b>chỉ khi bạn bấm Đồng ý</b> ở ô cookie. Bấm Từ chối thì không lưu cookie đo lường. Còn <b>app Tidymint</b> trên máy bạn thì không có công cụ đo lường nào.</p>
+<p>Nói rõ cho minh bạch: <b>trang web</b> dùng Google Analytics để đếm lượt xem, và <b>chỉ khi bạn bấm Đồng ý</b> ở ô cookie. Bấm Từ chối thì không lưu cookie đo lường.</p>
 <p>Bản crack của các app dọn máy trả phí là đường lây mã độc đánh cắp mật khẩu khá phổ biến. Đọc thêm ở bài <a href=\"{HOME}cleanmymac-mien-phi/\">CleanMyMac miễn phí: cách thay bản crack hợp pháp</a>.</p>
 """,
-  faq=[("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Hai chỗ đọc nội dung: tìm file trùng (so nội dung để biết hai file giống hệt nhau) và kiểm script trong thư mục dự án bạn tự khai (tìm xem script còn gọi tên file nào). Cả hai đều chạy trên máy, không gửi đi đâu."),
+  faq=[("Tidymint có đọc nội dung file của tôi không?", "Khi dọn, phần lớn chỉ đọc tên, kích thước, ngày. Hai chỗ đọc nội dung: tìm file trùng (so nội dung để biết hai file giống hệt nhau) và kiểm script trong thư mục dự án bạn tự khai. Các công cụ Mint đọc nội dung để làm việc bạn giao: Mintclip đọc thứ bạn copy và chữ trong ảnh, Mintdrop đọc file để xem trước hay đổi định dạng, Mintsort đọc ảnh và PDF nếu bạn bật. Việc đọc đều diễn ra trên máy."),
        ("Có bắt buộc cấp quyền Truy cập toàn bộ ổ đĩa không?", "Không. Không cấp thì Tidymint vẫn chạy, chỉ thấy ít thư mục hơn nên tìm được ít dung lượng hơn. Bạn bật, tắt quyền này lúc nào cũng được trong Cài đặt hệ thống."),
-       ("Gỡ Tidymint thì còn lại gì?", "Chỉ có cài đặt và lịch sử dọn lưu trên chính máy bạn (trong thư mục Library của bạn). Không có dữ liệu nào nằm trên máy chủ, vì Tidymint không có máy chủ lưu dữ liệu người dùng."),
-       ("Vì sao miễn phí mà không bán dữ liệu?", "Tidymint không có quảng cáo và không theo dõi bạn. Mã phần dọn dẹp công khai để ai cũng kiểm được.")],
+       ("Gỡ Tidymint thì còn lại gì?", "Trên máy còn cài đặt, lịch sử dọn và dữ liệu của các công cụ Mint bạn đã bật, trong thư mục Library của bạn. Trên máy chủ còn những gì app đã gửi theo bảng ở trên, và thông tin key nếu bạn đã dùng thử hoặc mua. Không có file hay tên file."),
+       ("Vì sao miễn phí mà không bán dữ liệu?", "Dọn dẹp miễn phí, còn Tidymint Plus là phần trả tiền. Tidymint không có quảng cáo và không bán dữ liệu. Mã phần dọn dẹp công khai để ai cũng kiểm được.")],
   sources=[("Apple: Thay đổi cài đặt Quyền riêng tư & Bảo mật trên máy Mac (Truy cập toàn bộ ổ đĩa)", "https://support.apple.com/vi-vn/guide/mac-help/mchl211c911f/mac"),
            ("Apple: Xem hoạt động mạng trong Giám sát hoạt động", "https://support.apple.com/vi-vn/guide/activity-monitor/actmntr1006/mac"),
            ("Mã nguồn Tidymint trên GitHub (giấy phép MIT)", "https://github.com/HaiTrung-Workspace/tidymint")],
@@ -2040,10 +2030,10 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="en", slug="tidymint-privacy", topic="start", date="2026-11-04", read="6 min read",
   title="Does Tidymint Send Your Data Anywhere? | Tidymint",
-  desc="A Mac cleaner can read your whole disk. Tidymint runs entirely on your Mac: works offline, no account, no tracking. Here's how.",
+  desc="A Mac cleaner can read your whole disk. Tidymint scans and cleans offline, with no account. See what the app sends, when, and what Plus needs to know.",
   crumb="Privacy",
-  h1="What Does Tidymint Do With Your Data? Short Answer: Nothing",
-  tldr="Tidymint scans and cleans <b>right on your Mac</b>, like a cleaner who works inside your home and leaves empty-handed. There is no account, no ads and no analytics, and <b>scanning and cleaning work with Wi-Fi off</b>. The app goes online in only two cases: <b>checking for a new version</b> (it reads a version number, at most once a day) and when <b>you choose to send feedback</b>. The cleaning code is public, so anyone can check.",
+  h1="What Does Tidymint Do With Your Data? Your Files Stay on Your Mac",
+  tldr="Tidymint scans and cleans <b>right on your Mac</b>, like a cleaner who works inside your home and takes none of your things. There is no account and there are no ads, and <b>scanning and cleaning work with Wi-Fi off</b>. Tidymint never receives your files, their names or what is in them. The app goes online to <b>check for a new version</b> with a few usage statistics, when <b>you send feedback</b>, and when you use <b>Tidymint Plus</b>: the trial, a key, iCloud sync. The cleaning code is public, so anyone can check.",
   toc=[("why-access","Why a cleaner needs to read your whole disk"),("on-your-mac","How Tidymint works"),
        ("when-online","When Tidymint goes online"),("check-yourself","Check it yourself in 2 minutes"),
        ("website","What about the tidymint.app website?"),("faq","FAQ")],
@@ -2054,8 +2044,9 @@ GUIDES.append(dict(
 
 <p>From 0.5.0 there is one more optional permission: <b>Accessibility</b>, used only by Mintangle (window tiling). Mintangle is off by default, and Tidymint never asks for this permission unless you turn it on. When on, the app uses it only to move and resize windows. It does not read their content or record your keystrokes.</p>
 <p>From 0.6.0, <b>Mintbar</b> (tidy menu bar) is off by default too. On macOS 27, when you turn it on, Mintbar asks for <b>Accessibility</b>, to see which apps have a menu bar icon and to open the one you pick from a group (it may click that icon for you, then puts the pointer back), and for <b>Screen Recording</b>, to take a picture of the menu bar icon of each app in a group. Only that icon's own slot is captured; the pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off. On macOS 14 to 26, Mintbar needs no permission.</p>
+<p><b>Mintclip</b> (clipboard history) is off by default too. When you turn it on, Mintclip reads what you copy and keeps it on your Mac. macOS asks to allow pasting from other apps, and pasting straight in with a click also needs <b>Accessibility</b>. Password managers and the apps you choose are skipped.</p>
 <h2 id="on-your-mac">How Tidymint works: everything happens on your Mac</h2>
-<p>Think of Tidymint as <b>a cleaner working inside your home</b>: it walks through each room, notes what is big or old, and hands you a list. You mark what to throw out, and it carries those things to the Trash. It doesn't photograph your belongings for head office, and it leaves empty-handed.</p>
+<p>Think of Tidymint as <b>a cleaner working inside your home</b>: it walks through each room, notes what is big or old, and hands you a list. You mark what to throw out, and it carries those things to the Trash. It doesn't photograph your belongings for head office, and it takes none of your things.</p>
 <ol class="steps">
 <li><b>Scan:</b> Tidymint reads the <b>name, size and date</b> of files in the folders that usually fill up. The work runs on your Mac's own processor, with no internet needed.</li>
 <li><b>Find duplicates:</b> the app compares file contents by computing a \"fingerprint\" for each file, also on your Mac. Thumbnails come from macOS itself.</li>
@@ -2066,18 +2057,22 @@ GUIDES.append(dict(
 <li><b>Hint when an app goes to the Trash</b> (off by default): when you turn it on, Tidymint watches the Trash folder while it is running. When an app lands there, it looks in your Library for folders named after that app's identifier. The notification shows the app's name and stays on your Mac. Nothing is ticked, moved or sent anywhere.</li>
 <li><b>Old project libraries:</b> Tidymint reads file names and dates inside the project folders you set in Settings, plus the working-copy folders of Codex and Cursor in your home folder, and asks macOS which folders running programs are working in, so a project in use is left alone.</li>
 </ul>
-<p>Tidymint has <b>no account</b>, <b>no ads</b> and <b>no analytics</b> (nothing counts which buttons you click or how long the app is open). Unless you choose to send feedback, no server knows who you are or what is on your Mac.</p>
+<p>Tidymint has <b>no account</b> and <b>no ads</b>. No server receives your files or their names.</p>
 
 <h2 id="when-online">When Tidymint goes online</h2>
 <p>Only in these cases, and you know about each one:</p>
-<div class="tbl"><table>
+<div class="tbl sends"><table>
 <tr><th>When</th><th>What Tidymint does</th><th>What it sends</th></tr>
-<tr><td>Checking for updates</td><td>Asks update.tidymint.app for the latest version number (for example 0.3.8), at most once a day. That server adds one to a daily count by app version and macOS version, read from the standard request line every Mac app sends. It keeps no IP address and no identifier, and its code is public in the repository. You can turn it off in Settings > Check for new versions automatically (from 0.4.0)</td><td>Only what the standard request already carries: app version and macOS version. No information about your Mac or your files</td></tr>
-<tr><td>You answer "Is Tidymint helping you?" on Clean Now</td><td>Sends your answer (helpful, okay, not yet), the reasons you tick and the optional line you type</td><td>Those, plus app version and language. No email, no Mac model, no identifier. Asked at most twice</td></tr>
-<tr><td>You click Send in Contact</td><td>Sends your feedback to the developer</td><td>The email and message you typed. If you tick the box: app version, macOS version and Mac model</td></tr>
-<tr><td>You click a link</td><td>Opens the website, GitHub or social pages in your browser</td><td>The same as opening any website yourself</td></tr>
+<tr><td>Checking for updates</td><td>Asks update.tidymint.app for the latest version number (backup: tidymint.app, GitHub). Once a day it adds a few usage statistics. This runs by itself and has no off switch. Requests to our servers are kept with their IP address for up to three months. The code that receives it is public in the repository</td><td>App version and macOS version, country, language, how long ago the app was installed, which tools are switched on, whether it opens at login, whether it shows in the menu bar, whether this is the first report, whether it was sent on a timer, how often they were used, how much was cleaned, whether the copy is free, on trial or paid, and a random number for this copy of the app. Never files, file names or anything you type</td></tr>
+<tr><td>You answer "Is Tidymint helping you?" on Clean Now</td><td>Sends your answer (helpful, okay, not yet), the reasons you tick and the optional line you type</td><td>Those, plus app version, language and which tools are switched on. No email, no Mac model. Asked at most twice</td></tr>
+<tr><td>You click Send in Contact</td><td>Sends your feedback to the developer, who keeps it in a private Google Sheet</td><td>The email and message you typed. If you tick the box: app version, macOS version and Mac model</td></tr>
+<tr><td>You sign up for the newsletter</td><td>Records your sign-up</td><td>Your email and the consent text you clicked. Nothing is pre-ticked</td></tr>
+<tr><td>You use the trial or a Plus key</td><td>Checks your right to use Plus with our server, when you click and from time to time after that</td><td>Your key, if any, and a code for your Mac. Polar checks the key. The trial date is kept with no time limit, the list of Macs until you remove them. Codes to add a Mac are emailed through Resend and stored in the US for 30 days.</td></tr>
+<tr><td>You buy Plus</td><td>Opens Polar's checkout in your browser. Polar handles the payment</td><td>Tidymint sees order details such as email, name, address and what you bought, never your full card number. Used for support and statistics.</td></tr>
+<tr><td>You turn on iCloud sync in Plus (off by default)</td><td>Writes your settings, or your Mintclip history, to your iCloud Drive</td><td>That data goes to your own iCloud, not through Tidymint's servers</td></tr>
+<tr><td>You click a link or the Download button</td><td>Opens the website, GitHub or social pages in your browser</td><td>The same as opening any website yourself. The Download button adds the version you are using</td></tr>
 </table></div>
-<p>Beyond these, Tidymint doesn't connect anywhere. <b>Unplug, turn off Wi-Fi, and scanning and cleaning still work.</b></p>
+<p>Beyond these, Tidymint doesn't connect anywhere by itself. A script or Shortcut you add to the app does what you wrote in it. <b>Unplug, turn off Wi-Fi, and scanning and cleaning still work.</b></p>
 
 <h2 id="check-yourself">Check it yourself in 2 minutes</h2>
 <p>You don't have to take our word for it:</p>
@@ -2087,16 +2082,16 @@ GUIDES.append(dict(
 <li><b>Read the code</b>: the source of Tidymint's cleaning core is public on <a href=\"https://github.com/HaiTrung-Workspace/tidymint\">GitHub</a> under the MIT license. You don't need to read code yourself: people who can, do, and anything odd would be visible.</li>
 <li><b>Revoke access any time</b>: go to Privacy &amp; Security › Full Disk Access and turn Tidymint off. The app still runs; it just sees fewer folders.</li>
 </ol>
-<p>One honest limit: Tidymint <b>is not notarized by Apple yet</b>, so the first launch needs \"Open Anyway\". Notarization means Apple scans an app for malware before it runs freely. Until then, the public code of the cleaning core is one way to check it. The steps, with screenshots, are in the <a href=\"{HOME}install/\">install guide</a>.</p>
+<p><b>From 1.0.0 Tidymint is notarized by Apple</b>, which scans it for malware before release. Notarization is not a privacy audit.</p>
 
 <h2 id="website">What about the tidymint.app website?</h2>
-<p>To be fully transparent: <b>the website</b> uses Google Analytics to count visits, <b>only if you click Accept</b> on the cookie banner. Click Decline and no analytics cookies are stored. <b>The Tidymint app</b> on your Mac has no analytics at all.</p>
+<p>To be fully transparent: <b>the website</b> uses Google Analytics to count visits, <b>only if you click Accept</b> on the cookie banner. Click Decline and no analytics cookies are stored.</p>
 <p>Cracked copies of paid cleaners are a known way password-stealing malware spreads. More on that in <a href=\"{HOME}cleanmymac-alternative/\">Free CleanMyMac alternatives</a>.</p>
 """,
-  faq=[("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. It reads contents in two places: finding duplicates (to confirm two files are identical) and checking scripts in project folders you add yourself (to see which file names they still use). Both run on your Mac and nothing is sent anywhere."),
+  faq=[("Does Tidymint read the contents of my files?", "When cleaning, mostly it reads only names, sizes and dates. It reads contents in two places: finding duplicates (to confirm two files are identical) and checking scripts in project folders you add yourself. The Mint tools read contents to do what you ask: Mintclip what you copy and text in images, Mintdrop a file to preview or convert it, Mintsort images and PDFs if you turn that on. All of that reading happens on your Mac."),
        ("Do I have to grant Full Disk Access?", "No. Without it Tidymint still runs, it just sees fewer folders, so it finds less space. You can turn the permission on or off at any time in System Settings."),
-       ("What's left after I uninstall Tidymint?", "Only its settings and cleaning history, stored on your own Mac in your Library folder. Nothing sits on a server, because Tidymint has no server that stores user data."),
-       ("It's free. Is my data the product?", "No. Tidymint has no ads and does not collect your data. The cleaning code is public, so anyone can check.")],
+       ("What's left after I uninstall Tidymint?", "On your Mac: its settings, cleaning history and the data of the Mint tools you turned on, in your Library folder. On our servers: what the app sent, as in the table above, and key details if you started a trial or bought. Never files or their names."),
+       ("It's free. Is my data the product?", "No. Cleaning is free and Tidymint Plus is the paid part. Tidymint has no ads and does not sell your data. The cleaning code is public, so anyone can check.")],
   sources=[("Apple: Change Privacy & Security settings on Mac (Full Disk Access)", "https://support.apple.com/guide/mac-help/mchl211c911f/mac"),
            ("Apple: View network activity in Activity Monitor", "https://support.apple.com/guide/activity-monitor/actmntr1006/mac"),
            ("Tidymint source code on GitHub (MIT license)", "https://github.com/HaiTrung-Workspace/tidymint")],
@@ -2107,7 +2102,7 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="vi", slug="an-toan", topic="start", date="2026-11-01", read="7 phút đọc",
   title="Tidymint có an toàn không? Bằng chứng và cách tự kiểm",
-  desc="Tidymint chỉ chuyển vào Thùng rác, không gửi dữ liệu đi, mã nguồn công khai. Xem ai đã kiểm, mỗi bản mới qua bước nào, và cách bạn tự kiểm tra.",
+  desc="Tidymint dọn vào Thùng rác, file không rời máy, lõi mã nguồn mở. Xem ai đã kiểm, mỗi bản mới qua bước nào, và cách bạn tự kiểm tra.",
   crumb="An toàn và minh bạch",
   h1="Tidymint có an toàn không? Đây là bằng chứng, và cách bạn tự kiểm",
   tldr="App dọn máy được đọc cả ổ đĩa, nên bạn cần biết nó làm gì. Bài này gom đủ: <b>5 lời hứa</b> kèm cách tự kiểm, <b>ai đã kiểm Tidymint</b> (trên VirusTotal, 65 phần mềm diệt virus cùng quét, không phần mềm nào báo vấn đề) và <b>các bước mỗi bản cập nhật phải đi qua</b>. Không cần rành công nghệ, mỗi mục đều có hướng dẫn từng bước.",
@@ -2117,11 +2112,11 @@ GUIDES.append(dict(
 <p>Không chỉ nghe lời nói, hãy nhìn vào hành động.</p>
 <div class="tbl"><table>
 <tr><th>Lời hứa</th><th>Tidymint làm thế nào</th><th>Bạn tự kiểm thế nào</th></tr>
-<tr><td><b>Dọn nhầm vẫn lấy lại được</b></td><td>Không xoá thẳng thứ gì: mọi dữ liệu chỉ vào Thùng rác của macOS. Nút Hoàn tác trả lần dọn gần nhất về đúng chỗ cũ (trừ khi bạn đã xoá trong đó, tất nhiên rồi). Đổ Thùng rác, Tidymint luôn xác nhận lại trước.</td><td>Dọn thử một mục nhỏ, kiểm tra Thùng rác trong Finder. Bấm Hoàn tác: mọi thứ về chỗ cũ.</td></tr>
+<tr><td><b>Dọn nhầm vẫn lấy lại được</b></td><td>Dọn không xoá thẳng thứ gì: mọi dữ liệu chỉ vào Thùng rác của macOS. Nút Hoàn tác trả lần dọn gần nhất về đúng chỗ cũ (trừ khi bạn đã xoá trong đó, tất nhiên rồi). Đổ Thùng rác, Tidymint luôn xác nhận lại trước. <b>Một ngoại lệ, tắt sẵn:</b> Tự dọn Thùng rác của Plus trọn gói. Khi bạn bật, nó tự xoá hẳn món cũ trong Thùng rác, không lấy lại được. Lúc bật, app hỏi trước nếu có món bị xoá ngay. Nó chừa món vào Thùng rác chưa đủ một ngày và món của lần dọn còn Hoàn tác được.</td><td>Dọn thử một mục nhỏ, kiểm tra Thùng rác trong Finder. Bấm Hoàn tác: mọi thứ về chỗ cũ.</td></tr>
 <tr><td><b>Không đụng đồ riêng tư</b></td><td>Thư viện Ảnh, Mail, mật khẩu (Keychain), iCloud Drive và thư mục đám mây không bao giờ được đưa ra dọn. Trong Dọn theo ứng dụng, tin nhắn và đăng nhập bị khoá, Tidymint tuyệt đối không đọc hay đụng tới.</td><td>Danh sách thư mục cấm nằm công khai trong mã nguồn (biến <code>neverBase</code>). Mục bị khoá hiện biểu tượng ổ khoá trong app.</td></tr>
-<tr><td><b>Không gửi dữ liệu đi</b></td><td>Quét và dọn chạy ngay trên máy, tắt mạng vẫn chạy. Tidymint chỉ lên mạng để kiểm tra bản mới (đọc một số phiên bản, mỗi ngày tối đa một lần; lần kiểm được đếm theo phiên bản app và macOS, không lưu IP hay mã máy; tắt được trong Cài đặt). Dữ liệu khác duy nhất chuyển ra khỏi máy là những góp ý của bạn.</td><td>Tắt Wi-Fi rồi quét thử. Chi tiết và cách xem lưu lượng mạng: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</td></tr>
+<tr><td><b>File không rời máy</b></td><td>Quét và dọn chạy ngay trên máy, tắt mạng vẫn chạy. App tự kiểm bản mới, mỗi ngày kèm vài số liệu sử dụng. Dùng thử, key và đồng bộ iCloud của Plus cũng cần mạng. Góp ý chỉ đi khi bạn tự gửi.</td><td>Tắt Wi-Fi rồi quét thử. Chi tiết và cách xem lưu lượng mạng: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</td></tr>
 <tr><td><b>Không chạy ngầm quyền quản trị</b></td><td>Tidymint không cài tiến trình chạy ngầm với quyền cao nhất của máy. Khi gỡ app cài cho mọi tài khoản (ví dụ app từ App Store), chính macOS hỏi mật khẩu trong cửa sổ của hệ thống, Tidymint không thấy mật khẩu.</td><td>Trang đánh giá độc lập <a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a> ghi Tidymint ở mục chạy quyền cao: <b>Never</b> (không bao giờ).</td></tr>
-<tr><td><b>Dọn dẹp miễn phí, lõi mã nguồn mở</b></td><td>Không tài khoản, không quảng cáo. Mã phần dọn dẹp công khai theo giấy phép MIT.</td><td>Mã phần dọn dẹp công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. Bạn không đọc code cũng không sao: ai rành đọc được, có gì bất thường cộng đồng sẽ thấy.</td></tr>
+<tr><td><b>Dọn dẹp miễn phí, lõi mã nguồn mở</b></td><td>Không tài khoản, không quảng cáo. Mã phần dọn dẹp công khai theo giấy phép MIT. Các công cụ Mint và Tidymint Plus là mã đóng.</td><td>Mã phần dọn dẹp công khai trên <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. Bạn không đọc code cũng không sao: ai rành đọc được, có gì bất thường cộng đồng sẽ thấy.</td></tr>
 </table></div>
 
 <h2 id="ai-da-kiem">Những ai đã kiểm tra Tidymint</h2>
@@ -2129,7 +2124,8 @@ GUIDES.append(dict(
 <div class="tbl"><table>
 <tr><th>Nơi</th><th>Họ làm gì</th><th>Kết quả</th></tr>
 <tr><td><a href="https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a">VirusTotal</a></td><td>Dịch vụ của Google, cho hơn 60 phần mềm diệt virus cùng quét một file</td><td>File cài bản 0.6.0: <b>0/66</b>, không phần mềm nào phát hiện bất kì thứ gì gây hại cho Mac của bạn (quét 15/11/2026)</td></tr>
-<tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>Trang độc lập chấm các app dọn dẹp theo từng tiêu chí</td><td>Không theo dõi: None. Chạy quyền cao: Never. Mã công khai: Yes. Chưa ký Apple: ghi đỏ, đúng sự thật (xem mục Tidymint chưa có gì?)</td></tr>
+<tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>Trang độc lập chấm các app dọn dẹp theo từng tiêu chí</td><td>Chạy quyền cao: Never. Mã công khai: Yes</td></tr>
+<tr><td><a href="https://support.apple.com/vi-vn/102445">Apple công chứng</a></td><td>Apple quét tự động tìm mã độc. Đây không phải Apple duyệt hay bảo chứng tính năng</td><td>Từ 1.0.0, app được ký Developer ID và được Apple công chứng</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>Danh sách app Mac chọn lọc trên GitHub, người duyệt xem từng đề cử</td><td>Đã nhận Tidymint (26/10/2026)</td></tr>
 <tr><td>Danh bạ phần mềm</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a>, <a href="https://openmacapps.com/apps/tidymint/">OpenMacApps</a></td><td>Đã duyệt và đăng Tidymint (26/10 tới 06/11/2026)</td></tr>
 </table></div>
@@ -2141,14 +2137,16 @@ GUIDES.append(dict(
 <li><b>Mỗi tính năng mới đều được sử dụng trên máy Mac thật</b> của chính người làm ra nó, nhất là các lời hứa an toàn: Thùng rác, Hoàn tác, mục bị khoá.</li>
 <li><b>Mỗi file cài có một "dấu vân tay"</b> (mã SHA-256) ghi trên trang phát hành. File bị sửa dù chỉ một chút thì dấu vân tay đổi hẳn. So dấu vân tay của file bạn tải với dòng ghi trên trang (cách làm ở mục dưới) là biết file có đúng bản gốc không.</li>
 <li><b>Quét VirusTotal</b> và đưa link kết quả lên trang phát hành (đã áp dụng từ bản 0.3.6).</li>
+<li><b>Ký Developer ID và gửi Apple công chứng</b> (áp dụng từ bản 1.0.0).</li>
 <li><b>Ghi chú thay đổi bằng lời dễ hiểu</b> trên trang <a href="{HOME}lich-su-cap-nhat/">Lịch sử cập nhật</a>. Nhãn của mỗi bản đã phát hành được khoá trên GitHub, không xoá hay dời được.</li>
 </ol>
 
-<h2 id="tu-kiem-file">Cách bạn tự kiểm file vừa tải về (3 bước)</h2>
+<h2 id="tu-kiem-file">Cách bạn tự kiểm file vừa tải về (4 bước)</h2>
 <ol class="steps">
 <li><b>Chỉ tải Tidymint từ duy nhất hai nguồn</b>: <a href="{HOME}">tidymint.app</a> hoặc <a href="https://github.com/HaiTrung-Workspace/tidymint/releases">trang phát hành trên GitHub</a>. Trang web khác đều không phải của chúng tôi.</li>
 <li><b>So mã kiểm tra</b>: bấm <b>Cmd + Space</b>, gõ <b>Terminal</b>, nhấn Enter. Dán dòng dưới rồi nhấn Enter:<br><code>shasum -a 256 ~/Downloads/Tidymint.zip</code><br>Máy in ra một dãy 64 ký tự. So với dòng <b>SHA-256</b> trên trang phát hành: khớp từng ký tự là file không bị ai sửa.</li>
 <li><b>Xem kết quả quét virus</b>: mở link VirusTotal trên trang phát hành, hoặc tự kéo file vào <a href="https://www.virustotal.com/">virustotal.com</a> để tự kiểm chứng.</li>
+<li><b>Kiểm chữ ký Apple</b>: kéo app vào Ứng dụng, dán dòng dưới vào Terminal rồi nhấn Enter:<br><code>spctl -a -vv /Applications/Tidymint.app</code><br>Kết quả cần có <b>accepted</b> và <b>Notarized Developer ID</b>.</li>
 </ol>
 
 <h2 id="khong-dung">Những thứ Tidymint không bao giờ đụng, đọc thẳng từ code</h2>
@@ -2156,8 +2154,7 @@ GUIDES.append(dict(
 
 <h2 id="chua-co">Tidymint chưa có gì?</h2>
 <ul>
-<li><b>Chưa có chữ ký của Apple.</b> Muốn ký, nhà phát triển phải đóng 99 USD mỗi năm cho Apple. Vì chưa ký, lần đầu mở app macOS hiện cảnh báo và bạn phải bấm <b>Vẫn mở</b> (Open Anyway) trong Cài đặt. Cảnh báo này nói app chưa được Apple xác nhận, không có nghĩa app có mã độc. Hướng dẫn có ảnh: <a href="{HOME}cai-dat/">Cài Tidymint từng bước</a>. Tiền ủng hộ trên <a href="https://github.com/sponsors/HaiTrung-Workspace">GitHub Sponsors</a> dành trước hết cho việc này.</li>
-<li><b>Tidymint do một người làm</b>, thông tin tác giả công khai trên GitHub. Email báo lỗi được trả lời trong 24 giờ.</li>
+<li><b>Tidymint do một người làm.</b> Email báo lỗi được trả lời trong 24 giờ.</li>
 <li><b>Hoàn tác có giới hạn.</b> Chỉ trả lần dọn gần nhất, và chỉ khi đồ còn trong Thùng rác. Đã đổ Thùng rác thì không lấy lại được.</li>
 </ul>
 
@@ -2182,16 +2179,16 @@ GUIDES.append(dict(
 <h2 id="bao-loi">Thấy lỗi bảo mật? Báo cho chúng tôi</h2>
 <p>Gửi email tới <b>hello@tidymint.app</b> (tiêu đề "Security"), hoặc bấm <b>Report a vulnerability</b> trong thẻ Security của <a href="https://github.com/HaiTrung-Workspace/tidymint/security">kho GitHub</a>. Bạn sẽ nhận phản hồi trong 24 giờ.</p>
 """,
-  faq=[("Dọn dẹp miễn phí thì kiếm tiền từ đâu?", "Tidymint không bán dữ liệu và không chạy quảng cáo. Chi phí do người làm tự bỏ ra, cộng tiền ủng hộ tự nguyện qua GitHub Sponsors. Mã công khai, nên nếu app lén gửi gì đi thì ai cũng thấy."),
+  faq=[("Dọn dẹp miễn phí thì kiếm tiền từ đâu?", "Tidymint không bán dữ liệu và không chạy quảng cáo. Phần trả tiền là Tidymint Plus, mua một lần: 3,99 USD mỗi công cụ hoặc 10,99 USD trọn gói. Ngoài ra có tiền ủng hộ tự nguyện qua GitHub Sponsors. Dọn dẹp vẫn miễn phí."),
        ("Phần mềm diệt virus trên máy tôi báo Tidymint thì sao?", "Hãy gửi email cho chúng tôi kèm tên phần mềm và ảnh chụp thông báo. Bạn cũng có thể so mã SHA-256 và xem kết quả VirusTotal như hướng dẫn ở trên để biết file có đúng là bản chính thức không."),
-       ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Vì Tidymint chưa có chữ ký của Apple (xem mục Tidymint chưa có gì?). Bạn mở một lần bằng nút Vẫn mở trong Cài đặt, các lần sau mở bình thường."),
-       ("Tidymint có đọc nội dung file của tôi không?", "Phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai, đều chạy trên máy, không gửi đi đâu."),
-       ("Mintangle xin quyền Trợ năng để làm gì?", "Để dời và đổi cỡ cửa sổ khi bạn bấm phím tắt hoặc kéo cửa sổ vào mép màn hình. Mintangle tắt sẵn, chỉ khi bạn bật thì macOS mới hỏi quyền. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ, không gửi gì đi. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư & Bảo mật › Trợ năng, lúc nào cũng được."),
-       ("Mintbar xin quyền Trợ năng và Ghi màn hình để làm gì?", "Chỉ trên macOS 27, và chỉ khi bạn bật Mintbar. Trợ năng để biết app nào có icon trên menu bar và mở icon bạn chọn trong nhóm. Ghi màn hình để chụp đúng ô icon menu bar của các app trong nhóm; hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Không gửi gì đi.")],
+       ("Vì sao macOS báo không thể xác minh nhà phát triển?", "Bản 0.6.0 trở về trước chưa được công chứng. Hãy tải bản mới nhất. Bản mới vẫn báo như vậy thì đừng mở: tải lại từ tidymint.app và làm mục Cách bạn tự kiểm file vừa tải về."),
+       ("Tidymint có đọc nội dung file của tôi không?", "Khi dọn, phần lớn chỉ đọc tên, kích thước, ngày. Nội dung chỉ được đọc khi tìm file trùng và khi kiểm script trong thư mục dự án bạn tự khai. Các công cụ Mint đọc nội dung khi làm việc bạn giao, ví dụ tìm chữ trong ảnh hay đổi định dạng. Việc đọc đều diễn ra trên máy."),
+       ("Mintangle xin quyền Trợ năng để làm gì?", "Để dời và đổi cỡ cửa sổ khi bạn bấm phím tắt hoặc kéo cửa sổ vào mép màn hình. Mintangle tắt sẵn, chỉ khi bạn bật thì macOS mới hỏi quyền. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ. Vị trí và cỡ cửa sổ không rời máy. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư & Bảo mật › Trợ năng, lúc nào cũng được."),
+       ("Mintbar xin quyền Trợ năng và Ghi màn hình để làm gì?", "Chỉ trên macOS 27, và chỉ khi bạn bật Mintbar. Trợ năng để biết app nào có icon trên menu bar và mở icon bạn chọn trong nhóm. Ghi màn hình để chụp đúng ô icon menu bar của các app trong nhóm; hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar. Hình icon không rời máy.")],
   sources=[("VirusTotal: kết quả quét Tidymint.zip 0.6.0", "https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
            ("AreWeCleanYet: trang đánh giá Tidymint", "https://arewecleanyet.org/apps/tidymint/"),
            ("Chính sách bảo mật của Tidymint (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
-           ("Apple: Mở app an toàn trên máy Mac (Vẫn mở)", "https://support.apple.com/vi-vn/102445"),
+           ("Apple: Mở app an toàn trên máy Mac", "https://support.apple.com/vi-vn/102445"),
            ("Mã nguồn Tidymint trên GitHub (giấy phép MIT)", "https://github.com/HaiTrung-Workspace/tidymint")],
   related=[("Tidymint có gửi dữ liệu của bạn đi không?", "{HOME}quyen-rieng-tu-tidymint/"), ("Cài Tidymint trên Mac: từng bước có ảnh", "{HOME}cai-dat/"), ("Trang chủ Tidymint", "{HOME}")],
   alt="safety",
@@ -2200,7 +2197,7 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="en", slug="safety", topic="start", date="2026-11-01", read="6 min read",
   title="Is Tidymint safe? The evidence, and how to check it",
-  desc="Tidymint only moves files to the Trash, sends no data, and its code is public. See who has checked it, what every update goes through, and how to verify it.",
+  desc="Tidymint cleans into the Trash, files stay on your Mac, and the cleaning code is public. See who has checked it, what every update goes through, and how to verify it.",
   crumb="Safety and transparency",
   h1="Is Tidymint safe? Here is the evidence, and how you can check it yourself",
   tldr="A Mac cleaner can read your whole disk, so you should know what it does. This page has it all: <b>5 promises</b> with a way to check each one, <b>who has checked Tidymint</b> (on VirusTotal, 65 antivirus engines scanned it and none found a problem) and <b>the steps every update goes through</b>. No technical knowledge needed: each part walks you through it.",
@@ -2210,11 +2207,11 @@ GUIDES.append(dict(
 <p>Don't just listen to what we say. Look at what we do.</p>
 <div class="tbl"><table>
 <tr><th>Promise</th><th>How Tidymint does it</th><th>How you can check</th></tr>
-<tr><td><b>A wrong clean can be undone</b></td><td>Nothing is deleted outright: everything only goes to the macOS Trash. The Undo button puts the most recent clean back where it was (unless you've already deleted it from the Trash, of course). Before emptying the Trash, Tidymint always asks you to confirm.</td><td>Clean one small item, then look in the Trash in Finder. Press Undo: everything goes back.</td></tr>
+<tr><td><b>A wrong clean can be undone</b></td><td>Cleaning deletes nothing outright: everything only goes to the macOS Trash. The Undo button puts the most recent clean back where it was (unless you've already deleted it from the Trash, of course). Before emptying the Trash, Tidymint always asks you to confirm. <b>One exception, off by default:</b> Trash rules in the full Plus set. Once you turn them on, they delete old Trash items for good, with no way back. When you turn one on, the app asks first if anything would be deleted right away. They spare items in their first day in the Trash and the last clean while it can be undone.</td><td>Clean one small item, then look in the Trash in Finder. Press Undo: everything goes back.</td></tr>
 <tr><td><b>Your private data is off limits</b></td><td>Your Photos library, Mail, passwords (Keychain), iCloud Drive and cloud folders are never offered for cleaning. In Clean by App, messages and logins are locked: Tidymint never reads or touches them.</td><td>The list of protected folders is public in the source code (<code>neverBase</code>). Locked items show a lock icon in the app.</td></tr>
-<tr><td><b>No data leaves your Mac</b></td><td>Scanning and cleaning run on your Mac and work offline. Tidymint only goes online to check for a new version (it reads a version number, at most once a day; that check is counted by app and macOS version, with no IP or identifier kept; you can turn it off in Settings). The only other data that leaves your Mac is feedback you choose to send.</td><td>Turn off Wi-Fi and run a scan. Details, and how to watch network traffic: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></td></tr>
+<tr><td><b>Your files stay on your Mac</b></td><td>Scanning and cleaning run on your Mac and work offline. The app checks for updates by itself and adds a few usage numbers once a day. The trial, a key and iCloud sync in Plus need the internet too. Feedback goes only when you send it.</td><td>Turn off Wi-Fi and run a scan. Details, and how to watch network traffic: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></td></tr>
 <tr><td><b>No hidden admin-level process</b></td><td>Tidymint installs no background process with full system privileges. When you remove an app installed for every user (an App Store app, for example), macOS itself asks for your password in its own window. Tidymint never sees it.</td><td>The independent review site <a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a> lists Tidymint as runs elevated: <b>Never</b>.</td></tr>
-<tr><td><b>Free to clean, open-source core</b></td><td>No account, no ads. The code of the cleaning core is public under the MIT license.</td><td>The source code of the cleaning core is public on <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. You don't need to read code yourself: people who can read it can, and anything unusual would be noticed.</td></tr>
+<tr><td><b>Free to clean, open-source core</b></td><td>No account, no ads. The code of the cleaning core is public under the MIT license. The Mint tools and Tidymint Plus are closed source.</td><td>The source code of the cleaning core is public on <a href="https://github.com/HaiTrung-Workspace/tidymint">GitHub</a>. You don't need to read code yourself: people who can read it can, and anything unusual would be noticed.</td></tr>
 </table></div>
 
 <h2 id="checked-by">Who has checked Tidymint</h2>
@@ -2222,7 +2219,8 @@ GUIDES.append(dict(
 <div class="tbl"><table>
 <tr><th>Where</th><th>What they do</th><th>Result</th></tr>
 <tr><td><a href="https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a">VirusTotal</a></td><td>A Google service that runs a file through more than 60 antivirus engines at once</td><td>Tidymint 0.6.0 installer: <b>0/66</b>, none of the engines found anything harmful to your Mac (scanned 15 Nov 2026)</td></tr>
-<tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>An independent site that rates disk cleaners on a set of checks</td><td>Telemetry: None. Runs elevated: Never. Source published: Yes. Release signing: marked red, which is accurate (see What Tidymint doesn't have yet)</td></tr>
+<tr><td><a href="https://arewecleanyet.org/apps/tidymint/">AreWeCleanYet</a></td><td>An independent site that rates disk cleaners on a set of checks</td><td>Runs elevated: Never. Source published: Yes</td></tr>
+<tr><td><a href="https://support.apple.com/102445">Apple notarization</a></td><td>An automatic malware scan by Apple. It is not a review or endorsement of features</td><td>From 1.0.0 the app is signed with Developer ID and notarized by Apple</td></tr>
 <tr><td><a href="https://github.com/jaywcjlove/awesome-mac">awesome-mac</a></td><td>A curated list of Mac apps on GitHub, where maintainers review each submission</td><td>Accepted Tidymint (26 Oct 2026)</td></tr>
 <tr><td>Software directories</td><td><a href="https://alternativeto.net/software/tidymint/about/">AlternativeTo</a>, <a href="https://www.opensourcealternatives.to/item/tidymint">Open Source Alternatives</a>, <a href="https://macnative.io/apps/tidymint">MacNative</a>, <a href="https://www.saashub.com/tidymint">SaaSHub</a>, <a href="https://openmacapps.com/apps/tidymint/">OpenMacApps</a></td><td>Reviewed and listed Tidymint (26 Oct to 6 Nov 2026)</td></tr>
 </table></div>
@@ -2234,14 +2232,16 @@ GUIDES.append(dict(
 <li><b>Every new feature is used on a real Mac</b> by the person who built it, above all the safety promises: Trash, Undo, locked items.</li>
 <li><b>Every installer has a "fingerprint"</b> (a SHA-256 checksum) listed on the release page. If the file is changed even slightly, the fingerprint changes completely. Compare the fingerprint of your download with the one on the page (how-to below) to know it's the original.</li>
 <li><b>A VirusTotal scan</b> is linked on the release page (since version 0.3.6).</li>
+<li><b>Signed with Developer ID and notarized by Apple</b> (since version 1.0.0).</li>
 <li><b>Changes are explained in plain words</b> on the <a href="{HOME}changelog/">Changelog</a>. Each release tag is locked on GitHub and can't be deleted or moved.</li>
 </ol>
 
-<h2 id="verify-download">How to check the file you downloaded (3 steps)</h2>
+<h2 id="verify-download">How to check the file you downloaded (4 steps)</h2>
 <ol class="steps">
 <li><b>Download Tidymint from only two places</b>: <a href="{HOME}">tidymint.app</a> or the <a href="https://github.com/HaiTrung-Workspace/tidymint/releases">releases page on GitHub</a>. Any other site is not ours.</li>
 <li><b>Compare the fingerprint</b>: press <b>Cmd + Space</b>, type <b>Terminal</b>, press Return. Paste the line below and press Return:<br><code>shasum -a 256 ~/Downloads/Tidymint.zip</code><br>You'll see a 64-character string. Compare it with the <b>SHA-256</b> line on the release page: if every character matches, the file hasn't been changed.</li>
 <li><b>See the virus scan</b>: open the VirusTotal link on the release page, or drop the file on <a href="https://www.virustotal.com/">virustotal.com</a> to check it yourself.</li>
+<li><b>Check the Apple signature</b>: move the app to Applications, paste the line below into Terminal and press Return:<br><code>spctl -a -vv /Applications/Tidymint.app</code><br>The result should contain <b>accepted</b> and <b>Notarized Developer ID</b>.</li>
 </ol>
 
 <h2 id="never">What Tidymint never touches, read from the code</h2>
@@ -2249,8 +2249,7 @@ GUIDES.append(dict(
 
 <h2 id="not-yet">What Tidymint doesn't have yet</h2>
 <ul>
-<li><b>No Apple signature yet.</b> To sign apps, a developer pays Apple 99 USD a year. Because Tidymint isn't signed yet, macOS shows a warning the first time you open it, and you click <b>Open Anyway</b> in System Settings. The warning means Apple hasn't verified the developer; it doesn't mean the app contains malware. Step-by-step guide: <a href="{HOME}install/">Install Tidymint</a>. Sponsorships on <a href="https://github.com/sponsors/HaiTrung-Workspace">GitHub Sponsors</a> go to this first.</li>
-<li><b>Tidymint is made by one person</b>, whose details are public on GitHub. Emailed reports get a reply within 24 hours.</li>
+<li><b>Tidymint is made by one person.</b> Emailed reports get a reply within 24 hours.</li>
 <li><b>Undo has limits.</b> It restores the most recent clean only, and only while the items are still in the Trash. Once you empty the Trash, they're gone.</li>
 </ul>
 
@@ -2275,16 +2274,16 @@ GUIDES.append(dict(
 <h2 id="report">Found a security issue? Tell us</h2>
 <p>Email <b>hello@tidymint.app</b> (subject "Security"), or click <b>Report a vulnerability</b> on the Security tab of the <a href="https://github.com/HaiTrung-Workspace/tidymint/security">GitHub repository</a>. You'll get a reply within 24 hours.</p>
 """,
-  faq=[("If it's free, how does Tidymint make money?", "Tidymint doesn't sell data and shows no ads. Costs are covered by the maker, plus voluntary support through GitHub Sponsors. The code is public, so if the app secretly sent anything out, anyone could see it."),
+  faq=[("If it's free, how does Tidymint make money?", "Tidymint doesn't sell data and shows no ads. The paid part is Tidymint Plus, a one-time purchase: $3.99 per tool or $10.99 for all five. There is also voluntary support through GitHub Sponsors. Cleaning stays free."),
        ("My antivirus flags Tidymint. What now?", "Email us with the name of the antivirus and a screenshot of the warning. You can also compare the SHA-256 and check the VirusTotal result as shown above, to confirm the file is the official one."),
-       ("Why does macOS say it can't verify the developer?", "Because Tidymint isn't signed by Apple yet (see What Tidymint doesn't have yet). Open it once with Open Anyway in System Settings; after that it opens normally."),
-       ("Does Tidymint read the contents of my files?", "Mostly it reads only names, sizes and dates. Contents are read only when finding duplicates and when checking scripts in project folders you add yourself, all on your Mac, sent nowhere."),
-       ("Why does Mintangle ask for Accessibility permission?", "To move and resize windows when you press a shortcut or drag a window to a screen edge. Mintangle is off by default, and macOS asks only when you turn it on. Tidymint does not read what is inside windows, does not record the keys you type, and sends nothing. Turn Mintangle off, or switch Tidymint off in Privacy & Security › Accessibility, at any time."),
-       ("Why does Mintbar ask for Accessibility and Screen Recording?", "Only on macOS 27, and only when you turn Mintbar on. Accessibility is used to see which apps have a menu bar icon and to open the one you pick from a group. Screen Recording is used to capture just the menu bar slot of each app in a group; the pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off. Nothing is sent.")],
+       ("Why does macOS say it can't verify the developer?", "Version 0.6.0 and earlier are not notarized. Download the latest version instead. If the latest version says the same, don't open it: download it again from tidymint.app and follow How to check the file you downloaded."),
+       ("Does Tidymint read the contents of my files?", "When cleaning, mostly it reads only names, sizes and dates, and contents only when finding duplicates and when checking scripts in project folders you add yourself. The Mint tools read contents to do what you ask, like finding text in an image or converting it. All of that reading happens on your Mac."),
+       ("Why does Mintangle ask for Accessibility permission?", "To move and resize windows when you press a shortcut or drag a window to a screen edge. Mintangle is off by default, and macOS asks only when you turn it on. Tidymint does not read what is inside windows and does not record the keys you type. Window positions and sizes never leave your Mac. Turn Mintangle off, or switch Tidymint off in Privacy & Security › Accessibility, at any time."),
+       ("Why does Mintbar ask for Accessibility and Screen Recording?", "Only on macOS 27, and only when you turn Mintbar on. Accessibility is used to see which apps have a menu bar icon and to open the one you pick from a group. Screen Recording is used to capture just the menu bar slot of each app in a group; the pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off. They are never sent.")],
   sources=[("VirusTotal: scan of Tidymint.zip 0.6.0", "https://www.virustotal.com/gui/file/4d6c2d89e9a29c19e392888e59d4311849458af02103ed39fdb8acd654b4f29a"),
            ("AreWeCleanYet: Tidymint review page", "https://arewecleanyet.org/apps/tidymint/"),
            ("Tidymint security policy (SECURITY.md)", "https://github.com/HaiTrung-Workspace/tidymint/security/policy"),
-           ("Apple: Safely open apps on your Mac (Open Anyway)", "https://support.apple.com/102445"),
+           ("Apple: Safely open apps on your Mac", "https://support.apple.com/102445"),
            ("Tidymint source code on GitHub (MIT license)", "https://github.com/HaiTrung-Workspace/tidymint")],
   related=[("Does Tidymint send your data anywhere?", "{HOME}tidymint-privacy/"), ("Install Tidymint on Mac, step by step", "{HOME}install/"), ("Tidymint home", "{HOME}")],
   alt="an-toan",
@@ -2298,7 +2297,7 @@ GUIDES.append(dict(
   desc="Mintdrop là kệ thả file nổi trên Mac: lắc chuột khi kéo file hoặc nhấn ⌃⌥S, gom file từ nhiều thư mục về một chỗ rồi kéo từng file ra nơi cần, có Hoàn tác.",
   crumb="Mintdrop",
   h1="Gom file từ nhiều nơi về một kệ, kéo ra đúng chỗ cần",
-  tldr="Mintdrop là kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, rồi <b>kéo từng file ra</b> đúng chỗ cần. Kệ chỉ nhớ đường dẫn, <b>không chép file nào</b>. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
+  tldr="Mintdrop là kệ nhỏ nổi trên màn hình. Bạn thả file từ nhiều thư mục vào, rồi <b>kéo từng file ra</b> đúng chỗ cần, hoặc kéo cả nhóm với Plus. Thả lên kệ <b>không chép file nào</b>, kệ chỉ nhớ đường dẫn. Có trong Tidymint từ bản 0.5.0, mặc định tắt, không cần cấp quyền.",
   toc=[("khi-nao","Dùng khi nào"),("bat","Bật Mintdrop"),("mo-ke","Mở kệ"),("chon","Chọn nhiều file"),("xu-ly","Kéo file ra"),
        ("chuyen-hay-chep","Kéo ra là chuyển hay chép?"),("hoan-tac","Hoàn tác"),("rieng-tu","Quyền riêng tư"),("faq","Câu hỏi thường gặp")],
   body="""<h2 id="khi-nao">Dùng khi nào</h2>
@@ -2319,7 +2318,7 @@ GUIDES.append(dict(
 <li><b>⌘A</b> chọn tất cả, <b>Esc</b> bỏ chọn.</li></ul>
 <p>Chọn nhiều dòng rồi nhấn <b>⌘⌫</b> để bỏ chúng khỏi kệ cùng lúc. File không bị xoá.</p>
 <h2 id="xu-ly">Kéo file ra</h2>
-<ul><li><b>Kéo ra</b>: kéo từng file tới chỗ cần đặt: một thư mục trong Finder, Desktop, hay cửa sổ một app.</li>
+<ul><li><b>Kéo ra</b>: kéo từng file (Plus kéo được cả nhóm) tới chỗ cần đặt: một thư mục trong Finder, Desktop, hay cửa sổ một app.</li>
 <li>Dấu trừ cạnh mỗi dòng và nút X trên đầu kệ chỉ <b>bỏ file khỏi kệ</b>, file không bị xoá.</li></ul>
 <h2 id="chuyen-hay-chep">Kéo ra là chuyển hay chép?</h2>
 <p>Kệ không tự quyết. Nơi bạn thả file quyết định, đúng như khi kéo file trong Finder:</p>
@@ -2330,11 +2329,11 @@ GUIDES.append(dict(
 <tr><td>Một app (Mail, Zalo, ô tải lên của trình duyệt)</td><td>App lấy một bản để đính kèm hoặc tải lên, file gốc không đổi</td></tr></table></div>
 <h2 id="hoan-tac">Hoàn tác</h2>
 <p>Sau khi bạn kéo một file ra một thư mục cùng ổ, dòng trạng thái cuối kệ có nút <b>Hoàn tác</b>: file về đúng chỗ cũ và quay lại kệ.</p>
-<p>Giới hạn cần biết: chỉ hoàn tác được <b>lần gần nhất</b>. Hoàn tác không bao giờ ghi đè: nếu chỗ cũ đã có file cùng tên, file đó được bỏ qua và kệ báo rõ.</p>
+<p>Bấm tiếp để lùi thêm các lần trước đó. Bản miễn phí nhớ tới khi bạn tắt app, Plus giữ cả sau khi tắt. Hoàn tác không bao giờ ghi đè: nếu chỗ cũ đã có file cùng tên, file đó được bỏ qua và kệ báo rõ.</p>
 <h2 id="rieng-tu">Quyền riêng tư</h2>
-<p>Mintdrop không cần quyền nào của macOS. Khi bạn giữ chuột, kệ chỉ xem có file đang được kéo hay không, và chỉ khi đó mới theo dõi chuột để nhận ra cú lắc. Kệ không đọc nội dung file, không gửi gì đi. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
+<p>Mintdrop không cần quyền nào của macOS. Khi bạn giữ chuột, kệ chỉ xem có file đang được kéo hay không, và chỉ khi đó mới theo dõi chuột để nhận ra cú lắc. Kệ chỉ đọc nội dung file để hiện ảnh xem trước hoặc làm việc bạn bấm, ngay trên máy. File không rời máy. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
 """,
-  faq=[("Mintdrop có chép file của tôi không?", "Không. Kệ chỉ nhớ đường dẫn tới file. File chỉ được chép khi bạn kéo nó sang ổ khác hoặc giữ Option khi thả, giống hệt Finder."),
+  faq=[("Mintdrop có chép file của tôi không?", "Thả lên kệ thì không: kệ chỉ nhớ đường dẫn. File được chép khi bạn kéo sang ổ khác hoặc giữ Option khi thả, như Finder. Các việc Làm nhanh của Plus, như đổi định dạng ảnh, tạo file mới."),
        ("Lắc chuột không mở được kệ?", "Kiểm tra Mintdrop đang bật và mục Lắc chuột khi kéo file đang bật trong trang Mintdrop. Phải lắc trong lúc vẫn đang giữ chuột kéo file. Cách chắc ăn nhất là nhấn ⌃⌥S."),
        ("Phím ⌃⌥S không chạy?", "Một app khác có thể đang giữ tổ hợp này, trang Mintdrop sẽ báo. Khi đó bạn mở kệ bằng cách lắc chuột, hoặc tắt phím đó ở app kia.")],
   sources=[("Apple: Kéo và thả mục trên Mac (giữ Option để chép)", "https://support.apple.com/guide/mac-help/mh35852/mac"),
@@ -2349,7 +2348,7 @@ GUIDES.append(dict(
   desc="Mintdrop is a floating drop shelf for Mac: shake while dragging or press ⌃⌥S, gather files from several folders, then drag each one where it goes, with Undo.",
   crumb="Mintdrop",
   h1="Gather Files From Anywhere on One Shelf, Then Drag Them Where They Belong",
-  tldr="Mintdrop is a small shelf that floats on your screen. Drop files from several folders onto it, then <b>drag each one out</b> where it belongs. The shelf only remembers paths and <b>never copies a file</b>. Part of Tidymint since 0.5.0, off by default, no permission needed.",
+  tldr="Mintdrop is a small shelf that floats on your screen. Drop files from several folders onto it, then <b>drag each one out</b> where it belongs, or all at once with Plus. Dropping on the shelf <b>copies nothing</b>: it only remembers paths. Part of Tidymint since 0.5.0, off by default, no permission needed.",
   toc=[("when","When to use it"),("turn-on","Turn on Mintdrop"),("open","Open the shelf"),("select","Select several files"),("handle","Drag files out"),
        ("move-or-copy","Does dragging out move or copy?"),("undo","Undo"),("privacy","Privacy"),("faq","FAQ")],
   body="""<h2 id="when">When to use it</h2>
@@ -2370,7 +2369,7 @@ GUIDES.append(dict(
 <li><b>⌘A</b> selects all, <b>Esc</b> clears the selection.</li></ul>
 <p>Select several rows and press <b>⌘⌫</b> to take them off the shelf at once. The files are not deleted.</p>
 <h2 id="handle">Drag files out</h2>
-<ul><li><b>Drag out</b>: drag each file to where it belongs: a folder in Finder, the Desktop, or an app window.</li>
+<ul><li><b>Drag out</b>: drag each file (or all at once with Plus) to where it belongs: a folder in Finder, the Desktop, or an app window.</li>
 <li>The minus next to each row and the X at the top only <b>take files off the shelf</b>; the files are not deleted.</li></ul>
 <h2 id="move-or-copy">Does dragging out move or copy?</h2>
 <p>The shelf does not decide. Where you drop decides, exactly as when you drag in Finder:</p>
@@ -2381,17 +2380,172 @@ GUIDES.append(dict(
 <tr><td>An app (Mail, a chat app, a browser upload box)</td><td>The app takes a copy to attach or upload; the original is unchanged</td></tr></table></div>
 <h2 id="undo">Undo</h2>
 <p>After you drag a file out to a folder on the same disk, the status line at the bottom of the shelf offers <b>Undo</b>: the file goes back where it was and back on the shelf.</p>
-<p>Limits: only the <b>last</b> action can be undone. Undo never overwrites: if a file with the same name now sits in the old place, that file is skipped and the shelf says so.</p>
+<p>Click again to step further back. The free version remembers until you quit, Plus keeps it after that. Undo never overwrites: if a file with the same name now sits in the old place, that file is skipped and the shelf says so.</p>
 <h2 id="privacy">Privacy</h2>
-<p>Mintdrop needs no macOS permission. While a mouse button is held, it only checks whether files are being dragged, and only then follows the pointer to notice a shake. It never reads file contents and sends nothing. Details: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
+<p>Mintdrop needs no macOS permission. While a mouse button is held, it only checks whether files are being dragged, and only then follows the pointer to notice a shake. It reads a file only to show its preview or to do what you click, right on your Mac. Files never leave your Mac. Details: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
 """,
-  faq=[("Does Mintdrop copy my files?", "No. The shelf only remembers where files are. A file is copied only when you drag it to another disk or hold Option while dropping, exactly as in Finder."),
+  faq=[("Does Mintdrop copy my files?", "Not when you drop on it: the shelf only remembers where files are. A file is copied when you drag it to another disk or hold Option while dropping, as in Finder. Quick actions in Plus, like converting an image, make a new file."),
        ("Shaking does not open the shelf?", "Check that Mintdrop and Shake while dragging are both on, on the Mintdrop page. Shake while still holding the files. The sure way is ⌃⌥S."),
        ("⌃⌥S does nothing?", "Another app may hold that shortcut; the Mintdrop page says so. Open the shelf by shaking, or free the shortcut in the other app.")],
   sources=[("Apple: Drag and drop items on Mac (hold Option to copy)", "https://support.apple.com/guide/mac-help/mh35852/mac"),
            ("Tidymint privacy policy (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
   related=[("How to split screen on Mac", "{HOME}mintangle-window-tiling-mac/"), ("Is Tidymint safe?", "{HOME}safety/"), ("Tidymint home", "{HOME}")],
   alt="mintdrop-ke-tha-file-mac",
+))
+
+# --- Mintclip (clipboard history). Drafted 21/11/2026, approved text in content-drafts/2026-11-21_mintclip-trang-web.md.
+# NOT to be published before Mintclip ships in the downloadable app.
+
+GUIDES.append(dict(
+  lang="vi", slug="mintclip-lich-su-clipboard-mac", topic="start", date="2026-11-21", read="5 phút đọc",
+  title="Lịch sử clipboard Mac: xem và dán lại thứ đã copy | Tidymint",
+  desc="Xem lịch sử clipboard trên Mac (clipboard history mac): Spotlight có sẵn từ macOS 26, hoặc Mintclip giữ chữ, link, ảnh đã copy, gõ để tìm, bấm là dán.",
+  crumb="Mintclip",
+  h1="Copy rồi vẫn tìm lại được: lịch sử clipboard trên Mac",
+  tldr="Copy cái mới là cái cũ trên clipboard bị thay, nên thứ vừa copy hôm qua thường khó tìm lại. Từ macOS 26, Spotlight có sẵn lịch sử clipboard. Bài này chỉ cách dùng nó, rồi tới <b>Mintclip</b>, phần lưu lịch sử copy của Tidymint: giữ 100 mục gần nhất (Plus 500), tìm cả chữ trong ảnh, <b>bấm là dán thẳng</b>, bỏ qua app bạn chọn, lưu trên máy.",
+  toc=[("spotlight","Cách có sẵn: Spotlight"),("hon-gi","Mintclip làm thêm được gì"),("khi-nao","Khi nào nên dùng Mintclip"),("bat","Bật Mintclip"),("mo","Mở danh sách"),("tim","Tìm và lọc"),
+       ("dan","Dán"),("keo","Kéo ra ngoài"),("giu-bo","Giữ gì, bỏ qua gì"),("xoa","Xoá"),("rieng-tu","Quyền riêng tư"),("faq","Câu hỏi thường gặp")],
+  body="""<h2 id="spotlight">Cách có sẵn: lịch sử clipboard trong Spotlight (macOS 26 trở lên)</h2>
+<ol class="steps"><li>Nhấn <b>⌘Space</b> mở Spotlight.</li><li>Bấm nút <b>Clipboard</b> cạnh ô tìm, hoặc nhấn <b>⌘4</b>. Lần đầu có thể phải bấm <b>Enable</b> để bật.</li><li>Chọn một mục rồi nhấn <b>⌘C</b> (hoặc bấm nút chép cạnh mục), sau đó dán như thường.</li><li>Xoá lịch sử: nút <b>More</b> cạnh ô tìm › <b>Clear History</b>.</li></ol>
+<p>Apple cũng nhắc: thông tin nhạy cảm có thể nằm trong clipboard. Máy chạy macOS 15 trở xuống thì không có mục này.</p>
+<h2 id="hon-gi">Mintclip làm thêm được gì</h2>
+<p>Spotlight đủ khi bạn chỉ cần lấy lại một đoạn chữ vừa copy. Mintclip dành cho lúc bạn copy dán cả ngày:</p>
+<div class="tbl"><table><tr><th></th><th>Spotlight (có sẵn)</th><th>Mintclip</th></tr>
+<tr><td>Máy chạy được</td><td>macOS 26 trở lên</td><td><b>macOS 14 trở lên</b></td></tr>
+<tr><td>Dán</td><td>Chọn mục, ⌘C, bấm vào chỗ cần dán rồi ⌘V</td><td><b>Bấm là dán thẳng</b> vào app đang dùng, giữ định dạng</td></tr>
+<tr><td>Mật khẩu, thứ nhạy cảm</td><td>Apple ghi: thông tin nhạy cảm có thể nằm trong lịch sử</td><td><b>Bỏ qua</b> trình quản lý mật khẩu và app bạn chọn</td></tr>
+<tr><td>Xoá</td><td>Clear History: xoá cả lịch sử</td><td>Xoá <b>từng mục</b>, <b>15 phút</b> hay <b>1 giờ gần nhất</b>, hoặc tất cả</td></tr>
+<tr><td>Giữ bao lâu</td><td>Tối đa 7 ngày (theo MacRumors, macOS 26.1)</td><td><b>100 mục gần nhất</b> (Plus 500), hoặc tự xoá sau 1 giờ, 24 giờ, 7 ngày</td></tr>
+<tr><td>Ảnh</td><td>Apple ghi: tìm chữ và file đã copy</td><td>Giữ ảnh, <b>tìm cả chữ trong ảnh</b></td></tr>
+<tr><td>Tìm và lọc</td><td>Ô tìm của Spotlight</td><td>Gõ để tìm, lọc theo loại, theo app, Hôm nay, 7 ngày qua</td></tr>
+<tr><td>Đi cùng việc khác</td><td>Dùng trong Spotlight</td><td>Kéo ảnh, file sang <b>kệ Mintdrop</b>; ghim danh sách cạnh chỗ làm</td></tr></table></div>
+<h2 id="khi-nao">Khi nào nên dùng Mintclip</h2>
+<ul><li><b>Lấy lại đoạn vừa bị đè</b>: copy một địa chỉ, rồi lỡ copy thứ khác. Mở Mintclip, địa chỉ cũ vẫn ở đó.</li>
+<li><b>Điền form nhiều ô</b>: copy tên, số điện thoại, mã đơn từ một nơi, rồi dán từng thứ vào ô của nó.</li>
+<li><b>Tìm lại ảnh chụp màn hình</b> đã copy hôm qua: gõ một chữ có trong ảnh là thấy.</li></ul>
+<h2 id="bat">Bật Mintclip</h2>
+<ol class="steps"><li>Mở Tidymint, ở thanh bên chọn <b>CÔNG CỤ › Mintclip</b>.</li><li>Bấm <b>Bật Mintclip</b>. Icon kẹp giấy hiện trên menu bar (thanh menu).</li><li>Lần đầu Mintclip đọc clipboard, macOS hỏi có cho Tidymint dán từ app khác không. Chọn cho phép. Đổi lại sau ở <code>Cài đặt hệ thống › Quyền riêng tư &amp; Bảo mật</code> (mục Paste from Other Apps); trang Mintclip có nút mở thẳng chỗ này.</li></ol>
+<figure class="fig-app"><img src="../mintclip.jpg" alt="Danh sách Mintclip nổi trên trang Mintclip của Tidymint, đang giữ chữ, link, một ảnh và một mã màu" width="1600" height="1050" loading="lazy"><figcaption>Danh sách Mintclip: mới nhất ở trên cùng, khung xem trước bên dưới.</figcaption></figure>
+<h2 id="mo">Mở danh sách: 2 cách</h2>
+<ul><li>Bấm <b>icon kẹp giấy</b> trên menu bar.</li>
+<li>Nhấn <b>⌃⌥V</b> (Control, Option, V). Muốn phím khác: trang Mintclip, mục Phím tắt, bấm vào ô phím rồi gõ phím mới.</li></ul>
+<p>Danh sách mới nhất ở trên cùng. Bấm ra ngoài, nhấn <b>Esc</b> hay <b>⌘W</b> là đóng. Cần mở lâu khi điền form: bấm <b>nút ghim</b> cạnh ô tìm, danh sách ở yên cạnh chỗ làm. Nắm gạch nhỏ ở mép trên để dời danh sách đi chỗ khác.</p>
+<h2 id="tim">Tìm và lọc</h2>
+<ul><li><b>Gõ để tìm</b> ngay khi danh sách mở. Tìm cả chữ trong ảnh: macOS đọc chữ ngay trên máy (tiếng Việt và tiếng Anh).</li>
+<li><b>Lọc theo loại</b>: Tất cả, Chữ, Link, File, Ảnh.</li>
+<li><b>Nút lọc</b> cạnh ô tìm: theo app đã copy, Hôm nay, 7 ngày qua.</li>
+<li><b>Mũi tên lên xuống</b> để chọn, khung xem trước bên dưới hiện đủ nội dung, app nguồn và giờ copy.</li></ul>
+<h2 id="dan">Dán</h2>
+<ul><li><b>Bấm một mục</b> (hoặc chọn rồi nhấn Return): Mintclip dán thẳng vào app bạn đang dùng, giữ nguyên định dạng (chữ đậm, link, màu chữ). Có Plus: giữ <b>⌥</b> rồi bấm để dán không kèm định dạng.</li>
+<li>Dán thẳng cần quyền <b>Trợ năng (Accessibility)</b> cho Tidymint. Chưa cấp thì mục được đưa lên clipboard, bạn nhấn <b>⌘V</b> như thường.</li>
+<li>Mục là mã màu (vd <code>#33AA77</code>) có chấm màu bên cạnh để nhận ra nhanh.</li></ul>
+<h2 id="keo">Kéo ra ngoài</h2>
+<p>Kéo một mục ra khỏi danh sách để thả vào chỗ khác:</p>
+<ul><li>Ảnh thành một <b>file PNG</b>: thả vào Finder, thư email, hay <a href="{HOME}mintdrop-ke-tha-file-mac/">kệ Mintdrop</a>.</li>
+<li>Link và chữ: thả vào ô soạn thảo của app khác.</li>
+<li>Mục file: thả lên <b>kệ Mintdrop</b> để gom cùng file khác.</li></ul>
+<h2 id="giu-bo">Mintclip giữ gì, bỏ qua gì</h2>
+<div class="tbl"><table><tr><th>Mintclip giữ</th><th>Mintclip bỏ qua</th></tr>
+<tr><td>Chữ, kèm định dạng, tối đa 10.000 ký tự mỗi mục (phần dài hơn bị cắt)</td><td>Nội dung app đánh dấu là bí mật hay tạm (quy ước nspasteboard.org mà trình quản lý mật khẩu hay dùng)</td></tr>
+<tr><td>Link</td><td>Thứ copy trong lúc bạn đang dùng Mật khẩu, 1Password, Bitwarden, KeePassXC và vài trình quản lý mật khẩu khác</td></tr>
+<tr><td>Đường dẫn file đã copy trong Finder</td><td>App bạn thêm vào danh sách <b>App bỏ qua</b></td></tr>
+<tr><td>Ảnh (có công tắc tắt), mỗi ảnh một file chỉ tài khoản của bạn đọc được</td><td>Chữ trống</td></tr></table></div>
+<p>Không phải app nào cũng đánh dấu nội dung bí mật. Copy thứ nhạy cảm từ app lạ thì xoá mục đó đi, hoặc thêm app đó vào App bỏ qua.</p>
+<h2 id="xoa">Xoá</h2>
+<ul><li>Dấu <b>X</b> cạnh mỗi mục: xoá mục đó.</li>
+<li>Menu <b>Xoá</b> cuối danh sách: <b>15 phút gần nhất</b>, <b>1 giờ gần nhất</b>, hoặc <b>Tất cả</b> (hỏi lại một lần).</li>
+<li>Trang Mintclip: <b>Tự xoá sau</b> 1 giờ, 24 giờ hay 7 ngày; mặc định không tự xoá theo giờ, chỉ bỏ mục cũ nhất khi đủ số mục được giữ.</li>
+<li><b>Chỉ giữ trong bộ nhớ</b>: không ghi gì xuống ổ, tắt Tidymint là hết.</li></ul>
+<p>Trang Mintclip cũng cho biết lịch sử đang chiếm bao nhiêu dung lượng.</p>
+<h2 id="rieng-tu">Quyền riêng tư</h2>
+<p>Lịch sử nằm trong một file trên máy, chỉ tài khoản của bạn đọc được. Những gì bạn copy không rời máy, trừ khi bạn bật đồng bộ iCloud của Plus (tắt sẵn): khi đó chúng nằm trong iCloud Drive của bạn. Không cần tài khoản Tidymint. Lịch sử không nằm trong file Sao lưu cài đặt. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
+""",
+  faq=[("Mintclip có lưu mật khẩu không?", "Mintclip bỏ qua nội dung trình quản lý mật khẩu đánh dấu bí mật, và mọi thứ copy trong lúc bạn đang dùng các trình quản lý mật khẩu phổ biến. App không đánh dấu thì Mintclip không phân biệt được, nên bạn có thêm App bỏ qua và nút xoá 15 phút gần nhất."),
+       ("Vì sao macOS hỏi quyền dán từ app khác?", "Từ macOS 15.4, app đọc clipboard mà bạn không bấm Dán thì macOS hỏi trước. Mintclip cần đọc mỗi lần bạn copy, nên cần quyền này."),
+       ("Phím ⌃⌥V không chạy?", "Một app khác có thể đang giữ tổ hợp này, trang Mintclip sẽ báo. Đổi sang phím khác ở mục Phím tắt.")],
+  sources=[("Apple: Tìm trong lịch sử clipboard (macOS 26)", "https://support.apple.com/guide/mac-help/search-your-clipboard-history-mchl40d5b86b/26/mac/26"),
+           ("MacRumors: macOS 26.1 thêm lựa chọn thời gian giữ lịch sử clipboard (04/11/2025)", "https://www.macrumors.com/2025/11/04/more-spotlight-clipboard-settings-macos-26-1/"),
+           ("Apple: NSPasteboard accessBehavior (macOS 15.4 hỏi quyền đọc clipboard)", "https://developer.apple.com/documentation/appkit/nspasteboard/accessbehavior-86972"),
+           ("nspasteboard.org: quy ước đánh dấu nội dung bí mật và tạm", "http://nspasteboard.org/"),
+           ("Chính sách quyền riêng tư của Tidymint (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
+  related=[("Mintdrop: kệ thả file", "{HOME}mintdrop-ke-tha-file-mac/"), ("Tidymint có gửi dữ liệu đi không?", "{HOME}quyen-rieng-tu-tidymint/"), ("Trang chủ Tidymint", "{HOME}")],
+  alt="mintclip-clipboard-history-mac",
+))
+
+GUIDES.append(dict(
+  lang="en", slug="mintclip-clipboard-history-mac", topic="start", date="2026-11-21", read="5 min read",
+  title="Clipboard History on Mac: Find What You Copied | Tidymint",
+  desc="See your clipboard history on Mac: Spotlight has one since macOS 26, or Mintclip keeps the text, links and images you copied, type to find, click to paste.",
+  crumb="Mintclip",
+  h1="Copied Once, Found Again: Clipboard History on Mac",
+  tldr="Copy something new and the old one on the clipboard is replaced, so what you copied yesterday is hard to get back. Since macOS 26, Spotlight has a clipboard history. This guide shows how to use it, then <b>Mintclip</b>, the part of Tidymint that keeps your copy history: your last 100 items (500 with Plus), text in images searchable, <b>one click pastes straight in</b>, apps you choose skipped, all on your Mac.",
+  toc=[("spotlight","The built-in way: Spotlight"),("more","What Mintclip adds"),("when","When Mintclip helps"),("turn-on","Turn on Mintclip"),("open","Open the list"),("search","Search and filter"),
+       ("paste","Paste"),("drag","Drag it out"),("keeps","What it keeps, what it skips"),("delete","Delete"),("privacy","Privacy"),("faq","FAQ")],
+  body="""<h2 id="spotlight">The built-in way: clipboard history in Spotlight (macOS 26 and later)</h2>
+<ol class="steps"><li>Press <b>⌘Space</b> to open Spotlight.</li><li>Click the <b>Clipboard</b> button next to the search field, or press <b>⌘4</b>. The first time, you may need to click <b>Enable</b>.</li><li>Select an item and press <b>⌘C</b> (or click the copy button next to it), then paste as usual.</li><li>To erase it: the <b>More</b> button next to the search field › <b>Clear History</b>.</li></ol>
+<p>Apple also notes that sensitive information may appear on the clipboard. Macs on macOS 15 or earlier don't have this.</p>
+<h2 id="more">What Mintclip adds</h2>
+<p>Spotlight is enough when you just need back a bit of text you copied. Mintclip is for days spent copying and pasting:</p>
+<div class="tbl"><table><tr><th></th><th>Spotlight (built in)</th><th>Mintclip</th></tr>
+<tr><td>Runs on</td><td>macOS 26 and later</td><td><b>macOS 14 and later</b></td></tr>
+<tr><td>Pasting</td><td>Select, ⌘C, click where it goes, then ⌘V</td><td><b>One click pastes</b> into the app you're using, formatting kept</td></tr>
+<tr><td>Passwords, sensitive items</td><td>Apple notes sensitive information may appear in it</td><td><b>Skips</b> password managers and apps you choose</td></tr>
+<tr><td>Deleting</td><td>Clear History: the whole history</td><td><b>One item</b>, the <b>last 15 minutes</b> or <b>last hour</b>, or everything</td></tr>
+<tr><td>How long it keeps</td><td>Up to 7 days (per MacRumors, macOS 26.1)</td><td><b>Your last 100 items</b> (500 with Plus), or on its own after 1 hour, 24 hours, 7 days</td></tr>
+<tr><td>Images</td><td>Apple says it searches text and files you copied</td><td>Keeps images, <b>finds text inside them</b></td></tr>
+<tr><td>Search and filters</td><td>Spotlight's search field</td><td>Type to search, filter by kind, by app, Today, Last 7 days</td></tr>
+<tr><td>Works with</td><td>Used inside Spotlight</td><td>Drag images and files to the <b>Mintdrop shelf</b>; pin the list beside your work</td></tr></table></div>
+<h2 id="when">When Mintclip helps</h2>
+<ul><li><b>Get back what you just copied over</b>: you copy an address, then copy something else by mistake. Open Mintclip and the address is still there.</li>
+<li><b>Fill in a long form</b>: copy a name, a phone number and an order number from one place, then paste each into its field.</li>
+<li><b>Find yesterday's screenshot</b>: type a word that appears in the picture.</li></ul>
+<h2 id="turn-on">Turn on Mintclip</h2>
+<ol class="steps"><li>Open Tidymint and choose <b>TOOLS › Mintclip</b> in the sidebar.</li><li>Click <b>Turn on Mintclip</b>. A paperclip icon appears in the menu bar.</li><li>The first time Mintclip reads the clipboard, macOS asks whether Tidymint may paste from other apps. Allow it. Change it later in <code>System Settings › Privacy &amp; Security</code> (Paste from Other Apps); the Mintclip page has a button that opens it.</li></ol>
+<figure class="fig-app"><img src="../mintclip.jpg" alt="The Mintclip list floating over Tidymint's Mintclip page, holding text, links, an image and a colour code" width="1600" height="1050" loading="lazy"><figcaption>The Mintclip list: newest at the top, a preview below.</figcaption></figure>
+<h2 id="open">Open the list: 2 ways</h2>
+<ul><li>Click the <b>paperclip icon</b> in the menu bar.</li>
+<li>Press <b>⌃⌥V</b> (Control, Option, V). Want other keys? On the Mintclip page, under Shortcut, click the keycap and type new keys.</li></ul>
+<p>The newest item is at the top. Click outside, press <b>Esc</b> or <b>⌘W</b> to close it. Filling in a long form? Click the <b>pin button</b> next to the search field and the list stays beside your work. Grab the small bar at the top edge to move it.</p>
+<h2 id="search">Search and filter</h2>
+<ul><li><b>Type to search</b> as soon as the list opens, text in images included: macOS reads it right on your Mac (English and Vietnamese).</li>
+<li><b>Filter by kind</b>: All, Text, Link, File, Image.</li>
+<li>The <b>filter button</b> next to the search field: by the app you copied from, Today, Last 7 days.</li>
+<li><b>Up and down arrows</b> select; the preview below shows the full content, the source app and when you copied it.</li></ul>
+<h2 id="paste">Paste</h2>
+<ul><li><b>Click an item</b> (or select it and press Return): Mintclip pastes it straight into the app you're using, formatting kept (bold, links, text colour). With Plus, hold <b>⌥</b> and click to paste without formatting.</li>
+<li>Pasting directly needs <b>Accessibility</b> permission for Tidymint. Without it the item goes on the clipboard and you press <b>⌘V</b> as usual.</li>
+<li>A colour code (like <code>#33AA77</code>) shows a colour dot beside it.</li></ul>
+<h2 id="drag">Drag it out</h2>
+<p>Drag an item out of the list and drop it somewhere else:</p>
+<ul><li>An image becomes a <b>PNG file</b>: drop it in Finder, an email, or on the <a href="{HOME}mintdrop-drop-shelf-mac/">Mintdrop shelf</a>.</li>
+<li>Links and text: drop them into another app's text field.</li>
+<li>A file item: drop it on the <b>Mintdrop shelf</b> to gather it with other files.</li></ul>
+<h2 id="keeps">What Mintclip keeps, what it skips</h2>
+<div class="tbl"><table><tr><th>Mintclip keeps</th><th>Mintclip skips</th></tr>
+<tr><td>Text, with its formatting, up to 10,000 characters an item (longer text is cut)</td><td>Content an app marks as secret or temporary (the nspasteboard.org convention password managers often use)</td></tr>
+<tr><td>Links</td><td>Anything copied while you're using Passwords, 1Password, Bitwarden, KeePassXC and a few other password managers</td></tr>
+<tr><td>Paths of files you copied in Finder</td><td>Apps you add to <b>Ignored apps</b></td></tr>
+<tr><td>Images (there's a switch to turn this off), each in a file only your user account can read</td><td>Empty text</td></tr></table></div>
+<p>Not every app marks its secrets. If you copy something sensitive from an unfamiliar app, delete that item, or add the app to Ignored apps.</p>
+<h2 id="delete">Delete</h2>
+<ul><li>The <b>X</b> next to an item deletes it.</li>
+<li>The <b>Delete</b> menu at the bottom of the list: <b>Last 15 minutes</b>, <b>Last hour</b>, or <b>Everything</b> (asks once more).</li>
+<li>On the Mintclip page: <b>Delete items after</b> 1 hour, 24 hours or 7 days; by default nothing is deleted by age, only the oldest items once the list is full.</li>
+<li><b>Keep in memory only</b>: nothing is written to disk, and it's gone when Tidymint quits.</li></ul>
+<p>The Mintclip page also shows how much space the history takes.</p>
+<h2 id="privacy">Privacy</h2>
+<p>The history sits in one file on your Mac that only your user account can read. What you copy never leaves your Mac unless you turn on iCloud sync in Plus (off by default), which keeps it in your own iCloud Drive. No Tidymint account needed. The history is not part of the settings backup file. Details: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
+""",
+  faq=[("Does Mintclip keep passwords?", "It skips content password managers mark as secret, and anything copied while you're using popular password managers. An app that marks nothing can't be told apart, which is why you have Ignored apps and Delete last 15 minutes."),
+       ("Why does macOS ask about pasting from other apps?", "Since macOS 15.4, macOS asks before an app reads the clipboard without you choosing Paste. Mintclip reads it each time you copy, so it needs this permission."),
+       ("⌃⌥V does nothing?", "Another app may hold that shortcut; the Mintclip page says so. Pick other keys under Shortcut.")],
+  sources=[("Apple: Search your clipboard history (macOS 26)", "https://support.apple.com/guide/mac-help/search-your-clipboard-history-mchl40d5b86b/26/mac/26"),
+           ("MacRumors: macOS 26.1 adds clipboard history retention options (4 Nov 2025)", "https://www.macrumors.com/2025/11/04/more-spotlight-clipboard-settings-macos-26-1/"),
+           ("Apple: NSPasteboard accessBehavior (macOS 15.4 asks before reading the clipboard)", "https://developer.apple.com/documentation/appkit/nspasteboard/accessbehavior-86972"),
+           ("nspasteboard.org: marking secret and temporary content", "http://nspasteboard.org/"),
+           ("Tidymint privacy policy (PRIVACY.md)", "https://github.com/HaiTrung-Workspace/tidymint/blob/main/PRIVACY.md")],
+  related=[("Mintdrop: a drop shelf", "{HOME}mintdrop-drop-shelf-mac/"), ("Does Tidymint send your data anywhere?", "{HOME}tidymint-privacy/"), ("Tidymint home", "{HOME}")],
+  alt="mintclip-lich-su-clipboard-mac",
 ))
 
 _MT_KEYS = [("Nửa trái / phải", "Left / right half", "⌃⌥ ← / →"), ("Nửa trên / dưới", "Top / bottom half", "⌃⌥ ↑ / ↓"),
@@ -2432,7 +2586,7 @@ GUIDES.append(dict(
 <ul><li><b>Đổi phím</b>: bấm vào một dòng, gõ tổ hợp mới. Tổ hợp phải có <b>Control hoặc Command</b>, vì từ macOS 15 Apple không nhận phím tắt toàn hệ thống chỉ có Option hay Shift. Phím trùng với phím tắt của macOS thì Mintangle báo và có nút mở cài đặt Bàn phím.</li>
 <li><b>Khôi phục mặc định</b> trả bộ phím về như bảng trên.</li></ul>
 <h2 id="rieng-tu">Quyền Trợ năng dùng để làm gì</h2>
-<p>Theo Apple, quyền Trợ năng cho phép app điều khiển máy, và bạn chỉ nên cấp cho app mình tin. Tidymint dùng quyền này để đọc vị trí, kích thước cửa sổ và dời, đổi cỡ chúng: cửa sổ đang mở phía trước khi bạn bấm phím tắt, và cửa sổ dưới con trỏ khi bạn kéo. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ (phím tắt đăng ký với macOS, macOS chỉ báo khi đúng phím của Mintangle được bấm), không gửi gì đi. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư &amp; Bảo mật › Trợ năng, lúc nào cũng được. Chi tiết: <a href="{HOME}an-toan/">Tidymint có an toàn không</a>.</p>
+<p>Theo Apple, quyền Trợ năng cho phép app điều khiển máy, và bạn chỉ nên cấp cho app mình tin. Tidymint dùng quyền này để đọc vị trí, kích thước cửa sổ và dời, đổi cỡ chúng: cửa sổ đang mở phía trước khi bạn bấm phím tắt, và cửa sổ dưới con trỏ khi bạn kéo. Tidymint không đọc nội dung cửa sổ, không ghi phím bạn gõ (phím tắt đăng ký với macOS, macOS chỉ báo khi đúng phím của Mintangle được bấm). Vị trí và cỡ cửa sổ không rời máy. Tắt Mintangle, hoặc tắt Tidymint trong Quyền riêng tư &amp; Bảo mật › Trợ năng, lúc nào cũng được. Chi tiết: <a href="{HOME}an-toan/">Tidymint có an toàn không</a>.</p>
 """,
   faq=[("Phím tắt không chạy?", "Kiểm tra Tidymint đã được bật trong Quyền riêng tư & Bảo mật › Trợ năng. Nếu trang Mintangle báo phím bị app khác giữ, bấm vào dòng đó để chọn phím khác, hoặc thoát app kia (Rectangle, Magnet)."),
        ("Có cửa sổ không xếp được?", "Một số app đặt cỡ tối thiểu hoặc không cho đổi cỡ, khi đó cửa sổ chỉ được dời, không co lại vừa khung."),
@@ -2477,7 +2631,7 @@ GUIDES.append(dict(
 <ul><li><b>Change a key</b>: click a row and press the new combination. It must include <b>Control or Command</b>, because since macOS 15 Apple refuses system-wide shortcuts that use only Option or Shift. If a key matches a macOS shortcut, Mintangle warns you and offers to open Keyboard settings.</li>
 <li><b>Restore defaults</b> puts the keys back as in the table above.</li></ul>
 <h2 id="privacy">What the Accessibility permission is for</h2>
-<p>Apple says Accessibility lets an app control your Mac, and that you should grant it only to apps you trust. Tidymint uses it to read the position and size of windows and to move or resize them: the front window when you press a shortcut, and the window under the pointer when you drag it. Tidymint does not read what is inside windows, does not record your keystrokes (shortcuts are registered with macOS, which tells Tidymint only when one of its own keys is pressed), and sends nothing. Turn Mintangle off, or switch Tidymint off in Privacy &amp; Security › Accessibility, at any time. Details: <a href="{HOME}safety/">Is Tidymint safe?</a></p>
+<p>Apple says Accessibility lets an app control your Mac, and that you should grant it only to apps you trust. Tidymint uses it to read the position and size of windows and to move or resize them: the front window when you press a shortcut, and the window under the pointer when you drag it. Tidymint does not read what is inside windows, does not record your keystrokes (shortcuts are registered with macOS, which tells Tidymint only when one of its own keys is pressed). Window positions and sizes never leave your Mac. Turn Mintangle off, or switch Tidymint off in Privacy &amp; Security › Accessibility, at any time. Details: <a href="{HOME}safety/">Is Tidymint safe?</a></p>
 """,
   faq=[("A shortcut does nothing?", "Check that Tidymint is on in Privacy & Security › Accessibility. If the Mintangle page says a key is taken by another app, click that row to pick another key, or quit the other app (Rectangle, Magnet)."),
        ("Some window will not tile?", "Some apps set a minimum size or cannot be resized; then the window is moved but not shrunk to fit."),
@@ -2496,10 +2650,10 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="vi", slug="mintbar-gon-thanh-menu-mac", topic="start", date="2026-11-15", read="4 phút đọc",
   title="Gom icon thanh menu Mac vào một nhóm: Mintbar | Tidymint",
-  desc="Mintbar gom icon trên thanh menu Mac vào sau một icon nhóm: bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Tắt sẵn, 2 nhóm, mỗi nhóm 4 app.",
+  desc="Mintbar gom icon trên thanh menu Mac vào sau một icon nhóm: bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Miễn phí 2 nhóm, Plus không giới hạn.",
   crumb="Mintbar",
   h1="Menu bar (thanh menu) gọn lại, icon nào cần vẫn chỉ một cú bấm",
-  tldr="Mintbar gom nhiều icon trên menu bar (thanh menu) vào sau <b>một icon nhóm do bạn chọn</b>. Bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Tối đa <b>2 nhóm, mỗi nhóm 4 app</b>. Có trong Tidymint từ bản 0.6.0, <b>mặc định tắt</b>. Trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình.",
+  tldr="Mintbar gom nhiều icon trên menu bar (thanh menu) vào sau <b>một icon nhóm do bạn chọn</b>. Bấm icon nhóm, các app mở ra ngay bên dưới; bấm một app để mở menu của nó. Miễn phí <b>2 nhóm, mỗi nhóm 4 app</b>, Plus không giới hạn. Có trong Tidymint từ bản 0.6.0, <b>mặc định tắt</b>. Trên macOS 27, khi bạn bật, macOS mới hỏi quyền Trợ năng và Ghi màn hình.",
   toc=[("khi-nao","Dùng khi nào"),("bat","Bật Mintbar"),("tao-nhom","Tạo nhóm"),("dung","Mở app trong nhóm"),
        ("luu-y","Vài điều cần biết"),("macos-cu","macOS 14 đến 26"),("rieng-tu","Hai quyền dùng để làm gì"),("faq","Câu hỏi thường gặp")],
   body="""<h2 id="khi-nao">Dùng khi nào</h2>
@@ -2516,10 +2670,10 @@ GUIDES.append(dict(
 <p>Tidymint cần nằm trong thư mục <b>Ứng dụng</b> (Applications). Chạy từ chỗ khác, Mintbar sẽ không ẩn gì và trang Mintbar báo rõ lý do.</p>
 <h2 id="tao-nhom">Tạo nhóm</h2>
 <ol class="steps"><li>Ở mục <b>Nhóm</b>, bấm <b>Thêm nhóm</b>.</li>
-<li>Đặt tên và chọn một trong 12 icon cho nhóm.</li>
+<li>Đặt tên và chọn icon cho nhóm: 12 icon miễn phí, Plus có mọi bộ icon và màu riêng.</li>
 <li>Tick các app muốn gom vào. Icon của các app đó rời menu bar, icon nhóm hiện ra thay chỗ.</li></ol>
 <figure class="fig-app"><img src="../mintbar.jpg" alt="Trang Mintbar của Tidymint: danh sách app có icon trên menu bar và hai nhóm AI, Kết nối" width="1600" height="1079" loading="lazy"><figcaption>Trang Mintbar: mỗi app nằm trong nhóm nào, và hai nhóm đang dùng.</figcaption></figure>
-<p>Dưới icon nhóm có một hàng chấm nhỏ, mỗi chấm là một app trong nhóm. Một app có thể nằm trong cả hai nhóm.</p>
+<p>Dưới icon nhóm có một hàng chấm nhỏ, mỗi chấm là một app trong nhóm. Một app có thể nằm trong nhiều nhóm.</p>
 <h2 id="dung">Mở app trong nhóm</h2>
 <ul><li><b>Bấm icon nhóm</b>: các app mở ra ngay bên dưới. Bấm lần nữa, hoặc nhấn Esc, để đóng.</li>
 <li><b>Bấm một app vừa mở ra</b>: menu hoặc cửa sổ nhỏ của app đó mở ra. App chưa chạy thì được mở lên.</li>
@@ -2537,9 +2691,9 @@ GUIDES.append(dict(
 <p>Theo Apple, quyền Trợ năng cho phép app điều khiển máy, và bạn chỉ nên cấp cho app mình tin. Trên macOS 27, Mintbar dùng hai quyền như sau:</p>
 <ul><li><b>Trợ năng</b>: để biết app nào có icon trên menu bar, icon nằm ở đâu, và để mở icon bạn chọn trong nhóm. Khi mở, Mintbar có thể bấm chuột hộ vào đúng icon đó rồi đưa con trỏ về chỗ cũ. Mintbar không đọc nội dung cửa sổ, không ghi phím bạn gõ.</li>
 <li><b>Ghi màn hình</b>: để chụp hình icon menu bar của các app trong nhóm, để nhóm hiện đúng icon đó. Mintbar chỉ chụp đúng ô của icon, lúc icon đang hiện. Hình lưu trên máy bạn, và bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar.</li></ul>
-<p>Không có gì được gửi đi. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
+<p>Hình icon và những gì trên màn hình không rời máy. Chi tiết: <a href="{HOME}quyen-rieng-tu-tidymint/">Tidymint có gửi dữ liệu đi không</a>.</p>
 """,
-  faq=[("Mintbar gom được bao nhiêu icon?", "Hai nhóm, mỗi nhóm tối đa 4 app. Một app có thể nằm trong cả hai nhóm."),
+  faq=[("Mintbar gom được bao nhiêu icon?", "Bản miễn phí có 2 nhóm, mỗi nhóm tối đa 4 app. Plus không giới hạn. Một app có thể nằm trong nhiều nhóm."),
        ("Vì sao Mintbar cần quyền Ghi màn hình?", "Để nhóm hiện đúng icon menu bar của từng app. Trên macOS 27, muốn lấy hình icon đó thì cần quyền này. Mintbar chỉ chụp đúng ô của icon trên menu bar. Hình lưu trên máy, bị xoá khi app rời nhóm hoặc khi bạn tắt Mintbar."),
        ("Bật Mintbar xong, icon Tập trung hay Đang phát biến mất?", "Trên macOS 27, khi có icon đang được giấu, macOS tự cất các icon này. Cho chúng vào một nhóm là bấm tới được."),
        ("Mintbar báo chưa ẩn được icon?", "Kiểm tra Tidymint đang nằm trong thư mục Ứng dụng và đã được bật ở cả hai mục Trợ năng, Ghi màn hình. Cấp quyền Ghi màn hình xong cần mở lại Tidymint."),
@@ -2556,10 +2710,10 @@ GUIDES.append(dict(
 GUIDES.append(dict(
   lang="en", slug="mintbar-tidy-menu-bar-mac", topic="start", date="2026-11-15", read="4 min read",
   title="Tidy a Crowded Mac Menu Bar With Groups: Mintbar | Tidymint",
-  desc="Mintbar gathers Mac menu bar icons behind one group icon: click the group and its apps open right below, click an app to open its menu. Off by default, 2 groups of 4 apps.",
+  desc="Mintbar gathers Mac menu bar icons behind one group icon: click the group and its apps open right below, click an app to open its menu. 2 groups free, no limit with Plus.",
   crumb="Mintbar",
   h1="A Tidy Menu Bar, With Every Icon Still One Click Away",
-  tldr="Mintbar gathers several menu bar icons behind <b>one group icon you choose</b>. Click the group and its apps open right below; click an app to open its menu. Up to <b>2 groups of 4 apps</b>. Part of Tidymint from 0.6.0, <b>off by default</b>. On macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on.",
+  tldr="Mintbar gathers several menu bar icons behind <b>one group icon you choose</b>. Click the group and its apps open right below; click an app to open its menu. Free: <b>2 groups of 4 apps</b>, no limit with Plus. Part of Tidymint from 0.6.0, <b>off by default</b>. On macOS 27, macOS asks for Accessibility and Screen Recording only when you turn it on.",
   toc=[("when","When to use it"),("turn-on","Turn on Mintbar"),("group","Make a group"),("use","Open an app from a group"),
        ("notes","Good to know"),("older","macOS 14 to 26"),("privacy","What the two permissions are for"),("faq","FAQ")],
   body="""<h2 id="when">When to use it</h2>
@@ -2576,10 +2730,10 @@ GUIDES.append(dict(
 <p>Tidymint has to be in the <b>Applications</b> folder. From anywhere else Mintbar hides nothing, and its page says why.</p>
 <h2 id="group">Make a group</h2>
 <ol class="steps"><li>Under <b>Groups</b>, click <b>New group</b>.</li>
-<li>Name it and pick one of 12 icons.</li>
+<li>Name it and pick an icon: 12 are free, Plus has every icon set and your own colors.</li>
 <li>Tick the apps to gather. Their icons leave the menu bar and the group icon takes their place.</li></ol>
 <figure class="fig-app"><img src="../mintbar.jpg" alt="The Mintbar page in Tidymint: the apps with a menu bar icon and two groups, AI and Connection" width="1600" height="1079" loading="lazy"><figcaption>The Mintbar page: which group each app is in, and the two groups in use.</figcaption></figure>
-<p>A row of small dots under the group icon shows one dot per app. An app can sit in both groups.</p>
+<p>A row of small dots under the group icon shows one dot per app. An app can sit in several groups.</p>
 <h2 id="use">Open an app from a group</h2>
 <ul><li><b>Click the group icon</b>: its apps open right below. Click again, or press Esc, to close.</li>
 <li><b>Click one of those apps</b>: its menu or panel opens. An app that is not running is started.</li>
@@ -2597,9 +2751,9 @@ GUIDES.append(dict(
 <p>Apple says Accessibility lets an app control your Mac, and that you should grant it only to apps you trust. On macOS 27, Mintbar uses the two permissions like this:</p>
 <ul><li><b>Accessibility</b>: to see which apps have a menu bar icon and where it is, and to open the icon you pick from a group. To open it, Mintbar may click that icon for you and then puts the pointer back. It does not read what is inside windows and does not record the keys you type.</li>
 <li><b>Screen Recording</b>: to take a picture of the menu bar icon of each app in a group, so the group shows that same icon. Only the icon's own slot is captured, and only while the icon is in view. The pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off.</li></ul>
-<p>Nothing is sent anywhere. More: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
+<p>Icon pictures and what is on your screen never leave your Mac. More: <a href="{HOME}tidymint-privacy/">Does Tidymint send your data anywhere?</a></p>
 """,
-  faq=[("How many icons can Mintbar gather?", "Two groups of up to 4 apps each. An app can sit in both groups."),
+  faq=[("How many icons can Mintbar gather?", "The free version has 2 groups of up to 4 apps each. Plus has no limit. An app can sit in several groups."),
        ("Why does Mintbar need Screen Recording?", "So the group can show each app's own menu bar icon. On macOS 27, getting that picture takes this permission. Mintbar captures only the icon's slot in the menu bar. The pictures stay on your Mac and are deleted when the app leaves the group or when you turn Mintbar off."),
        ("Focus or Now Playing disappeared after I turned Mintbar on?", "On macOS 27, while any icon is hidden, macOS puts these icons away by itself. Add them to a group and you can reach them again."),
        ("Mintbar says it could not hide the icons?", "Check that Tidymint is in the Applications folder and switched on under both Accessibility and Screen Recording. After allowing Screen Recording, reopen Tidymint."),

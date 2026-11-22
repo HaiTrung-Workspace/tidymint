@@ -52,6 +52,23 @@ struct OpenWindowKeeper: View {
     var body: some View { Color.clear.onAppear { sharedOpenWindow = openWindow } }
 }
 
+/// Brings the main window forward and opens it again when it was closed. Also for code outside a SwiftUI scene (the
+/// app delegate, a status item's action), which has no `openWindow` of its own: it uses the one kept above.
+@MainActor func showMainWindow(using action: OpenWindowAction? = nil) {
+    NSApp.activate(ignoringOtherApps: true)
+    func mains() -> [NSWindow] { NSApp.windows.filter { !($0 is NSPanel) && $0.identifier?.rawValue.contains("main") == true } }
+    if let w = mains().first(where: { $0.isVisible || $0.isMiniaturized }) {
+        if w.isMiniaturized { w.deminiaturize(nil) }
+        w.makeKeyAndOrderFront(nil); return
+    }
+    (sharedOpenWindow ?? action)?(id: "main")
+    // The kept action comes from a window that has since closed: should it open nothing, the caller's own is tried.
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        guard !mains().contains(where: { $0.isVisible }) else { return }
+        action?(id: "main")
+    }
+}
+
 struct MenuView: View {
     @ObservedObject var vm: VM
     @Environment(\.openWindow) var openWindow
@@ -61,6 +78,13 @@ struct MenuView: View {
                 Image(nsImage: cachedIcon(Theme.p)).resizable().frame(width: 22, height: 22)
                 (Text("Tidy") + Text("mint").foregroundColor(Theme.brandMint)).font(.system(size: fs(13), weight: .bold))
                 Spacer()
+            }
+            // A new version: one line here too, for those who never open the main window.
+            if let v = vm.newVersion {
+                Button { NSWorkspace.shared.open(Updates.download) } label: {
+                    Label(t("Tidymint \(v) is available · Download", "Đã có Tidymint \(v) · Tải về"), systemImage: "arrow.down.circle")
+                        .font(.system(size: fs(12), weight: .medium)).foregroundColor(Theme.brandMint)
+                }.buttonStyle(.plain)
             }
             VStack(alignment: .leading, spacing: 4) {
                 HStack { Text(t("Disk", "Ổ đĩa")).foregroundColor(.secondary); Spacer()
@@ -76,19 +100,49 @@ struct MenuView: View {
             }
             HStack { Text(t("Trash", "Thùng rác")).foregroundColor(.secondary); Spacer(); Text(fmt(vm.trashSize)).fontWeight(.semibold) }.font(.system(size: fs(12)))
             Divider()
+            let rows = menuRows
             VStack(spacing: 1) {
-                MenuRow(title: t("Open Tidymint", "Mở Tidymint")) { (sharedOpenWindow ?? openWindow)(id: "main"); NSApp.activate(ignoringOtherApps: true) }
-                MenuRow(title: t("Clean Now", "Dọn ngay")) { vm.page = .smart; (sharedOpenWindow ?? openWindow)(id: "main"); NSApp.activate(ignoringOtherApps: true); vm.smartScan() }
-                MenuRow(title: t("Empty Trash...", "Đổ Thùng rác..."), disabled: vm.trashCount == 0) { NSApp.activate(ignoringOtherApps: true); vm.emptyTrash() }
+                ForEach(0..<3, id: \.self) { i in MenuRow(title: rows[i].title, disabled: rows[i].disabled, nav: i, action: rows[i].action) }
             }.padding(.horizontal, -8)
             Divider()
             VStack(spacing: 1) {
-                MenuRow(title: t("Support the project", "Ủng hộ dự án")) { NSWorkspace.shared.open(sponsorURL("menubar")) }
-                MenuRow(title: t("Quit", "Thoát")) { NSApp.terminate(nil) }
+                ForEach(tailStart..<rows.count, id: \.self) { i in MenuRow(title: rows[i].title, disabled: rows[i].disabled, nav: i, action: rows[i].action) }
             }.padding(.horizontal, -8)
         }
         .padding(14).frame(width: 280)
-        .onAppear { vm.refreshRAM(); vm.refreshDisk(); vm.refreshTrash() }
+        .background(MenuNavWindow())
+        .onAppear {
+            vm.refreshRAM(); vm.refreshDisk(); vm.refreshTrash()
+            // Up, Down, Return and Esc work in this panel as in a macOS menu (MenuNav).
+            MenuNav.shared.rows = { menuRows.map { (disabled: $0.disabled, action: $0.action) } }
+            MenuNav.shared.close = menuClose
+            MenuNav.shared.begin()
+        }
+        .onDisappear {
+            MenuNav.shared.end()
+        }
+    }
+    var tailStart: Int { 3 }
+    /// The rows of the panel, in order: the first three above the line, the rest below it.
+    var menuRows: [(title: String, disabled: Bool, action: () -> Void)] {
+        [(t("Open Tidymint", "Mở Tidymint"), false, { showMainWindow(using: openWindow) }),
+         (t("Clean Now", "Dọn ngay"), false, { vm.page = .smart; showMainWindow(using: openWindow); vm.smartScan() }),
+         (t("Empty Trash...", "Đổ Thùng rác..."), vm.trashCount == 0, { NSApp.activate(ignoringOtherApps: true); vm.emptyTrash() })]
+        + extraRows +
+        [(t("Support the project", "Ủng hộ dự án"), false, { NSWorkspace.shared.open(sponsorURL("menubar")) }),
+         (t("Quit", "Thoát"), false, { NSApp.terminate(nil) })]
+    }
+    var extraRows: [(title: String, disabled: Bool, action: () -> Void)] {
+        return []
+    }
+    /// Closes the panel after a key: the popover a Mintbar group opened, or the menu bar window itself.
+    var menuClose: () -> Void {
+        {
+            #if TIDYMINT_PRIVATE
+            if let p = MintbarFan.shared.ownPanel, p.isShown { p.performClose(nil); return }
+            #endif
+            NSApp.keyWindow.map { if !$0.canBecomeMain { $0.close() } }
+        }
     }
 }
 
@@ -186,14 +240,29 @@ func menuBarImage(free: Double, total: Double, level: Int, leafOnly: Bool = fals
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+    /// A click on the Dock icon, or opening the app again while it runs. macOS counts any panel of the app as a visible
+    /// window, and with one on screen nothing else would bring the main window back.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MainActor.assumeIsolated { showMainWindow() }
+        return true
+    }
     func applicationDidBecomeActive(_ n: Notification) {
         if !CommandLine.arguments.contains("--demo") { sharedVM.checkFullDiskAccess(); TrashHint.apply() }
         #if TIDYMINT_PRIVATE
-        if !CommandLine.arguments.contains("--demo") && Mintangle.shared.enabled { Mintangle.shared.apply() }
+        if !CommandLine.arguments.contains("--demo") && !CommandLine.arguments.contains("--selftest") && Mintangle.shared.enabled { Mintangle.shared.apply() }
         #endif
     }
 
+    /// Helper runs (icon export during the build, self-tests) get no Dock icon: a run started from a script could leave
+    /// a dead tile in the Dock that shows "damaged" when clicked (16/11/2026).
+    func applicationWillFinishLaunching(_ n: Notification) {
+        let a = CommandLine.arguments
+        if a.contains("--export-icon") || a.contains("--export-menubar") { NSApp.setActivationPolicy(.prohibited) }
+        else if a.contains("--selftest") { NSApp.setActivationPolicy(.accessory) }
+    }
+
     func applicationDidFinishLaunching(_ n: Notification) {
+        ClickAway.install()
         // Developer helper: `Tidymint --export-icon <theme> <out.png>` writes the 1024px icon and quits.
         let a = CommandLine.arguments
         if let i = a.firstIndex(of: "--export-icon"), i + 2 < a.count,
@@ -213,8 +282,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try? px.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: a[i + 2])); exit(0)
         }
         // Single instance: a second copy (typically an older build still running after an update) is asked to quit,
-        // so the menu bar never shows two Tidymint icons. Screenshot/demo runs are exempt so tooling can run beside a live app.
-        if !a.contains("--demo"), let bid = Bundle.main.bundleIdentifier {
+        // so the menu bar never shows two Tidymint icons. Screenshot/demo runs and self-tests are exempt so tooling can run
+        // beside a live app (a self-test used to quit the running copy, 18/11/2026); a self-test then stays off the
+        // shortcuts and the shelf below, so the two copies never both answer a key or a shake.
+        if !a.contains("--demo") && !a.contains("--selftest"), let bid = Bundle.main.bundleIdentifier {
             let me = ProcessInfo.processInfo.processIdentifier
             for other in NSRunningApplication.runningApplications(withBundleIdentifier: bid) where other.processIdentifier != me {
                 other.terminate()
@@ -225,8 +296,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.applicationIconImage = dockIcon(Theme.p)
         if !a.contains("--demo") { sharedVM.checkFullDiskAccess() }
         #if TIDYMINT_PRIVATE
-        if !a.contains("--demo") { Mintangle.shared.apply() }   // shortcuts only when the user turned Mintangle on
-        if !a.contains("--demo") && featureShelf { Shelf.shared.apply() }   // shelf only when the user turned it on
+        if !a.contains("--demo") && !a.contains("--selftest") { Mintangle.shared.apply() }   // shortcuts only when the user turned Mintangle on
+        if !a.contains("--demo") && !a.contains("--selftest") && featureShelf { Shelf.shared.apply() }   // shelf only when the user turned it on
         if !a.contains("--demo") && !a.contains("--selftest") { Mintbar.shared.apply(atLaunch: true) }   // only when the user turned it on
         if isDevBuild, let i = a.firstIndex(of: "--mintbar-unmatte"), i + 2 < a.count { MintbarGlyphs.unmatteFile(a[i + 1], a[i + 2]); exit(0) }
         if isDevBuild, let i = a.firstIndex(of: "--mintbar-pick"), i + 1 < a.count { let id = a[i + 1]; DispatchQueue.main.asyncAfter(deadline: .now() + 4) { Mintbar.shared.openFromGroup(id) } }
@@ -237,7 +308,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Helper for screenshots: `--shelf-open path1 path2…` opens the shelf with those files (Dev build, or with `--demo`).
         if isDevBuild || a.contains("--demo"), let i = a.firstIndex(of: "--shelf-open") {
             let paths = a[(i + 1)...].prefix { !$0.hasPrefix("--") }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { Shelf.shared.add(paths.map { URL(fileURLWithPath: $0) }); Shelf.shared.show(atPointer: false) }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { let b = Shelf.shared.main; b.add(paths.map { URL(fileURLWithPath: $0) }); b.show(atPointer: false) }
         }
         #endif
         PreviewLinks.clear()   // leftovers from a run that quit with the month viewer open
@@ -258,9 +329,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if a.contains("--demo") { Demo.load(sharedVM) }
         if isDevBuild, let i = a.firstIndex(of: "--selftest"), i + 1 < a.count { SelfTest.run(Array(a[(i + 1)...])) }
+        // `--backup-import <file> --parts general,data`: loads a backup as the Load button does, without the panels
+        // (dev test copy of the whole app; the app then reopens as after a real load).
+        if isDevBuild, let i = a.firstIndex(of: "--backup-import"), i + 1 < a.count {
+            let only = a.firstIndex(of: "--parts").flatMap { $0 + 1 < a.count ? Set(a[$0 + 1].split(separator: ",").map(String.init)) : nil } ?? []
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { SettingsBackup.load(URL(fileURLWithPath: a[i + 1]), only: only) }
+        }
         // A self-test only touches its own test files: no Trash watcher and no sorting of the real Downloads meanwhile.
         let testing = a.contains("--selftest")
         if !a.contains("--demo") && !testing { TrashHint.apply() }
+        if isDevBuild, let i = a.firstIndex(of: "--open-group"), i + 1 < a.count { OpenGroups.shared.ids.formUnion(a[i + 1].split(separator: ",").map(String.init)) }   // screenshots: a folded group open
         if let i = a.firstIndex(of: "--page"), i + 1 < a.count,
            let pg = Page.allCases.first(where: { "\($0)" == a[i + 1] }),
            pageAvailable(pg) {   // a page that is not released yet cannot be opened from the command line either

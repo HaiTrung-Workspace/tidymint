@@ -52,10 +52,9 @@ struct SmartView: View {
             case .idle:
                 CheckInCard()
                 Header(title: t("Tidy up a little?", "Dọn máy chút nhé?"),
-                       sub: t("Scan finds the safe part: caches, logs, old downloads. You see what it is, then press Clean.\nEverything goes to the Trash first, so you can change your mind.",
-                              "Quét sẽ tìm phần an toàn: bộ nhớ đệm, nhật ký, Downloads cũ. Bạn xem rồi mới bấm Dọn.\nMọi thứ vào Thùng rác trước, đổi ý thì lấy lại được."))
+                       sub: t("Everything goes to the Trash first.", "Mọi thứ vào Thùng rác trước."))
                 if let v = vm.newVersion {
-                    Button { NSWorkspace.shared.open(Updates.page) } label: {
+                    Button { NSWorkspace.shared.open(Updates.download) } label: {
                         Label(t("Tidymint \(v) is available. Download", "Đã có Tidymint \(v). Tải về"), systemImage: "arrow.down.circle")
                             .font(.system(size: fs(12), weight: .medium)).foregroundColor(Theme.text)
                             .padding(.horizontal, 12).padding(.vertical, 6).background(Capsule().fill(Theme.ink.opacity(0.12)))
@@ -64,9 +63,9 @@ struct SmartView: View {
                 BigScanButton(label: t("Scan", "Quét")) { vm.smartScan() }
                     .onAppear { CheckIn.shared.refresh() }   // the card itself is empty while hidden, so it cannot carry onAppear
                 HStack(spacing: 14) {
-                    HomeCard(title: t("Chrome, Slack, Telegram...", "Zalo, Chrome, Telegram..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: t("by type and by month", "theo loại, theo tháng")) { vm.page = .byapp }
-                    HomeCard(title: t("Photos, videos, old files", "Ảnh, video, file cũ"), value: t("Large Files", "File lớn"), sub: t("you choose", "bạn tự chọn")) { vm.page = .large }
-                    HomeCard(title: t("Trash", "Thùng rác"), value: fmt(vm.trashSize), sub: t("empty it to delete for good", "đổ là xoá sạch")) { vm.page = .trash }
+                    HomeCard(title: t("Chrome, Slack, Telegram...", "Zalo, Chrome, Telegram..."), value: t("Clean by App", "Dọn theo ứng dụng"), sub: "") { vm.page = .byapp }
+                    HomeCard(title: t("Photos, videos, old files", "Ảnh, video, file cũ"), value: t("Large Files", "File lớn"), sub: "") { vm.page = .large }
+                    HomeCard(title: t("Trash", "Thùng rác"), value: fmt(vm.trashSize), sub: "") { vm.page = .trash }
                 }.padding(.top, 6)
             case .done:
                 Image(systemName: "checkmark.circle.fill").font(.system(size: fs(54))).foregroundColor(Theme.green)
@@ -95,8 +94,8 @@ struct SmartView: View {
                 Text(vm.junkSelected > 0 ? t("\(fmt(vm.junkSelected)) safe to clean", "\(fmt(vm.junkSelected)) an toàn để dọn") : t("Already tidy", "Máy đang gọn rồi"))
                     .font(.system(size: fs(40), weight: .bold)).foregroundColor(Theme.text)
                 Text(vm.junkSelected > 0
-                     ? t("Apps rebuild all of this on their own. Everything goes to the Trash first.", "Toàn bộ phần này app tự tạo lại được. Mọi thứ vào Thùng rác trước.")
-                     : t("Nothing safe to clean right now. Try Clean by App or Large Files for things only you can decide on.", "Không có gì an toàn để dọn lúc này. Thử Dọn theo ứng dụng hoặc File lớn, là phần chỉ bạn quyết được."))
+                     ? t("Everything goes to the Trash first.", "Mọi thứ vào Thùng rác trước.")
+                     : t("Nothing safe to clean right now.", "Không có gì an toàn để dọn lúc này."))
                     .foregroundColor(Theme.sub).multilineTextAlignment(.center).frame(maxWidth: 520)
                 // What will be cleaned, one card per group: the decision is informed without opening the full list.
                 // Cleaning itself stays on the single button below (preview first, then Clean).
@@ -113,7 +112,7 @@ struct SmartView: View {
                     PrimaryButton(title: t("Clean (\(fmt(vm.junkSelected)))", "Dọn (\(fmt(vm.junkSelected)))"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
                 }
                 if vm.junkSelected > 0 {
-                    Text(t("Not selected: \(fmt(vm.junkTotal - vm.junkSelected)) that only you can decide on. Tick it under Review every item.", "Chưa tick: \(fmt(vm.junkTotal - vm.junkSelected)) là phần bạn tự quyết. Muốn dọn thì tick ở Xem từng mục."))
+                    Text(t("Not selected: \(fmt(vm.junkTotal - vm.junkSelected))", "Chưa tick: \(fmt(vm.junkTotal - vm.junkSelected))"))
                         .font(.system(size: fs(11))).foregroundColor(Theme.sub)
                 }
                 TextLink(t("Disk still full of \"System Data\"? See what is in it", "Ổ vẫn đầy vì \"System Data\"? Xem nó gồm những gì"), size: fs(12), weight: .semibold) {
@@ -135,7 +134,7 @@ struct HomeCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).foregroundColor(Theme.sub).font(.system(size: fs(11))).lineLimit(1)
                 Text(value).foregroundColor(Theme.text).font(.system(size: fs(16), weight: .semibold))
-                Text(sub).foregroundColor(Theme.sub).font(.system(size: fs(11)))
+                if !sub.isEmpty { Text(sub).foregroundColor(Theme.sub).font(.system(size: fs(11))) }
             }
             .padding(14).frame(width: 190 * uiScale, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 14).fill(hover.v ? Theme.cardHi : Theme.card))
@@ -149,7 +148,7 @@ struct CleanupView: View {
         switch vm.phase {
         case .idle:
             VStack(spacing: 28) {
-                Header(title: t("Cleanup", "Dọn rác"), sub: t("Find caches, logs, drafts and old downloads.\nItems are moved to the Trash, not deleted.", "Tìm bộ nhớ đệm, nhật ký, nháp và Downloads cũ.\nChỉ chuyển vào Thùng rác, chưa xoá hẳn."))
+                Header(title: t("Cleanup", "Dọn rác"), sub: "")
                 BigScanButton(label: t("Scan", "Quét")) { vm.scanJunk() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         case .scanning:
@@ -157,7 +156,7 @@ struct CleanupView: View {
         case .summary:
             VStack(spacing: 24) {
                 Text(fmt(vm.junkTotal)).font(.system(size: fs(54), weight: .bold)).foregroundColor(Theme.text)
-                Text(t("can be cleaned. \(fmt(vm.junkSelected)) is rebuilt by apps on their own and is pre-selected.", "có thể dọn. \(fmt(vm.junkSelected)) là phần app tự tạo lại được, đã chọn sẵn.")).foregroundColor(Theme.sub)
+                Text(t("can be cleaned. \(fmt(vm.junkSelected)) pre-selected.", "có thể dọn. Đã chọn sẵn \(fmt(vm.junkSelected)).")).foregroundColor(Theme.sub)
                 HStack(spacing: 14) {
                     GhostButton(title: t("Review Details", "Xem chi tiết")) { vm.phase = .review }
                     PrimaryButton(title: t("Clean", "Dọn"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
@@ -235,7 +234,6 @@ struct ReviewView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(selLabel(vm.cats.reduce(0) { $0 + $1.items.filter(\.selected).count }, vm.junkSelected)).foregroundColor(Theme.text).font(.system(size: fs(15), weight: .semibold))
-                    Text(t("Moved to the Trash, not deleted yet. Right-click an item for more.", "Chỉ chuyển vào Thùng rác, chưa xoá hẳn. Chuột phải vào một mục để xem thêm.")).foregroundColor(Theme.sub).font(.system(size: fs(11)))
                 }
                 Spacer()
                 PrimaryButton(title: t("Clean", "Dọn"), action: { vm.cleanJunk() }, disabled: vm.junkSelected == 0)
@@ -252,8 +250,7 @@ struct ByAppView: View {
         } else if !vm.appScanned {
             VStack(spacing: 28) {
                 Header(title: t("Clean by App", "Dọn theo ứng dụng"),
-                       sub: t("See what each app keeps on your Mac and clean it by type.\nMessages and logins are never touched.",
-                              "Xem từng app đang giữ gì trên máy và dọn theo loại.\nTin nhắn và đăng nhập không bao giờ bị đụng."))
+                       sub: t("Messages and logins are never touched.", "Tin nhắn và đăng nhập không bao giờ bị đụng."))
                 BigScanButton(label: t("Scan", "Quét")) { vm.scanByApp() }
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let id = vm.appSel, let r = vm.appReports.first(where: { $0.id == id }) {
@@ -391,7 +388,7 @@ struct AppDetail: View {
             if report.running {
                 HStack(spacing: 10) {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundColor(Theme.warn)
-                    Text(t("\(report.rule.name) is open. Quit it before cleaning so it does not write to these files.", "\(report.rule.name) đang mở. Tắt app trước khi dọn để app không ghi vào các file này."))
+                    Text(t("Quit \(report.rule.name) before cleaning.", "Tắt \(report.rule.name) trước khi dọn."))
                         .font(.system(size: fs(12))).foregroundColor(Theme.text)
                     Spacer()
                     GhostButton(title: t("Quit \(report.rule.name)", "Tắt \(report.rule.name)")) { vm.quitApp(report.id) }
@@ -495,7 +492,7 @@ struct LargeView: View {
             switch vm.largePhase {
             case .idle:
                 VStack(spacing: 28) {
-                    Header(title: t("Large Files", "File lớn và cũ"), sub: t("Files over 100 MB in your folders and the drives added in Settings, hidden files included. App and library packages are listed whole, not opened.\nNothing is ticked; you choose.", "File trên 100 MB trong các thư mục của bạn và ổ đã thêm ở Cài đặt, gồm cả file ẩn. Gói của app hay thư viện được liệt kê nguyên gói, không mở ra.\nKhông tick sẵn, bạn tự chọn."))
+                    Header(title: t("Large Files", "File lớn và cũ"), sub: t("Files over 100 MB. Nothing is ticked.", "File trên 100 MB. Không tick sẵn."))
                     BigScanButton(label: t("Scan", "Quét")) { vm.scanLarge() }
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
             case .scanning:
@@ -547,7 +544,7 @@ struct IgnoreView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(t("Ignore List", "Danh sách bỏ qua")).font(.system(size: fs(15), weight: .bold)).foregroundColor(Theme.text)
-                    Text(t("Items here never show up in scans. Add files or folders here, or right-click an item in a scan list.", "Mục ở đây không bao giờ hiện trong kết quả quét. Thêm file, thư mục ở đây, hoặc chuột phải vào một mục trong danh sách quét."))
+                    Text(t("Items here never show up in scans.", "Mục ở đây không bao giờ hiện trong kết quả quét."))
                         .foregroundColor(Theme.sub).font(.system(size: fs(12)))
                 }
                 Spacer(minLength: 16)

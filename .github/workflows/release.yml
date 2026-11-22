@@ -40,6 +40,10 @@ jobs:
           ./build.sh --release
           cp "build/Tidymint-${{ steps.v.outputs.version }}.zip" build/Tidymint.zip
           shasum -a 256 build/Tidymint.zip | tee build/sha256.txt
+          # The same file under two more names, so GitHub counts downloads per channel:
+          # Tidymint.zip (website), Tidymint-brew.zip (Homebrew), Tidymint-direct.zip (links on other sites).
+          cp build/Tidymint.zip build/Tidymint-brew.zip
+          cp build/Tidymint.zip build/Tidymint-direct.zip
 
       - name: Release notes
         run: |
@@ -50,9 +54,11 @@ jobs:
           {
             echo "## What's new"; echo
             cat build/items.md; echo
-            echo "Universal build (Apple silicon and Intel), macOS 14 or later. Not notarized yet: open it once via System Settings › Privacy & Security › Open Anyway. Step-by-step guide with screenshots: https://tidymint.app/install/ (Tiếng Việt: https://tidymint.app/vi/cai-dat/). Apple's guide: https://support.apple.com/102445"
+            echo "Universal build (Apple silicon and Intel), macOS 14 or later. Signed and notarized by Apple: macOS asks once before the first launch, click Open. Step-by-step guide with screenshots: https://tidymint.app/install/ (Tiếng Việt: https://tidymint.app/vi/cai-dat/)."
             echo
             echo "SHA-256 \`Tidymint.zip\`: \`$SHA\`"
+            echo
+            echo "\`Tidymint-brew.zip\` and \`Tidymint-direct.zip\` are the same file under another name."
           } > build/notes.md
           cat build/notes.md
 
@@ -92,10 +98,10 @@ jobs:
         run: |
           V="${{ steps.v.outputs.version }}"
           if [ "${{ steps.v.outputs.draft }}" = "1" ]; then
-            gh release create "v$V-dryrun-${{ github.run_number }}" build/Tidymint.zip --draft --target "$GITHUB_SHA" \
+            gh release create "v$V-dryrun-${{ github.run_number }}" build/Tidymint.zip build/Tidymint-brew.zip build/Tidymint-direct.zip --draft --target "$GITHUB_SHA" \
               --title "Tidymint $V (dry run)" --notes-file build/notes.md
           else
-            gh release create "v$V" build/Tidymint.zip --draft --title "Tidymint $V" --notes-file build/notes.md --verify-tag
+            gh release create "v$V" build/Tidymint.zip build/Tidymint-brew.zip build/Tidymint-direct.zip --draft --title "Tidymint $V" --notes-file build/notes.md --verify-tag
             if [ "${{ steps.vt.outputs.ok }}" = "1" ]; then gh release edit "v$V" --draft=false --latest; fi
           fi
 
@@ -112,7 +118,7 @@ jobs:
           SHA="$(cut -d' ' -f1 build/sha256.txt)"
           git clone -q "https://x-access-token:${TAP_TOKEN}@github.com/HaiTrung-Workspace/homebrew-tidymint.git" build/tap
           cd build/tap
-          sed -i '' -E "s/^  version \".*\"/  version \"$V\"/; s/^  sha256 \".*\"/  sha256 \"$SHA\"/" Casks/tidymint.rb
+          sed -i '' -E "s/^  version \".*\"/  version \"$V\"/; s/^  sha256 \".*\"/  sha256 \"$SHA\"/; s#/Tidymint\.zip#/Tidymint-brew.zip#" Casks/tidymint.rb
           grep -E '^  (version|sha256) ' Casks/tidymint.rb
           if git diff --quiet; then echo "Cask already at $V"; exit 0; fi
           git -c user.name=Tidymint -c user.email=HaiTrung-Workspace@users.noreply.github.com commit -qam "Update to $V"

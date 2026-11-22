@@ -7,7 +7,7 @@
  */
 const SHEET = 'Submissions';
 const COLUMNS = ['time', 'source', 'type', 'email', 'newsletter', 'consent', 'consentVersion',
-                 'message', 'app', 'macos', 'model', 'lang', 'answer', 'reasons'];
+                 'message', 'app', 'macos', 'model', 'lang', 'answer', 'reasons', 'usage'];
 const MAX_LEN = 5000;
 
 function doPost(e) {

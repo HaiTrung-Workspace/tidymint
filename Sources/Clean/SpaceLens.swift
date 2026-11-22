@@ -151,7 +151,7 @@ struct LensView: View {
             SysDataView(vm: vm)
         } else if vm.lensPath.isEmpty {
             VStack(spacing: 28) {
-                Header(title: t("Space Lens", "Bản đồ ổ đĩa"), sub: t("See what takes up space, folder by folder. Cloud folders (Google Drive, iCloud Drive...) are not measured here; see the Cloud page.\nClick a bubble to look inside.", "Xem thư mục nào chiếm chỗ. Thư mục đám mây (Google Drive, iCloud Drive...) không đo ở đây, xem trang Đám mây.\nBấm vào bong bóng để xem bên trong."))
+                Header(title: t("Space Lens", "Bản đồ ổ đĩa"), sub: "")
                 BigScanButton(label: t("Scan", "Quét")) { vm.openLens(Scanner.home) }
                 HStack(spacing: 12) {
                     GhostButton(title: "Library") { vm.openLens(Scanner.lib) }

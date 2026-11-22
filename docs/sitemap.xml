@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://tidymint.app/</loc><lastmod>2026-11-17</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
-  <url><loc>https://tidymint.app/vi/</loc><lastmod>2026-11-17</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
-  <url><loc>https://tidymint.app/guides/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/changelog/</loc><lastmod>2026-11-17</lastmod></url>
-  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://tidymint.app/</loc><lastmod>2026-11-21</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
+  <url><loc>https://tidymint.app/vi/</loc><lastmod>2026-11-21</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/"/><xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/"/></url>
+  <url><loc>https://tidymint.app/guides/</loc><lastmod>2026-11-21</lastmod></url>
+  <url><loc>https://tidymint.app/vi/huong-dan/</loc><lastmod>2026-11-21</lastmod></url>
+  <url><loc>https://tidymint.app/changelog/</loc><lastmod>2026-11-21</lastmod></url>
+  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>2026-11-21</lastmod></url>
   <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://tidymint.app/vi/cleanmymac-mien-phi/</loc><lastmod>2026-10-26</lastmod></url>
@@ -39,6 +39,8 @@
   <url><loc>https://tidymint.app/safety/</loc><lastmod>2026-11-01</lastmod></url>
   <url><loc>https://tidymint.app/vi/mintdrop-ke-tha-file-mac/</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://tidymint.app/mintdrop-drop-shelf-mac/</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://tidymint.app/vi/mintclip-lich-su-clipboard-mac/</loc><lastmod>2026-11-21</lastmod></url>
+  <url><loc>https://tidymint.app/mintclip-clipboard-history-mac/</loc><lastmod>2026-11-21</lastmod></url>
   <url><loc>https://tidymint.app/vi/mintangle-xep-cua-so-mac/</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://tidymint.app/mintangle-window-tiling-mac/</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://tidymint.app/vi/mintbar-gon-thanh-menu-mac/</loc><lastmod>2026-11-15</lastmod></url>

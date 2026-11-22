@@ -10,6 +10,8 @@ _spec = importlib.util.spec_from_file_location("tmsite", os.path.join(ROOT, "too
 S = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(S)
 _spec2 = importlib.util.spec_from_file_location("tmcontent", os.path.join(ROOT, "tools", "guides_content.py"))
 C = importlib.util.module_from_spec(_spec2); _spec2.loader.exec_module(C)
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import plus_tool
 
 ART_CSS = """
 .cpw{position:relative}.cpw pre{padding-right:52px}
@@ -73,6 +75,20 @@ ART_CSS = """
 .box .bico{width:56px;height:56px;margin:0 auto 10px;border:0;border-radius:0}
 .box h3{font-size:clamp(22px,2.6vw,28px)}.box p{max-width:520px;margin:0 auto 18px}
 .box-cta{justify-content:center}
+/* Privacy: on a phone each case is a card, so "what it sends" is never off screen */
+@media (max-width:600px){
+ .art .sends table{display:block;min-width:0}
+ .art .sends tbody,.art .sends tr,.art .sends td{display:block}
+ .art .sends tr:first-child{display:none}
+ .art .sends tr{border:1px solid var(--line);border-radius:12px;margin:0 0 10px;padding:12px 14px}
+ .art .sends td{border:0;padding:3px 0}
+ .art .sends td:first-child{color:var(--text);font-weight:700}
+ .art .sends td+td:before{display:block;color:var(--leaf);font-size:12px;font-weight:700;margin-top:6px}
+ .art .sends td:nth-child(2):before{content:"What Tidymint does"}
+ .art .sends td:nth-child(3):before{content:"What it sends"}
+ .art .sends td:nth-child(2):lang(vi):before{content:"Tidymint làm gì"}
+ .art .sends td:nth-child(3):lang(vi):before{content:"Gửi đi thông tin gì"}
+}
 @media (max-width:600px){.art p,.art li{font-size:16px}.fig-dlg img{max-width:100%}}
 """
 
@@ -81,12 +97,12 @@ L = {
             toc="Trong bài", faq="Câu hỏi thường gặp", src="Nguồn tham khảo", rel="Đọc thêm",
             cta_h="Dọn Mac miễn phí, hợp pháp", cta_p="Dọn dẹp miễn phí, lõi mã nguồn mở, có tiếng Việt. Mọi thứ luôn vào Thùng rác trước, bạn tự quyết.",
             cta_btn="Tải <span class=\"hs\">Tidymint</span><span class=\"hm\">về</span>", cta_more="Xem cách cài", inst="#cai-dat",
-            nav=[("../#tinh-nang","Tính năng"),("../#cach-dung","Cách dùng"),("../huong-dan/","Hướng dẫn"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
+            nav=[("../#tinh-nang","Tính năng"),("../huong-dan/","Hướng dẫn"),("../plus/","Plus"),("../#hoi-dap","Hỏi đáp"),(S.GH,"GitHub")]),
  "en": dict(home="../", homename="Home", guides="Guides", updated="Updated", tldr="Quick answer",
             toc="On this page", faq="FAQ", src="Sources", rel="Read next",
             cta_h="Clean your Mac for free", cta_p="Free to clean, with an open-source core. Everything always goes to the Trash first, so you stay in control.",
             cta_btn="Download <span class=\"hs\">Tidymint</span>", cta_more="How to install", inst="#install",
-            nav=[("../#features","Features"),("../#how","How it works"),("../guides/","Guides"),("../#faq","FAQ"),(S.GH,"GitHub")]),
+            nav=[("../#features","Features"),("../guides/","Guides"),("../plus/","Plus"),("../#faq","FAQ"),(S.GH,"GitHub")]),
 }
 
 TLOG_CSS = '.tlog .relv .ver{font-size:16px;white-space:nowrap}.tlog .relv summary{align-items:baseline}.tlog .relv p{margin:0 0 16px}'
@@ -107,6 +123,7 @@ def log_details(body):
     return body[:m.start()] + m.group(1) + '<style>' + TLOG_CSS + '</style><div class="tlog">' + ''.join(out) + '</div>' + body[m.end():]
 
 def guide(g):
+    g = plus_tool.extend(g)      # the four tools' Free and Plus
     k = g["lang"]; t = S.T[k]; l = L[k]
     pre = "vi/" if k == "vi" else ""
     url = "https://tidymint.app/%s%s/" % (pre, g["slug"])
@@ -268,6 +285,10 @@ def sitemap(guides):
              '  <url><loc>https://tidymint.app/vi/lich-su-cap-nhat/</loc><lastmod>%s</lastmod></url>' % today,
              '  <url><loc>https://tidymint.app/sponsor/</loc><lastmod>2026-10-30</lastmod></url>',
              '  <url><loc>https://tidymint.app/vi/ung-ho/</loc><lastmod>2026-10-30</lastmod></url>']
+    if plus_tool.P.READY:    # until the checkout links are in, the Plus page is noindex and stays out
+        rows += ['  <url><loc>https://tidymint.app/%splus/</loc><lastmod>%s</lastmod>'
+                 '<xhtml:link rel="alternate" hreflang="en" href="https://tidymint.app/plus/"/>'
+                 '<xhtml:link rel="alternate" hreflang="vi" href="https://tidymint.app/vi/plus/"/></url>' % (p, today) for p in ("", "vi/")]
     for g in guides:
         pre = "vi/" if g["lang"] == "vi" else ""
         rows.append('  <url><loc>https://tidymint.app/%s%s/</loc><lastmod>%s</lastmod></url>' % (pre, g["slug"], g["date"]))
@@ -378,11 +399,10 @@ SP = {
    status=("Đã mở nhận ủng hộ", "Ủng hộ qua GitHub Sponsors, hằng tháng hoặc một lần, số tiền tuỳ bạn (từ 1 USD). Mục tiêu: 12 USD mỗi tháng, đủ trả tài khoản Apple Developer và tên miền mỗi năm."),
    sponsor="Ủng hộ trên GitHub",
    h_use="Tiền ủng hộ dùng vào đâu",
-   use=["<b>Tài khoản Apple Developer, 99 USD mỗi năm.</b> Có nó, app được Apple xác nhận: người mới tải về mở là chạy, không phải vào Cài đặt > Bảo mật để cho phép.",
-        "<b>Cập nhật tới nhanh hơn.</b> App đã xác nhận có thể tự cập nhật, bạn không phải tải lại bản mới bằng tay.",
+   use=["<b>Tài khoản Apple Developer, 99 USD mỗi năm.</b> Phí duy trì chữ ký: nhờ nó, mỗi bản mới được ký và Apple công chứng, tải về chỉ cần bấm Mở.",
         "<b>Phần còn lại</b> (nếu có) trả tên miền tidymint.app và thời gian làm bản mới."],
    h_top="3 cách giúp miễn phí, mỗi cách 30 giây",
-   top=["<b>Gắn sao trên GitHub.</b> Số sao là thứ người ta xem đầu tiên ở một dự án mã nguồn mở.",
+   top=["<b>Gắn sao trên GitHub.</b> Số sao là thứ người ta xem đầu tiên ở một dự án có lõi mã nguồn mở.",
         "<b>Bấm thích trên AlternativeTo.</b> Lượt thích đưa Tidymint lên cao trong danh sách app miễn phí thay CleanMyMac.",
         "<b>Viết đánh giá trên MacUpdate.</b> Vài dòng thật lòng, khen hay chê đều được, giúp người sau biết app thế nào."],
    top_btn=["Gắn sao trên GitHub", "Thích trên AlternativeTo", "Đánh giá trên MacUpdate"],
@@ -393,7 +413,7 @@ SP = {
          "<b>Gợi ý app cần dọn.</b> Mở mục Issues trên GitHub, ghi tên app và thư mục nó chiếm nhiều dung lượng. Tidymint sẽ đo trên máy thật rồi mới thêm vào."],
    h_promise="Tidymint cam kết",
    promise=["Không quảng cáo. Dọn dẹp miễn phí.",
-            "Người ủng hộ và người không ủng hộ dùng cùng một app.",
+            "Người ủng hộ và người không ủng hộ dùng cùng một app. Ủng hộ không kèm Tidymint Plus, Plus bán riêng.",
             "Mỗi năm công khai số tiền nhận được và đã chi vào đâu."],
    star="Gắn sao trên GitHub", issue="Báo lỗi trên GitHub"),
  "en": dict(slug="sponsor", title="Sponsor Tidymint", crumb="Sponsor", h1="Sponsor Tidymint", alt="ung-ho",
@@ -401,11 +421,10 @@ SP = {
    status=("Open for sponsorship", "Sponsor through GitHub Sponsors, monthly or once, any amount from $1. The goal is $12 a month, enough to cover the Apple Developer account and the domain each year."),
    sponsor="Sponsor on GitHub",
    h_use="Where the money goes",
-   use=["<b>The Apple Developer account, $99 a year.</b> With it, Apple verifies the app: new users download it and it just opens, no trip to Settings > Security.",
-        "<b>Faster updates.</b> A verified app can update itself, so you no longer download each new version by hand.",
+   use=["<b>The Apple Developer account, $99 a year.</b> It keeps the signature going: each new version can be signed and notarized, so opening a download takes one click on Open.",
         "<b>Anything left over</b> pays for the tidymint.app domain and time spent on new versions."],
    h_top="Three free ways to help, 30 seconds each",
-   top=["<b>Star it on GitHub.</b> Stars are the first thing people look at on an open-source project.",
+   top=["<b>Star it on GitHub.</b> Stars are the first thing people look at on a project with an open-source core.",
         "<b>Like it on AlternativeTo.</b> Likes move Tidymint up the list of free CleanMyMac alternatives.",
         "<b>Review it on MacUpdate.</b> A few honest lines, good or bad, tell the next person what to expect."],
    top_btn=["Star on GitHub", "Like on AlternativeTo", "Review on MacUpdate"],
@@ -416,7 +435,7 @@ SP = {
          "<b>Suggest an app to clean.</b> Open an issue on GitHub with the app name and the folder that takes up space. Tidymint measures it on a real Mac before adding it."],
    h_promise="What Tidymint promises",
    promise=["No ads. Free to clean.",
-            "Sponsors and non-sponsors use the same app.",
+            "Sponsors and non-sponsors use the same app. Sponsoring doesn't include Tidymint Plus, which is sold separately.",
             "Each year we publish what came in and where it went."],
    star="Star on GitHub", issue="Report a bug on GitHub"),
 }

@@ -94,7 +94,7 @@ Also: open any file from the lists (click or Space for Quick Look, double-click 
 > **Official site:** tidymint.app. Downloads come only from this GitHub repository. There is no other website.
 
 1. Download **[Tidymint.zip](https://github.com/HaiTrung-Workspace/tidymint/releases/latest/download/Tidymint.zip)** (Apple silicon and Intel, macOS 14 or later), open it and drag **Tidymint** to Applications.
-2. Tidymint is not notarized yet, so macOS blocks the first launch. Click **Done**, open **System Settings > Privacy & Security**, scroll to the **Security** heading (under *Allow applications from*) and click **Open Anyway**, then **Open** ([Apple's guide](https://support.apple.com/102445)). The button only shows for a while after a blocked launch; if it is missing, double-click the app again and come back. Step-by-step guide with screenshots: [tidymint.app/install](https://tidymint.app/install/).
+2. Double-click Tidymint to open it. The app is signed and notarized by Apple, so macOS only asks once whether to open an app downloaded from the internet: click **Open**. Step-by-step guide with screenshots: [tidymint.app/install](https://tidymint.app/install/).
 
 ### Homebrew
 
@@ -102,7 +102,7 @@ Also: open any file from the lists (click or Space for Quick Look, double-click 
 brew install --cask HaiTrung-Workspace/tidymint/tidymint
 ```
 
-The cask in [homebrew-tidymint](https://github.com/HaiTrung-Workspace/homebrew-tidymint) is updated by the release workflow and installs the same `Tidymint.zip` as the download above, so the first-launch step in point 2 still applies.
+The cask in [homebrew-tidymint](https://github.com/HaiTrung-Workspace/homebrew-tidymint) is updated by the release workflow and installs the same `Tidymint.zip` as the download above.
 
 ### Build from source
 
@@ -135,7 +135,7 @@ defaults write com.haitrung.diskcleanup protectedKeywords -array "my-profile-fol
 - Settings: `~/Library/Preferences/com.haitrung.diskcleanup.plist`
 - Activity log: `~/Library/Application Support/Tidymint/activity.log`
 
-Scanning and cleaning run on your Mac and work offline. The only automatic connection is a once-a-day check for a new version (update.tidymint.app, counted by app and macOS version only), which you can turn off in Settings. Anything else leaves your Mac only when you send it yourself (feedback, newsletter, the "Is Tidymint helping you?" card). See [PRIVACY.md](PRIVACY.md).
+Scanning and cleaning run on your Mac and work offline. The app checks for a new version by itself and, once a day, sends usage statistics with that check (update.tidymint.app); this cannot be turned off. A Plus trial or key is checked with the key service. Anything else leaves your Mac only when you send it yourself (feedback, newsletter, the "Is Tidymint helping you?" card). See [PRIVACY.md](PRIVACY.md).
 
 ## Feedback
 
@@ -145,7 +145,7 @@ Self-hosting the collector: `backend/Code.gs` is a Google Apps Script that appen
 
 ## Support the project
 
-Cleaning with Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://github.com/sponsors/HaiTrung-Workspace). Sponsorships go toward the Apple Developer account (so the app can be notarized and open without warnings) and time for new features.
+Cleaning with Tidymint is free and will stay free. If it saved you some space, you can [sponsor the project on GitHub](https://github.com/sponsors/HaiTrung-Workspace). Sponsorships go toward the Apple Developer account (which keeps the app signed and notarized) and time for new features.
 
 ## License
 

@@ -175,7 +175,7 @@ struct MonthViewer: View {
                         .padding(.horizontal, 6).padding(.vertical, 3).hoverTile()
                 }.buttonStyle(.plain).disabled(all.isEmpty)
             }.padding(.horizontal, 24).padding(.top, 34).padding(.bottom, 6)
-            Text(t("Click to tick, drag a box to tick many, Shift-click for a range. Double-click or Space to see a file large.", "Bấm để tick, kéo chuột quét vùng để tick nhiều, giữ Shift để chọn một dải. Bấm đúp hoặc phím cách để xem to."))
+            Text(t("Drag to tick many. Space to see a file large.", "Kéo chuột để tick nhiều. Phím cách để xem to."))
                 .font(.system(size: fs(11))).foregroundColor(Theme.sub).padding(.bottom, 10)
             if vm.monthLoading {
                 Scanning(text: t("Reading files...", "Đang đọc file...")).frame(maxWidth: .infinity, maxHeight: .infinity)

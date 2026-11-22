@@ -161,10 +161,25 @@ final class TipPanel {
     /// instead of waiting the half second again.
     var warm: Bool { panel?.isVisible == true || Date().timeIntervalSince(lastShown) < 0.35 }
     var delay: Double { warm ? 0 : 0.5 }
+    /// A menu is open (a picker, a context menu): the bubble sits at menu level and would cover its items, so it is
+    /// hidden and a tip that was still waiting does not show.
+    private var menuOpen = 0
+
+    private init() {
+        let nc = NotificationCenter.default
+        nc.addObserver(forName: NSMenu.didBeginTrackingNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.menuOpen += 1; self?.hide(cold: true)
+        }
+        nc.addObserver(forName: NSMenu.didEndTrackingNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            self.menuOpen = max(0, self.menuOpen - 1)
+        }
+    }
 
     /// `below`: a screen rect to hang the bubble under (left-aligned to it) instead of following the pointer.
     func show(_ text: String, owner o: ObjectIdentifier, below: NSRect? = nil) {
-        guard !text.isEmpty else { return }
+        // Also not while a mouse button is down: the click that opens a menu comes before the menu reports it.
+        guard !text.isEmpty, menuOpen == 0, NSEvent.pressedMouseButtons == 0 else { return }
         let font = NSFont.systemFont(ofSize: fs(11))
         let line = (text as NSString).size(withAttributes: [.font: font]).width
         let w = min(ceil(line) + 2, maxW)
@@ -333,17 +348,74 @@ extension View {
 }
 
 /// Menu bar popover row: system accent highlight with white text on hover, like a macOS menu.
+/// Keyboard in the menu bar panel (17/11/2026): Up and Down move a highlight along the rows that can be pressed,
+/// Return, Enter or Space presses the highlighted one, Esc closes the panel, as in a macOS menu. Only while the panel
+/// is on screen, and only for keys typed in a panel (a window that cannot be the main window), so the main window's
+/// own keys are never touched.
+final class MenuNav: ObservableObject {
+    static let shared = MenuNav()
+    @Published var index: Int?
+    /// The rows as they are right now (asked at each key, so a row that became disabled is skipped).
+    var rows: (() -> [(disabled: Bool, action: () -> Void)])?
+    /// Closes the panel the rows sit in.
+    var close: (() -> Void)?
+    /// Every window a panel has been shown in (the menu bar window, the popover a Mintbar group opens): filled by
+    /// `MenuNavWindow` inside the panel. Keys typed anywhere else, a Mintbar fan included, are never touched. A list,
+    /// not one window: the panel exists in two places and one copy must not switch the other off (17/11/2026).
+    let windows = NSHashTable<NSWindow>.weakObjects()
+    private var monitor: Any?
+
+    func begin() {
+        index = nil
+        guard monitor == nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in self.map { $0.handle(e) } ?? e }
+    }
+    /// A panel went off screen: only the highlight is cleared (the other copy of the panel may still be in use).
+    func end() { index = nil }
+
+    private func handle(_ e: NSEvent) -> NSEvent? {
+        guard let w = e.window, windows.contains(w), w.isVisible, !w.canBecomeMain, e.modifierFlags.intersection([.command, .control, .option]).isEmpty, let list = rows?() else { return e }
+        let ok = list.indices.filter { !list[$0].disabled }
+        switch e.keyCode {
+        case 125, 126:   // down, up
+            guard !ok.isEmpty else { return nil }
+            let d = e.keyCode == 125 ? 1 : -1
+            if let i = index, let k = ok.firstIndex(of: i) { index = ok[(k + d + ok.count) % ok.count] } else { index = d > 0 ? ok.first : ok.last }
+            return nil
+        case 36, 76, 49: // return, enter, space
+            guard let i = index, ok.contains(i) else { return e }
+            let run = list[i].action
+            close?(); run(); return nil
+        case 53:         // esc
+            guard let close else { return e }
+            close(); return nil
+        default: return e
+        }
+    }
+}
+
+/// Sits inside the menu bar panel and tells `MenuNav` which window that is.
+struct MenuNavWindow: NSViewRepresentable {
+    final class Probe: NSView { override func viewDidMoveToWindow() { if let window { MenuNav.shared.windows.add(window) } } }
+    func makeNSView(context: Context) -> NSView { Probe() }
+    func updateNSView(_ v: NSView, context: Context) {}
+}
+
 struct MenuRow: View {
     let title: String
     var disabled = false
+    /// Place of the row for the keyboard highlight (`MenuNav`); nil = a row the keyboard does not reach.
+    var nav: Int? = nil
     let action: () -> Void
     @StateObject private var h = Flag()
+    @ObservedObject private var keys = MenuNav.shared
     var body: some View {
+        let on = (h.v || (nav != nil && keys.index == nav)) && !disabled
         Button(action: action) {
             HStack { Text(title).font(.system(size: fs(13))); Spacer() }
-                .foregroundColor(disabled ? .secondary : (h.v ? .white : .primary))
+                .foregroundColor(disabled ? .secondary : (on ? .white : .primary))
                 .padding(.horizontal, 8).padding(.vertical, 4)
-                .background(RoundedRectangle(cornerRadius: 5).fill(h.v && !disabled ? Color.accentColor : Color.clear))
+                .background(RoundedRectangle(cornerRadius: 5).fill(on ? Color.accentColor : Color.clear))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain).disabled(disabled)

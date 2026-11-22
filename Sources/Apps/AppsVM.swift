@@ -61,7 +61,7 @@ extension VM {
         let total = a.size + extra.reduce(0) { $0 + $1.size }
         guard confirm(t("Uninstall \(a.name)?", "Gỡ \(a.name)?"),
                       (extra.isEmpty ? t("The app (\(fmt(total))) will be moved to the Trash.", "App (\(fmt(total))) sẽ được chuyển vào Thùng rác.") : t("The app and \(plural(extra.count, "related item")) (\(fmt(total))) will be moved to the Trash.", "App và \(extra.count) mục liên quan (\(fmt(total))) sẽ được chuyển vào Thùng rác."))
-                        + (a.needsAdmin ? t(" macOS will ask for an administrator password in its own window; Tidymint never sees it.", " macOS sẽ hỏi mật khẩu quản trị trong hộp thoại của macOS; Tidymint không thấy mật khẩu.") : ""),
+                        + (a.needsAdmin ? t(" macOS will ask for an administrator password.", " macOS sẽ hỏi mật khẩu quản trị.") : ""),
                       t("Uninstall", "Gỡ")) else { return }
         TrashHint.uninstalling(a.bundleID)   // the Trash hint stays quiet about an app removed here
         if a.needsAdmin { uninstallWithFinder(a, extra: extra, total: total); return }
@@ -106,7 +106,7 @@ extension VM {
                                      "Chưa gỡ \(a.name): Tidymint chưa được phép nhờ Finder. Bật trong Cài đặt hệ thống > Quyền riêng tư & Bảo mật > Tự động hoá > Tidymint > Finder. Chưa có gì bị chuyển đi.")
                 default:
                     self.appsMsgErr = true
-                    self.appsMsg = t("Could not move \(a.name) to the Trash. Nothing was moved. You can drag the app to the Trash in Finder.", "Không chuyển được \(a.name) vào Thùng rác. Chưa có gì bị chuyển đi. Bạn có thể kéo app vào Thùng rác trong Finder.")
+                    self.appsMsg = t("Could not move \(a.name) to the Trash. Nothing was moved.", "Không chuyển được \(a.name) vào Thùng rác. Chưa có gì bị chuyển đi.")
                 }
                 if case .failed(let e) = r { self.log(t("Uninstall \(a.name) through Finder failed: \(e)", "Gỡ \(a.name) qua Finder thất bại: \(e)")) }
                 self.log(self.appsMsg); self.refreshTrash(); self.refreshDisk()
@@ -123,7 +123,7 @@ extension VM {
         let size = h.items.reduce(0) { $0 + $1.size }
         let c = UNMutableNotificationContent()
         c.title = t("\(h.name) left \(plural(h.items.count, "item")) behind", "\(h.name) còn để lại \(h.items.count) mục")
-        c.body = t("\(fmt(size)) in Library. Nothing was removed. Open Tidymint to pick what goes.", "\(fmt(size)) trong Library. Chưa có gì bị xoá. Mở Tidymint để chọn mục cần dọn.")
+        c.body = t("\(fmt(size)) left in Library. Open Tidymint to clean it.", "Còn \(fmt(size)) trong Library. Mở Tidymint để dọn.")
         c.userInfo = ["page": "trashhint", "id": h.id]
         UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "trashhint-" + h.id, content: c, trigger: nil))
     }

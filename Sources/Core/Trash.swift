@@ -78,11 +78,12 @@ extension VM {
             // Finder's Empty Trash also empties the Trash on each mounted drive (.Trashes/<uid>), so count those too.
             let vols = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [.volumeIsLocalKey], options: [.skipHiddenVolumes]) ?? []
             let uid = getuid()
-            // iCloud Drive items (and iCloud Desktop & Documents) go to a separate Trash that Finder shows merged with ~/.Trash.
-            // Seen 05/11/2026: files and folders trashed from ~/Documents landed in ~/Library/Mobile Documents/.Trash.
-            // Not yet verified: whether Finder's Empty Trash also empties that folder.
-            let icloud = Scanner.home.appendingPathComponent("Library/Mobile Documents/.Trash")
-            let local = [t] + (FileManager.default.fileExists(atPath: icloud.path) ? [icloud] : [])
+            // iCloud Drive items trashed in Finder go to a separate Trash (~/Library/Mobile Documents/.Trash, seen 05/11/2026)
+            // that Finder shows merged with ~/.Trash. It is NOT read here: touching it makes macOS ask "Tidymint wants to
+            // access files managed by iCloud Drive" at every first launch (verified 21/11/2026 on macOS 27 with fresh copies:
+            // 2 of 2 asked, 0 of 1 without this read). So the count leaves out what Finder trashed from iCloud Drive;
+            // what Tidymint trashes lands in ~/.Trash and is counted. Emptying goes through Finder and empties both.
+            let local = [t]
             let trashes = local + vols.filter { $0.path.hasPrefix("/Volumes/") && (try? $0.resourceValues(forKeys: [.volumeIsLocalKey]))?.volumeIsLocal == true }
                 .map { $0.appendingPathComponent(".Trashes/\(uid)") }
                 .filter { FileManager.default.fileExists(atPath: $0.path) && VM.isRealDriveTrash($0.deletingLastPathComponent()) }
@@ -201,11 +202,11 @@ extension VM {
         let needsPassword = s.entries.contains { ((try? FileManager.default.attributesOfItem(atPath: $0.to)[.ownerAccountID] as? NSNumber)?.intValue) == 0 }
         guard confirm(t("Undo the last clean\(sessionName(s))?", "Hoàn tác lần dọn vừa rồi\(sessionName(s))?"),
                       t("\(plural(s.entries.count, "item")) (\(fmt(s.size))) \(s.entries.count == 1 ? "goes back to where it was" : "go back to where they were").", "\(s.entries.count) mục (\(fmt(s.size))) sẽ trở về chỗ cũ.")
-                        + (needsPassword ? t(" An app installed for every user goes back through Finder: macOS asks for an administrator password in its own window.", " App cài cho mọi tài khoản được Finder trả về: macOS hỏi mật khẩu quản trị trong hộp thoại của macOS.") : ""),
+                        + (needsPassword ? t(" macOS will ask for an administrator password.", " macOS sẽ hỏi mật khẩu quản trị.") : ""),
                       t("Put Back", "Trả về chỗ cũ")) else { return }
         let r = Journal.restore(s)
         lastResult = t("Put back \(plural(r.ok, "item"))\(sessionName(s)).", "Đã trả về \(r.ok) mục\(sessionName(s)).") + (r.skipped > 0 ? t(" \(r.skipped) were already gone or replaced.", " \(r.skipped) mục đã mất hoặc đã có file mới ở chỗ cũ.") : "")
-            + (r.failed.isEmpty ? "" : t(" \(r.failed.count) could not be put back and are still in the Trash. Undo is still there for them on the Trash page.", " \(r.failed.count) mục chưa trả về được, vẫn nằm trong Thùng rác. Vẫn Hoàn tác được các mục này ở trang Thùng rác."))
+            + (r.failed.isEmpty ? "" : t(" \(r.failed.count) could not be put back and are still in the Trash.", " \(r.failed.count) mục chưa trả về được, vẫn nằm trong Thùng rác."))
         undoNote = (page == .trash ? .trash : (doneInfo?.page ?? page), lastResult)
         log(t("Undo: put back \(plural(r.ok, "item")), skipped \(r.skipped), failed \(r.failed.count).", "Hoàn tác: đã trả về \(r.ok) mục, bỏ qua \(r.skipped), chưa trả được \(r.failed.count)."))
         // What could not be moved back (a cancelled password prompt, for one) keeps its record, so Undo can be tried again.

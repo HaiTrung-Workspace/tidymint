@@ -22,7 +22,10 @@ struct LogEntry: Identifiable {
 }
 
 enum Stats {
-    static let dir = NSHomeDirectory() + "/Library/Application Support/" + (isDevBuild ? "Tidymint Dev" : "Tidymint")
+    /// Ultra keeps "Tidymint Dev"; a test copy under another dev id (bundle id ending ".dev") gets a folder of its own,
+    /// so a test of the whole app never reads or writes the developer's own data.
+    static let dir = NSHomeDirectory() + "/Library/Application Support/"
+        + (!isDevBuild ? "Tidymint" : Bundle.main.bundleIdentifier == "com.haitrung.diskcleanup.dev" ? "Tidymint Dev" : "Tidymint Test")
     static let oldDir = NSHomeDirectory() + "/Library/Application Support/Disk Cleanup"   // name before the rename
     static var path: String {
         let fm = FileManager.default

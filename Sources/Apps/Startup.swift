@@ -39,12 +39,12 @@ enum SignState {
     var help: String {
         switch self {
         case .apple: return t("Signed by Apple.", "Do Apple ký.")
-        case .developer: return t("Signed with an Apple Developer ID. The maker is known.", "Ký bằng Developer ID của Apple. Biết được hãng làm ra.")
-        case .adhoc: return t("Signed without a registered identity. Common for tools from Homebrew or built locally; fine if you installed it yourself.", "Ký không có danh tính đăng ký. Thường gặp ở tool cài qua Homebrew hoặc tự build; ổn nếu bạn tự cài.")
-        case .unsigned: return t("No signature, so the maker cannot be confirmed. Check that it belongs to software you know.", "Không có chữ ký nên không xác nhận được ai làm ra. Kiểm tra xem nó thuộc phần mềm bạn biết không.")
-        case .invalid: return t("The signature does not verify, or Apple revoked the certificate. Apple revokes certificates when it finds a problem.", "Chữ ký không khớp, hoặc Apple đã thu hồi chứng chỉ. Apple thu hồi khi phát hiện có vấn đề.")
-        case .script: return t("Starts a script. Scripts cannot be signed, so make sure it belongs to software you know.", "Khởi động một script. Script không ký được, hãy chắc nó thuộc phần mềm bạn biết.")
-        case .empty: return t("The file names no program, so it starts nothing. Usually left behind by an updater that removed itself. Safe to remove.", "File không ghi chương trình nào nên không khởi động gì. Thường là vỏ còn lại của trình cập nhật đã tự gỡ. Gỡ được.")
+        case .developer: return t("Signed with a Developer ID.", "Ký bằng Developer ID.")
+        case .adhoc: return t("No registered identity. Common for tools you install yourself.", "Không có danh tính đăng ký. Thường gặp ở tool tự cài.")
+        case .unsigned: return t("Not signed: the maker cannot be confirmed.", "Không có chữ ký: không rõ ai làm ra.")
+        case .invalid: return t("Signature invalid or revoked by Apple.", "Chữ ký sai hoặc đã bị Apple thu hồi.")
+        case .script: return t("Starts a script.", "Khởi động một script.")
+        case .empty: return t("Starts nothing. Safe to remove.", "Không khởi động gì. Gỡ được.")
         case .unknown: return ""
         }
     }

@@ -26,9 +26,9 @@ Only the latest release receives security fixes.
 
 ## Scope notes
 
-- Tidymint moves files to the Trash only and never deletes permanently.
-- The app makes one outbound request: a once-a-day check of a version text file on tidymint.app (see [PRIVACY.md](../PRIVACY.md)). It sends no account, usage or tracking data.
-- Current builds are not yet signed or notarized by Apple, so macOS asks for confirmation on first launch. Verify downloads against the SHA-256 listed on each GitHub release.
+- Tidymint moves files to the Trash and does not delete them itself. One exception, off by default: Auto-empty Trash in the Plus bundle permanently deletes items that are already in the Trash.
+- The app checks for a new version by itself and, once a day, sends usage statistics with that check. A Plus trial or key is checked with the key service. Both are described in [PRIVACY.md](../PRIVACY.md). Your files, their names and their contents are never sent.
+- From 1.0.0, builds are signed with a Developer ID and notarized by Apple. You can still verify a download against the SHA-256 listed on each GitHub release.
 
 ## Verify your download
 

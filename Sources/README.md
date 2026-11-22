@@ -7,7 +7,7 @@ How the app code is organised. Read this before adding a file or a feature.
 1. **One feature per file.** Logic and its page live together (for example `Apps/Apps.swift` holds the Uninstaller model and its page). Shared building blocks go in `UI/Components.swift`.
 2. **Folders one level deep** (six in the public tree, plus `Private/` in the dev repo). `build.sh` compiles every `.swift` file under `Sources/`. File names stay unique across folders (tools look files up by name). A new file goes in the folder of its feature area; do not add a folder for a single file.
 3. **Everything that moves user files goes through `Trash.swift`.** Call `VM.trash(...)` (or `VM.trashQuiet(_:)` for a feature that keeps its own undo record and must not replace the Undo of the last clean); never call `trashItem` or `removeItem` on a user's file from another file. `removeItem` is only for files the app created itself (its own history, temporary preview links, `.DS_Store`), with a comment saying why.
-4. **Network only in `Network.swift` and `Contact.swift`.** Two paths exist: the update check (can be turned off) and the form the user sends. See `PRIVACY.md`.
+4. **Network only in `Network.swift` and `Contact.swift`.** Three paths exist: the update check (can be turned off), usage statistics sent with it (`Usage`, off together with the check), and the form the user sends. See `PRIVACY.md`.
 5. **Unreleased features** sit behind a `dev-...` flag and in their own file. A hidden flag still publishes the code, so a feature that must stay secret is not in the release branch at all.
 6. **Size.** When a file passes about 800 lines, split it by sub-feature. State of the shared view model (`@Published` properties) stays in `App/ViewModel.swift`; the actions of a feature go in an `extension VM` file next to that feature (`AppsVM.swift`, `DuplicatesVM.swift`...). A `private` member is only visible inside its own file, so keep it in the file that uses it.
 7. **Text.** Every user-facing string goes through `t("English", "Tiếng Việt")`. No em dashes.
@@ -35,7 +35,7 @@ How the app code is organised. Read this before adding a file or a feature.
 | `Prefs.swift` | Settings stored in `UserDefaults`, Ignore list |
 | `Scanner.swift` | Folder scanning, sizes, what is ticked by default and why |
 | `Trash.swift` | Move to Trash, Undo journal, safe-area check, iCloud handling, Trash size and Empty Trash |
-| `Network.swift` | Update check (`Updates`) and feedback sending (`Backend`) |
+| `Network.swift` | Update check (`Updates`), usage statistics (`Usage`) and feedback sending (`Backend`) |
 
 ### `UI/` Look and reusable views
 

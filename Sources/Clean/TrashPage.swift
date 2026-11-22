@@ -50,7 +50,7 @@ struct TrashView: View {
                     Label(n, systemImage: "exclamationmark.triangle.fill").font(.system(size: fs(11), weight: .medium)).foregroundColor(Theme.warn)
                         .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 14)
                 }
-                SettingNote(t("Emptying cannot be undone. Take a quick look first.", "Đổ rồi thì không lấy lại được. Liếc qua một lượt trước đã."))
+                SettingNote(t("Emptying cannot be undone.", "Đổ rồi không lấy lại được."))
             }
             if let n = vm.undoNote {
                 Label(n.text, systemImage: "arrow.uturn.backward.circle.fill").font(.system(size: fs(12))).foregroundColor(Theme.green).padding(.horizontal, 14)
@@ -69,7 +69,7 @@ struct TrashView: View {
                             GhostButton(title: t("Undo", "Hoàn tác"), action: { vm.undoLast() }, compact: true)
                         }.settingFlat()
                     }
-                    SettingNote(t("Undo puts back only these items. The Trash total above also counts what was there before.", "Hoàn tác chỉ trả về đúng các mục này. Con số Thùng rác ở trên tính cả những thứ đã có từ trước."))
+                    SettingNote(t("Undo puts back only these items.", "Hoàn tác chỉ trả về các mục này."))
                 }
             }
         }.frame(maxWidth: 760 * uiScale, alignment: .leading).padding(.horizontal, 24).padding(.bottom, 24).frame(maxWidth: .infinity) }

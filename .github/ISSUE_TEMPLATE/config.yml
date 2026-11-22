@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Install or first-launch help
     url: https://tidymint.app/install/
-    about: Step-by-step guide with screenshots, including the "Open Anyway" step.
+    about: Step-by-step guide with screenshots.
   - name: Report a security problem privately
     url: https://github.com/HaiTrung-Workspace/tidymint/security/advisories/new
     about: Please do not open a public issue for security problems.

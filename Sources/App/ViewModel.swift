@@ -231,16 +231,16 @@ enum Phase { case idle, scanning, summary, review, done }
             switch c {
             case .network:
                 a.messageText = t("Network drives are not supported", "Chưa hỗ trợ ổ mạng")
-                a.informativeText = t("macOS has no Trash on a network drive, so Tidymint cannot move files there safely.", "macOS không có Thùng rác trên ổ mạng, nên Tidymint không chuyển file ở đó vào Thùng rác một cách an toàn được.")
+                a.informativeText = t("macOS has no Trash on a network drive.", "macOS không có Thùng rác trên ổ mạng.")
             case .readOnly:
                 a.messageText = t("This drive is read-only", "Ổ này chỉ đọc")
                 a.informativeText = t("Files on it cannot be moved to the Trash (common for NTFS drives formatted on Windows).", "Không chuyển được file trên ổ này vào Thùng rác (hay gặp với ổ NTFS định dạng trên Windows).")
             case .timeMachine:
                 a.messageText = t("This is a Time Machine backup", "Đây là ổ sao lưu Time Machine")
-                a.informativeText = t("macOS manages old backups on its own. Remove them in Time Machine, not here.", "macOS tự quản lý bản sao lưu cũ. Muốn xoá thì làm trong Time Machine, không làm ở đây.")
+                a.informativeText = t("Remove old backups in Time Machine.", "Xoá bản sao lưu cũ trong Time Machine.")
             default:
                 a.messageText = t("Pick an external drive or a folder in your home folder", "Chọn một ổ ngoài hoặc một thư mục trong thư mục người dùng")
-                a.informativeText = t("Library, system folders and the startup disk as a whole are not scanned.", "Tidymint không quét thư mục Library, thư mục hệ thống hay cả ổ khởi động.")
+                a.informativeText = t("Library, system folders and the whole startup disk are not scanned.", "Không quét Library, thư mục hệ thống hay cả ổ khởi động.")
             }
             a.runModal()
         }
@@ -257,7 +257,6 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var lowSpaceGB: Double = UserDefaults.standard.object(forKey: "lowSpaceGB") as? Double ?? 30
     @Published var ramAlert: Bool = UserDefaults.standard.object(forKey: "ramAlert") as? Bool ?? true
     /// Daily check for a new version (asked for on MacRumors, 04/11/2026). Off: no automatic check; "Check Now" still works.
-    @Published var autoUpdateCheck: Bool = UserDefaults.standard.object(forKey: "autoUpdateCheck") as? Bool ?? true
     @Published var openAtLogin: Bool = SMAppService.mainApp.status == .enabled
     var lastDiskAlert = Date.distantPast, lastRamAlert = Date.distantPast
     var timer: Timer?
@@ -302,11 +301,27 @@ enum Phase { case idle, scanning, summary, review, done }
     @Published var cloudMsg = ""
 
     init() {
+        SettingsBackup.applyPending()   // history from a just-loaded backup, merged before anything reads the data folder
+        if UserDefaults.standard.bool(forKey: SettingsBackup.permCheckKey) { page = .settings }   // permissions to grant again
         refreshDisk(); refreshTrash(); refreshRAM()
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
         timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
+        // Memory alert: macOS's own memory pressure, the yardstick of Activity Monitor (and of the Memory widget). A Mac
+        // with over 90% of its RAM in use is often fine (macOS keeps recent files in RAM), so "90% used" warned while
+        // nothing was wrong (20/11/2026).
+        let src = DispatchSource.makeMemoryPressureSource(eventMask: [.critical], queue: .main)
+        src.setEventHandler { [weak self] in MainActor.assumeIsolated { self?.memoryCritical() } }
+        src.activate(); pressureSource = src
+    }
+    private var pressureSource: DispatchSourceMemoryPressure?
+    func memoryCritical() {
+        guard ramAlert, Date().timeIntervalSince(lastRamAlert) > 3600 else { return }
+        lastRamAlert = Date(); refreshRAM()
+        notify(t("Memory is running low", "Mac đang thiếu bộ nhớ"),
+               String(format: t("macOS is short of memory (%.1f of %.0f GB in use). Quit apps you are not using.",
+                                "macOS đang thiếu bộ nhớ (dùng %.1f / %.0f GB). Tắt bớt app không dùng."), ramUsed, ramTotal))
     }
 
     /// Assign only on a visible change: every assignment of a published value redraws every open page.
@@ -319,15 +334,11 @@ enum Phase { case idle, scanning, summary, review, done }
     func tick() {
         refreshRAM(); tickCount += 1
         if tickCount % 6 == 0 { refreshDisk() }
+        if tickCount % 360 == 30 { checkUpdates(source: "b") }   // once an hour while the app runs; the check itself is once a day
         if lowSpaceGB > 0 && freeGB > 0 && freeGB < lowSpaceGB && Date().timeIntervalSince(lastDiskAlert) > 6 * 3600 {
             lastDiskAlert = Date()
             notify(t("Low disk space", "Ổ sắp đầy"),
                    String(format: t("Only %.0f GB left. Open Tidymint to free up space.", "Chỉ còn %.0f GB. Mở Tidymint để dọn."), freeGB))
-        }
-        if ramAlert && ramTotal > 0 && ramUsed / ramTotal > 0.9 && Date().timeIntervalSince(lastRamAlert) > 3600 {
-            lastRamAlert = Date()
-            notify(t("Memory is almost full", "RAM sắp đầy"),
-                   String(format: t("%.1f of %.0f GB in use. Quit apps you are not using.", "Đang dùng %.1f / %.0f GB. Tắt bớt app không dùng."), ramUsed, ramTotal))
         }
     }
     func notify(_ title: String, _ body: String) {
@@ -341,7 +352,6 @@ enum Phase { case idle, scanning, summary, review, done }
     }
     func setLowSpace(_ v: Double) { lowSpaceGB = v; UserDefaults.standard.set(v, forKey: "lowSpaceGB") }
     func setRamAlert(_ v: Bool) { ramAlert = v; UserDefaults.standard.set(v, forKey: "ramAlert") }
-    func setAutoUpdateCheck(_ v: Bool) { autoUpdateCheck = v; UserDefaults.standard.set(v, forKey: "autoUpdateCheck"); if v { checkUpdates() } }
     func setOpenAtLogin(_ v: Bool) {
         do { if v { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() } } catch { }
         openAtLogin = SMAppService.mainApp.status == .enabled
@@ -465,13 +475,18 @@ enum Phase { case idle, scanning, summary, review, done }
     /// Result line of the last manual "Check Now" when nothing newer was found (nil: show the usual hint).
     @Published var updResult: String? = nil
     @Published var updChecking = false
-    func checkUpdates(force: Bool = false) {
+    func checkUpdates(force: Bool = false, source: String = "w") {
         guard force || !updChecking else { return }
-        guard force || autoUpdateCheck else { return }   // automatic check turned off in Settings: no request at all
         updChecking = true; if force { updResult = nil }
         let started = Date()
-        Updates.check(force: force) { v in
+        Updates.check(force: force, source: source) { v in
             self.newVersion = v; self.updChecking = false
+            // A macOS notification once for each new version, for those who only use Tidymint from the menu bar.
+            if let v, UserDefaults.standard.string(forKey: "upd-notified") != v, !CommandLine.arguments.contains("--demo") {
+                UserDefaults.standard.set(v, forKey: "upd-notified")
+                self.notify(t("Tidymint \(v) is available", "Đã có Tidymint \(v)"),
+                            t("Open Tidymint to download it.", "Mở Tidymint để tải về."))
+            }
             guard force, v == nil else { return }
             // Manual check with nothing newer: say so, and tell "up to date" apart from "no answer" (record() stamps upd-last).
             let reached = (UserDefaults.standard.object(forKey: "upd-last") as? Date ?? .distantPast) >= started
@@ -550,8 +565,11 @@ enum Phase { case idle, scanning, summary, review, done }
     func openFile(_ u: URL, with app: URL) { NSWorkspace.shared.open([u], withApplicationAt: app, configuration: NSWorkspace.OpenConfiguration()) }
 
     func log(_ s: String) {
+        // Self-tests work on their own files: their lines must not land in the user's activity log (18/11/2026).
+        if CommandLine.arguments.contains("--selftest") { return }
         let p = Stats.path
         let df = DateFormatter(); df.dateFormat = "yyyy-MM-dd HH:mm"
+        Usage.logged(s)
         let line = "\(df.string(from: Date())) | \(s) | free \(String(format: "%.0f", freeGB)) GB\n"
         if let h = FileHandle(forWritingAtPath: p) { h.seekToEndOfFile(); h.write(line.data(using: .utf8)!); try? h.close() }
         else { try? line.write(toFile: p, atomically: true, encoding: .utf8) }
