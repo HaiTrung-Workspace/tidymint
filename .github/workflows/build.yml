@@ -32,7 +32,10 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_26.6.app
           swiftc --version
 
+      # No Developer ID on the runner: an ad-hoc signature, which build.sh accepts only when asked for like this.
       - name: Build (universal, as a release does)
+        env:
+          TIDYMINT_SIGN_ID: "-"
         run: ./build.sh --release
 
       - name: Check the app

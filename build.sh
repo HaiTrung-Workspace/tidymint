@@ -87,16 +87,25 @@ if [ "$1" = "--release" ]; then
   # The Developer ID signing identity is read from the environment and never written in this file, which goes to the
   # public repo; the identity names a person (22/11/2026). Set TIDYMINT_SIGN_ID on the build machine, taken from
   # `security find-identity -v -p codesigning`.
+  # TIDYMINT_SIGN_ID=- asks for an ad-hoc signature on purpose: the build check on GitHub and anyone compiling the
+  # public code have no Developer ID. Such a build is for checking that the code compiles, not for handing out:
+  # macOS blocks it on other Macs and it cannot be notarized.
   SIGN_ID="${TIDYMINT_SIGN_ID:-}"
   if [ -z "$SIGN_ID" ]; then
-    echo "STOP: set TIDYMINT_SIGN_ID to the Developer ID Application identity (see: security find-identity -v -p codesigning)" >&2
+    echo "STOP: set TIDYMINT_SIGN_ID to the Developer ID Application identity (see: security find-identity -v -p codesigning), or to - for an ad-hoc build that is not for distribution" >&2
     exit 1
   fi
-  if ! security find-identity -v -p codesigning | grep -qF "$SIGN_ID"; then
-    echo "STOP: the identity in TIDYMINT_SIGN_ID is not in the keychain" >&2
-    exit 1
+  if [ "$SIGN_ID" = "-" ]; then
+    if [ -n "${TIDYMINT_NOTARIZE:-}" ]; then echo "STOP: an ad-hoc build cannot be notarized" >&2; exit 1; fi
+    echo "NOTE: ad-hoc signature (TIDYMINT_SIGN_ID=-). Not a release to distribute." >&2
+    codesign --force --deep -s - -r="designated => identifier \"$BUNDLE_ID\"" "$APP"
+  else
+    if ! security find-identity -v -p codesigning | grep -qF "$SIGN_ID"; then
+      echo "STOP: the identity in TIDYMINT_SIGN_ID is not in the keychain" >&2
+      exit 1
+    fi
+    codesign --force --options runtime --timestamp -s "$SIGN_ID" "$APP" || { echo "STOP: codesign --release failed" >&2; exit 1; }
   fi
-  codesign --force --options runtime --timestamp -s "$SIGN_ID" "$APP" || { echo "STOP: codesign --release failed" >&2; exit 1; }
 else
   codesign --force --deep -s - -r="designated => identifier \"$BUNDLE_ID\"" "$APP"
 fi
