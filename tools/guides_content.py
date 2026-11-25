@@ -2667,14 +2667,14 @@ GUIDES.append(dict(
 <h2 id="tao-nhom">Tạo nhóm</h2>
 <ol class="steps"><li>Ở mục <b>Nhóm</b>, bấm <b>Thêm nhóm</b>.</li>
 <li>Đặt tên và chọn icon cho nhóm: 12 icon miễn phí, Plus có mọi bộ icon và màu riêng.</li>
-<li>Tick các app muốn gom vào. Icon của các app đó rời menu bar, icon nhóm hiện ra thay chỗ.</li></ol>
+<li>Bấm <b>Thêm app</b> để thấy đủ danh sách, rồi tick các app muốn gom vào. Icon của các app đó rời menu bar, icon nhóm hiện ra thay chỗ.</li></ol>
 <figure class="fig-app"><img src="../mintbar.jpg" alt="Trang Mintbar của Tidymint: danh sách app có icon trên menu bar và hai nhóm AI, Kết nối" width="1600" height="1079" loading="lazy"><figcaption>Trang Mintbar: mỗi app nằm trong nhóm nào, và hai nhóm đang dùng.</figcaption></figure>
 <p>Dưới icon nhóm có một hàng chấm nhỏ, mỗi chấm là một app trong nhóm. Một app có thể nằm trong nhiều nhóm.</p>
 <h2 id="dung">Mở app trong nhóm</h2>
 <ul><li><b>Bấm icon nhóm</b>: các app mở ra ngay bên dưới. Bấm lần nữa, hoặc nhấn Esc, để đóng.</li>
 <li><b>Bấm một app vừa mở ra</b>: menu hoặc cửa sổ nhỏ của app đó mở ra. App chưa chạy thì được mở lên.</li>
 <li><b>Giữ Option rồi bấm icon nhóm</b>: mở trang Mintbar.</li>
-<li><b>Đổi thứ tự icon</b>: giữ ⌘ rồi kéo icon tới chỗ mới. Đây là tính năng có sẵn của macOS, dùng được cho cả icon nhóm.</li></ul>
+<li><b>Đổi thứ tự icon</b>: giữ ⌘ rồi kéo icon tới chỗ mới.</li></ul>
 <figure class="fig-app"><img src="../../mintbar-fan.jpg" alt="Bấm nhóm Tools, bốn app mở ra ngay dưới menu bar, con trỏ đang chỉ vào Google Drive" width="900" height="250" loading="lazy"><figcaption>Bấm icon nhóm: app mở ra ngay bên dưới.</figcaption></figure>
 <h2 id="luu-y">Vài điều cần biết</h2>
 <ul><li><b>Đồng hồ và Trung tâm điều khiển luôn ở lại</b> trên menu bar, Mintbar không đưa hai mục này vào nhóm.</li>
@@ -2727,14 +2727,14 @@ GUIDES.append(dict(
 <h2 id="group">Make a group</h2>
 <ol class="steps"><li>Under <b>Groups</b>, click <b>New group</b>.</li>
 <li>Name it and pick an icon: 12 are free, Plus has every icon set and your own colors.</li>
-<li>Tick the apps to gather. Their icons leave the menu bar and the group icon takes their place.</li></ol>
+<li>Click <b>Add apps</b> to see the full list, then tick the apps to gather. Their icons leave the menu bar and the group icon takes their place.</li></ol>
 <figure class="fig-app"><img src="../mintbar.jpg" alt="The Mintbar page in Tidymint: the apps with a menu bar icon and two groups, AI and Connection" width="1600" height="1079" loading="lazy"><figcaption>The Mintbar page: which group each app is in, and the two groups in use.</figcaption></figure>
 <p>A row of small dots under the group icon shows one dot per app. An app can sit in several groups.</p>
 <h2 id="use">Open an app from a group</h2>
 <ul><li><b>Click the group icon</b>: its apps open right below. Click again, or press Esc, to close.</li>
 <li><b>Click one of those apps</b>: its menu or panel opens. An app that is not running is started.</li>
 <li><b>Option-click the group icon</b>: opens the Mintbar page.</li>
-<li><b>Reorder icons</b>: hold ⌘ and drag an icon to its new place. This is built into macOS and works for group icons too.</li></ul>
+<li><b>Reorder icons</b>: hold ⌘ and drag an icon to its new place.</li></ul>
 <figure class="fig-app"><img src="../mintbar-fan.jpg" alt="Clicking the Tools group opens its four apps right below the menu bar, with the pointer on Google Drive" width="900" height="250" loading="lazy"><figcaption>Click a group: its apps open right below.</figcaption></figure>
 <h2 id="notes">Good to know</h2>
 <ul><li><b>The clock and Control Center always stay</b> in the menu bar. Mintbar never offers them for a group.</li>

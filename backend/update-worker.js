@@ -121,6 +121,17 @@ const STATS = {
   // Copies in use by kind (from the release that opens sales): blob11 "0" free, "1" in the trial, "2" one or more tools
   // bought, "3" the bundle bought; "" a release before it. One copy is one install number, so this counts Macs, not checks.
   "plans-week": `SELECT toStartOfWeek(timestamp) AS week, blob11 AS plan, count(DISTINCT blob10) AS machines FROM tidymint_checks WHERE ${D90} AND blob1 = 'Tidymint' AND blob10 != '' GROUP BY week, plan ORDER BY week`,
+  // The same count by day and version, for the morning report (23/11/2026): how many copies of each release are
+  // free, in the trial or paid. A copy shows the kind it had at its check of that day.
+  "plans-day": `SELECT ${DAY} AS day, blob2 AS version, blob11 AS plan, count(DISTINCT blob10) AS machines FROM tidymint_checks WHERE ${D90} AND blob1 = 'Tidymint' AND blob10 != '' GROUP BY day, version, plan ORDER BY day`,
+  // The licence Worker's own dataset (tidymint_license; layout in backend/license/license-worker.js, count()). Totals
+  // only: no key id, no machine hash and no address leaves in these tables.
+  //   trials-day: trial requests by outcome ("started": a Mac began its trial that day; "had": it asked again).
+  //   keys-day: key requests by action and outcome ("confirm"/"added": a Mac was added to a key).
+  //   keys-added-day: Macs added to a key, by product and whole days since that Mac's trial began ("none": never tried).
+  "trials-day": `SELECT ${DAY} AS day, blob2 AS action, blob3 AS outcome, SUM(_sample_interval) AS n, count(DISTINCT blob6) AS machines FROM tidymint_license WHERE ${D90} AND blob1 = 'license' AND (blob2 = 'trial/start' OR blob2 = 'trial/status') GROUP BY day, action, outcome ORDER BY day`,
+  "keys-day": `SELECT ${DAY} AS day, blob2 AS action, blob3 AS outcome, SUM(_sample_interval) AS n, count(DISTINCT blob5) AS keys, count(DISTINCT blob6) AS machines FROM tidymint_license WHERE ${D90} AND blob1 = 'license' AND blob2 != 'trial/start' AND blob2 != 'trial/status' GROUP BY day, action, outcome ORDER BY day`,
+  "keys-added-day": `SELECT ${DAY} AS day, blob3 AS product, blob4 AS days_since_trial, SUM(_sample_interval) AS n FROM tidymint_license WHERE ${D90} AND blob1 = 'funnel' AND blob2 = 'trial_to_key' GROUP BY day, product, days_since_trial ORDER BY day`,
   "clicks": `SELECT ${DAY} AS day, blob2 AS version, SUM(_sample_interval) AS n FROM tidymint_checks WHERE ${D90} AND blob1 = 'click' GROUP BY day, version ORDER BY day`,
   "usage": `SELECT ${DAY} AS day, blob2 AS version, SUM(_sample_interval) AS reports, ` +
            USAGE_KEYS.map((k, i) => `SUM(double${i + 1}) AS ${k}`).join(", ") +
